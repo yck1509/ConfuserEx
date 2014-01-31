@@ -1,0 +1,3 @@
+[submodule "dnlib"]
+	path = dnlib
+	url = https://bitbucket.org/0xd4d/dnlib.git
