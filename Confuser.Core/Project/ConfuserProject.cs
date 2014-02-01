@@ -355,20 +355,6 @@ namespace Confuser.Core.Project
     public class ConfuserProject : List<ProjectModule>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConfuserProject"/> class.
-        /// </summary>
-        public ConfuserProject()
-        {
-            Plugins = new List<string>();
-        }
-
-        /// <summary>
-        /// Gets the list of paths to the plugins used in the project.
-        /// </summary>
-        /// <value>A list of paths to the plugins.</value>
-        public IList<string> Plugins { get; private set; }
-
-        /// <summary>
         /// Gets or sets the seed of pseudo-random generator used in process of protection.
         /// </summary>
         /// <value>The random seed.</value>
@@ -437,17 +423,6 @@ namespace Confuser.Core.Project
                 elem.Attributes.Append(debugAttr);
             }
 
-            foreach (var i in Plugins)
-            {
-                XmlElement plug = xmlDoc.CreateElement("plugin", Namespace);
-
-                XmlAttribute pathAttr = xmlDoc.CreateAttribute("path");
-                pathAttr.Value = i;
-                plug.Attributes.Append(pathAttr);
-
-                elem.AppendChild(plug);
-            }
-
             if (Packer != null)
                 elem.AppendChild(Packer.Save(xmlDoc));
 
@@ -495,11 +470,7 @@ namespace Confuser.Core.Project
 
             foreach (XmlElement i in docElem.ChildNodes.OfType<XmlElement>())
             {
-                if (i.Name == "plugin")
-                {
-                    Plugins.Add(i.Attributes["path"].Value);
-                }
-                else if (i.Name == "packer")
+                if (i.Name == "packer")
                 {
                     Packer = new SettingItem<Packer>();
                     Packer.Load(i);

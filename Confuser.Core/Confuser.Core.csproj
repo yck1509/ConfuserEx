@@ -12,6 +12,8 @@
     <AssemblyName>Confuser.Core</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +37,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Threading, Version=1.0.2856.102, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -42,14 +48,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfuserEngine.cs" />
+    <Compile Include="ConfuserParameters.cs" />
     <Compile Include="DependencyResolver.cs" />
+    <Compile Include="ILogger.cs" />
+    <Compile Include="PluginDiscovery.cs" />
+    <Compile Include="NullLogger.cs" />
     <Compile Include="Packer.cs" />
     <Compile Include="Project\ConfuserProject.cs" />
     <Compile Include="Protection.cs" />
     <Compile Include="ProtectionDependencyAttributes.cs" />
     <Compile Include="ProtectionPhase.cs" />
     <Compile Include="ProtectionTargets.cs" />
-    <Compile Include="ProtectionContext.cs" />
+    <Compile Include="ConfuserContext.cs" />
     <Compile Include="ProtectionParameters.cs" />
     <Compile Include="ProtectionPipeline.cs" />
     <Compile Include="ProtectionPreset.cs" />
@@ -66,7 +76,17 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

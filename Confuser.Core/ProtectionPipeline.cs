@@ -11,7 +11,7 @@ namespace Confuser.Core
     public enum PipelineStage
     {
         /// <summary>
-        /// Confuser engine loads modules from the sources and creates <see cref="ProtectionContext"/>.
+        /// Confuser engine loads modules from the sources and creates <see cref="ConfuserContext"/>.
         /// This stage occurs only once per pipeline run.
         /// </summary>
         LoadModules,
@@ -105,7 +105,7 @@ namespace Confuser.Core
         /// </summary>
         /// <param name="stage">The pipeline stage.</param>
         /// <param name="phase">The stage function.</param>
-        internal void ExecuteStage(PipelineStage stage, Action func, ProtectionContext context)
+        internal void ExecuteStage(PipelineStage stage, Action func, ConfuserContext context)
         {
             foreach (var pre in preStage[stage])
                 pre.Execute(context, protectionParams[pre.Parent]);

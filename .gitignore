@@ -29,3 +29,5 @@ _ReSharper*/
 [Tt]est[Rr]esult*
 
 /docs
+!packages/*/build/
+packages/

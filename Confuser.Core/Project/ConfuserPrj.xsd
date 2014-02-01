@@ -55,14 +55,9 @@
     <xs:attribute name="isMain" type="xs:boolean" default="false" />
   </xs:complexType>
 
-  <xs:complexType name="plugin">
-    <xs:attribute name="path" type="xs:string" use="required" />
-  </xs:complexType>
-
   <xs:element name="project">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="plugin" type="plugin" minOccurs="0" maxOccurs="unbounded"/>
         <xs:element name="packer" type="objSettings" minOccurs="0" maxOccurs="1"/>
         <xs:element name="module" type="module" minOccurs="1" maxOccurs="unbounded"/>
       </xs:sequence>

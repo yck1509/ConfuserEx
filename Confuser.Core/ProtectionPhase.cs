@@ -21,6 +21,6 @@ namespace Confuser.Core
         /// </summary>
         /// <param name="context">The context of protection.</param>
         /// <param name="parameters">The parameters of protection.</param>
-        protected internal abstract void Execute(ProtectionContext context, ProtectionParameters parameters);
+        protected internal abstract void Execute(ConfuserContext context, ProtectionParameters parameters);
     }
 }
