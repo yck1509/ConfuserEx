@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://confuser.codeplex.com"
+           xmlns="http://confuser.codeplex.com"
+           attributeFormDefault="unqualified"
+           elementFormDefault="qualified" >
+
+  <xs:simpleType name="action">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="add"/>
+      <xs:enumeration value="remove"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="preset">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="none"/>
+      <xs:enumeration value="minimum"/>
+      <xs:enumeration value="normal"/>
+      <xs:enumeration value="aggressive"/>
+      <xs:enumeration value="maximum"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="argument">
+    <xs:attribute name="name" type="xs:string" use="required" />
+    <xs:attribute name="value" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="objSettings">
+    <xs:sequence>
+      <xs:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required" />
+    <xs:attribute name="action" type="action" default="add" />
+  </xs:complexType>
+
+  <xs:complexType name="rule">
+    <xs:sequence>
+      <xs:element name="protection" type="objSettings" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="preset" type="preset" default="none" />
+    
+    <xs:attribute name="inherit" type="xs:boolean" default="true" />
+    <xs:attribute name="pattern" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="module">
+    <xs:sequence>
+      <xs:element name="rule" type="rule" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="path" type="xs:string" use="required" />
+    <xs:attribute name="snKey" type="xs:string" use="optional" />
+    <xs:attribute name="snKeyPass" type="xs:string" use="optional" />
+    <xs:attribute name="isMain" type="xs:boolean" default="false" />
+  </xs:complexType>
+
+  <xs:complexType name="plugin">
+    <xs:attribute name="path" type="xs:string" use="required" />
+  </xs:complexType>
+
+  <xs:element name="project">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="plugin" type="plugin" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="packer" type="objSettings" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="module" type="module" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="outputDir" type="xs:string" use="required" />
+      <xs:attribute name="seed" type="xs:string" use="optional"/>
+      <xs:attribute name="debug" type="xs:boolean" default="false" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
