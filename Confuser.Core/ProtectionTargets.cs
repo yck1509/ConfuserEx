@@ -6,10 +6,10 @@ using System.Text;
 namespace Confuser.Core
 {
     /// <summary>
-    /// Target components of protection.
+    /// Targets of protection.
     /// </summary>
     /// <remarks>
-    /// <see cref="ProtectionTarget.Module"/> cannot be used with other flags.
+    /// <see cref="ProtectionTargets.Module"/> cannot be used with other flags.
     /// </remarks>
     [Flags]
     public enum ProtectionTargets

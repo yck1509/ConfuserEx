@@ -38,12 +38,12 @@ namespace Confuser.Core
         }
 
 
-        Protection[] protections;
+        IList<Protection> protections;
         /// <summary>
         /// Initializes a new instance of the <see cref="DependencyResolver"/> class.
         /// </summary>
         /// <param name="protections">The protections for resolution.</param>
-        public DependencyResolver(Protection[] protections)
+        public DependencyResolver(IList<Protection> protections)
         {
             this.protections = protections;
         }
@@ -55,7 +55,7 @@ namespace Confuser.Core
         /// <exception cref="T:CircularDependencyException">
         /// The protections contain circular dependencies.
         /// </exception>
-        public Protection[] SortDependency()
+        public IList<Protection> SortDependency()
         {
             /* Here we do a topological sort of the protections.
              * First we construct a dependency graph of the protections.
@@ -64,15 +64,18 @@ namespace Confuser.Core
              */
 
             var nodes = protections
-                .Concat(new Protection[] { null })
                 .ToDictionary(prot => prot, prot => new DependencyGraphNode(prot));
 
             var id2Nodes = protections
                 .ToDictionary(prot => prot.FullId, prot => nodes[prot]);
 
+            DependencyGraphNode root = new DependencyGraphNode(null);
+
             foreach (var prot in protections)
             {
                 DependencyGraphNode protNode = nodes[prot];
+                root.TargetNodes.Add(protNode);
+
                 Type protType = prot.GetType();
 
                 BeforeProtectionAttribute before = protType
@@ -104,7 +107,7 @@ namespace Confuser.Core
                 }
             }
 
-            var sortedNodes = SortNodes(nodes[null]);
+            var sortedNodes = SortNodes(root);
 
             //First one must be root node.
             Debug.Assert(sortedNodes.Length >= 1 && sortedNodes[0].Protection == null);

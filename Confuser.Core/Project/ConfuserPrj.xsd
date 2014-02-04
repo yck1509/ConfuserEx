@@ -52,16 +52,18 @@
     <xs:attribute name="path" type="xs:string" use="required" />
     <xs:attribute name="snKey" type="xs:string" use="optional" />
     <xs:attribute name="snKeyPass" type="xs:string" use="optional" />
-    <xs:attribute name="isMain" type="xs:boolean" default="false" />
   </xs:complexType>
+
 
   <xs:element name="project">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="packer" type="objSettings" minOccurs="0" maxOccurs="1"/>
         <xs:element name="module" type="module" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element name="probePath" type="xs:string"  minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
       <xs:attribute name="outputDir" type="xs:string" use="required" />
+      <xs:attribute name="baseDir" type="xs:string" use="required" />
       <xs:attribute name="seed" type="xs:string" use="optional"/>
       <xs:attribute name="debug" type="xs:boolean" default="false" />
     </xs:complexType>

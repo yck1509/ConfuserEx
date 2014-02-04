@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using dnlib.DotNet;
 
 namespace Confuser.Core
 {
@@ -10,11 +11,6 @@ namespace Confuser.Core
     /// </summary>
     public enum PipelineStage
     {
-        /// <summary>
-        /// Confuser engine loads modules from the sources and creates <see cref="ConfuserContext"/>.
-        /// This stage occurs only once per pipeline run.
-        /// </summary>
-        LoadModules,
         /// <summary>
         /// Confuser engine inspects the loaded modules and makes necessary changes.
         /// This stage occurs only once per pipeline run.
@@ -66,18 +62,15 @@ namespace Confuser.Core
     {
         Dictionary<PipelineStage, List<ProtectionPhase>> preStage;
         Dictionary<PipelineStage, List<ProtectionPhase>> postStage;
-        Dictionary<Protection, ProtectionParameters> protectionParams;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProtectionPipeline"/> class.
         /// </summary>
-        /// <param name="parameters">The protection parameters.</param>
-        public ProtectionPipeline(Dictionary<Protection, ProtectionParameters> parameters)
+        public ProtectionPipeline()
         {
             var stages = (PipelineStage[])Enum.GetValues(typeof(PipelineStage));
             preStage = stages.ToDictionary(stage => stage, stage => new List<ProtectionPhase>());
             postStage = stages.ToDictionary(stage => stage, stage => new List<ProtectionPhase>());
-            this.protectionParams = parameters;
         }
 
         /// <summary>
@@ -101,17 +94,57 @@ namespace Confuser.Core
         }
 
         /// <summary>
-        /// Execute the specified pipeline stage with pre-processing & post-processing.
+        /// Execute the specified pipeline stage with pre-processing and post-processing.
         /// </summary>
         /// <param name="stage">The pipeline stage.</param>
-        /// <param name="phase">The stage function.</param>
-        internal void ExecuteStage(PipelineStage stage, Action func, ConfuserContext context)
+        /// <param name="func">The stage function.</param>
+        /// <param name="targets">The target list of the stage.</param>
+        /// <param name="context">The working context.</param>
+        internal void ExecuteStage(PipelineStage stage, Action<ConfuserContext> func, IList<IDefinition> targets, ConfuserContext context)
         {
             foreach (var pre in preStage[stage])
-                pre.Execute(context, protectionParams[pre.Parent]);
-            func();
+            {
+                pre.Execute(context, new ProtectionParameters(pre.Parent, Filter(context, targets, pre.Targets, pre.Parent)));
+                context.CheckCancellation();
+            }
+            func(context);
+            context.CheckCancellation();
             foreach (var post in postStage[stage])
-                post.Execute(context, protectionParams[post.Parent]);
+            {
+                post.Execute(context, new ProtectionParameters(post.Parent, Filter(context, targets, post.Targets, post.Parent)));
+                context.CheckCancellation();
+            }
+        }
+
+        /// <summary>
+        /// Returns only the targets with the specified type and used by specified component.
+        /// </summary>
+        /// <param name="context">The working context.</param>
+        /// <param name="targets">List of targets.</param>
+        /// <param name="targetType">Type of targets.</param>
+        /// <param name="component">The component.</param>
+        /// <returns>Filtered targets.</returns>
+        static IList<IDefinition> Filter(ConfuserContext context, IList<IDefinition> targets, ProtectionTargets targetType, ConfuserComponent component)
+        {
+            IEnumerable<IDefinition> ret;
+            if (targetType == ProtectionTargets.Module)
+                ret = targets.OfType<ModuleDef>().OfType<IDefinition>();
+            else
+            {
+                IEnumerable<IDefinition> filter = targets;
+                if ((targetType & ProtectionTargets.Types) == 0)
+                    filter = filter.Where(def => !(def is TypeDef));
+                if ((targetType & ProtectionTargets.Methods) == 0)
+                    filter = filter.Where(def => !(def is MethodDef));
+                if ((targetType & ProtectionTargets.Fields) == 0)
+                    filter = filter.Where(def => !(def is FieldDef));
+                if ((targetType & ProtectionTargets.Properties) == 0)
+                    filter = filter.Where(def => !(def is PropertyDef));
+                if ((targetType & ProtectionTargets.Events) == 0)
+                    filter = filter.Where(def => !(def is EventDef));
+                ret = filter.ToList();
+            }
+            return ret.Where(def => ProtectionParameters.GetParameters(context, def).ContainsKey(component)).ToList();
         }
     }
 }

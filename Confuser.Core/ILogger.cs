@@ -85,26 +85,6 @@ namespace Confuser.Core
         void Progress(int overall, int progress);
 
         /// <summary>
-        /// Logs the beginning of protection of the module.
-        /// </summary>
-        /// <remarks>
-        /// This method may not be called on modules that the protection is
-        /// not yet started.
-        /// </remarks>
-        /// <param name="module">The module.</param>
-        void BeginModule(ModuleDef module);
-
-        /// <summary>
-        /// Logs the ending of protection of the module.
-        /// </summary>
-        /// <remarks>
-        /// This method may not be called on modules that the protection is
-        /// interrupted due to error or cancellation.
-        /// </remarks>
-        /// <param name="module">The module.</param>
-        void EndModule(ModuleDef module);
-
-        /// <summary>
         /// Logs the finish of protection.
         /// </summary>
         /// <param name="successful">Indicated whether the protection process is successful.</param>

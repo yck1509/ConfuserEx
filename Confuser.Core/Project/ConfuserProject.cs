@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using System.Collections.Specialized;
 using System.Xml.Schema;
 using dnlib.DotNet;
 
@@ -27,11 +26,6 @@ namespace Confuser.Core.Project
         /// </summary>
         public string Path { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether this module is the main module.
-        /// </summary>
-        /// <value><c>true</c> if this module is the main module; otherwise, <c>false</c>.</value>
-        public bool IsMain { get; set; }
-        /// <summary>
         /// Gets or sets the path to the strong name private key for signing.
         /// </summary>
         /// <value>The path to the strong name private key, or null if not necessary.</value>
@@ -52,13 +46,14 @@ namespace Confuser.Core.Project
         /// </summary>
         /// <param name="basePath">The base path for the relative module path,
         /// or null if the module path is absolute or relative to current directory.</param>
+        /// <param name="context">The resolved module's context.</param>
         /// <returns>The resolved module.</returns>
-        public ModuleDef Resolve(string basePath)
+        public ModuleDefMD Resolve(string basePath, ModuleContext context = null)
         {
             if (basePath == null)
-                return ModuleDefMD.Load(Path);
+                return ModuleDefMD.Load(Path, context);
             else
-                return ModuleDefMD.Load(System.IO.Path.Combine(basePath, Path));
+                return ModuleDefMD.Load(System.IO.Path.Combine(basePath, Path), context);
         }
 
         /// <summary>
@@ -74,12 +69,6 @@ namespace Confuser.Core.Project
             nameAttr.Value = Path;
             elem.Attributes.Append(nameAttr);
 
-            if (IsMain != false)
-            {
-                XmlAttribute mainAttr = xmlDoc.CreateAttribute("isMain");
-                mainAttr.Value = IsMain.ToString().ToLower();
-                elem.Attributes.Append(mainAttr);
-            }
             if (SNKeyPath != null)
             {
                 XmlAttribute snKeyAttr = xmlDoc.CreateAttribute("snKey");
@@ -107,13 +96,18 @@ namespace Confuser.Core.Project
         internal void Load(XmlElement elem)
         {
             this.Path = elem.Attributes["path"].Value;
-            if (elem.Attributes["isMain"] != null)
-                this.IsMain = bool.Parse(elem.Attributes["isMain"].Value);
-            if (elem.Attributes["snKey"] != null)
-                this.SNKeyPath = elem.Attributes["snKey"].Value;
-            if (elem.Attributes["snKeyPass"] != null)
-                this.SNKeyPassword = elem.Attributes["snKeyPass"].Value;
 
+            if (elem.Attributes["snKey"] != null)
+                this.SNKeyPath = elem.Attributes["snKey"].Value.NullIfEmpty();
+            else
+                this.SNKeyPath = null;
+
+            if (elem.Attributes["snKeyPass"] != null)
+                this.SNKeyPassword = elem.Attributes["snKeyPass"].Value.NullIfEmpty();
+            else
+                this.SNKeyPassword = null;
+
+            Rules.Clear();
             foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>())
             {
                 Rule settings = new Rule();
@@ -148,22 +142,22 @@ namespace Confuser.Core.Project
     }
 
     /// <summary>
-    /// A <see cref="Protection"/> setting within a rule.
+    /// A <see cref="ConfuserComponent"/> setting within a rule.
     /// </summary>
     /// <typeparam name="T"><see cref="Protection"/> or <see cref="Packer"/></typeparam>
-    public class SettingItem<T> : NameValueCollection
+    public class SettingItem<T> : Dictionary<string, string>
     {
         /// <summary>
-        /// The identifier of protection
+        /// The identifier of component
         /// </summary>
-        /// <value>The identifier of protection.</value>
-        /// <seealso cref="Protection.Id" />
+        /// <value>The identifier of component.</value>
+        /// <seealso cref="ConfuserComponent.Id" />
         public string Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the action of protection.
+        /// Gets or sets the action of component.
         /// </summary>
-        /// <value>The action of protection.</value>
+        /// <value>The action of component.</value>
         public SettingItemAction Action { get; set; }
 
         /// <summary>
@@ -186,15 +180,15 @@ namespace Confuser.Core.Project
                 elem.Attributes.Append(pAttr);
             }
 
-            foreach (var i in this.AllKeys)
+            foreach (var i in this)
             {
                 XmlElement arg = xmlDoc.CreateElement("argument", ConfuserProject.Namespace);
 
                 XmlAttribute nameAttr = xmlDoc.CreateAttribute("name");
-                nameAttr.Value = i;
+                nameAttr.Value = i.Key;
                 arg.Attributes.Append(nameAttr);
                 XmlAttribute valAttr = xmlDoc.CreateAttribute("value");
-                valAttr.Value = base[i];
+                valAttr.Value = i.Value;
                 arg.Attributes.Append(valAttr);
 
                 elem.AppendChild(arg);
@@ -210,10 +204,13 @@ namespace Confuser.Core.Project
         internal void Load(XmlElement elem)
         {
             this.Id = elem.Attributes["id"].Value;
+
             if (elem.Attributes["action"] != null)
                 this.Action = (SettingItemAction)Enum.Parse(typeof(SettingItemAction), elem.Attributes["action"].Value, true);
             else
                 this.Action = SettingItemAction.Add;
+
+            this.Clear();
             foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>())
                 this.Add(i.Attributes["name"].Value, i.Attributes["value"].Value);
         }
@@ -295,6 +292,7 @@ namespace Confuser.Core.Project
             else
                 this.Inherit = true;
 
+            this.Clear();
             foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>())
             {
                 var x = new SettingItem<Protection>();
@@ -319,7 +317,7 @@ namespace Confuser.Core.Project
                 var item = new SettingItem<Protection>();
                 item.Id = i.Id;
                 item.Action = i.Action;
-                foreach (var j in i.AllKeys)
+                foreach (var j in i.Keys)
                     item.Add(j, i[j]);
                 ret.Add(item);
             }
@@ -355,6 +353,14 @@ namespace Confuser.Core.Project
     public class ConfuserProject : List<ProjectModule>
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ConfuserProject"/> class.
+        /// </summary>
+        public ConfuserProject()
+        {
+            this.ProbePaths = new List<string>();
+        }
+
+        /// <summary>
         /// Gets or sets the seed of pseudo-random generator used in process of protection.
         /// </summary>
         /// <value>The random seed.</value>
@@ -373,16 +379,22 @@ namespace Confuser.Core.Project
         public string OutputDirectory { get; set; }
 
         /// <summary>
-        /// Gets or sets the base path of the project.
+        /// Gets or sets the base directory of the project.
         /// </summary>
-        /// <value>The base path.</value>
-        public string BasePath { get; set; }
+        /// <value>The base directory.</value>
+        public string BaseDirectory { get; set; }
 
         /// <summary>
         /// Gets or sets the packer used to pack up the output.
         /// </summary>
         /// <value>The packer.</value>
         public SettingItem<Packer> Packer { get; set; }
+
+        /// <summary>
+        /// Gets a list of paths that used to resolve assemblies.
+        /// </summary>
+        /// <value>The list of paths.</value>
+        public IList<string> ProbePaths { get; private set; }
 
         /// <summary>
         /// The schema of project XML.
@@ -409,6 +421,10 @@ namespace Confuser.Core.Project
             outputAttr.Value = OutputDirectory;
             elem.Attributes.Append(outputAttr);
 
+            XmlAttribute baseAttr = xmlDoc.CreateAttribute("baseDir");
+            baseAttr.Value = BaseDirectory;
+            elem.Attributes.Append(baseAttr);
+
             if (Seed != null)
             {
                 XmlAttribute seedAttr = xmlDoc.CreateAttribute("seed");
@@ -428,6 +444,13 @@ namespace Confuser.Core.Project
 
             foreach (var i in this)
                 elem.AppendChild(i.Save(xmlDoc));
+
+            foreach (var i in ProbePaths)
+            {
+                XmlElement path = xmlDoc.CreateElement("probePath");
+                path.Value = i;
+                elem.AppendChild(path);
+            }
 
             xmlDoc.AppendChild(elem);
             return xmlDoc;
@@ -457,9 +480,10 @@ namespace Confuser.Core.Project
             XmlElement docElem = doc.DocumentElement;
 
             this.OutputDirectory = docElem.Attributes["outputDir"].Value;
+            this.BaseDirectory = docElem.Attributes["baseDir"].Value;
 
             if (docElem.Attributes["seed"] != null)
-                this.Seed = docElem.Attributes["seed"].Value;
+                this.Seed = docElem.Attributes["seed"].Value.NullIfEmpty();
             else
                 this.Seed = null;
 
@@ -468,12 +492,19 @@ namespace Confuser.Core.Project
             else
                 this.Debug = false;
 
+            Packer = null;
+            this.Clear();
+            ProbePaths.Clear();
             foreach (XmlElement i in docElem.ChildNodes.OfType<XmlElement>())
             {
                 if (i.Name == "packer")
                 {
                     Packer = new SettingItem<Packer>();
                     Packer.Load(i);
+                }
+                else if (i.Name == "probePath")
+                {
+                    ProbePaths.Add(i.Value);
                 }
                 else
                 {

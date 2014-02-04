@@ -24,22 +24,24 @@ namespace Confuser.Core
         /// <summary>
         /// Retrieves the available protection plugins.
         /// </summary>
-        /// <param name="logger">The logger.</param>
-        /// <returns>A list of resolved <see cref="Protection" />s.</returns>
-        public IList<Protection> GetPlugins(ILogger logger)
+        /// <param name="context">The working context.</param>
+        /// <param name="protections">A list of resolved protections.</param>
+        /// <param name="packers">A list of resolved packers.</param>
+        public void GetPlugins(ConfuserContext context, out IList<Protection> protections, out IList<Packer> packers)
         {
-            List<Protection> ret = new List<Protection>();
-            GetPluginsInternal(logger, ret);
-            return ret;
+            protections = new List<Protection>();
+            packers = new List<Packer>();
+            GetPluginsInternal(context, protections, packers);
         }
 
         /// <summary>
         /// Adds plugins in the assembly to the protection list.
         /// </summary>
-        /// <param name="logger">The logger.</param>
-        /// <param name="protections">The protections.</param>
+        /// <param name="context">The working context.</param>
+        /// <param name="protections">The working list of protections.</param>
+        /// <param name="packers">The working list of packers.</param>
         /// <param name="asm">The assembly.</param>
-        protected static void AddPlugins(ILogger logger, IList<Protection> protections, Assembly asm)
+        protected static void AddPlugins(ConfuserContext context, IList<Protection> protections, IList<Packer> packers, Assembly asm)
         {
             foreach (var i in asm.GetTypes())
             {
@@ -51,36 +53,50 @@ namespace Confuser.Core
                     }
                     catch (Exception ex)
                     {
-                        logger.ErrorException("Failed to instantiate protection '" + i.Name + "'.", ex);
+                        context.Logger.ErrorException("Failed to instantiate protection '" + i.Name + "'.", ex);
+                    }
+                }
+                else if (typeof(Packer).IsAssignableFrom(i))
+                {
+                    try
+                    {
+                        packers.Add((Packer)Activator.CreateInstance(i));
+                    }
+                    catch (Exception ex)
+                    {
+                        context.Logger.ErrorException("Failed to instantiate packer '" + i.Name + "'.", ex);
                     }
                 }
             }
+            context.CheckCancellation();
         }
 
         /// <summary>
         /// Retrieves the available protection plugins.
         /// </summary>
+        /// <param name="context">The working context.</param>
         /// <param name="protections">The working list of protections.</param>
-        protected virtual void GetPluginsInternal(ILogger logger, IList<Protection> protections)
+        /// <param name="packers">The working list of packers.</param>
+        protected virtual void GetPluginsInternal(ConfuserContext context, IList<Protection> protections, IList<Packer> packers)
         {
             try
             {
                 Assembly protAsm = Assembly.Load("Confuser.Protections");
-                AddPlugins(logger, protections, protAsm);
+                AddPlugins(context, protections, packers, protAsm);
             }
             catch (Exception ex)
             {
-                logger.WarnException("Failed to load built-in protections.", ex);
+                context.Logger.WarnException("Failed to load built-in protections.", ex);
             }
 
             try
             {
                 Assembly renameAsm = Assembly.Load("Confuser.Renamer");
-                AddPlugins(logger, protections, renameAsm);
+                AddPlugins(context, protections, packers, renameAsm);
             }
             catch (Exception ex)
             {
-                logger.WarnException("Failed to load renamer.", ex);
+                context.Logger.WarnException("Failed to load renamer.", ex);
             }
         }
     }
