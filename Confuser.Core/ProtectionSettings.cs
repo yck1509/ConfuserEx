@@ -8,7 +8,7 @@ namespace Confuser.Core
     /// <summary>
     /// Protection settings for a certain component
     /// </summary>
-    class ProtectionSettings : Dictionary<ConfuserComponent, Dictionary<string, string>>
+    public class ProtectionSettings : Dictionary<ConfuserComponent, Dictionary<string, string>>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ProtectionSettings"/> class.

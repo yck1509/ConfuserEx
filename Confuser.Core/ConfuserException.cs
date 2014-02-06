@@ -8,7 +8,7 @@ namespace Confuser.Core
     /// <summary>
     /// The exception that is thrown when a handled error occurred during the protection process.
     /// </summary>
-    class ConfuserException : Exception
+    public class ConfuserException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfuserException"/> class.

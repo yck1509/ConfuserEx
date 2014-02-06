@@ -13,14 +13,24 @@ namespace Confuser.Core
         Dictionary<Type, object> services = new Dictionary<Type, object>();
         HashSet<string> serviceIds = new HashSet<string>();
 
+        /// <summary>
+        /// Retrieves the service of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of service.</typeparam>
+        /// <returns>The service instance.</returns>
+        public T GetService<T>()
+        {
+            return (T)services.GetValueOrDefault(typeof(T), null);
+        }
+
         /// <inheritdoc/>
-        public object GetService(Type serviceType)
+        object IServiceProvider.GetService(Type serviceType)
         {
             return services.GetValueOrDefault(serviceType, null);
         }
 
         /// <summary>
-        /// Register the service with specified ID .
+        /// Registers the service with specified ID .
         /// </summary>
         /// <param name="serviceId">The service identifier.</param>
         /// <param name="serviceType">The service type.</param>

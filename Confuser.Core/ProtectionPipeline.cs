@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using dnlib.DotNet;
+using System.Diagnostics;
 
 namespace Confuser.Core
 {
@@ -100,18 +101,18 @@ namespace Confuser.Core
         /// <param name="func">The stage function.</param>
         /// <param name="targets">The target list of the stage.</param>
         /// <param name="context">The working context.</param>
-        internal void ExecuteStage(PipelineStage stage, Action<ConfuserContext> func, IList<IDefinition> targets, ConfuserContext context)
+        internal void ExecuteStage(PipelineStage stage, Action<ConfuserContext> func, Func<IList<IDefinition>> targets, ConfuserContext context)
         {
             foreach (var pre in preStage[stage])
             {
-                pre.Execute(context, new ProtectionParameters(pre.Parent, Filter(context, targets, pre.Targets, pre.Parent)));
+                pre.Execute(context, new ProtectionParameters(pre.Parent, Filter(context, targets(), pre)));
                 context.CheckCancellation();
             }
             func(context);
             context.CheckCancellation();
             foreach (var post in postStage[stage])
             {
-                post.Execute(context, new ProtectionParameters(post.Parent, Filter(context, targets, post.Targets, post.Parent)));
+                post.Execute(context, new ProtectionParameters(post.Parent, Filter(context, targets(), post)));
                 context.CheckCancellation();
             }
         }
@@ -121,30 +122,40 @@ namespace Confuser.Core
         /// </summary>
         /// <param name="context">The working context.</param>
         /// <param name="targets">List of targets.</param>
-        /// <param name="targetType">Type of targets.</param>
-        /// <param name="component">The component.</param>
+        /// <param name="phase">The component phase.</param>
         /// <returns>Filtered targets.</returns>
-        static IList<IDefinition> Filter(ConfuserContext context, IList<IDefinition> targets, ProtectionTargets targetType, ConfuserComponent component)
+        static IList<IDefinition> Filter(ConfuserContext context, IList<IDefinition> targets, ProtectionPhase phase)
         {
-            IEnumerable<IDefinition> ret;
-            if (targetType == ProtectionTargets.Module)
-                ret = targets.OfType<ModuleDef>().OfType<IDefinition>();
+            var targetType = phase.Targets;
+
+            IEnumerable<IDefinition> filter = targets;
+            if ((targetType & ProtectionTargets.Modules) == 0)
+                filter = filter.Where(def => !(def is ModuleDef));
+            if ((targetType & ProtectionTargets.Types) == 0)
+                filter = filter.Where(def => !(def is TypeDef));
+            if ((targetType & ProtectionTargets.Methods) == 0)
+                filter = filter.Where(def => !(def is MethodDef));
+            if ((targetType & ProtectionTargets.Fields) == 0)
+                filter = filter.Where(def => !(def is FieldDef));
+            if ((targetType & ProtectionTargets.Properties) == 0)
+                filter = filter.Where(def => !(def is PropertyDef));
+            if ((targetType & ProtectionTargets.Events) == 0)
+                filter = filter.Where(def => !(def is EventDef));
+
+            if (phase.ProcessAll)
+                return filter.ToList();
             else
-            {
-                IEnumerable<IDefinition> filter = targets;
-                if ((targetType & ProtectionTargets.Types) == 0)
-                    filter = filter.Where(def => !(def is TypeDef));
-                if ((targetType & ProtectionTargets.Methods) == 0)
-                    filter = filter.Where(def => !(def is MethodDef));
-                if ((targetType & ProtectionTargets.Fields) == 0)
-                    filter = filter.Where(def => !(def is FieldDef));
-                if ((targetType & ProtectionTargets.Properties) == 0)
-                    filter = filter.Where(def => !(def is PropertyDef));
-                if ((targetType & ProtectionTargets.Events) == 0)
-                    filter = filter.Where(def => !(def is EventDef));
-                ret = filter.ToList();
-            }
-            return ret.Where(def => ProtectionParameters.GetParameters(context, def).ContainsKey(component)).ToList();
+                return filter.Where(def =>
+                {
+                    var parameters = ProtectionParameters.GetParameters(context, def);
+                    Debug.Assert(parameters != null);
+                    if (parameters == null)
+                    {
+                        context.Logger.ErrorFormat("'{0}' not marked for obfuscation, possibly a bug.");
+                        throw new ConfuserException(null);
+                    }
+                    return parameters.ContainsKey(phase.Parent);
+                }).ToList();
         }
     }
 }

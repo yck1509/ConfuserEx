@@ -18,7 +18,7 @@ namespace Confuser.CLI
 
             try
             {
-                if (args.Length != 1)
+                if (args.Length < 1)
                 {
                     PrintUsage();
                     return 0;

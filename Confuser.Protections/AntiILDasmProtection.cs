@@ -9,6 +9,10 @@ namespace Confuser.Protections
 {
     class AntiILDasmProtection : Protection
     {
+        public const string _Id = "anti ildasm";
+        public const string _FullId = "Ki.AntiILDasm";
+        public const string _ServiceId = "Ki.AntiILDasm";
+
         protected override void Initialize(ConfuserContext context)
         {
             //
@@ -31,12 +35,12 @@ namespace Confuser.Protections
 
         public override string Id
         {
-            get { return "anti ildasm"; }
+            get { return _Id; }
         }
 
         public override string FullId
         {
-            get { return "Ki.AntiILDasm"; }
+            get { return _FullId; }
         }
 
         public override ProtectionPreset Preset
@@ -53,7 +57,7 @@ namespace Confuser.Protections
 
             public override ProtectionTargets Targets
             {
-                get { return ProtectionTargets.Module; }
+                get { return ProtectionTargets.Modules; }
             }
 
             protected override void Execute(ConfuserContext context, ProtectionParameters parameters)

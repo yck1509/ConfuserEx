@@ -91,9 +91,9 @@ namespace Confuser.Core
         /// <param name="obj">The object.</param>
         /// <param name="key">The key of annotation.</param>
         /// <param name="defValue">The default value if the specified annotation does not exists on the object.</param>
-        /// <returns>The value of annotation, or null if the annotation does not exist.</returns>
+        /// <returns>The value of annotation, or default value if the annotation does not exist.</returns>
         /// <exception cref="System.ArgumentNullException">
-        /// <paramref name="obj"/> or <paramref name="key"/> is null.
+        /// <paramref name="obj"/> or <paramref name="key"/> is <c>null</c>.
         /// </exception>
         public TValue Get<TValue>(object obj, object key, TValue defValue = default(TValue))
         {
@@ -111,6 +111,61 @@ namespace Confuser.Core
         }
 
         /// <summary>
+        /// Retrieves the annotation on the specified object associated with the specified key.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the value.</typeparam>
+        /// <param name="obj">The object.</param>
+        /// <param name="key">The key of annotation.</param>
+        /// <param name="defValueFactory">The default value factory function.</param>
+        /// <returns>The value of annotation, or default value if the annotation does not exist.</returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name="obj"/> or <paramref name="key"/> is <c>null</c>.
+        /// </exception>
+        public TValue GetLazy<TValue>(object obj, object key, Func<object, TValue> defValueFactory)
+        {
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            ListDictionary objAnno;
+            if (!annotations.TryGetValue(obj, out objAnno))
+                return defValueFactory(key);
+            if (!objAnno.Contains(key))
+                return defValueFactory(key);
+            return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
+        }
+
+        /// <summary>
+        /// Retrieves or create the annotation on the specified object associated with the specified key.
+        /// </summary>
+        /// <typeparam name="TValue">The type of the value.</typeparam>
+        /// <param name="obj">The object.</param>
+        /// <param name="key">The key of annotation.</param>
+        /// <param name="factory">The factory function to create the annotation value when the annotation does not exist.</param>
+        /// <returns>The value of annotation, or the newly created value.</returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name="obj"/> or <paramref name="key"/> is <c>null</c>.
+        /// </exception>
+        public TValue GetOrCreate<TValue>(object obj, object key, Func<object, TValue> factory)
+        {
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+            if (key == null)
+                throw new ArgumentNullException("key");
+
+            ListDictionary objAnno;
+            if (!annotations.TryGetValue(obj, out objAnno))
+                objAnno = annotations[new WeakReferenceKey(obj)] = new ListDictionary();
+            TValue ret;
+            if (objAnno.Contains(key))
+                ret = (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
+            else
+                objAnno[key] = ret = factory(key);
+            return ret;
+        }
+
+        /// <summary>
         /// Sets a annotation on the specified object.
         /// </summary>
         /// <typeparam name="TValue">The type of the value.</typeparam>
@@ -118,7 +173,7 @@ namespace Confuser.Core
         /// <param name="key">The key of annotation.</param>
         /// <param name="value">The value of annotation.</param>
         /// <exception cref="System.ArgumentNullException">
-        /// <paramref name="obj"/> or <paramref name="key"/> is null.
+        /// <paramref name="obj"/> or <paramref name="key"/> is <c>null</c>.
         /// </exception>
         public void Set<TValue>(object obj, object key, TValue value)
         {

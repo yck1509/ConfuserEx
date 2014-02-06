@@ -46,5 +46,20 @@ namespace Confuser.Core
         {
             return PluginDiscovery ?? PluginDiscovery.Instance;
         }
+
+        /// <summary>
+        /// Gets or sets the marker.
+        /// </summary>
+        /// <value>The marker, or <c>null</c> if default marker is used.</value>
+        public Marker Marker { get; set; }
+
+        /// <summary>
+        /// Gets the actual non-null marker.
+        /// </summary>
+        /// <returns>The marker.</returns>
+        internal Marker GetMarker()
+        {
+            return Marker ?? new Marker();
+        }
     }
 }

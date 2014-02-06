@@ -32,6 +32,12 @@ namespace Confuser.Core
         public abstract ProtectionTargets Targets { get; }
 
         /// <summary>
+        /// Gets a value indicating whether this phase process all targets, not just the targets that requires the component.
+        /// </summary>
+        /// <value><c>true</c> if this phase process all targets; otherwise, <c>false</c>.</value>
+        public virtual bool ProcessAll { get { return false; } }
+
+        /// <summary>
         /// Executes the protection phase.
         /// </summary>
         /// <param name="context">The working context.</param>

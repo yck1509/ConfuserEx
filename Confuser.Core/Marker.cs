@@ -9,6 +9,8 @@ using System.IO;
 
 namespace Confuser.Core
 {
+    using Rules = Dictionary<Rule, Regex>;
+
     /// <summary>
     /// Resolves and marks the modules with protection settings according to the rules.
     /// </summary>
@@ -44,6 +46,11 @@ namespace Confuser.Core
         /// Annotation key of Strong Name Key.
         /// </summary>
         public static readonly object SNKey = new object();
+
+        /// <summary>
+        /// Annotation key of rules.
+        /// </summary>
+        public static readonly object RulesKey = new object();
 
         /// <summary>
         /// Loads the Strong Name Key at the specified path with a optional password.
@@ -89,7 +96,7 @@ namespace Confuser.Core
         /// <param name="proj">The project.</param>
         /// <param name="context">The working context.</param>
         /// <returns><see cref="MarkerResult"/> storing the marked modules and packer information.</returns>
-        public virtual MarkerResult MarkProject(ConfuserProject proj, ConfuserContext context)
+        protected internal virtual MarkerResult MarkProject(ConfuserProject proj, ConfuserContext context)
         {
             Packer packer = null;
             Dictionary<string, string> packerParams = null;
@@ -112,6 +119,7 @@ namespace Confuser.Core
                 var rules = ParseRules(module, context);
 
                 context.Annotations.Set(modDef, SNKey, LoadSNKey(context, module.SNKeyPath, module.SNKeyPassword));
+                context.Annotations.Set(modDef, RulesKey, rules);
 
                 foreach (var def in modDef.FindDefinitions())
                     ApplyRules(context, def, rules);
@@ -126,6 +134,18 @@ namespace Confuser.Core
         }
 
         /// <summary>
+        /// Marks the member definition.
+        /// </summary>
+        /// <param name="member">The member definition.</param>
+        /// <param name="context">The working context.</param>
+        protected internal virtual void MarkMember(IDefinition member, ConfuserContext context)
+        {
+            ModuleDef module = ((IMemberRef)member).Module;
+            var rules = context.Annotations.Get<Rules>(module, RulesKey);
+            ApplyRules(context, member, rules);
+        }
+
+        /// <summary>
         /// Parses the rules' patterns.
         /// </summary>
         /// <param name="module">The module description.</param>
@@ -134,9 +154,9 @@ namespace Confuser.Core
         /// <exception cref="System.ArgumentException">
         /// One of the rules has invalid RegEx pattern.
         /// </exception>
-        Dictionary<Rule, Regex> ParseRules(ProjectModule module, ConfuserContext context)
+        Rules ParseRules(ProjectModule module, ConfuserContext context)
         {
-            var ret = new Dictionary<Rule, Regex>();
+            var ret = new Rules();
             foreach (var rule in module.Rules)
             {
                 try
@@ -167,7 +187,7 @@ namespace Confuser.Core
         /// <param name="context">The working context.</param>
         /// <param name="target">The target definition.</param>
         /// <param name="rules">The rules.</param>
-        void ApplyRules(ConfuserContext context, IDefinition target, Dictionary<Rule, Regex> rules)
+        void ApplyRules(ConfuserContext context, IDefinition target, Rules rules)
         {
             ProtectionSettings ret = new ProtectionSettings();
             string sig = GetSignature(target);

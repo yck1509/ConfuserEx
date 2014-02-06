@@ -8,6 +8,7 @@ using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using System.IO;
 using dnlib.DotNet.Writer;
+using Confuser.Core.Services;
 
 namespace Confuser.Core
 {
@@ -23,7 +24,7 @@ namespace Confuser.Core
         /// <param name="token">The token used for cancellation.</param>
         /// <returns>Task to run the engine.</returns>
         /// <exception cref="System.ArgumentNullException">
-        /// <paramref name="parameters"/>.Project is null.
+        /// <paramref name="parameters"/>.Project is <c>null</c>.
         /// </exception>
         public static Task Run(ConfuserParameters parameters, CancellationToken? token = null)
         {
@@ -58,13 +59,17 @@ namespace Confuser.Core
             bool ok = false;
             try
             {
+                Marker marker = parameters.GetMarker();
 
                 // 2. Discover plugins
                 context.Logger.Debug("Discovering plugins...");
                 IList<Protection> prots;
                 IList<Packer> packers;
                 parameters.GetPluginDiscovery().GetPlugins(context, out prots, out packers);
-                var components = prots.OfType<ConfuserComponent>().Concat(packers.OfType<ConfuserComponent>()).ToArray();
+                var components = new ConfuserComponent[] { new CoreComponent(parameters, marker) }
+                    .Concat(prots.OfType<ConfuserComponent>())
+                    .Concat(packers.OfType<ConfuserComponent>())
+                    .ToList();
                 context.Logger.InfoFormat("Discovered {0} protections, {1} packers.", prots.Count, packers.Count);
 
                 // 3. Resolve dependency
@@ -82,7 +87,6 @@ namespace Confuser.Core
 
                 // 4. Load modules
                 context.Logger.Info("Loading input modules...");
-                Marker marker = new Marker();
                 marker.Initalize(prots, packers);
                 var markings = marker.MarkProject(parameters.Project, context);
                 context.Modules = markings.Modules;
@@ -119,9 +123,17 @@ namespace Confuser.Core
 
                 ok = true;
             }
+            catch (AssemblyResolveException ex)
+            {
+                context.Logger.ErrorException("Failed to resolve a assembly, check if all dependencies are of correct version.", ex);
+            }
             catch (TypeResolveException ex)
             {
-                context.Logger.ErrorException("Failed to find a type, check if all dependencies are of correct version.", ex);
+                context.Logger.ErrorException("Failed to resolve a type, check if all dependencies are of correct version.", ex);
+            }
+            catch (MemberRefResolveException ex)
+            {
+                context.Logger.ErrorException("Failed to resolve a member, check if all dependencies are of correct version.", ex);
             }
             catch (OperationCanceledException)
             {
@@ -153,16 +165,16 @@ namespace Confuser.Core
 
             context.CurrentModuleIndex = -1;
 
-            pipeline.ExecuteStage(PipelineStage.Inspection, Inspection, getAllDefs(), context);
+            pipeline.ExecuteStage(PipelineStage.Inspection, Inspection, () => getAllDefs(), context);
 
             for (int i = 0; i < context.Modules.Count; i++)
             {
                 context.CurrentModuleIndex = i;
 
-                pipeline.ExecuteStage(PipelineStage.BeginModule, BeginModule, getModuleDefs(context.CurrentModule), context);
-                pipeline.ExecuteStage(PipelineStage.OptimizeMethods, OptimizeMethods, getModuleDefs(context.CurrentModule), context);
-                pipeline.ExecuteStage(PipelineStage.WriteModule, WriteModule, getModuleDefs(context.CurrentModule), context);
-                pipeline.ExecuteStage(PipelineStage.EndModule, EndModule, getModuleDefs(context.CurrentModule), context);
+                pipeline.ExecuteStage(PipelineStage.BeginModule, BeginModule, () => getModuleDefs(context.CurrentModule), context);
+                pipeline.ExecuteStage(PipelineStage.OptimizeMethods, OptimizeMethods, () => getModuleDefs(context.CurrentModule), context);
+                pipeline.ExecuteStage(PipelineStage.WriteModule, WriteModule, () => getModuleDefs(context.CurrentModule), context);
+                pipeline.ExecuteStage(PipelineStage.EndModule, EndModule, () => getModuleDefs(context.CurrentModule), context);
 
                 context.OutputModules[i] = context.CurrentModuleOutput;
                 context.CurrentModuleWriterOptions = null;
@@ -171,9 +183,9 @@ namespace Confuser.Core
 
             context.CurrentModuleIndex = -1;
 
-            pipeline.ExecuteStage(PipelineStage.Debug, Debug, getAllDefs(), context);
-            pipeline.ExecuteStage(PipelineStage.Pack, Pack, getAllDefs(), context);
-            pipeline.ExecuteStage(PipelineStage.SaveModules, SaveModules, getAllDefs(), context);
+            pipeline.ExecuteStage(PipelineStage.Debug, Debug, () => getAllDefs(), context);
+            pipeline.ExecuteStage(PipelineStage.Pack, Pack, () => getAllDefs(), context);
+            pipeline.ExecuteStage(PipelineStage.SaveModules, SaveModules, () => getAllDefs(), context);
 
             context.Logger.Info("Done.");
         }
@@ -208,6 +220,8 @@ namespace Confuser.Core
                     context.Logger.WarnFormat("Provided SN Key and signed module's public key do not match, the output may not be working.");
             }
 
+            IMarkerService marker = context.Registry.GetService<IMarkerService>();
+
             context.Logger.Debug("Creating global .cctors...");
             foreach (var module in context.Modules)
             {
@@ -217,8 +231,11 @@ namespace Confuser.Core
                     modType = new TypeDefUser("", "<Module>", null);
                     modType.Attributes = TypeAttributes.AnsiClass;
                     module.Types.Add(modType);
+                    marker.Mark(modType);
                 }
-                modType.FindOrCreateStaticConstructor();
+                var cctor = modType.FindOrCreateStaticConstructor();
+                if (!marker.IsMarked(cctor))
+                    marker.Mark(cctor);
             }
 
             context.Logger.Debug("Watermarking...");
@@ -227,6 +244,7 @@ namespace Confuser.Core
                 var attrRef = module.CorLibTypes.GetTypeRef("System", "Attribute");
                 var attrType = new TypeDefUser("", "ConfusedByAttribute", attrRef);
                 module.Types.Add(attrType);
+                marker.Mark(attrType);
 
                 MethodDefUser ctor = new MethodDefUser(
                     ".ctor",
@@ -239,6 +257,7 @@ namespace Confuser.Core
                 ctor.Body.Instructions.Add(OpCodes.Call.ToInstruction(new MemberRefUser(module, ".ctor", MethodSig.CreateInstance(module.CorLibTypes.Void), attrRef)));
                 ctor.Body.Instructions.Add(OpCodes.Ret.ToInstruction());
                 attrType.Methods.Add(ctor);
+                marker.Mark(ctor);
 
                 CustomAttribute attr = new CustomAttribute(ctor);
                 attr.ConstructorArguments.Add(new CAArgument(module.CorLibTypes.String, "ConfuserEx 0.1"));
@@ -281,7 +300,7 @@ namespace Confuser.Core
         {
             string output = context.Modules[context.CurrentModuleIndex].Location;
             if (output != null)
-                output = Utilities.GetRelativePath(output, context.BaseDirectory);
+                output = Utils.GetRelativePath(output, context.BaseDirectory);
             else
                 output = context.CurrentModule.Name;
             context.OutputPaths[context.CurrentModuleIndex] = output;

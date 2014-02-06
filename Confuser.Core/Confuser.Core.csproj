@@ -48,8 +48,10 @@
     <Compile Include="ConfuserEngine.cs" />
     <Compile Include="ConfuserException.cs" />
     <Compile Include="ConfuserParameters.cs" />
+    <Compile Include="CoreComponent.cs" />
     <Compile Include="DependencyResolver.cs" />
     <Compile Include="ConfuserComponent.cs" />
+    <Compile Include="DnlibUtils.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Marker.cs" />
     <Compile Include="MarkerResult.cs" />
@@ -69,8 +71,10 @@
     <Compile Include="ProtectionPreset.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceRegistry.cs" />
+    <Compile Include="Services\MarkerService.cs" />
+    <Compile Include="Services\RandomService.cs" />
     <Compile Include="UnreachableException.cs" />
-    <Compile Include="Utilities.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\dnlib\src\dnlib.csproj">
@@ -86,9 +90,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

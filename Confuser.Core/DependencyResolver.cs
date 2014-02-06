@@ -111,7 +111,7 @@ namespace Confuser.Core
 
             //First one must be root node.
             Debug.Assert(sortedNodes.Length >= 1 && sortedNodes[0].Protection == null);
-            return sortedNodes.Skip(1).Select(node => node.Protection).ToArray();
+            return sortedNodes.Skip(1).Select(node => node.Protection).ToList();
         }
 
         /// <summary>

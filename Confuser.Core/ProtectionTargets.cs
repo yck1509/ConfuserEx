@@ -8,9 +8,6 @@ namespace Confuser.Core
     /// <summary>
     /// Targets of protection.
     /// </summary>
-    /// <remarks>
-    /// <see cref="ProtectionTargets.Module"/> cannot be used with other flags.
-    /// </remarks>
     [Flags]
     public enum ProtectionTargets
     {
@@ -24,9 +21,11 @@ namespace Confuser.Core
         Events = 8,
         /// <summary> Property definitions. </summary>
         Properties = 16,
-        /// <summary> All member definitions (i.e. type, methods, fields, events, properties). </summary>
+        /// <summary> All member definitions (i.e. type, methods, fields, events and properties). </summary>
         AllMembers = Types | Methods | Fields | Events | Properties,
-        /// <summary> Module definition. </summary>
-        Module = 32,
+        /// <summary> Module definitions. </summary>
+        Modules = 32,
+        /// <summary> All definitions (i.e. All member definitions and modules). </summary>
+        AllDefinitions = AllMembers | Modules,
     }
 }

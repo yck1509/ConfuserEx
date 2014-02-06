@@ -66,7 +66,7 @@ namespace Confuser.Core
         /// <param name="context">The context.</param>
         /// <param name="target">The protection target.</param>
         /// <param name="parameters">The parameters.</param>
-        internal static void SetParameters(
+        public static void SetParameters(
             ConfuserContext context, IDefinition target, ProtectionSettings parameters)
         {
             context.Annotations.Set(target, ParametersKey, parameters);
@@ -78,7 +78,7 @@ namespace Confuser.Core
         /// <param name="context">The context.</param>
         /// <param name="target">The protection target.</param>
         /// <returns>The parameters.</returns>
-        internal static ProtectionSettings GetParameters(
+        public static ProtectionSettings GetParameters(
             ConfuserContext context, IDefinition target)
         {
             return context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
