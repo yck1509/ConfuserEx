@@ -237,7 +237,7 @@ namespace Confuser.Renamer
             {
                 VTableSignature sig = VTableSignature.FromMethod(method);
                 VTableSlot methodSlot = new VTableSlot(ret, method, method.DeclaringType.ToTypeSig(), sig);
-                if (slotDict.ContainsKey(sig))
+                if (slotDict.ContainsKey(sig) && slotDict[sig].Count > 0)
                 {
                     ret.Override(slotDict, sig, methodSlot);
                     methodsProcessed.Add(method);

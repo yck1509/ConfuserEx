@@ -92,6 +92,8 @@ namespace Confuser.Core
                 context.Modules = markings.Modules;
                 context.OutputModules = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToList();
                 context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToList();
+                foreach (var module in context.Modules)
+                    asmResolver.AddToCache(module);
 
                 // 5. Initialize components
                 context.Logger.Info("Initializing...");
@@ -198,7 +200,10 @@ namespace Confuser.Core
             {
                 try
                 {
-                    context.Resolver.ResolveThrow(dependency.Item1, dependency.Item2);
+                    var assembly = context.Resolver.ResolveThrow(dependency.Item1, dependency.Item2);
+                    foreach (var module in assembly.Modules)
+                        if (!context.Modules.Contains((ModuleDefMD)module))
+                            module.EnableTypeDefFindCache = true;
                 }
                 catch (AssemblyResolveException ex)
                 {
@@ -274,6 +279,13 @@ namespace Confuser.Core
             context.CurrentModuleWriterOptions = new ModuleWriterOptions(context.CurrentModule, context.CurrentModuleWriterListener);
             var snKey = context.Annotations.Get<StrongNameKey>(context.CurrentModule, Marker.SNKey);
             context.CurrentModuleWriterOptions.InitializeStrongNameSigning(context.CurrentModule, snKey);
+
+            foreach (var type in context.CurrentModule.GetTypes())
+                foreach (var method in type.Methods)
+                {
+                    if (method.Body != null)
+                        method.Body.Instructions.SimplifyMacros(method.Body.Variables, method.Parameters);
+                }
         }
 
         static void OptimizeMethods(ConfuserContext context)
@@ -326,6 +338,9 @@ namespace Confuser.Core
             for (int i = 0; i < context.Modules.Count; i++)
             {
                 string path = Path.GetFullPath(Path.Combine(context.OutputDirectory, context.OutputPaths[i]));
+                var dir = Path.GetDirectoryName(path);
+                if (!Directory.Exists(dir))
+                    Directory.CreateDirectory(dir);
                 File.WriteAllBytes(path, context.OutputModules[i]);
             }
         }

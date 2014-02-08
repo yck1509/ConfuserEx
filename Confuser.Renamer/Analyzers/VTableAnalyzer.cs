@@ -29,13 +29,18 @@ namespace Confuser.Renamer.Analyzers
             else
             {
                 foreach (var baseSlot in slot.Overrides)
+                {
+                    // Better on safe side, add references to both methods.
                     service.AddReference(method, new OverrideDirectiveReference(slot, baseSlot));
+                    service.AddReference(baseSlot.MethodDef, new OverrideDirectiveReference(slot, baseSlot));
+                }
             }
         }
 
 
         public void PreRename(ConfuserContext context, INameService service, IDefinition def)
         {
+            //
         }
 
         class MethodDefOrRefComparer : IEqualityComparer<IMethodDefOrRef>

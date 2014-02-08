@@ -202,7 +202,6 @@ namespace Confuser.Core
             }
             return self;
         }
-
     }
 
     /// <summary>

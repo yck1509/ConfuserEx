@@ -34,11 +34,17 @@ namespace Confuser.Core
         /// </summary>
         public const string _MarkerServiceId = "Confuser.Marker";
 
+        /// <summary>
+        /// The service ID of Trace
+        /// </summary>
+        public const string _TraceServiceId = "Confuser.Trace";
+
         /// <inheritdoc/>
         protected internal override void Initialize(ConfuserContext context)
         {
             context.Registry.RegisterService(_RandomServiceId, typeof(IRandomService), new RandomService(parameters.Project.Seed));
             context.Registry.RegisterService(_MarkerServiceId, typeof(IMarkerService), new MarkerService(context, marker));
+            context.Registry.RegisterService(_TraceServiceId, typeof(ITraceService), new TraceService(context));
         }
 
         /// <inheritdoc/>

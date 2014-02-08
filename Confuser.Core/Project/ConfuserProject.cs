@@ -36,7 +36,7 @@ namespace Confuser.Core.Project
         /// <value>The password of the strong name private key, or null if not necessary.</value>
         public string SNKeyPassword { get; set; }
         /// <summary>
-        /// Gets a list of protection rules applied to the module
+        /// Gets a list of protection rules applies to the module.
         /// </summary>
         /// <value>A list of protection rules.</value>
         public IList<Rule> Rules { get; private set; }
@@ -110,9 +110,9 @@ namespace Confuser.Core.Project
             Rules.Clear();
             foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>())
             {
-                Rule settings = new Rule();
-                settings.Load(i);
-                Rules.Add(settings);
+                Rule rule = new Rule();
+                rule.Load(i);
+                Rules.Add(rule);
             }
         }
 
@@ -358,6 +358,7 @@ namespace Confuser.Core.Project
         public ConfuserProject()
         {
             this.ProbePaths = new List<string>();
+            this.Rules = new List<Rule>();
         }
 
         /// <summary>
@@ -383,6 +384,12 @@ namespace Confuser.Core.Project
         /// </summary>
         /// <value>The base directory.</value>
         public string BaseDirectory { get; set; }
+
+        /// <summary>
+        /// Gets a list of protection rules that applies globally.
+        /// </summary>
+        /// <value>A list of protection rules.</value>
+        public IList<Rule> Rules { get; private set; }
 
         /// <summary>
         /// Gets or sets the packer used to pack up the output.
@@ -495,9 +502,16 @@ namespace Confuser.Core.Project
             Packer = null;
             this.Clear();
             ProbePaths.Clear();
+            Rules.Clear();
             foreach (XmlElement i in docElem.ChildNodes.OfType<XmlElement>())
             {
-                if (i.Name == "packer")
+                if (i.Name == "rule")
+                {
+                    Rule rule = new Rule();
+                    rule.Load(i);
+                    Rules.Add(rule);
+                }
+                else if (i.Name == "packer")
                 {
                     Packer = new SettingItem<Packer>();
                     Packer.Load(i);

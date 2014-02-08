@@ -31,3 +31,5 @@ _ReSharper*/
 /docs
 !packages/*/build/
 packages/
+/Confuser.Test
+*.sln.*

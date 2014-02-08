@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="AntiILDasmProtection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectorTrapProtection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -52,6 +53,10 @@
     <ProjectReference Include="..\Confuser.Core\Confuser.Core.csproj">
       <Project>{BEB67A6E-4C54-4DE5-8C6B-2C12F44A7B92}</Project>
       <Name>Confuser.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Confuser.Renamer\Confuser.Renamer.csproj">
+      <Project>{862DA0DA-52E1-47CD-B9C2-46B106031B28}</Project>
+      <Name>Confuser.Renamer</Name>
     </ProjectReference>
     <ProjectReference Include="..\dnlib\src\dnlib.csproj">
       <Project>{FDFC1237-143F-4919-8318-4926901F4639}</Project>

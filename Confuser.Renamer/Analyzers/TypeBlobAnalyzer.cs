@@ -10,7 +10,7 @@ using Confuser.Renamer.References;
 
 namespace Confuser.Renamer.Analyzers
 {
-    class GenericAnalyzer : IRenamer
+    class TypeBlobAnalyzer : IRenamer
     {
         public void Analyze(ConfuserContext context, INameService service, IDefinition def)
         {
@@ -36,12 +36,23 @@ namespace Confuser.Renamer.Analyzers
             var attrs = Enumerable.Range(1, (int)len)
                 .Select(rid => module.ResolveHasCustomAttribute(module.TablesStream.ReadCustomAttributeRow((uint)rid).Parent))
                 .Distinct()
-                .SelectMany(owner => owner.CustomAttributes)
-                .ToList();
-            Debug.Assert(len == attrs.Count);
+                .SelectMany(owner => owner.CustomAttributes);
+            // Just resolving the attributes is enough for dnlib to correct the references.
             foreach (var attr in attrs)
             {
-                AnalyzeCustomAttributes(context, service, attr);
+                TypeDef attrType = attr.AttributeType.ResolveTypeDefThrow();
+                if (!context.Modules.Contains((ModuleDefMD)attrType.Module))
+                    continue;
+                foreach (var fieldArg in attr.Fields)
+                {
+                    FieldDef field = attrType.FindField(fieldArg.Name, new FieldSig(fieldArg.Type));
+                    service.AddReference(field, new CAMemberReference(fieldArg, field));
+                }
+                foreach (var propertyArg in attr.Properties)
+                {
+                    PropertyDef property = attrType.FindProperty(propertyArg.Name, new PropertySig(true, propertyArg.Type));
+                    service.AddReference(property, new CAMemberReference(propertyArg, property));
+                }
             }
         }
 
@@ -61,8 +72,8 @@ namespace Confuser.Renamer.Analyzers
             if (sig is GenericInstSig)
             {
                 GenericInstSig inst = (GenericInstSig)sig;
-                TypeDef openType = inst.GenericType.TypeDef;
-                if (openType == null || openType.Module != memberRef.Module)
+                TypeDef openType = inst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
+                if (openType == null || !context.Modules.Contains((ModuleDefMD)openType.Module))
                     return;
 
                 IDefinition member;
@@ -75,17 +86,14 @@ namespace Confuser.Renamer.Analyzers
 
         }
 
-        void AnalyzeCustomAttributes(ConfuserContext context, INameService service, CustomAttribute attr)
-        {
-        }
-
-
         public void PreRename(ConfuserContext context, INameService service, IDefinition def)
         {
+            //
         }
 
         public void PostRename(ConfuserContext context, INameService service, IDefinition def)
         {
+            //
         }
     }
 }

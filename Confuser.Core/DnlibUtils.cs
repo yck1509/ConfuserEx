@@ -22,12 +22,16 @@ namespace Confuser.Core
             foreach (var type in module.GetTypes())
             {
                 yield return type;
+
                 foreach (var method in type.Methods)
                     yield return method;
+
                 foreach (var field in type.Fields)
                     yield return field;
+
                 foreach (var prop in type.Properties)
                     yield return prop;
+
                 foreach (var evt in type.Events)
                     yield return evt;
             }
@@ -105,10 +109,14 @@ namespace Confuser.Core
             do
             {
                 foreach (var iface in type.Interfaces)
+                {
                     if (iface.Interface.FullName == fullName)
                         return true;
+                }
+
                 if (type.BaseType == null)
                     return false;
+
                 type = type.BaseType.ResolveTypeDefThrow();
             } while (type != null);
             throw new UnreachableException();
@@ -117,14 +125,53 @@ namespace Confuser.Core
         /// <summary>
         /// Resolves the method.
         /// </summary>
-        /// <returns>A <see cref="MethodDef"/> instance.</returns>
+        /// <param name="method">The method to resolve.</param>
+        /// <returns>A <see cref="MethodDef" /> instance.</returns>
         /// <exception cref="MemberRefResolveException">The method couldn't be resolved.</exception>
-        public static MethodDef ResolveThrow(this IMethodDefOrRef method)
+        public static MethodDef ResolveThrow(this IMethod method)
         {
-            MethodDef ret = method as MethodDef;
-            if (ret != null)
-                return ret;
+            MethodDef def = method as MethodDef;
+            if (def != null)
+                return def;
+
+            MethodSpec spec = method as MethodSpec;
+            if (spec != null)
+                return spec.Method.ResolveThrow();
+
             return ((MemberRef)method).ResolveMethodThrow();
+        }
+
+        /// <summary>
+        /// Resolves the field.
+        /// </summary>
+        /// <param name="field">The field to resolve.</param>
+        /// <returns>A <see cref="FieldDef" /> instance.</returns>
+        /// <exception cref="MemberRefResolveException">The method couldn't be resolved.</exception>
+        public static FieldDef ResolveThrow(this IField field)
+        {
+            FieldDef def = field as FieldDef;
+            if (def != null)
+                return def;
+
+            return ((MemberRef)field).ResolveFieldThrow();
+        }
+
+        /// <summary>
+        /// Find the basic type reference.
+        /// </summary>
+        /// <param name="field">The type signature to get the basic type.</param>
+        /// <returns>A <see cref="ITypeDefOrRef" /> instance, or null if the typeSig cannot be resolved to basic type.</returns>
+        public static ITypeDefOrRef ToBasicTypeDefOrRef(this TypeSig typeSig)
+        {
+            while (typeSig.Next != null)
+                typeSig = typeSig.Next;
+
+            if (typeSig is GenericInstSig)
+                return ((GenericInstSig)typeSig).GenericType.TypeDefOrRef;
+            else if (typeSig is TypeDefOrRefSig)
+                return ((TypeDefOrRefSig)typeSig).TypeDefOrRef;
+            else
+                return null;
         }
     }
 }

@@ -116,7 +116,7 @@ namespace Confuser.Core
             {
                 context.Logger.InfoFormat("Loading '{0}'...", module.Path);
                 ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
-                var rules = ParseRules(module, context);
+                var rules = ParseRules(proj, module, context);
 
                 context.Annotations.Set(modDef, SNKey, LoadSNKey(context, module.SNKeyPath, module.SNKeyPassword));
                 context.Annotations.Set(modDef, RulesKey, rules);
@@ -154,10 +154,10 @@ namespace Confuser.Core
         /// <exception cref="System.ArgumentException">
         /// One of the rules has invalid RegEx pattern.
         /// </exception>
-        Rules ParseRules(ProjectModule module, ConfuserContext context)
+        Rules ParseRules(ConfuserProject proj, ProjectModule module, ConfuserContext context)
         {
             var ret = new Rules();
-            foreach (var rule in module.Rules)
+            foreach (var rule in module.Rules.Concat(proj.Rules))
             {
                 try
                 {
