@@ -14,7 +14,7 @@ namespace Confuser.Renamer
         bool ShouldCancelRename();
     }
 
-    public interface INameReference<T> : INameReference
+    public interface INameReference<out T> : INameReference
     {
     }
 }

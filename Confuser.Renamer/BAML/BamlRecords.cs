@@ -82,7 +82,6 @@ namespace Confuser.Renamer.BAML
             int size = reader.ReadEncodedInt();
 
             ReadData(reader, size - (int)(reader.BaseStream.Position - pos));
-            Debug.Assert(reader.BaseStream.Position - pos == size);
         }
         int SizeofEncodedInt(int val)
         {

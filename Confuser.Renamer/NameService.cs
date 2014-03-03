@@ -40,6 +40,7 @@ namespace Confuser.Renamer
 
             this.Renamers = new List<IRenamer>()
             {
+                new InterReferenceAnalyzer(),
                 new VTableAnalyzer(),
                 new TypeBlobAnalyzer(),
                 new ResourceAnalyzer(),

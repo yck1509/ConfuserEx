@@ -23,7 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>Confuser.Core.xml</DocumentationFile>
+    <DocumentationFile>..\Debug\bin\Confuser.Core.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,7 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>Confuser.Core.xml</DocumentationFile>
+    <DocumentationFile>..\Release\bin\Confuser.Core.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -74,6 +74,7 @@
     <Compile Include="Services\MarkerService.cs" />
     <Compile Include="Services\RandomService.cs" />
     <Compile Include="Services\TraceService.cs" />
+    <Compile Include="Tuples.cs" />
     <Compile Include="UnreachableException.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>

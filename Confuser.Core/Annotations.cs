@@ -166,7 +166,7 @@ namespace Confuser.Core
         }
 
         /// <summary>
-        /// Sets a annotation on the specified object.
+        /// Sets an annotation on the specified object.
         /// </summary>
         /// <typeparam name="TValue">The type of the value.</typeparam>
         /// <param name="obj">The object.</param>

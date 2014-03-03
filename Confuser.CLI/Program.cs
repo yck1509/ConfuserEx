@@ -90,6 +90,12 @@ namespace Confuser.CLI
 
         class ConsoleLogger : ILogger
         {
+            DateTime begin;
+            public ConsoleLogger()
+            {
+                begin = DateTime.Now;
+            }
+
             public int ReturnValue { get; private set; }
 
             public void Debug(string msg)
@@ -130,18 +136,18 @@ namespace Confuser.CLI
 
             public void Error(string msg)
             {
-                WriteLineWithColor(ConsoleColor.Yellow, "[ERROR] " + msg);
+                WriteLineWithColor(ConsoleColor.Red, "[ERROR] " + msg);
             }
 
             public void ErrorFormat(string format, params object[] args)
             {
-                WriteLineWithColor(ConsoleColor.Yellow, "[ERROR] " + string.Format(format, args));
+                WriteLineWithColor(ConsoleColor.Red, "[ERROR] " + string.Format(format, args));
             }
 
             public void ErrorException(string msg, Exception ex)
             {
-                WriteLineWithColor(ConsoleColor.Yellow, "[ERROR] " + msg);
-                WriteLineWithColor(ConsoleColor.Yellow, "Exception: " + ex.ToString());
+                WriteLineWithColor(ConsoleColor.Red, "[ERROR] " + msg);
+                WriteLineWithColor(ConsoleColor.Red, "Exception: " + ex.ToString());
             }
 
             public void Progress(int overall, int progress)
@@ -151,10 +157,16 @@ namespace Confuser.CLI
 
             public void Finish(bool successful)
             {
+                DateTime now = DateTime.Now;
+                string timeString = string.Format(
+                    "at {0}, {1}:{2} elapsed.",
+                    now.ToShortTimeString(),
+                    (int)now.Subtract(begin).TotalMinutes,
+                    now.Subtract(begin).Seconds);
                 if (successful)
-                    WriteLineWithColor(ConsoleColor.Green, "Finished at " + DateTime.Now.ToShortTimeString());
+                    WriteLineWithColor(ConsoleColor.Green, "Finished " + timeString);
                 else
-                    WriteLineWithColor(ConsoleColor.Green, "Failed at " + DateTime.Now.ToShortTimeString());
+                    WriteLineWithColor(ConsoleColor.Red, "Failed " + timeString);
             }
         }
     }

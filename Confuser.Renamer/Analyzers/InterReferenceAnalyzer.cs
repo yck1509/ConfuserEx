@@ -6,13 +6,14 @@ using Confuser.Core;
 using dnlib.DotNet;
 using Confuser.Core.Services;
 using dnlib.DotNet.MD;
+using Confuser.Renamer.References;
 
 namespace Confuser.Renamer.Analyzers
 {
-    class InterReferenceAnalyzer: IRenamer
+    class InterReferenceAnalyzer : IRenamer
     {
         // i.e. Inter-Assembly References, e.g. InternalVisibleToAttributes
-        
+
         public void Analyze(ConfuserContext context, INameService service, IDefinition def)
         {
             ModuleDefMD module = def as ModuleDefMD;
@@ -29,9 +30,24 @@ namespace Confuser.Renamer.Analyzers
                 MemberRef memberRef = module.ResolveMemberRef(i);
 
                 TypeDef declType = memberRef.DeclaringType.ResolveTypeDefThrow();
-                if (context.Modules.Contains((ModuleDefMD)declType.Module))
+                if (declType.Module != module && context.Modules.Contains((ModuleDefMD)declType.Module))
                 {
-                    
+                    IDefinition memberDef = (IDefinition)declType.ResolveThrow(memberRef);
+                    service.AddReference(memberDef, new MemberRefReference(memberRef, memberDef));
+                }
+            }
+
+            // TypeRef
+            table = module.TablesStream.Get(Table.TypeRef);
+            len = table.Rows;
+            for (uint i = 1; i <= len; i++)
+            {
+                TypeRef typeRef = module.ResolveTypeRef(i);
+
+                TypeDef typeDef = typeRef.ResolveTypeDefThrow();
+                if (typeDef.Module != module && context.Modules.Contains((ModuleDefMD)typeDef.Module))
+                {
+                    service.AddReference(typeDef, new TypeRefReference(typeRef, typeDef));
                 }
             }
 

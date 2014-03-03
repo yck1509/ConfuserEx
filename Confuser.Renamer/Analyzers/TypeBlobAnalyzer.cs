@@ -40,9 +40,19 @@ namespace Confuser.Renamer.Analyzers
             // Just resolving the attributes is enough for dnlib to correct the references.
             foreach (var attr in attrs)
             {
+                foreach (var arg in attr.ConstructorArguments)
+                    AnalyzeCAArgument(context, service, arg);
+
+                foreach (var arg in attr.Fields)
+                    AnalyzeCAArgument(context, service, arg.Argument);
+
+                foreach (var arg in attr.Properties)
+                    AnalyzeCAArgument(context, service, arg.Argument);
+
                 TypeDef attrType = attr.AttributeType.ResolveTypeDefThrow();
                 if (!context.Modules.Contains((ModuleDefMD)attrType.Module))
                     continue;
+
                 foreach (var fieldArg in attr.Fields)
                 {
                     FieldDef field = attrType.FindField(fieldArg.Name, new FieldSig(fieldArg.Type));
@@ -53,6 +63,26 @@ namespace Confuser.Renamer.Analyzers
                     PropertyDef property = attrType.FindProperty(propertyArg.Name, new PropertySig(true, propertyArg.Type));
                     service.AddReference(property, new CAMemberReference(propertyArg, property));
                 }
+            }
+        }
+
+        void AnalyzeCAArgument(ConfuserContext context, INameService service, CAArgument arg)
+        {
+            if (arg.Type.DefinitionAssembly.IsCorLib() && arg.Type.FullName == "System.Type")
+            {
+                TypeSig typeSig = (TypeSig)arg.Value;
+                foreach (var typeRef in typeSig.FindTypeRefs())
+                {
+                    if (!(typeRef is TypeRef)) continue;
+                    TypeDef typeDef = typeRef.ResolveTypeDefThrow();
+                    if (context.Modules.Contains((ModuleDefMD)typeDef.Module))
+                        service.AddReference(typeDef, new TypeRefReference((TypeRef)typeRef, typeDef));
+                }
+            }
+            else if (arg.Value is CAArgument[])
+            {
+                foreach (var elem in (CAArgument[])arg.Value)
+                    AnalyzeCAArgument(context, service, elem);
             }
         }
 
@@ -81,7 +111,7 @@ namespace Confuser.Renamer.Analyzers
                 else if (memberRef.IsMethodRef) member = memberRef.ResolveMethodThrow();
                 else throw new UnreachableException();
 
-                service.AddReference(member, new GenericMemberRefReference(memberRef, member));
+                service.AddReference(member, new MemberRefReference(memberRef, member));
             }
 
         }

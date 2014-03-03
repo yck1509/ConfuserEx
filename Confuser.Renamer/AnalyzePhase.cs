@@ -57,6 +57,8 @@ namespace Confuser.Renamer
                     Analyze(service, context, (PropertyDef)def);
                 else if (def is EventDef)
                     Analyze(service, context, (EventDef)def);
+                else if (def is ModuleDef)
+                    service.SetCanRename(def, false);
 
                 foreach (var renamer in renamers)
                     renamer.Analyze(context, service, def);

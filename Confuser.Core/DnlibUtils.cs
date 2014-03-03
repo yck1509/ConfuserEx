@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using dnlib.DotNet;
+using System.IO;
+using dnlib.IO;
 
 namespace Confuser.Core
 {
@@ -159,7 +161,7 @@ namespace Confuser.Core
         /// <summary>
         /// Find the basic type reference.
         /// </summary>
-        /// <param name="field">The type signature to get the basic type.</param>
+        /// <param name="typeSig">The type signature to get the basic type.</param>
         /// <returns>A <see cref="ITypeDefOrRef" /> instance, or null if the typeSig cannot be resolved to basic type.</returns>
         public static ITypeDefOrRef ToBasicTypeDefOrRef(this TypeSig typeSig)
         {
@@ -172,6 +174,186 @@ namespace Confuser.Core
                 return ((TypeDefOrRefSig)typeSig).TypeDefOrRef;
             else
                 return null;
+        }
+
+        /// <summary>
+        /// Find the type references within the specified type signature.
+        /// </summary>
+        /// <param name="typeSig">The type signature to find the type references.</param>
+        /// <returns>A list of <see cref="ITypeDefOrRef" /> instance.</returns>
+        public static IList<ITypeDefOrRef> FindTypeRefs(this TypeSig typeSig)
+        {
+            List<ITypeDefOrRef> ret = new List<ITypeDefOrRef>();
+            FindTypeRefsInternal(typeSig, ret);
+            return ret;
+        }
+
+        static void FindTypeRefsInternal(TypeSig typeSig, IList<ITypeDefOrRef> ret)
+        {
+            while (typeSig.Next != null)
+            {
+                if (typeSig is ModifierSig)
+                    ret.Add(((ModifierSig)typeSig).Modifier);
+                typeSig = typeSig.Next;
+            }
+
+            if (typeSig is GenericInstSig)
+            {
+                GenericInstSig genInst = (GenericInstSig)typeSig;
+                ret.Add(genInst.GenericType.TypeDefOrRef);
+                foreach (var genArg in genInst.GenericArguments)
+                    FindTypeRefsInternal(genArg, ret);
+            }
+            else if (typeSig is TypeDefOrRefSig)
+                ret.Add(((TypeDefOrRefSig)typeSig).TypeDefOrRef);
+        }
+
+        /// <summary>
+        /// Determines whether the specified property is public.
+        /// </summary>
+        /// <param name="property">The property.</param>
+        /// <returns><c>true</c> if the specified property is public; otherwise, <c>false</c>.</returns>
+        public static bool IsPublic(this PropertyDef property)
+        {
+            if (property.GetMethod != null && property.GetMethod.IsPublic)
+                return true;
+
+            if (property.SetMethod != null && property.SetMethod.IsPublic)
+                return true;
+
+            return property.OtherMethods.Any(method => method.IsPublic);
+        }
+
+        /// <summary>
+        /// Determines whether the specified property is static.
+        /// </summary>
+        /// <param name="property">The property.</param>
+        /// <returns><c>true</c> if the specified property is static; otherwise, <c>false</c>.</returns>
+        public static bool IsStatic(this PropertyDef property)
+        {
+            if (property.GetMethod != null && property.GetMethod.IsStatic)
+                return true;
+
+            if (property.SetMethod != null && property.SetMethod.IsStatic)
+                return true;
+
+            return property.OtherMethods.Any(method => method.IsStatic);
+        }
+
+        /// <summary>
+        /// Determines whether the specified event is public.
+        /// </summary>
+        /// <param name="evt">The event.</param>
+        /// <returns><c>true</c> if the specified event is public; otherwise, <c>false</c>.</returns>
+        public static bool IsPublic(this EventDef evt)
+        {
+            if (evt.AddMethod != null && evt.AddMethod.IsPublic)
+                return true;
+
+            if (evt.RemoveMethod != null && evt.RemoveMethod.IsPublic)
+                return true;
+
+            if (evt.InvokeMethod != null && evt.InvokeMethod.IsPublic)
+                return true;
+
+            return evt.OtherMethods.Any(method => method.IsPublic);
+        }
+
+        /// <summary>
+        /// Determines whether the specified event is static.
+        /// </summary>
+        /// <param name="evt">The event.</param>
+        /// <returns><c>true</c> if the specified event is static; otherwise, <c>false</c>.</returns>
+        public static bool IsStatic(this EventDef evt)
+        {
+            if (evt.AddMethod != null && evt.AddMethod.IsStatic)
+                return true;
+
+            if (evt.RemoveMethod != null && evt.RemoveMethod.IsStatic)
+                return true;
+
+            if (evt.InvokeMethod != null && evt.InvokeMethod.IsStatic)
+                return true;
+
+            return evt.OtherMethods.Any(method => method.IsStatic);
+        }
+    }
+
+
+    public class ImageStream : Stream
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageStream"/> class.
+        /// </summary>
+        /// <param name="baseStream">The base stream.</param>
+        public ImageStream(IImageStream baseStream)
+        {
+            this.BaseStream = baseStream;
+        }
+
+        /// <summary>
+        /// Gets the base stream of this instance.
+        /// </summary>
+        /// <value>The base stream.</value>
+        public IImageStream BaseStream { get; private set; }
+
+        /// <inheritdoc/>
+        public override bool CanRead { get { return true; } }
+        /// <inheritdoc/>
+        public override bool CanSeek { get { return true; } }
+        /// <inheritdoc/>
+        public override bool CanWrite { get { return false; } }
+
+        /// <inheritdoc/>
+        public override void Flush() { }
+
+        /// <inheritdoc/>
+        public override long Length
+        {
+            get { return BaseStream.Length; }
+        }
+
+        /// <inheritdoc/>
+        public override long Position
+        {
+            get { return BaseStream.Position; }
+            set { BaseStream.Position = value; }
+        }
+
+        /// <inheritdoc/>
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return BaseStream.Read(buffer, offset, count);
+        }
+
+        /// <inheritdoc/>
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            switch (origin)
+            {
+                case SeekOrigin.Begin:
+                    BaseStream.Position = offset;
+                    break;
+                case SeekOrigin.Current:
+                    BaseStream.Position += offset;
+                    break;
+                case SeekOrigin.End:
+                    BaseStream.Position = BaseStream.Length + offset;
+                    break;
+            }
+            return BaseStream.Position;
+        }
+
+        /// <inheritdoc/>
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <inheritdoc/>
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            throw new NotSupportedException();
         }
     }
 }

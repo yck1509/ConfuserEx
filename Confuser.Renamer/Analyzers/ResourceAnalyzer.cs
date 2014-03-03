@@ -57,7 +57,11 @@ namespace Confuser.Renamer.Analyzers
                     if (!match.Success)
                         continue;
                     string typeName = match.Groups[1].Value;
-                    TypeDef type = module.FindReflectionThrow(typeName);
+
+                    if (typeName.EndsWith(".g")) // WPF resources, ignore
+                        continue;
+
+                    TypeDef type = module.FindReflection(typeName);
                     if (type == null)
                     {
                         context.Logger.WarnFormat("Could not found resource type '{0}'.", typeName);

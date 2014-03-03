@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using System.Diagnostics;
 
 namespace Confuser.Core.Services
 {
@@ -64,6 +65,12 @@ namespace Confuser.Core.Services
             this.method = method;
         }
 
+        /// <summary>
+        /// Gets the method this trace belongs to.
+        /// </summary>
+        /// <value>The method.</value>
+        public MethodDef Method { get { return method; } }
+
         Dictionary<uint, int> offset2index;
         /// <summary>
         /// Gets the map of offset to index.
@@ -77,7 +84,7 @@ namespace Confuser.Core.Services
         /// <value>The stack depths.</value>
         public int[] StackDepths { get; private set; }
 
-        Dictionary<Instruction, List<Instruction>> fromInstrs;
+        Dictionary<int, List<Instruction>> fromInstrs;
 
         /// <summary>
         /// Perform the actual tracing.
@@ -91,7 +98,7 @@ namespace Confuser.Core.Services
 
             offset2index = new Dictionary<uint, int>();
             var depths = new int[body.Instructions.Count];
-            fromInstrs = new Dictionary<Instruction, List<Instruction>>();
+            fromInstrs = new Dictionary<int, List<Instruction>>();
 
             var instrs = body.Instructions;
             for (int i = 0; i < instrs.Count; i++)
@@ -114,18 +121,14 @@ namespace Confuser.Core.Services
             {
                 var instr = instrs[i];
 
-                if (depths[i] != -1)   // already set due to being target of a branch.
+                if (depths[i] != -1)   // Already set due to being target of a branch / beginning of EHs.
                     currentStack = depths[i];
-                else
-                    depths[i] = currentStack;
-
-                instr.UpdateStack(ref currentStack);
 
                 switch (instr.OpCode.FlowControl)
                 {
                     case FlowControl.Branch:
                         depths[offset2index[((Instruction)instr.Operand).Offset]] = currentStack;
-                        fromInstrs.AddListEntry((Instruction)instr.Operand, instr);
+                        fromInstrs.AddListEntry(offset2index[((Instruction)instr.Operand).Offset], instr);
                         currentStack = 0;
                         break;
                     case FlowControl.Break:
@@ -140,13 +143,13 @@ namespace Confuser.Core.Services
                             foreach (var target in (Instruction[])instr.Operand)
                             {
                                 depths[offset2index[target.Offset]] = currentStack;
-                                fromInstrs.AddListEntry(target, instr);
+                                fromInstrs.AddListEntry(offset2index[target.Offset], instr);
                             }
                         }
                         else
                         {
                             depths[offset2index[((Instruction)instr.Operand).Offset]] = currentStack;
-                            fromInstrs.AddListEntry((Instruction)instr.Operand, instr);
+                            fromInstrs.AddListEntry(offset2index[((Instruction)instr.Operand).Offset], instr);
                         }
                         break;
                     case FlowControl.Meta:
@@ -162,6 +165,9 @@ namespace Confuser.Core.Services
                     default:
                         throw new UnreachableException();
                 }
+
+                instr.UpdateStack(ref currentStack);
+                depths[i] = currentStack;
             }
             foreach (var stackDepth in depths)
                 if (stackDepth == -1)
@@ -170,6 +176,123 @@ namespace Confuser.Core.Services
             StackDepths = depths;
 
             return this;
+        }
+
+        /// <summary>
+        /// Traces the arguments of the specified call instruction.
+        /// </summary>
+        /// <param name="instr">The call instruction.</param>
+        /// <returns>The indexes of the begin instruction of arguments.</returns>
+        /// <exception cref="System.ArgumentException">The specified call instruction is invalid.</exception>
+        /// <exception cref="InvalidMethodException">The method body is invalid.</exception>
+        public int[] TraceArguments(Instruction instr)
+        {
+            if (instr.OpCode.Code != Code.Call && instr.OpCode.Code != Code.Callvirt)
+                throw new ArgumentException("Invalid call instruction.", "instr");
+
+            int push, pop;
+            instr.CalculateStackUsage(out push, out pop);   // pop is number of arguments
+            int instrIndex = offset2index[instr.Offset];
+            int argCount = pop;
+            int targetStack = StackDepths[instrIndex - 1] - argCount + 1;
+
+            // Find the begin instruction of method call
+            int beginInstrIndex = -1;
+            HashSet<uint> seen = new HashSet<uint>();
+            Queue<int> working = new Queue<int>();
+            working.Enqueue(offset2index[instr.Offset] - 1);
+            while (working.Count > 0)
+            {
+                int index = working.Dequeue();
+                while (index >= 0)
+                {
+                    if (StackDepths[index] == targetStack)
+                        break;
+
+                    if (fromInstrs.ContainsKey(index))
+                        foreach (var fromInstr in fromInstrs[index])
+                        {
+                            if (!seen.Contains(fromInstr.Offset))
+                            {
+                                seen.Add(fromInstr.Offset);
+                                working.Enqueue(offset2index[fromInstr.Offset]);
+                            }
+                        }
+                    index--;
+                }
+                if (index < 0)
+                    throw new InvalidMethodException("Empty evaluation stack.");
+
+                if (beginInstrIndex == -1)
+                    beginInstrIndex = index;
+                else if (beginInstrIndex != index)
+                    throw new InvalidMethodException("Stack depth not matched.");
+            }
+
+            // Trace the index of arguments
+            seen.Clear();
+            Queue<Tuple<int, Stack<int>>> working2 = new Queue<Tuple<int, Stack<int>>>();
+            working2.Clear();
+            working2.Enqueue(Tuple.Create(beginInstrIndex, new Stack<int>()));
+            int[] ret = null;
+            while (working2.Count > 0)
+            {
+                var tuple = working2.Dequeue();
+                int index = tuple.Item1;
+                Stack<int> evalStack = tuple.Item2;
+
+                while (index != instrIndex)
+                {
+                    Instruction currentInstr = method.Body.Instructions[index];
+                    currentInstr.CalculateStackUsage(out push, out pop);
+                    int stackUsage = pop - push;
+                    if (stackUsage < 0)
+                    {
+                        Debug.Assert(stackUsage == -1);     // i.e. push
+                        evalStack.Push(index);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < stackUsage; i++)
+                            evalStack.Pop();
+                    }
+
+                    object instrOperand = currentInstr.Operand;
+                    if (currentInstr.Operand is Instruction)
+                    {
+                        var targetIndex = offset2index[((Instruction)currentInstr.Operand).Offset];
+                        if (currentInstr.OpCode.FlowControl == FlowControl.Branch)
+                            index = targetIndex;
+                        else
+                        {
+                            working2.Enqueue(Tuple.Create(targetIndex, new Stack<int>(evalStack)));
+                            index++;
+                        }
+                    }
+
+                    else if (currentInstr.Operand is Instruction[])
+                    {
+                        foreach (var targetInstr in (Instruction[])currentInstr.Operand)
+                            working2.Enqueue(Tuple.Create(offset2index[targetInstr.Offset], new Stack<int>(evalStack)));
+                        index++;
+                    }
+                    else
+                        index++;
+                }
+
+                if (evalStack.Count != argCount)
+                    throw new InvalidMethodException("Cannot find argument index.");
+                else if (ret != null && !evalStack.SequenceEqual(ret))
+                    throw new InvalidMethodException("Stack depths mismatched.");
+                else
+                    ret = evalStack.ToArray();
+            }
+
+            Array.Reverse(ret);
+            if (ret == null)
+                throw new InvalidMethodException("Cannot find argument index.");
+
+            return ret;
         }
     }
 }

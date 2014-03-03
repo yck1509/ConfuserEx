@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 
 namespace Confuser.Renamer.BAML
 {
-    class BamlDocument : Collection<BamlRecord>
+    class BamlDocument : List<BamlRecord>
     {
         public struct BamlVersion
         {

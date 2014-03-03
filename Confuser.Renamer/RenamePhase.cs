@@ -16,7 +16,7 @@ namespace Confuser.Renamer
 
         public override ProtectionTargets Targets
         {
-            get { return ProtectionTargets.AllMembers; }
+            get { return ProtectionTargets.AllDefinitions; }
         }
 
         protected override void Execute(ConfuserContext context, ProtectionParameters parameters)
@@ -62,12 +62,6 @@ namespace Confuser.Renamer
                         throw new ConfuserException(null);
                     }
                 }
-            }
-
-            foreach (var renamer in service.Renamers)
-            {
-                foreach (var def in parameters.Targets)
-                    renamer.PostRename(context, service, def);
             }
         }
     }

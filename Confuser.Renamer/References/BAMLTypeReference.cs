@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using dnlib.DotNet;
+using Confuser.Renamer.BAML;
 using Confuser.Core;
 
 namespace Confuser.Renamer.References
 {
-    class GenericMemberRefReference : INameReference<IDefinition>
+    class BAMLTypeReference : INameReference<TypeDef>
     {
-        MemberRef memberRef;
-        IDefinition memberDef;
-        public GenericMemberRefReference(MemberRef memberRef, IDefinition memberDef)
+        TypeSig sig;
+        TypeInfoRecord rec;
+        public BAMLTypeReference(TypeSig sig, TypeInfoRecord rec)
         {
-            this.memberRef = memberRef;
-            this.memberDef = memberDef;
+            this.sig = sig;
+            this.rec = rec;
         }
 
         public bool UpdateNameReference(ConfuserContext context, INameService service)
         {
-            memberRef.Name = memberDef.Name;
+            rec.TypeFullName = sig.ReflectionFullName;
             return true;
         }
 

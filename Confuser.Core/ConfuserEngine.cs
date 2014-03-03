@@ -89,9 +89,9 @@ namespace Confuser.Core
                 context.Logger.Info("Loading input modules...");
                 marker.Initalize(prots, packers);
                 var markings = marker.MarkProject(parameters.Project, context);
-                context.Modules = markings.Modules;
-                context.OutputModules = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToList();
-                context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToList();
+                context.Modules = markings.Modules.ToList().AsReadOnly();
+                context.OutputModules = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
+                context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToArray();
                 foreach (var module in context.Modules)
                     asmResolver.AddToCache(module);
 
@@ -169,14 +169,24 @@ namespace Confuser.Core
 
             pipeline.ExecuteStage(PipelineStage.Inspection, Inspection, () => getAllDefs(), context);
 
+            ModuleWriterOptionsBase[] options = new ModuleWriterOptionsBase[context.Modules.Count];
             for (int i = 0; i < context.Modules.Count; i++)
             {
                 context.CurrentModuleIndex = i;
 
                 pipeline.ExecuteStage(PipelineStage.BeginModule, BeginModule, () => getModuleDefs(context.CurrentModule), context);
                 pipeline.ExecuteStage(PipelineStage.OptimizeMethods, OptimizeMethods, () => getModuleDefs(context.CurrentModule), context);
-                pipeline.ExecuteStage(PipelineStage.WriteModule, WriteModule, () => getModuleDefs(context.CurrentModule), context);
                 pipeline.ExecuteStage(PipelineStage.EndModule, EndModule, () => getModuleDefs(context.CurrentModule), context);
+
+                options[i] = context.CurrentModuleWriterOptions;
+            }
+
+            for (int i = 0; i < context.Modules.Count; i++)
+            {
+                context.CurrentModuleIndex = i;
+                context.CurrentModuleWriterOptions = options[i];
+
+                pipeline.ExecuteStage(PipelineStage.WriteModule, WriteModule, () => getModuleDefs(context.CurrentModule), context);
 
                 context.OutputModules[i] = context.CurrentModuleOutput;
                 context.CurrentModuleWriterOptions = null;
@@ -298,16 +308,6 @@ namespace Confuser.Core
                 }
         }
 
-        static void WriteModule(ConfuserContext context)
-        {
-            MemoryStream ms = new MemoryStream();
-            if (context.CurrentModuleWriterOptions is ModuleWriterOptions)
-                context.CurrentModule.Write(ms, (ModuleWriterOptions)context.CurrentModuleWriterOptions);
-            else
-                context.CurrentModule.NativeWrite(ms, (NativeModuleWriterOptions)context.CurrentModuleWriterOptions);
-            context.CurrentModuleOutput = ms.ToArray();
-        }
-
         static void EndModule(ConfuserContext context)
         {
             string output = context.Modules[context.CurrentModuleIndex].Location;
@@ -316,6 +316,16 @@ namespace Confuser.Core
             else
                 output = context.CurrentModule.Name;
             context.OutputPaths[context.CurrentModuleIndex] = output;
+        }
+
+        static void WriteModule(ConfuserContext context)
+        {
+            MemoryStream ms = new MemoryStream();
+            if (context.CurrentModuleWriterOptions is ModuleWriterOptions)
+                context.CurrentModule.Write(ms, (ModuleWriterOptions)context.CurrentModuleWriterOptions);
+            else
+                context.CurrentModule.NativeWrite(ms, (NativeModuleWriterOptions)context.CurrentModuleWriterOptions);
+            context.CurrentModuleOutput = ms.ToArray();
         }
 
         static void Debug(ConfuserContext context)
