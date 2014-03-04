@@ -137,6 +137,10 @@ namespace Confuser.Core
             {
                 context.Logger.ErrorException("Failed to resolve a member, check if all dependencies are of correct version.", ex);
             }
+            catch (IOException ex)
+            {
+                context.Logger.ErrorException("An IO error occured, check if all input/output locations are read/writable.", ex);
+            }
             catch (OperationCanceledException)
             {
                 context.Logger.Error("Operation is canceled.");
@@ -320,6 +324,8 @@ namespace Confuser.Core
 
         static void WriteModule(ConfuserContext context)
         {
+            context.Logger.InfoFormat("Writing module '{0}'...", context.CurrentModule.Name);
+
             MemoryStream ms = new MemoryStream();
             if (context.CurrentModuleWriterOptions is ModuleWriterOptions)
                 context.CurrentModule.Write(ms, (ModuleWriterOptions)context.CurrentModuleWriterOptions);

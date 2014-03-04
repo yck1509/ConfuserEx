@@ -35,7 +35,7 @@ namespace Confuser.Renamer
         public NameService(ConfuserContext context)
         {
             this.context = context;
-            this.random = context.Registry.GetService<IRandomService>().GetRandomGenerator(NameProtection._ServiceId);
+            this.random = context.Registry.GetService<IRandomService>().GetRandomGenerator(NameProtection._FullId);
             this.nameSeed = random.NextBytes(20);
 
             this.Renamers = new List<IRenamer>()

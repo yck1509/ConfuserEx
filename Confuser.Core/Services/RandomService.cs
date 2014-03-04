@@ -98,8 +98,8 @@ namespace Confuser.Core.Services
                 else
                 {
                     Buffer.BlockCopy(state, 32 - stateFilled, buffer, offset, length);
-                    length = 0;
                     stateFilled -= length;
+                    length = 0;
                 }
                 if (stateFilled == 0)
                     NextState();
@@ -156,6 +156,15 @@ namespace Confuser.Core.Services
         }
 
         /// <summary>
+        /// Returns a random double floating pointer number from 0 (inclusive) to 1 (exclusive).
+        /// </summary>
+        /// <returns>Requested random number.</returns>
+        public double NextDouble()
+        {
+            return NextUInt32() / ((double)uint.MaxValue + 1);
+        }
+
+        /// <summary>
         /// Returns a random boolean value.
         /// </summary>
         /// <returns>Requested random boolean value.</returns>
@@ -166,6 +175,22 @@ namespace Confuser.Core.Services
             if (stateFilled == 0)
                 NextState();
             return s % 2 == 0;
+        }
+
+        /// <summary>
+        /// Shuffles the element in the specified list.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">The list to shuffle.</param>
+        public void Shuffle<T>(IList<T> list)
+        {
+            for (int i = list.Count - 1; i > 1; i--)
+            {
+                int k = NextInt32(i + 1);
+                T tmp = list[k];
+                list[k] = list[i];
+                list[i] = tmp;
+            }
         }
     }
 

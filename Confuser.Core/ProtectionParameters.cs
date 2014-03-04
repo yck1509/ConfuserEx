@@ -47,7 +47,7 @@ namespace Confuser.Core
         /// <returns>The value of the parameter.</returns>
         public T GetParameter<T>(ConfuserContext context, IDefinition target, string name, T defValue = default(T))
         {
-            var objParams = context.Annotations.Get<ProtectionSettings>(comp, ParametersKey);
+            var objParams = context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
             if (objParams == null)
                 return defValue;
             Dictionary<string, string> protParams;
@@ -55,7 +55,13 @@ namespace Confuser.Core
                 return defValue;
             string ret;
             if (protParams.TryGetValue(name, out ret))
-                return (T)Convert.ChangeType(ret, typeof(T));
+            {
+                Type paramType = typeof(T);
+                if (paramType.IsEnum)
+                    return (T)Enum.Parse(paramType, ret, true);
+                else
+                    return (T)Convert.ChangeType(ret, typeof(T));
+            }
             else
                 return defValue;
         }

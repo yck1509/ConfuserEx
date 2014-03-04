@@ -280,6 +280,9 @@ namespace Confuser.Core
     }
 
 
+    /// <summary>
+    /// <see cref="Stream"/> wrapper of <see cref="IImageStream"/>.
+    /// </summary>
     public class ImageStream : Stream
     {
         /// <summary>

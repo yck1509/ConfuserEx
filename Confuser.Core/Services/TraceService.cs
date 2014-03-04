@@ -40,7 +40,7 @@ namespace Confuser.Core.Services
         /// Trace the stack of the specified method.
         /// </summary>
         /// <param name="method">The method to trace.</param>
-        /// <exception cref="InvalidMethodException"><paramref name="member"/> has invalid body.</exception>
+        /// <exception cref="InvalidMethodException"><paramref name="method"/> has invalid body.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="method"/> is <c>null</c>.</exception>
         MethodTrace Trace(MethodDef method);
     }
@@ -104,7 +104,7 @@ namespace Confuser.Core.Services
             for (int i = 0; i < instrs.Count; i++)
             {
                 offset2index.Add(instrs[i].Offset, i);
-                depths[i] = -1;
+                depths[i] = int.MinValue;
             }
 
             foreach (var eh in body.ExceptionHandlers)
@@ -121,7 +121,7 @@ namespace Confuser.Core.Services
             {
                 var instr = instrs[i];
 
-                if (depths[i] != -1)   // Already set due to being target of a branch / beginning of EHs.
+                if (depths[i] != int.MinValue)   // Already set due to being target of a branch / beginning of EHs.
                     currentStack = depths[i];
 
                 switch (instr.OpCode.FlowControl)
@@ -160,7 +160,6 @@ namespace Confuser.Core.Services
                         currentStack = 0;
                         break;
                     case FlowControl.Throw:
-                        currentStack = 0;
                         break;
                     default:
                         throw new UnreachableException();
@@ -170,7 +169,7 @@ namespace Confuser.Core.Services
                 depths[i] = currentStack;
             }
             foreach (var stackDepth in depths)
-                if (stackDepth == -1)
+                if (stackDepth == int.MinValue)
                     throw new InvalidMethodException("Bad method body.");
 
             StackDepths = depths;

@@ -148,6 +148,7 @@ namespace Confuser.Core
         /// <summary>
         /// Parses the rules' patterns.
         /// </summary>
+        /// <param name="proj">The project.</param>
         /// <param name="module">The module description.</param>
         /// <param name="context">The working context.</param>
         /// <returns>Parsed rule patterns.</returns>

@@ -11,7 +11,6 @@ namespace Confuser.Protections
     {
         public const string _Id = "anti ildasm";
         public const string _FullId = "Ki.AntiILDasm";
-        public const string _ServiceId = "Ki.AntiILDasm";
 
         protected override void Initialize(ConfuserContext context)
         {
