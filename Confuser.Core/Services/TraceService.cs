@@ -124,10 +124,15 @@ namespace Confuser.Core.Services
                 if (depths[i] != int.MinValue)   // Already set due to being target of a branch / beginning of EHs.
                     currentStack = depths[i];
 
+                instr.UpdateStack(ref currentStack);
+                depths[i] = currentStack;
+
                 switch (instr.OpCode.FlowControl)
                 {
                     case FlowControl.Branch:
-                        depths[offset2index[((Instruction)instr.Operand).Offset]] = currentStack;
+                        int index = offset2index[((Instruction)instr.Operand).Offset];
+                        if (depths[index] == int.MinValue)
+                            depths[index] = currentStack;
                         fromInstrs.AddListEntry(offset2index[((Instruction)instr.Operand).Offset], instr);
                         currentStack = 0;
                         break;
@@ -142,13 +147,17 @@ namespace Confuser.Core.Services
                         {
                             foreach (var target in (Instruction[])instr.Operand)
                             {
-                                depths[offset2index[target.Offset]] = currentStack;
+                                int targetIndex = offset2index[target.Offset];
+                                if (depths[targetIndex] == int.MinValue)
+                                    depths[targetIndex] = currentStack;
                                 fromInstrs.AddListEntry(offset2index[target.Offset], instr);
                             }
                         }
                         else
                         {
-                            depths[offset2index[((Instruction)instr.Operand).Offset]] = currentStack;
+                            int targetIndex = offset2index[((Instruction)instr.Operand).Offset];
+                            if (depths[targetIndex] == int.MinValue)
+                                depths[targetIndex] = currentStack;
                             fromInstrs.AddListEntry(offset2index[((Instruction)instr.Operand).Offset], instr);
                         }
                         break;
@@ -157,16 +166,12 @@ namespace Confuser.Core.Services
                     case FlowControl.Next:
                         break;
                     case FlowControl.Return:
-                        currentStack = 0;
                         break;
                     case FlowControl.Throw:
                         break;
                     default:
                         throw new UnreachableException();
                 }
-
-                instr.UpdateStack(ref currentStack);
-                depths[i] = currentStack;
             }
             foreach (var stackDepth in depths)
                 if (stackDepth == int.MinValue)

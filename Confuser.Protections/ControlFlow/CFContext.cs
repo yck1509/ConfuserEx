@@ -5,6 +5,7 @@ using System.Text;
 using Confuser.Core.Services;
 using dnlib.DotNet.Emit;
 using dnlib.DotNet;
+using Confuser.Core;
 
 namespace Confuser.Protections.ControlFlow
 {
@@ -17,13 +18,14 @@ namespace Confuser.Protections.ControlFlow
     class CFContext
     {
         public RandomGenerator Random;
+        public ConfuserContext Context;
         public MethodDef Method;
         public CFType Type;
         public double Intensity;
         public bool JunkCode;
         public bool FakeBranch;
 
-        public void AddJump(IList<Instruction> instrs, Instruction target, IList<Instruction> candidates)
+        public void AddJump(IList<Instruction> instrs, Instruction target)
         {
             if (!Method.Module.IsClr40 && JunkCode &&
                 !Method.DeclaringType.HasGenericParameters && !Method.HasGenericParameters &&

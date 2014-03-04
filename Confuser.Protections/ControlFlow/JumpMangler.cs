@@ -8,23 +8,9 @@ using Confuser.Core.Services;
 
 namespace Confuser.Protections.ControlFlow
 {
-    class JumpMangler
+    class JumpMangler : ManglerBase
     {
-        static IEnumerable<InstrBlock> GetAllBlocks(ScopeBlock scope)
-        {
-            foreach (var child in scope.Children)
-            {
-                if (child is InstrBlock)
-                    yield return (InstrBlock)child;
-                else
-                {
-                    foreach (var block in GetAllBlocks((ScopeBlock)child))
-                        yield return block;
-                }
-            }
-        }
-
-        static LinkedList<Instruction[]> SpiltFragments(InstrBlock block, CFContext ctx)
+        LinkedList<Instruction[]> SpiltFragments(InstrBlock block, CFContext ctx)
         {
             LinkedList<Instruction[]> fragments = new LinkedList<Instruction[]>();
             List<Instruction> currentFragment = new List<Instruction>();
@@ -90,7 +76,7 @@ namespace Confuser.Protections.ControlFlow
             return fragments;
         }
 
-        public static void Mangle(CilBody body, ScopeBlock root, CFContext ctx)
+        public override void Mangle(CilBody body, ScopeBlock root, CFContext ctx)
         {
             body.MaxStack++;
             foreach (var block in GetAllBlocks(root))
@@ -102,7 +88,7 @@ namespace Confuser.Protections.ControlFlow
                 while (current.Next != null)
                 {
                     List<Instruction> newFragment = new List<Instruction>(current.Value);
-                    ctx.AddJump(newFragment, current.Next.Value[0], block.Instructions);
+                    ctx.AddJump(newFragment, current.Next.Value[0]);
                     ctx.AddJunk(newFragment);
                     current.Value = newFragment.ToArray();
                     current = current.Next;

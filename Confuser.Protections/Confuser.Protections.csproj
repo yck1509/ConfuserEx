@@ -49,6 +49,8 @@
     <Compile Include="ControlFlow\BlockParser.cs" />
     <Compile Include="ControlFlow\Blocks.cs" />
     <Compile Include="ControlFlow\JumpMangler.cs" />
+    <Compile Include="ControlFlow\ManglerBase.cs" />
+    <Compile Include="ControlFlow\SwitchMangler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

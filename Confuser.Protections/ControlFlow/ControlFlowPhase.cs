@@ -35,6 +35,7 @@ namespace Confuser.Protections.ControlFlow
             ret.FakeBranch = parameters.GetParameter<bool>(context, method, "fakeBr", false);
             ret.Random = random;
             ret.Method = method;
+            ret.Context = context;
 
             return ret;
         }
@@ -51,11 +52,22 @@ namespace Confuser.Protections.ControlFlow
             context.CurrentModuleWriterOptions.MetaDataOptions.Flags |= dnlib.DotNet.Writer.MetaDataFlags.KeepOldMaxStack;
         }
 
+        static readonly JumpMangler Jump = new JumpMangler();
+        static readonly SwitchMangler Switch = new SwitchMangler();
+
+        static ManglerBase GetMangler(CFType type)
+        {
+            if (type == CFType.Switch)
+                return Switch;
+            else
+                return Jump;
+        }
+
         void ProcessMethod(CilBody body, CFContext ctx)
         {
             ScopeBlock root = BlockParser.ParseBody(body);
 
-            JumpMangler.Mangle(body, root, ctx);
+            GetMangler(ctx.Type).Mangle(body, root, ctx);
 
             body.Instructions.Clear();
             root.ToBody(body);
