@@ -115,6 +115,9 @@ namespace Confuser.Core
         /// <summary>
         /// Requests the current module to be written as mix-mode module, and return the native writer options.
         /// </summary>
+        /// <remarks>
+        /// DO NOT USE AT THE MOMENT! Somehow dnlib seems to handle it strangely...
+        /// </remarks>
         /// <returns>The native writer options.</returns>
         public NativeModuleWriterOptions RequestNative()
         {

@@ -54,6 +54,10 @@
       <Project>{BEB67A6E-4C54-4DE5-8C6B-2C12F44A7B92}</Project>
       <Name>Confuser.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Confuser.DynCipher\Confuser.DynCipher.csproj">
+      <Project>{E832E9B8-2158-4FC0-89A1-56C6ECC10F6B}</Project>
+      <Name>Confuser.DynCipher</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Confuser.Protections\Confuser.Protections.csproj">
       <Project>{3EAB01B5-9B49-48D8-BFA1-5493B26CCB71}</Project>
       <Name>Confuser.Protections</Name>

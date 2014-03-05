@@ -6,6 +6,8 @@ using Confuser.Core;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using Confuser.Core.Services;
+using Confuser.DynCipher;
+using Confuser.Renamer;
 
 namespace Confuser.Protections.ControlFlow
 {
@@ -21,21 +23,24 @@ namespace Confuser.Protections.ControlFlow
             get { return ProtectionTargets.Methods; }
         }
 
-        CFContext ParseParameter(
-            MethodDef method, ConfuserContext context, 
-            ProtectionParameters parameters, RandomGenerator random)
+        static CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random)
         {
             CFContext ret = new CFContext();
             ret.Type = parameters.GetParameter<CFType>(context, method, "type", CFType.Switch);
+            ret.Predicate = parameters.GetParameter<PredicateType>(context, method, "predicate", PredicateType.Normal);
 
             int rawIntensity = parameters.GetParameter<int>(context, method, "intensity", 60);
             ret.Intensity = rawIntensity / 100.0;
+            ret.Depth = parameters.GetParameter<int>(context, method, "depth", 5);
 
             ret.JunkCode = parameters.GetParameter<bool>(context, method, "junk", false);
             ret.FakeBranch = parameters.GetParameter<bool>(context, method, "fakeBr", false);
+
             ret.Random = random;
             ret.Method = method;
             ret.Context = context;
+            ret.DynCipher = context.Registry.GetService<IDynCipherService>();
+            ret.Name = context.Registry.GetService<INameService>();
 
             return ret;
         }
@@ -46,7 +51,7 @@ namespace Confuser.Protections.ControlFlow
             foreach (var method in parameters.Targets.OfType<MethodDef>())
                 if (method.HasBody && method.Body.Instructions.Count > 0)
                 {
-                    ProcessMethod(method.Body, ParseParameter(method, context, parameters, random));
+                    ProcessMethod(method.Body, ParseParameters(method, context, parameters, random));
                 }
 
             context.CurrentModuleWriterOptions.MetaDataOptions.Flags |= dnlib.DotNet.Writer.MetaDataFlags.KeepOldMaxStack;

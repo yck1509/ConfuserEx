@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{E832E9B8-2158-4FC0-89A1-56C6ECC10F6B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Confuser.DynCipher</RootNamespace>
+    <AssemblyName>Confuser.DynCipher</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Debug\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Release\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AST\ArrayIndexExpression.cs" />
+    <Compile Include="AST\AssignmentStatement.cs" />
+    <Compile Include="AST\BinOpExpression.cs" />
+    <Compile Include="AST\Expression.cs" />
+    <Compile Include="AST\LiteralExpression.cs" />
+    <Compile Include="AST\LoopStatement.cs" />
+    <Compile Include="AST\Statement.cs" />
+    <Compile Include="AST\StatementBlock.cs" />
+    <Compile Include="AST\UnaryOpExpression.cs" />
+    <Compile Include="AST\Variable.cs" />
+    <Compile Include="AST\VariableExpression.cs" />
+    <Compile Include="DynCipherComponent.cs" />
+    <Compile Include="DynCipherService.cs" />
+    <Compile Include="Elements\AddKey.cs" />
+    <Compile Include="Elements\BinOp.cs" />
+    <Compile Include="Elements\CryptoElement.cs" />
+    <Compile Include="Elements\Matrix.cs" />
+    <Compile Include="Elements\NumOp.cs" />
+    <Compile Include="Elements\RotateBit.cs" />
+    <Compile Include="Elements\Swap.cs" />
+    <Compile Include="Generation\CipherGenContext.cs" />
+    <Compile Include="Generation\CipherGenerator.cs" />
+    <Compile Include="Generation\CILCodeGen.cs" />
+    <Compile Include="Generation\DMCodeGen.cs" />
+    <Compile Include="Generation\ExpressionGenerator.cs" />
+    <Compile Include="Generation\x86CodeGen.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Transforms\ConvertVariables.cs" />
+    <Compile Include="Transforms\ExpansionTransform.cs" />
+    <Compile Include="Transforms\MulToShiftTransform.cs" />
+    <Compile Include="Transforms\NormalizeBinOpTransform.cs" />
+    <Compile Include="Transforms\ShuffleTransform.cs" />
+    <Compile Include="Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Confuser.Core\Confuser.Core.csproj">
+      <Project>{BEB67A6E-4C54-4DE5-8C6B-2C12F44A7B92}</Project>
+      <Name>Confuser.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\dnlib\src\dnlib.csproj">
+      <Project>{FDFC1237-143F-4919-8318-4926901F4639}</Project>
+      <Name>dnlib</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

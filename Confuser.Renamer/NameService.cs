@@ -131,7 +131,7 @@ namespace Confuser.Renamer
         }
         public string RandomName()
         {
-            return Utils.ToHexString(random.NextBytes(16));
+            return ObfuscateName(Utils.ToHexString(random.NextBytes(16)), RenameMode.Unicode);
         }
 
         static readonly object OriginalNameKey = new object();

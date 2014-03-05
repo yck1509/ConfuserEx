@@ -48,6 +48,9 @@
     <Compile Include="ControlFlow\ControlFlowProtection.cs" />
     <Compile Include="ControlFlow\BlockParser.cs" />
     <Compile Include="ControlFlow\Blocks.cs" />
+    <Compile Include="ControlFlow\x86Predicate.cs" />
+    <Compile Include="ControlFlow\ExpressionPredicate.cs" />
+    <Compile Include="ControlFlow\IPredicate.cs" />
     <Compile Include="ControlFlow\JumpMangler.cs" />
     <Compile Include="ControlFlow\ManglerBase.cs" />
     <Compile Include="ControlFlow\SwitchMangler.cs" />
@@ -60,6 +63,10 @@
     <ProjectReference Include="..\Confuser.Core\Confuser.Core.csproj">
       <Project>{BEB67A6E-4C54-4DE5-8C6B-2C12F44A7B92}</Project>
       <Name>Confuser.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Confuser.DynCipher\Confuser.DynCipher.csproj">
+      <Project>{E832E9B8-2158-4FC0-89A1-56C6ECC10F6B}</Project>
+      <Name>Confuser.DynCipher</Name>
     </ProjectReference>
     <ProjectReference Include="..\Confuser.Renamer\Confuser.Renamer.csproj">
       <Project>{862DA0DA-52E1-47CD-B9C2-46B106031B28}</Project>

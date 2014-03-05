@@ -6,6 +6,8 @@ using Confuser.Core.Services;
 using dnlib.DotNet.Emit;
 using dnlib.DotNet;
 using Confuser.Core;
+using Confuser.Renamer;
+using Confuser.DynCipher;
 
 namespace Confuser.Protections.ControlFlow
 {
@@ -15,13 +17,25 @@ namespace Confuser.Protections.ControlFlow
         Jump,
     }
 
+    enum PredicateType
+    {
+        Normal,
+        Expression,
+        x86,
+    }
+
     class CFContext
     {
         public RandomGenerator Random;
         public ConfuserContext Context;
         public MethodDef Method;
+        public IDynCipherService DynCipher;
+        public INameService Name;
+
         public CFType Type;
+        public PredicateType Predicate;
         public double Intensity;
+        public int Depth;
         public bool JunkCode;
         public bool FakeBranch;
 

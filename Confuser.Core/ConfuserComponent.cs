@@ -6,14 +6,14 @@ using System.Text;
 namespace Confuser.Core
 {
     /// <summary>
-    /// Represent a protection component in Confuser
+    /// Represent a component in Confuser
     /// </summary>
     public abstract class ConfuserComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfuserComponent"/> class.
         /// </summary>
-        internal ConfuserComponent() { }
+        public ConfuserComponent() { }
 
         /// <summary>
         /// Initializes the component.

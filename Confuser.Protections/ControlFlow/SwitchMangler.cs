@@ -5,6 +5,7 @@ using System.Text;
 using dnlib.DotNet.Emit;
 using Confuser.Core.Services;
 using dnlib.DotNet;
+using Confuser.DynCipher;
 
 namespace Confuser.Protections.ControlFlow
 {
@@ -19,7 +20,7 @@ namespace Confuser.Protections.ControlFlow
             {
                 currentStatement.Add(instr);
 
-                if (trace.StackDepths[trace.OffsetToIndexMap(instr.Offset)] == 0)
+                if ((instr.OpCode.OpCodeType != OpCodeType.Prefix && trace.StackDepths[trace.OffsetToIndexMap(instr.Offset)] == 0) && ctx.Intensity > ctx.Random.NextDouble())
                 {
                     statements.AddLast(currentStatement.ToArray());
                     currentStatement.Clear();
@@ -37,6 +38,12 @@ namespace Confuser.Protections.ControlFlow
             MethodTrace trace = ctx.Context.Registry.GetService<ITraceService>().Trace(ctx.Method);
 
             body.MaxStack++;
+            IPredicate predicate = null;
+            if (ctx.Predicate == PredicateType.Expression)
+                predicate = new ExpressionPredicate(ctx);
+            else if (ctx.Predicate == PredicateType.x86)
+                predicate = new x86Predicate(ctx);
+
             foreach (var block in GetAllBlocks(root))
             {
                 var statements = SpiltStatements(block, trace, ctx);
@@ -63,10 +70,21 @@ namespace Confuser.Protections.ControlFlow
 
                 Instruction switchInstr = new Instruction(OpCodes.Switch);
 
-                var switchHdr = new List<Instruction>() {
-                    Instruction.CreateLdcI4(key[1]),
-                    switchInstr
-                };
+                var switchHdr = new List<Instruction>();
+
+                if (predicate != null)
+                {
+                    predicate.Init(body);
+                    predicate.EmitSwitchKey(switchHdr, key[1]);
+                    predicate.EmitSwitchLoad(switchHdr);
+                }
+                else
+                {
+                    switchHdr.Add(Instruction.CreateLdcI4(key[1]));
+                }
+
+                switchHdr.Add(switchInstr);
+
                 ctx.AddJump(switchHdr, statements.Last.Value[0]);
                 ctx.AddJunk(switchHdr);
 
@@ -78,8 +96,11 @@ namespace Confuser.Protections.ControlFlow
                     List<Instruction> newStatement = new List<Instruction>(current.Value);
                     if (i != 0)
                     {
-                        newStatement.Add(Instruction.CreateLdcI4(key[i + 1]));
-                        ctx.AddJump(newStatement, switchInstr);
+                        if (predicate != null)
+                            predicate.EmitSwitchKey(newStatement, key[i + 1]);
+                        else
+                            newStatement.Add(Instruction.CreateLdcI4(key[i + 1]));
+                        ctx.AddJump(newStatement, switchHdr[1]);
                         ctx.AddJunk(newStatement);
                         operands[key[i]] = current.Value[0];
                     }

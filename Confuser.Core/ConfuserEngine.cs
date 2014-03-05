@@ -63,13 +63,18 @@ namespace Confuser.Core
 
                 // 2. Discover plugins
                 context.Logger.Debug("Discovering plugins...");
+
                 IList<Protection> prots;
                 IList<Packer> packers;
-                parameters.GetPluginDiscovery().GetPlugins(context, out prots, out packers);
-                var components = new ConfuserComponent[] { new CoreComponent(parameters, marker) }
-                    .Concat(prots.OfType<ConfuserComponent>())
-                    .Concat(packers.OfType<ConfuserComponent>())
-                    .ToList();
+                IList<ConfuserComponent> components;
+                parameters.GetPluginDiscovery().GetPlugins(context, out prots, out packers, out components);
+
+                components.Insert(0, new CoreComponent(parameters, marker));
+                foreach (var prot in prots)
+                    components.Add(prot);
+                foreach (var packer in packers)
+                    components.Add(packer);
+
                 context.Logger.InfoFormat("Discovered {0} protections, {1} packers.", prots.Count, packers.Count);
 
                 // 3. Resolve dependency
