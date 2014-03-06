@@ -34,7 +34,6 @@ namespace Confuser.Protections.ControlFlow
             ret.Depth = parameters.GetParameter<int>(context, method, "depth", 5);
 
             ret.JunkCode = parameters.GetParameter<bool>(context, method, "junk", false);
-            ret.FakeBranch = parameters.GetParameter<bool>(context, method, "fakeBr", false);
 
             ret.Random = random;
             ret.Method = method;

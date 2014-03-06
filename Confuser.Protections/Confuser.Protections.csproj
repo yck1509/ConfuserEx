@@ -57,6 +57,11 @@
     <Compile Include="AntiDumpProtection.cs" />
     <Compile Include="AntiDebugProtection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReferenceProxy\IRPEncoding.cs" />
+    <Compile Include="ReferenceProxy\IRPMode.cs" />
+    <Compile Include="ReferenceProxy\ReferenceProxyPhase.cs" />
+    <Compile Include="ReferenceProxy\ReferenceProxyProtection.cs" />
+    <Compile Include="ReferenceProxy\RPContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

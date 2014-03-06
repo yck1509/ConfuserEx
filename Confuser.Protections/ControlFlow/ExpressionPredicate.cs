@@ -79,10 +79,9 @@ namespace Confuser.Protections.ControlFlow
                 instrs.Add(instr);
         }
 
-        public void EmitSwitchKey(IList<Instruction> instrs, int val)
+        public int GetSwitchKey(int key)
         {
-            int encodedKey = expCompiled(val);
-            instrs.Add(Instruction.CreateLdcI4(encodedKey));
+            return expCompiled(key);
         }
     }
 }

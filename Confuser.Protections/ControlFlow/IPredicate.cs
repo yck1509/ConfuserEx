@@ -10,6 +10,6 @@ namespace Confuser.Protections.ControlFlow
     {
         void Init(CilBody body);
         void EmitSwitchLoad(IList<Instruction> instrs);
-        void EmitSwitchKey(IList<Instruction> instrs, int val);
+        int GetSwitchKey(int key);
     }
 }

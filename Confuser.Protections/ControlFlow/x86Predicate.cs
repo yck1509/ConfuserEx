@@ -162,10 +162,9 @@ namespace Confuser.Protections.ControlFlow
             instrs.Add(Instruction.Create(OpCodes.Call, encoding.native));
         }
 
-        public void EmitSwitchKey(IList<Instruction> instrs, int val)
+        public int GetSwitchKey(int key)
         {
-            int encodedKey = encoding.expCompiled(val);
-            instrs.Add(Instruction.CreateLdcI4(encodedKey));
+            return encoding.expCompiled(key);
         }
     }
 }

@@ -80,7 +80,7 @@ namespace Confuser.Protections
 
                     foreach (var member in members)
                     {
-                        ((MethodDef)member).Access = MethodAttributes.PrivateScope;
+                        ((MethodDef)member).Access = MethodAttributes.Assembly;
                         marker.Mark(member);
                         name.Analyze(member);
                     }

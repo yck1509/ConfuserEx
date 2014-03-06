@@ -36,7 +36,6 @@ namespace Confuser.Protections.ControlFlow
         public double Intensity;
         public int Depth;
         public bool JunkCode;
-        public bool FakeBranch;
 
         public void AddJump(IList<Instruction> instrs, Instruction target)
         {

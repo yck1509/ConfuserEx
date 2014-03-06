@@ -87,6 +87,16 @@ namespace Confuser.Core.Services
         Dictionary<int, List<Instruction>> fromInstrs;
 
         /// <summary>
+        /// Determines whether the specified instruction is the target of a branch instruction.
+        /// </summary>
+        /// <param name="instrIndex">The index of instruction.</param>
+        /// <returns><c>true</c> if the specified instruction is a branch target; otherwise, <c>false</c>.</returns>
+        public bool IsBranchTarget(int instrIndex)
+        {
+            return fromInstrs.ContainsKey(instrIndex);
+        }
+
+        /// <summary>
         /// Perform the actual tracing.
         /// </summary>
         /// <returns>This instance.</returns>
