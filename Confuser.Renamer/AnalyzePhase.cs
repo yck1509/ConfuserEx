@@ -21,12 +21,21 @@ namespace Confuser.Renamer
             get { return ProtectionTargets.AllDefinitions; }
         }
 
+        void ParseParameters(IDefinition def, ConfuserContext context, NameService service, ProtectionParameters parameters)
+        {
+            RenameMode? mode = parameters.GetParameter<RenameMode?>(context, def, "mode", null);
+            if (mode != null)
+                service.SetRenameMode(def, mode.Value);
+        }
+
         protected override void Execute(ConfuserContext context, ProtectionParameters parameters)
         {
             NameService service = (NameService)context.Registry.GetService<INameService>();
             context.Logger.Debug("Building VTables & identifier list...");
             foreach (var def in parameters.Targets)
             {
+                ParseParameters(def, context, service, parameters);
+
                 if (def is ModuleDef)
                 {
                     var module = (ModuleDef)def;
@@ -47,22 +56,30 @@ namespace Confuser.Renamer
             var renamers = service.Renamers;
             foreach (var def in parameters.Targets)
             {
-                if (def is TypeDef)
-                    Analyze(service, context, (TypeDef)def);
-                else if (def is MethodDef)
-                    Analyze(service, context, (MethodDef)def);
-                else if (def is FieldDef)
-                    Analyze(service, context, (FieldDef)def);
-                else if (def is PropertyDef)
-                    Analyze(service, context, (PropertyDef)def);
-                else if (def is EventDef)
-                    Analyze(service, context, (EventDef)def);
-                else if (def is ModuleDef)
-                    service.SetCanRename(def, false);
-
-                foreach (var renamer in renamers)
-                    renamer.Analyze(context, service, def);
+                Analyze(service, context, def, true);
             }
+        }
+
+        internal void Analyze(NameService service, ConfuserContext context, IDefinition def, bool runAnalyzer)
+        {
+            if (def is TypeDef)
+                Analyze(service, context, (TypeDef)def);
+            else if (def is MethodDef)
+                Analyze(service, context, (MethodDef)def);
+            else if (def is FieldDef)
+                Analyze(service, context, (FieldDef)def);
+            else if (def is PropertyDef)
+                Analyze(service, context, (PropertyDef)def);
+            else if (def is EventDef)
+                Analyze(service, context, (EventDef)def);
+            else if (def is ModuleDef)
+                service.SetCanRename(def, false);
+
+            if (!runAnalyzer)
+                return;
+
+            foreach (var renamer in service.Renamers)
+                renamer.Analyze(context, service, def);
         }
 
         void Analyze(NameService service, ConfuserContext context, TypeDef type)

@@ -119,6 +119,7 @@ namespace Confuser.Core
                 // 6. Build pipeline
                 context.Logger.Debug("Building pipeline...");
                 ProtectionPipeline pipeline = new ProtectionPipeline();
+                context.Pipeline = pipeline;
                 foreach (var comp in components)
                 {
                     comp.PopulatePipeline(pipeline);

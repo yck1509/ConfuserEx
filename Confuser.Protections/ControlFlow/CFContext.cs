@@ -30,7 +30,6 @@ namespace Confuser.Protections.ControlFlow
         public ConfuserContext Context;
         public MethodDef Method;
         public IDynCipherService DynCipher;
-        public INameService Name;
 
         public CFType Type;
         public PredicateType Predicate;

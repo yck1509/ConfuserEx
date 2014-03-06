@@ -40,6 +40,31 @@ namespace Confuser.Core
         }
 
         /// <summary>
+        /// Finds all definitions of interest in a type.
+        /// </summary>
+        /// <param name="typeDef">The type.</param>
+        /// <returns>A collection of all required definitions</returns>
+        public static IEnumerable<IDefinition> FindDefinitions(this TypeDef typeDef)
+        {
+            yield return typeDef;
+
+            foreach (var nestedType in typeDef.NestedTypes)
+                yield return nestedType;
+
+            foreach (var method in typeDef.Methods)
+                yield return method;
+
+            foreach (var field in typeDef.Fields)
+                yield return field;
+
+            foreach (var prop in typeDef.Properties)
+                yield return prop;
+
+            foreach (var evt in typeDef.Events)
+                yield return evt;
+        }
+
+        /// <summary>
         /// Determines whether the specified type is visible outside the containing assembly.
         /// </summary>
         /// <param name="typeDef">The type.</param>

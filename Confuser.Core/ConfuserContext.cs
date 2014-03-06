@@ -77,6 +77,12 @@ namespace Confuser.Core
         public Packer Packer { get; internal set; }
 
         /// <summary>
+        /// Gets the current processing pipeline.
+        /// </summary>
+        /// <value>The processing pipeline.</value>
+        public ProtectionPipeline Pipeline { get; internal set; }
+
+        /// <summary>
         /// Gets the <c>byte[]</c> of modules after protected, or null if module is not protected yet.
         /// </summary>
         /// <value>The list of <c>byte[]</c> of protected modules.</value>

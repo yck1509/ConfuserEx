@@ -33,7 +33,7 @@ namespace Confuser.Renamer.References
             {
                 target = baseSlot.MethodDef;
                 if (target.Module != method.Module)
-                    target = method.Module.Import(baseSlot.MethodDef);
+                    target = (IMethodDefOrRef)method.Module.Import(baseSlot.MethodDef);
             }
 
             if (method.Overrides.Any(impl =>

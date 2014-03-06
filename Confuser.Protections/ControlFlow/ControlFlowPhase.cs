@@ -40,7 +40,6 @@ namespace Confuser.Protections.ControlFlow
             ret.Method = method;
             ret.Context = context;
             ret.DynCipher = context.Registry.GetService<IDynCipherService>();
-            ret.Name = context.Registry.GetService<INameService>();
 
             return ret;
         }

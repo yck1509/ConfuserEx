@@ -57,6 +57,10 @@ namespace Confuser.Core
             if (protParams.TryGetValue(name, out ret))
             {
                 Type paramType = typeof(T);
+                Type nullable = Nullable.GetUnderlyingType(paramType);
+                if (nullable != null)
+                    paramType = nullable;
+
                 if (paramType.IsEnum)
                     return (T)Enum.Parse(paramType, ret, true);
                 else

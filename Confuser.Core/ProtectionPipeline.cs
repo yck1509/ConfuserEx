@@ -96,6 +96,28 @@ namespace Confuser.Core
         }
 
         /// <summary>
+        /// Finds the phase with the specified type in the pipeline.
+        /// </summary>
+        /// <typeparam name="T">The type of the phase.</typeparam>
+        /// <returns>The phase with specified type in the pipeline.</returns>
+        public T FindPhase<T>() where T : ProtectionPhase
+        {
+            foreach (var phases in preStage.Values)
+                foreach (var phase in phases)
+                {
+                    if (phase is T)
+                        return (T)phase;
+                }
+            foreach (var phases in postStage.Values)
+                foreach (var phase in phases)
+                {
+                    if (phase is T)
+                        return (T)phase;
+                }
+            return null;
+        }
+
+        /// <summary>
         /// Execute the specified pipeline stage with pre-processing and post-processing.
         /// </summary>
         /// <param name="stage">The pipeline stage.</param>

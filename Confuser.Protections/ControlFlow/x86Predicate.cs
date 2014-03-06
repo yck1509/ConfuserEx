@@ -11,6 +11,7 @@ using dnlib.DotNet.Emit;
 using dnlib.DotNet;
 using dnlib.DotNet.Writer;
 using System.IO;
+using Confuser.Renamer;
 
 namespace Confuser.Protections.ControlFlow
 {
@@ -32,10 +33,13 @@ namespace Confuser.Protections.ControlFlow
                 Variable result = new Variable("{RESULT}");
 
                 var int32 = ctx.Method.Module.CorLibTypes.Int32;
-                native = new MethodDefUser(ctx.Name.RandomName(), MethodSig.CreateStatic(int32, int32),
+                native = new MethodDefUser(ctx.Method.DeclaringType.FullName + "{native}", MethodSig.CreateStatic(int32, int32),
                     MethodAttributes.PinvokeImpl | MethodAttributes.PrivateScope | MethodAttributes.Static);
                 native.ImplAttributes = MethodImplAttributes.Native | MethodImplAttributes.Unmanaged | MethodImplAttributes.PreserveSig;
                 ctx.Method.Module.GlobalType.Methods.Add(native);
+
+                ctx.Context.Registry.GetService<IMarkerService>().Mark(native);
+                ctx.Context.Registry.GetService<INameService>().Analyze(native);
 
                 x86Register? reg;
                 var codeGen = new x86CodeGen();
@@ -149,7 +153,7 @@ namespace Confuser.Protections.ControlFlow
                 encoding.Compile(ctx);
                 ctx.Context.Annotations.Set(ctx.Method.DeclaringType, Encoding, encoding);
             }
-            
+
             inited = true;
         }
 

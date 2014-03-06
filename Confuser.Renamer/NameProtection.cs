@@ -21,7 +21,7 @@ namespace Confuser.Renamer
         protected override void PopulatePipeline(ProtectionPipeline pipeline)
         {
             pipeline.InsertPostStage(PipelineStage.Inspection, new AnalyzePhase(this));
-            pipeline.InsertPostStage(PipelineStage.BeginModule, new RenamePhase(this));
+            pipeline.InsertPreStage(PipelineStage.EndModule, new RenamePhase(this));
             pipeline.InsertPostStage(PipelineStage.OptimizeMethods, new PostRenamePhase(this));
         }
 

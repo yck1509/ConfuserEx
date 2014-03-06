@@ -13,6 +13,8 @@ namespace Confuser.Renamer
     {
         VTableStorage GetVTables();
 
+        void Analyze(IDefinition def);
+
         bool CanRename(object obj);
         void SetCanRename(object obj, bool val);
 
@@ -75,7 +77,7 @@ namespace Confuser.Renamer
         static readonly object RenameModeKey = new object();
         public RenameMode GetRenameMode(object obj)
         {
-            return context.Annotations.Get<RenameMode>(obj, RenameModeKey, RenameMode.Debug);
+            return context.Annotations.Get<RenameMode>(obj, RenameModeKey, RenameMode.Unicode);
         }
         public void SetRenameMode(object obj, RenameMode val)
         {
@@ -90,6 +92,21 @@ namespace Confuser.Renamer
         public IList<INameReference> GetReferences(object obj)
         {
             return context.Annotations.GetLazy<List<INameReference>>(obj, ReferencesKey, key => new List<INameReference>());
+        }
+
+        AnalyzePhase analyze;
+        public void Analyze(IDefinition def)
+        {
+            if (analyze == null)
+                analyze = context.Pipeline.FindPhase<AnalyzePhase>();
+
+            SetOriginalName(def, def.Name);
+            if (def is TypeDef)
+            {
+                GetVTables().GetVTable((TypeDef)def);
+                SetOriginalNamespace(def, ((TypeDef)def).Namespace);
+            }
+            analyze.Analyze(this, context, def, false);
         }
 
         #region Charsets

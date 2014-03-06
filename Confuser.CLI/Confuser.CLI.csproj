@@ -66,6 +66,10 @@
       <Project>{862DA0DA-52E1-47CD-B9C2-46B106031B28}</Project>
       <Name>Confuser.Renamer</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Confuser.Runtime\Confuser.Runtime.csproj">
+      <Project>{A45C184F-F98F-4258-A928-BFF437034791}</Project>
+      <Name>Confuser.Runtime</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
