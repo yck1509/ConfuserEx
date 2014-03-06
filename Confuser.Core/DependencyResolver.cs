@@ -99,7 +99,7 @@ namespace Confuser.Core
                 if (after != null)
                 {
                     //targetNodes --> protNode
-                    IEnumerable<DependencyGraphNode> targetNodes = before.Ids.Select(id => id2Nodes[id]);
+                    IEnumerable<DependencyGraphNode> targetNodes = after.Ids.Select(id => id2Nodes[id]);
                     foreach (var node in targetNodes)
                     {
                         node.TargetNodes.Add(protNode);
@@ -126,6 +126,8 @@ namespace Confuser.Core
             Action<DependencyGraphNode> visit = null;
             visit = node =>
             {
+                if (ret.Contains(node))
+                    return;
                 visited.Add(node);
                 foreach (var targetNode in node.TargetNodes)
                 {
@@ -134,6 +136,7 @@ namespace Confuser.Core
                     visit(targetNode);
                 }
                 ret.Add(node);
+                visited.Remove(node);
             };
             visit(root);
             ret.Reverse();

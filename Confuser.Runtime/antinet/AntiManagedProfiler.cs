@@ -61,9 +61,9 @@ namespace Confuser.Runtime
         /// pipe anymore.
         /// </para>
         /// </remarks>
-        static IProfilerDetector profilerDetector;
+        static ProfilerDetector profilerDetector;
 
-        abstract class IProfilerDetector
+        abstract class ProfilerDetector
         {
             public abstract bool IsProfilerAttached();
             public abstract bool WasProfilerAttached();
@@ -71,7 +71,7 @@ namespace Confuser.Runtime
             public abstract void PreventActiveProfilerFromReceivingProfilingMessages();
         }
 
-        class ProfilerDetectorCLR20 : IProfilerDetector
+        class ProfilerDetectorCLR20 : ProfilerDetector
         {
             /// <summary>
             /// Address of CLR 2.0's profiler status flag. If one or both of bits 1 or 2 is set,
@@ -182,7 +182,7 @@ namespace Confuser.Runtime
             }
         }
 
-        class ProfilerDetectorCLR40 : IProfilerDetector
+        class ProfilerDetectorCLR40 : ProfilerDetector
         {
             const uint PIPE_ACCESS_DUPLEX = 3;
             const uint PIPE_TYPE_MESSAGE = 4;
@@ -925,7 +925,7 @@ namespace Confuser.Runtime
             return profilerDetector.Init();
         }
 
-        static IProfilerDetector CreateProfilerDetector()
+        static ProfilerDetector CreateProfilerDetector()
         {
             if (Environment.Version.Major == 2)
                 return new ProfilerDetectorCLR20();

@@ -101,6 +101,7 @@ namespace Confuser.Protections
                                 marker.Mark(member);
                                 name.Analyze(member);
                             }
+                            name.SetCanRename(attr, false);
                             break;
                         default:
                             throw new UnreachableException();
@@ -120,7 +121,8 @@ namespace Confuser.Protections
                             MethodDef method = (MethodDef)member;
                             if (method.Access == MethodAttributes.Public)
                                 method.Access = MethodAttributes.Assembly;
-                            method.IsSpecialName = false;
+                            if (!method.IsConstructor)
+                                method.IsSpecialName = false;
                             var ca = method.CustomAttributes.Find(attrName);
                             if (ca != null)
                                 ca.Constructor = attr.FindMethod(".ctor");

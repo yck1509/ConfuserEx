@@ -172,12 +172,6 @@ namespace Confuser.Runtime
             {
                 return ((uint)addr.ToInt64() & (alignment - 1)) == 0;
             }
-
-            /// <inheritdoc/>
-            public override string ToString()
-            {
-                return string.Format("{0:X8} - {1:X8}", (ulong)imageBase.ToInt64(), (ulong)imageEnd.ToInt64());
-            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Confuser.Renamer
         {
             pipeline.InsertPostStage(PipelineStage.Inspection, new AnalyzePhase(this));
             pipeline.InsertPreStage(PipelineStage.EndModule, new RenamePhase(this));
-            pipeline.InsertPostStage(PipelineStage.OptimizeMethods, new PostRenamePhase(this));
+            pipeline.InsertPostStage(PipelineStage.EndModule, new PostRenamePhase(this));
         }
 
         public override string Name

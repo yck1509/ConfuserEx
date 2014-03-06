@@ -12,9 +12,14 @@ namespace Confuser.Runtime
     {
         static unsafe void Initialize()
         {
-            if (!InitializeAntiDebugger() || !InitializeAntiProfiler())
+            if (!InitializeAntiDebugger())
                 Environment.FailFast(null);
-            PreventActiveProfilerFromReceivingProfilingMessages();
+            InitializeAntiProfiler();
+            if (IsProfilerAttached)
+            {
+                Environment.FailFast(null);
+                PreventActiveProfilerFromReceivingProfilingMessages();
+            }
         }
     }
 }

@@ -101,6 +101,11 @@ namespace Confuser.Renamer
                 // Courtesy
                 service.SetCanRename(type, false);
             }
+
+            if (type.BaseType != null && type.BaseType.DefinitionAssembly.IsCorLib() && type.BaseType.FullName == "System.Attribute")
+            {
+                service.SetRenameMode(type, RenameMode.Letters);
+            }
         }
 
         void Analyze(NameService service, ConfuserContext context, MethodDef method)
