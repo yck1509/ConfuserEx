@@ -11,6 +11,7 @@ using Confuser.Renamer;
 
 namespace Confuser.Protections
 {
+    [BeforeProtection("Ki.ControlFlow")]
     class AntiDumpProtection : Protection
     {
         public const string _Id = "anti dump";
@@ -80,6 +81,8 @@ namespace Confuser.Protections
 
                     foreach (var member in members)
                     {
+                        member.Name = name.RandomName();
+                        name.SetCanRename(member, false);
                         ((MethodDef)member).Access = MethodAttributes.Assembly;
                         marker.Mark(member);
                         name.Analyze(member);

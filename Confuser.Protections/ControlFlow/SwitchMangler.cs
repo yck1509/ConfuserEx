@@ -23,7 +23,7 @@ namespace Confuser.Protections.ControlFlow
 
                 bool nextIsBrTarget = i + 1 < block.Instructions.Count && trace.IsBranchTarget(trace.OffsetToIndexMap(block.Instructions[i + 1].Offset));
 
-                if ((instr.OpCode.OpCodeType != OpCodeType.Prefix && trace.StackDepths[trace.OffsetToIndexMap(instr.Offset)] == 0) &&
+                if ((instr.OpCode.OpCodeType != OpCodeType.Prefix && trace.AfterStackDepths[trace.OffsetToIndexMap(instr.Offset)] == 0) &&
                     (nextIsBrTarget || ctx.Intensity > ctx.Random.NextDouble()))
                 {
                     statements.AddLast(currentStatement.ToArray());
@@ -109,7 +109,9 @@ namespace Confuser.Protections.ControlFlow
                 int i = 0;
                 while (current != null)
                 {
-                    statementKeys[current.Value[0]] = key[i++];
+                    if (i != 0)
+                        statementKeys[current.Value[0]] = key[i];
+                    i++;
                     current = current.Next;
                 }
 

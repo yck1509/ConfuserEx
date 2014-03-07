@@ -46,7 +46,8 @@ namespace Confuser.Core
             ConfuserContext context = new ConfuserContext();
             context.Logger = parameters.GetLogger();
             context.token = token;
-            var asmResolver = new AssemblyResolver();
+            var asmResolver = new AssemblyResolver(); 
+            asmResolver.EnableTypeDefCache = true;
             asmResolver.DefaultModuleContext = new ModuleContext(asmResolver);
             foreach (var probePath in parameters.Project.ProbePaths)
                 asmResolver.PostSearchPaths.Add(probePath);
@@ -221,9 +222,6 @@ namespace Confuser.Core
                 try
                 {
                     var assembly = context.Resolver.ResolveThrow(dependency.Item1, dependency.Item2);
-                    foreach (var module in assembly.Modules)
-                        if (!context.Modules.Contains((ModuleDefMD)module))
-                            module.EnableTypeDefFindCache = true;
                 }
                 catch (AssemblyResolveException ex)
                 {

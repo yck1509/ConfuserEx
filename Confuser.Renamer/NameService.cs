@@ -106,7 +106,7 @@ namespace Confuser.Renamer
                 GetVTables().GetVTable((TypeDef)def);
                 SetOriginalNamespace(def, ((TypeDef)def).Namespace);
             }
-            analyze.Analyze(this, context, def, false);
+            analyze.Analyze(this, context, def, true);
         }
 
         #region Charsets

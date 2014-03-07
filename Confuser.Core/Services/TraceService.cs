@@ -71,6 +71,12 @@ namespace Confuser.Core.Services
         /// <value>The method.</value>
         public MethodDef Method { get { return method; } }
 
+        /// <summary>
+        /// Gets the instructions this trace is performed on.
+        /// </summary>
+        /// <value>The instructions.</value>
+        public Instruction[] Instructions { get; private set; }
+
         Dictionary<uint, int> offset2index;
         /// <summary>
         /// Gets the map of offset to index.
@@ -82,7 +88,13 @@ namespace Confuser.Core.Services
         /// Gets the stack depths of method body.
         /// </summary>
         /// <value>The stack depths.</value>
-        public int[] StackDepths { get; private set; }
+        public int[] BeforeStackDepths { get; private set; }
+
+        /// <summary>
+        /// Gets the stack depths of method body.
+        /// </summary>
+        /// <value>The stack depths.</value>
+        public int[] AfterStackDepths { get; private set; }
 
         Dictionary<int, List<Instruction>> fromInstrs;
 
@@ -105,24 +117,26 @@ namespace Confuser.Core.Services
         {
             var body = method.Body;
             method.Body.UpdateInstructionOffsets();
+            Instructions = method.Body.Instructions.ToArray();
 
             offset2index = new Dictionary<uint, int>();
-            var depths = new int[body.Instructions.Count];
+            var beforeDepths = new int[body.Instructions.Count];
+            var afterDepths = new int[body.Instructions.Count];
             fromInstrs = new Dictionary<int, List<Instruction>>();
 
             var instrs = body.Instructions;
             for (int i = 0; i < instrs.Count; i++)
             {
                 offset2index.Add(instrs[i].Offset, i);
-                depths[i] = int.MinValue;
+                beforeDepths[i] = int.MinValue;
             }
 
             foreach (var eh in body.ExceptionHandlers)
             {
-                depths[offset2index[eh.TryStart.Offset]] = 0;
-                depths[offset2index[eh.HandlerStart.Offset]] = (eh.HandlerType != ExceptionHandlerType.Finally ? 1 : 0);
+                beforeDepths[offset2index[eh.TryStart.Offset]] = 0;
+                beforeDepths[offset2index[eh.HandlerStart.Offset]] = (eh.HandlerType != ExceptionHandlerType.Finally ? 1 : 0);
                 if (eh.FilterStart != null)
-                    depths[offset2index[eh.FilterStart.Offset]] = 1;
+                    beforeDepths[offset2index[eh.FilterStart.Offset]] = 1;
             }
 
             // Just do a simple forward scan to build the stack depth map
@@ -131,18 +145,19 @@ namespace Confuser.Core.Services
             {
                 var instr = instrs[i];
 
-                if (depths[i] != int.MinValue)   // Already set due to being target of a branch / beginning of EHs.
-                    currentStack = depths[i];
+                if (beforeDepths[i] != int.MinValue)   // Already set due to being target of a branch / beginning of EHs.
+                    currentStack = beforeDepths[i];
 
+                beforeDepths[i] = currentStack;
                 instr.UpdateStack(ref currentStack);
-                depths[i] = currentStack;
+                afterDepths[i] = currentStack;
 
                 switch (instr.OpCode.FlowControl)
                 {
                     case FlowControl.Branch:
                         int index = offset2index[((Instruction)instr.Operand).Offset];
-                        if (depths[index] == int.MinValue)
-                            depths[index] = currentStack;
+                        if (beforeDepths[index] == int.MinValue)
+                            beforeDepths[index] = currentStack;
                         fromInstrs.AddListEntry(offset2index[((Instruction)instr.Operand).Offset], instr);
                         currentStack = 0;
                         break;
@@ -158,16 +173,16 @@ namespace Confuser.Core.Services
                             foreach (var target in (Instruction[])instr.Operand)
                             {
                                 int targetIndex = offset2index[target.Offset];
-                                if (depths[targetIndex] == int.MinValue)
-                                    depths[targetIndex] = currentStack;
+                                if (beforeDepths[targetIndex] == int.MinValue)
+                                    beforeDepths[targetIndex] = currentStack;
                                 fromInstrs.AddListEntry(offset2index[target.Offset], instr);
                             }
                         }
                         else
                         {
                             int targetIndex = offset2index[((Instruction)instr.Operand).Offset];
-                            if (depths[targetIndex] == int.MinValue)
-                                depths[targetIndex] = currentStack;
+                            if (beforeDepths[targetIndex] == int.MinValue)
+                                beforeDepths[targetIndex] = currentStack;
                             fromInstrs.AddListEntry(offset2index[((Instruction)instr.Operand).Offset], instr);
                         }
                         break;
@@ -183,11 +198,17 @@ namespace Confuser.Core.Services
                         throw new UnreachableException();
                 }
             }
-            foreach (var stackDepth in depths)
+
+            foreach (var stackDepth in beforeDepths)
                 if (stackDepth == int.MinValue)
                     throw new InvalidMethodException("Bad method body.");
 
-            StackDepths = depths;
+            foreach (var stackDepth in afterDepths)
+                if (stackDepth == int.MinValue)
+                    throw new InvalidMethodException("Bad method body.");
+
+            BeforeStackDepths = beforeDepths;
+            AfterStackDepths = afterDepths;
 
             return this;
         }
@@ -206,9 +227,12 @@ namespace Confuser.Core.Services
 
             int push, pop;
             instr.CalculateStackUsage(out push, out pop);   // pop is number of arguments
+            if (pop == 0)
+                return new int[0];
+
             int instrIndex = offset2index[instr.Offset];
             int argCount = pop;
-            int targetStack = StackDepths[instrIndex - 1] - argCount + 1;
+            int targetStack = BeforeStackDepths[instrIndex] - argCount;
 
             // Find the begin instruction of method call
             int beginInstrIndex = -1;
@@ -220,7 +244,7 @@ namespace Confuser.Core.Services
                 int index = working.Dequeue();
                 while (index >= 0)
                 {
-                    if (StackDepths[index] == targetStack)
+                    if (BeforeStackDepths[index] == targetStack)
                         break;
 
                     if (fromInstrs.ContainsKey(index))

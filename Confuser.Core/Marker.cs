@@ -108,7 +108,7 @@ namespace Confuser.Core
                     throw new ConfuserException(null);
                 }
                 packer = packers[proj.Packer.Id];
-                packerParams = new Dictionary<string, string>(proj.Packer);
+                packerParams = new Dictionary<string, string>(proj.Packer, StringComparer.OrdinalIgnoreCase);
             }
 
             List<ModuleDefMD> modules = new List<ModuleDefMD>();
@@ -116,6 +116,7 @@ namespace Confuser.Core
             {
                 context.Logger.InfoFormat("Loading '{0}'...", module.Path);
                 ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
+                modDef.EnableTypeDefFindCache = true;
                 var rules = ParseRules(proj, module, context);
 
                 context.Annotations.Set(modDef, SNKey, LoadSNKey(context, module.SNKeyPath, module.SNKeyPassword));
@@ -203,7 +204,7 @@ namespace Confuser.Core
                 foreach (var prot in i.Key)
                 {
                     if (prot.Action == SettingItemAction.Add)
-                        ret[protections[prot.Id]] = new Dictionary<string, string>(prot);
+                        ret[protections[prot.Id]] = new Dictionary<string, string>(prot, StringComparer.OrdinalIgnoreCase);
                     else
                         ret.Remove(protections[prot.Id]);
                 }

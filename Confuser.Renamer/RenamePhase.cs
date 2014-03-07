@@ -63,6 +63,9 @@ namespace Confuser.Renamer
                     }
                 }
             }
+
+            foreach (var module in context.Modules)
+                module.ResetTypeDefFindCache();
         }
     }
 }

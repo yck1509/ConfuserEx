@@ -11,6 +11,7 @@ using Confuser.Renamer;
 
 namespace Confuser.Protections
 {
+    [BeforeProtection("Ki.ControlFlow")]
     class AntiDebugProtection : Protection
     {
         public const string _Id = "anti debug";
@@ -115,14 +116,16 @@ namespace Confuser.Protections
 
                     foreach (var member in members)
                     {
+                        bool ren = true;
                         if (member is MethodDef)
                         {
-                            name.SetRenameMode(member, RenameMode.Debug);
                             MethodDef method = (MethodDef)member;
                             if (method.Access == MethodAttributes.Public)
                                 method.Access = MethodAttributes.Assembly;
                             if (!method.IsConstructor)
                                 method.IsSpecialName = false;
+                            else
+                                ren = false;
                             var ca = method.CustomAttributes.Find(attrName);
                             if (ca != null)
                                 ca.Constructor = attr.FindMethod(".ctor");
@@ -138,6 +141,12 @@ namespace Confuser.Protections
                                 continue;
                             }
                         }
+                        if (ren)
+                        {
+                            member.Name = name.ObfuscateName(member.Name, RenameMode.Unicode);
+                            name.SetCanRename(member, false);
+                        }
+
                         marker.Mark(member);
                         name.Analyze(member);
                     }

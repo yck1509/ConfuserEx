@@ -24,16 +24,16 @@ namespace Confuser.Core
         }
 
         /// <summary>
-        /// Gets the value of the first component.
+        /// Gets or sets the value of the first component.
         /// </summary>
         /// <value>The value of the first component.</value>
-        public T1 Item1 { get; private set; }
+        public T1 Item1 { get; set; }
 
         /// <summary>
-        /// Gets the value of the second component.
+        /// Gets or sets the value of the second component.
         /// </summary>
         /// <value>The value of the second component.</value>
-        public T2 Item2 { get; private set; }
+        public T2 Item2 { get; set; }
 
         /// <inheritdoc/>
         public override bool Equals(object obj)
@@ -80,22 +80,22 @@ namespace Confuser.Core
         }
 
         /// <summary>
-        /// Gets the value of the first component.
+        /// Gets or sets the value of the first component.
         /// </summary>
         /// <value>The value of the first component.</value>
-        public T1 Item1 { get; private set; }
+        public T1 Item1 { get; set; }
 
         /// <summary>
-        /// Gets the value of the second component.
+        /// Gets or sets the value of the second component.
         /// </summary>
         /// <value>The value of the second component.</value>
-        public T2 Item2 { get; private set; }
+        public T2 Item2 { get; set; }
 
         /// <summary>
-        /// Gets the value of the third component.
+        /// Gets or sets the value of the third component.
         /// </summary>
         /// <value>The value of the third component.</value>
-        public T3 Item3 { get; private set; }
+        public T3 Item3 { get; set; }
 
         /// <inheritdoc/>
         public override bool Equals(object obj)

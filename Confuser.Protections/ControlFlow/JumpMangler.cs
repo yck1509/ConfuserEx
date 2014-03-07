@@ -50,6 +50,17 @@ namespace Confuser.Protections.ControlFlow
                     currentFragment.Add(block.Instructions[i]);
                     continue;
                 }
+                else if (i + 4 < block.Instructions.Count &&
+                    block.Instructions[i + 0].OpCode.Code == Code.Ldc_I4 &&
+                    block.Instructions[i + 1].OpCode.Code == Code.Newarr &&
+                    block.Instructions[i + 2].OpCode.Code == Code.Dup &&
+                    block.Instructions[i + 3].OpCode.Code == Code.Ldtoken &&
+                    block.Instructions[i + 4].OpCode.Code == Code.Call)     // Array initializer
+                {
+                    skipCount = 4;
+                    currentFragment.Add(block.Instructions[i]);
+                    continue;
+                }
                 else if (i + 1 < block.Instructions.Count &&
                     block.Instructions[i + 0].OpCode.Code == Code.Ldftn &&
                     block.Instructions[i + 1].OpCode.Code == Code.Newobj)
