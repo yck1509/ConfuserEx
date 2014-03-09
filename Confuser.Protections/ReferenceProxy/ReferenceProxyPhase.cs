@@ -31,6 +31,8 @@ namespace Confuser.Protections.ReferenceProxy
             public StrongMode strong;
 
             public NormalEncoding normal;
+            public ExpressionEncoding expression;
+            public x86Encoding x86;
 
             class MethodSigComparer : IEqualityComparer<MethodSig>
             {
@@ -54,6 +56,7 @@ namespace Confuser.Protections.ReferenceProxy
             ret.Encoding = parameters.GetParameter<EncodingType>(context, method, "encoding", EncodingType.Normal);
             ret.InternalAlso = parameters.GetParameter<bool>(context, method, "internal", false);
             ret.TypeErasure = parameters.GetParameter<bool>(context, method, "typeErasure", false);
+            ret.Depth = parameters.GetParameter<int>(context, method, "depth", 3);
 
             ret.Module = method.Module;
             ret.Method = method;
@@ -91,6 +94,12 @@ namespace Confuser.Protections.ReferenceProxy
                 case EncodingType.Normal:
                     ret.EncodingHandler = store.normal ?? (store.normal = new NormalEncoding());
                     break;
+                case EncodingType.Expression:
+                    ret.EncodingHandler = store.expression ?? (store.expression = new ExpressionEncoding());
+                    break;
+                case EncodingType.x86:
+                    ret.EncodingHandler = store.x86 ?? (store.x86 = new x86Encoding());
+                    break;
                 default:
                     throw new UnreachableException();
             }
@@ -101,6 +110,8 @@ namespace Confuser.Protections.ReferenceProxy
         static RPContext ParseParameters(ModuleDef module, ConfuserContext context, ProtectionParameters parameters, RPStore store)
         {
             RPContext ret = new RPContext();
+            ret.Depth = parameters.GetParameter<int>(context, module, "depth", 3);
+            ret.InitCount = parameters.GetParameter<int>(context, module, "initCount", 0x10);
 
             ret.Random = store.random;
             ret.Module = module;

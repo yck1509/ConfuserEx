@@ -266,7 +266,7 @@ namespace Confuser.Protections.ReferenceProxy
                 ctx.DynCipher.GenerateExpressionPair(
                     ctx.Random,
                     new VariableExpression() { Variable = var }, new VariableExpression() { Variable = result },
-                    3, out expression, out inverse);
+                    ctx.Depth, out expression, out inverse);
 
                 var expCompiled = new DMCodeGen(typeof(int), new[] { Tuple.Create("{VAR}", typeof(int)) })
                     .GenerateCIL(expression)
@@ -298,7 +298,7 @@ namespace Confuser.Protections.ReferenceProxy
         {
             InitMethodDesc[] initDescs;
             if (!inits.TryGetValue(encoding, out initDescs))
-                inits[encoding] = initDescs = new InitMethodDesc[0x10];
+                inits[encoding] = initDescs = new InitMethodDesc[ctx.InitCount];
 
             int index = (int)ctx.Random.NextInt32(initDescs.Length);
             if (initDescs[index] == null)

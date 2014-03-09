@@ -39,6 +39,8 @@ namespace Confuser.Protections.ReferenceProxy
         public EncodingType Encoding;
         public bool TypeErasure;
         public bool InternalAlso;
+        public int Depth;
+        public int InitCount;
 
         public RPMode ModeHandler;
         public IRPEncoding EncodingHandler;
