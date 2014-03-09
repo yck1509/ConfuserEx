@@ -116,6 +116,9 @@ namespace Confuser.Protections
 
                     foreach (var member in members)
                     {
+                        marker.Mark(member);
+                        name.Analyze(member);
+
                         bool ren = true;
                         if (member is MethodDef)
                         {
@@ -126,6 +129,7 @@ namespace Confuser.Protections
                                 method.IsSpecialName = false;
                             else
                                 ren = false;
+
                             var ca = method.CustomAttributes.Find(attrName);
                             if (ca != null)
                                 ca.Constructor = attr.FindMethod(".ctor");
@@ -146,9 +150,6 @@ namespace Confuser.Protections
                             member.Name = name.ObfuscateName(member.Name, RenameMode.Unicode);
                             name.SetCanRename(member, false);
                         }
-
-                        marker.Mark(member);
-                        name.Analyze(member);
                     }
                 }
             }

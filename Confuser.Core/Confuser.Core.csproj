@@ -53,6 +53,7 @@
     <Compile Include="ConfuserComponent.cs" />
     <Compile Include="DnlibUtils.cs" />
     <Compile Include="Helpers\InjectHelper.cs" />
+    <Compile Include="Helpers\MutationHelper.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Marker.cs" />
     <Compile Include="MarkerResult.cs" />

@@ -8,6 +8,8 @@ using dnlib.DotNet.Emit;
 using Confuser.Core.Services;
 using Confuser.DynCipher;
 using Confuser.Renamer;
+using dnlib.DotNet.Writer;
+using System.Diagnostics;
 
 namespace Confuser.Protections.ControlFlow
 {
@@ -23,7 +25,7 @@ namespace Confuser.Protections.ControlFlow
             get { return ProtectionTargets.Methods; }
         }
 
-        static CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random)
+        static CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random, bool disableOpti)
         {
             CFContext ret = new CFContext();
             ret.Type = parameters.GetParameter<CFType>(context, method, "type", CFType.Switch);
@@ -31,9 +33,9 @@ namespace Confuser.Protections.ControlFlow
 
             int rawIntensity = parameters.GetParameter<int>(context, method, "intensity", 60);
             ret.Intensity = rawIntensity / 100.0;
-            ret.Depth = parameters.GetParameter<int>(context, method, "depth", 5);
+            ret.Depth = parameters.GetParameter<int>(context, method, "depth", 4);
 
-            ret.JunkCode = parameters.GetParameter<bool>(context, method, "junk", false);
+            ret.JunkCode = parameters.GetParameter<bool>(context, method, "junk", false) && !disableOpti;
 
             ret.Random = random;
             ret.Method = method;
@@ -43,16 +45,38 @@ namespace Confuser.Protections.ControlFlow
             return ret;
         }
 
+        static bool DisabledOptimization(ModuleDef module)
+        {
+            bool disableOpti = false;
+            var debugAttr = module.Assembly.CustomAttributes.Find("System.Diagnostics.DebuggableAttribute");
+            if (debugAttr != null)
+            {
+                if (debugAttr.ConstructorArguments.Count == 1)
+                    disableOpti |= ((DebuggableAttribute.DebuggingModes)(int)debugAttr.ConstructorArguments[0].Value & DebuggableAttribute.DebuggingModes.DisableOptimizations) != 0;
+                else
+                    disableOpti |= (bool)debugAttr.ConstructorArguments[1].Value;
+            }
+            debugAttr = module.CustomAttributes.Find("System.Diagnostics.DebuggableAttribute");
+            if (debugAttr != null)
+            {
+                if (debugAttr.ConstructorArguments.Count == 1)
+                    disableOpti |= ((DebuggableAttribute.DebuggingModes)(int)debugAttr.ConstructorArguments[0].Value & DebuggableAttribute.DebuggingModes.DisableOptimizations) != 0;
+                else
+                    disableOpti |= (bool)debugAttr.ConstructorArguments[1].Value;
+            }
+            return disableOpti;
+        }
+
         protected override void Execute(ConfuserContext context, ProtectionParameters parameters)
         {
+            bool disabledOpti = DisabledOptimization(context.CurrentModule);
             var random = context.Registry.GetService<IRandomService>().GetRandomGenerator(ControlFlowProtection._FullId);
+
             foreach (var method in parameters.Targets.OfType<MethodDef>())
                 if (method.HasBody && method.Body.Instructions.Count > 0)
                 {
-                    ProcessMethod(method.Body, ParseParameters(method, context, parameters, random));
+                    ProcessMethod(method.Body, ParseParameters(method, context, parameters, random, disabledOpti));
                 }
-
-            context.CurrentModuleWriterOptions.MetaDataOptions.Flags |= dnlib.DotNet.Writer.MetaDataFlags.KeepOldMaxStack;
         }
 
         static readonly JumpMangler Jump = new JumpMangler();
@@ -68,6 +92,13 @@ namespace Confuser.Protections.ControlFlow
 
         void ProcessMethod(CilBody body, CFContext ctx)
         {
+            uint maxStack;
+            if (!MaxStackCalculator.GetMaxStack(body.Instructions, body.ExceptionHandlers, out maxStack))
+            {
+                ctx.Context.Logger.Error("Failed to calcuate maxstack.");
+                throw new ConfuserException(null);
+            }
+            body.MaxStack = (ushort)maxStack;
             ScopeBlock root = BlockParser.ParseBody(body);
 
             GetMangler(ctx.Type).Mangle(body, root, ctx);
@@ -79,6 +110,7 @@ namespace Confuser.Protections.ControlFlow
                 eh.TryEnd = body.Instructions[body.Instructions.IndexOf(eh.TryEnd) + 1];
                 eh.HandlerEnd = body.Instructions[body.Instructions.IndexOf(eh.HandlerEnd) + 1];
             }
+            body.KeepOldMaxStack = true;
         }
     }
 }

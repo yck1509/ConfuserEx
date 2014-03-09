@@ -73,7 +73,7 @@ namespace Confuser.Protections.ControlFlow
         {
             MethodTrace trace = ctx.Context.Registry.GetService<ITraceService>().Trace(ctx.Method);
 
-            body.MaxStack++;
+            body.MaxStack += 2;
             IPredicate predicate = null;
             if (ctx.Predicate == PredicateType.Expression)
                 predicate = new ExpressionPredicate(ctx);

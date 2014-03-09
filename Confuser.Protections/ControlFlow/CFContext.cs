@@ -56,9 +56,29 @@ namespace Confuser.Protections.ControlFlow
                         break;
 
                     case 2:     // Take that, de4dot + ILSpy :)
-                        instrs.Add(Instruction.Create(OpCodes.Ldc_I4, Random.NextBoolean() ? 0 : 1));
-                        instrs.Add(Instruction.Create(OpCodes.Box, Method.Module.CorLibTypes.Int32.TypeDefOrRef));
+                        bool addDefOk = false;
+                        if (Random.NextBoolean())
+                        {
+                            TypeDef randomType;
+                            randomType = Method.Module.Types[Random.NextInt32(Method.Module.Types.Count)];
+
+                            if (randomType.HasMethods)
+                            {
+                                instrs.Add(Instruction.Create(OpCodes.Ldtoken, randomType.Methods[Random.NextInt32(randomType.Methods.Count)]));
+                                instrs.Add(Instruction.Create(OpCodes.Box, Method.Module.CorLibTypes.GetTypeRef("System", "RuntimeMethodHandle")));
+                                addDefOk = true;
+                            }
+                        }
+
+                        if (!addDefOk)
+                        {
+                            instrs.Add(Instruction.Create(OpCodes.Ldc_I4, Random.NextBoolean() ? 0 : 1));
+                            instrs.Add(Instruction.Create(OpCodes.Box, Method.Module.CorLibTypes.Int32.TypeDefOrRef));
+                        }
+                        var pop = Instruction.Create(OpCodes.Pop);
                         instrs.Add(Instruction.Create(OpCodes.Brfalse, instrs[0]));
+                        instrs.Add(Instruction.Create(OpCodes.Ldc_I4, Random.NextBoolean() ? 0 : 1));
+                        instrs.Add(pop);
                         break;
                 }
             }
@@ -89,6 +109,7 @@ namespace Confuser.Protections.ControlFlow
                     instrs.Add(Instruction.Create(OpCodes.Ldloc, new Local(null) { Index = 0xff }));
                     break;
                 case 5:
+                    instrs.Add(Instruction.Create(OpCodes.Ldtoken, Method));
                     break;
             }
         }

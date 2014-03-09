@@ -158,7 +158,7 @@ namespace Confuser.DynCipher.Generation
                     {
                         Debug.Assert(constExp is LiteralExpression);
                         uint val = ((LiteralExpression)constExp).Value;
-                        val = Utils.modInv(val);
+                        val = MathsUtils.modInv(val);
                         result = new BinOpExpression()
                         {
                             Operation = BinOps.Mul,

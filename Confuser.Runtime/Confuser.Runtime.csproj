@@ -41,9 +41,9 @@
     <Compile Include="antinet\AntiManagedProfiler.cs" />
     <Compile Include="antinet\HandleProcessCorruptedStateExceptionsAttribute.cs" />
     <Compile Include="antinet\PEInfo.cs" />
+    <Compile Include="Mutation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
+    <Compile Include="RefProxy.Strong.cs" />
     <Compile Include="AntiDebug.Safe.cs" />
   </ItemGroup>
   <ItemGroup>

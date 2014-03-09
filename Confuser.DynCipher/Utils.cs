@@ -5,10 +5,10 @@ using System.Text;
 
 namespace Confuser.DynCipher
 {
-    static class Utils
+    public static class MathsUtils
     {
         const ulong MODULO32 = 0x100000000;
-        static ulong modInv(ulong num, ulong mod)
+        public static ulong modInv(ulong num, ulong mod)
         {
             ulong a = mod, b = num % mod;
             ulong p0 = 0, p1 = 1;
@@ -30,6 +30,11 @@ namespace Confuser.DynCipher
         public static uint modInv(uint num)
         {
             return (uint)modInv(num, MODULO32);
+        }
+
+        public static byte modInv(byte num)
+        {
+            return (byte)modInv(num, 0x100);
         }
     }
 }

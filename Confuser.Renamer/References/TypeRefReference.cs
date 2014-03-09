@@ -7,7 +7,7 @@ using Confuser.Core;
 
 namespace Confuser.Renamer.References
 {
-    class TypeRefReference : INameReference<TypeDef>
+    public class TypeRefReference : INameReference<TypeDef>
     {
         TypeRef typeRef;
         TypeDef typeDef;

@@ -116,7 +116,6 @@ namespace Confuser.Core
             {
                 context.Logger.InfoFormat("Loading '{0}'...", module.Path);
                 ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
-                modDef.EnableTypeDefFindCache = true;
                 var rules = ParseRules(proj, module, context);
 
                 context.Annotations.Set(modDef, SNKey, LoadSNKey(context, module.SNKeyPath, module.SNKeyPassword));

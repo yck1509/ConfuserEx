@@ -7,7 +7,7 @@ using Confuser.Core;
 
 namespace Confuser.Renamer.References
 {
-    class MemberRefReference : INameReference<IDefinition>
+    public class MemberRefReference : INameReference<IDefinition>
     {
         MemberRef memberRef;
         IDefinition memberDef;

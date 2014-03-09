@@ -49,7 +49,7 @@ namespace Confuser.Protections
 
         public override ProtectionPreset Preset
         {
-            get { return ProtectionPreset.Aggressive; }
+            get { return ProtectionPreset.Maximum; }
         }
 
         class AntiDumpPhase : ProtectionPhase

@@ -107,6 +107,19 @@ namespace Confuser.Core.Services
         }
 
         /// <summary>
+        /// Returns a random byte.
+        /// </summary>
+        /// <returns>Requested random byte.</returns>
+        public byte NextByte()
+        {
+            byte ret = state[32 - stateFilled];
+            stateFilled--;
+            if (stateFilled == 0)
+                NextState();
+            return ret;
+        }
+
+        /// <summary>
         /// Gets a buffer of random bytes with the specified length.
         /// </summary>
         /// <param name="length">The number of random bytes.</param>
@@ -126,6 +139,7 @@ namespace Confuser.Core.Services
         {
             return BitConverter.ToInt32(NextBytes(4), 0);
         }
+
         /// <summary>
         /// Returns a nonnegative random integer that is less than the specified maximum.
         /// </summary>
@@ -135,6 +149,7 @@ namespace Confuser.Core.Services
         {
             return (int)(NextUInt32() % max);
         }
+
         /// <summary>
         /// Returns a random integer that is within a specified range.
         /// </summary>

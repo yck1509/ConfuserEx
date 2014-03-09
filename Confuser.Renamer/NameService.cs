@@ -20,9 +20,11 @@ namespace Confuser.Renamer
 
         RenameMode GetRenameMode(object obj);
         void SetRenameMode(object obj, RenameMode val);
+        void ReduceRenameMode(object obj, RenameMode val);
 
         string ObfuscateName(string name, RenameMode mode);
         string RandomName();
+        string RandomName(RenameMode mode);
 
         void RegisterRenamer(IRenamer renamer);
         void AddReference<T>(T obj, INameReference<T> reference);
@@ -83,6 +85,12 @@ namespace Confuser.Renamer
         {
             context.Annotations.Set<RenameMode>(obj, RenameModeKey, val);
         }
+        public void ReduceRenameMode(object obj, RenameMode val)
+        {
+            RenameMode original = GetRenameMode(obj);
+            if (original < val)
+                context.Annotations.Set<RenameMode>(obj, RenameModeKey, val);
+        }
 
         static readonly object ReferencesKey = new object();
         public void AddReference<T>(T obj, INameReference<T> reference)
@@ -110,7 +118,10 @@ namespace Confuser.Renamer
         }
 
         #region Charsets
-        static char[] asciiCharset = Enumerable.Range(32, 95).Select(ord => (char)ord).ToArray();
+        static char[] asciiCharset = Enumerable.Range(32, 95)
+            .Select(ord => (char)ord)
+            .Except(new [] { '.' })
+            .ToArray();
         static char[] letterCharset = Enumerable.Range(0, 26)
             .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
             .ToArray();
@@ -126,6 +137,9 @@ namespace Confuser.Renamer
 
         public string ObfuscateName(string name, RenameMode mode)
         {
+            if (string.IsNullOrEmpty(name))
+                return string.Empty;
+
             if (mode == RenameMode.Empty)
                 return "";
             else if (mode == RenameMode.Debug)
@@ -148,7 +162,11 @@ namespace Confuser.Renamer
         }
         public string RandomName()
         {
-            return ObfuscateName(Utils.ToHexString(random.NextBytes(16)), RenameMode.Unicode);
+            return RandomName(RenameMode.Unicode);
+        }
+        public string RandomName(RenameMode mode)
+        {
+            return ObfuscateName(Utils.ToHexString(random.NextBytes(16)), mode);
         }
 
         static readonly object OriginalNameKey = new object();

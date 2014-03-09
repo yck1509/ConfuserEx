@@ -73,10 +73,13 @@ namespace Confuser.Renamer.Analyzers
                 TypeSig typeSig = (TypeSig)arg.Value;
                 foreach (var typeRef in typeSig.FindTypeRefs())
                 {
-                    if (!(typeRef is TypeRef)) continue;
                     TypeDef typeDef = typeRef.ResolveTypeDefThrow();
                     if (context.Modules.Contains((ModuleDefMD)typeDef.Module))
-                        service.AddReference(typeDef, new TypeRefReference((TypeRef)typeRef, typeDef));
+                    {
+                        if (typeRef is TypeRef)
+                            service.AddReference(typeDef, new TypeRefReference((TypeRef)typeRef, typeDef));
+                        service.ReduceRenameMode(typeDef, RenameMode.ASCII);
+                    }
                 }
             }
             else if (arg.Value is CAArgument[])

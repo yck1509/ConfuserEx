@@ -102,9 +102,9 @@ namespace Confuser.Renamer
                 service.SetCanRename(type, false);
             }
 
-            if (type.BaseType != null && type.BaseType.DefinitionAssembly.IsCorLib() && type.BaseType.FullName == "System.Attribute")
+            if (type.InheritsFromCorlib("System.Attribute"))
             {
-                service.SetRenameMode(type, RenameMode.Letters);
+                service.ReduceRenameMode(type, RenameMode.ASCII);
             }
         }
 

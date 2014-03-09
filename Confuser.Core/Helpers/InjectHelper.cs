@@ -46,7 +46,7 @@ namespace Confuser.Core.Helpers
             {
                 OriginModule = module;
                 TargetModule = target;
-                importer = new Importer(target);
+                importer = new Importer(target, ImporterOptions.TryToUseTypeDefs);
                 importer.Resolver = this;
             }
 
@@ -280,6 +280,20 @@ namespace Confuser.Core.Helpers
             PopulateContext(typeDef, ctx);
             Copy(typeDef, ctx, true);
             return (TypeDef)ctx.Map[typeDef];
+        }
+
+        /// <summary>
+        /// Injects the specified MethodDef to another module.
+        /// </summary>
+        /// <param name="methodDef">The source MethodDef.</param>
+        /// <param name="target">The target module.</param>
+        /// <returns>The injected MethodDef.</returns>
+        public static MethodDef Inject(MethodDef methodDef, ModuleDef target)
+        {
+            InjectContext ctx = new InjectContext(methodDef.Module, target);
+            ctx.Map[methodDef] = Clone(methodDef);
+            CopyMethodDef(methodDef, ctx);
+            return (MethodDef)ctx.Map[methodDef];
         }
 
         /// <summary>

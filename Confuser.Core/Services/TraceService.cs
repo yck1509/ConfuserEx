@@ -27,7 +27,7 @@ namespace Confuser.Core.Services
         {
             if (method == null)
                 throw new ArgumentNullException("method");
-            return cache.GetValueOrDefaultLazy(method, m => cache[m] = new MethodTrace(this, m)).Trace();
+            return cache.GetValueOrDefaultLazy(method, m => cache[m] = new MethodTrace(m)).Trace();
         }
     }
 
@@ -51,17 +51,14 @@ namespace Confuser.Core.Services
     /// </summary>
     public class MethodTrace
     {
-        TraceService service;
         MethodDef method;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MethodTrace"/> class.
         /// </summary>
-        /// <param name="service">The trace service.</param>
         /// <param name="method">The method to trace.</param>
-        internal MethodTrace(TraceService service, MethodDef method)
+        internal MethodTrace(MethodDef method)
         {
-            this.service = service;
             this.method = method;
         }
 
@@ -222,7 +219,7 @@ namespace Confuser.Core.Services
         /// <exception cref="InvalidMethodException">The method body is invalid.</exception>
         public int[] TraceArguments(Instruction instr)
         {
-            if (instr.OpCode.Code != Code.Call && instr.OpCode.Code != Code.Callvirt)
+            if (instr.OpCode.Code != Code.Call && instr.OpCode.Code != Code.Callvirt && instr.OpCode.Code != Code.Newobj)
                 throw new ArgumentException("Invalid call instruction.", "instr");
 
             int push, pop;
@@ -259,12 +256,12 @@ namespace Confuser.Core.Services
                     index--;
                 }
                 if (index < 0)
-                    throw new InvalidMethodException("Empty evaluation stack.");
+                    return null;
 
                 if (beginInstrIndex == -1)
                     beginInstrIndex = index;
                 else if (beginInstrIndex != index)
-                    throw new InvalidMethodException("Stack depth not matched.");
+                    return null;
             }
 
             // Trace the index of arguments
@@ -279,9 +276,9 @@ namespace Confuser.Core.Services
                 int index = tuple.Item1;
                 Stack<int> evalStack = tuple.Item2;
 
-                while (index != instrIndex)
+                while (index != instrIndex && index < method.Body.Instructions.Count)
                 {
-                    Instruction currentInstr = method.Body.Instructions[index];
+                    Instruction currentInstr = Instructions[index];
                     currentInstr.CalculateStackUsage(out push, out pop);
                     int stackUsage = pop - push;
                     if (stackUsage < 0)
@@ -291,6 +288,9 @@ namespace Confuser.Core.Services
                     }
                     else
                     {
+                        if (evalStack.Count < stackUsage)
+                            return null;
+
                         for (int i = 0; i < stackUsage; i++)
                             evalStack.Pop();
                     }
@@ -319,17 +319,17 @@ namespace Confuser.Core.Services
                 }
 
                 if (evalStack.Count != argCount)
-                    throw new InvalidMethodException("Cannot find argument index.");
+                    return null;
                 else if (ret != null && !evalStack.SequenceEqual(ret))
-                    throw new InvalidMethodException("Stack depths mismatched.");
+                    return null;
                 else
                     ret = evalStack.ToArray();
             }
 
-            Array.Reverse(ret);
             if (ret == null)
-                throw new InvalidMethodException("Cannot find argument index.");
+                return ret;
 
+            Array.Reverse(ret);
             return ret;
         }
     }

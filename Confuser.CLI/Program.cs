@@ -159,7 +159,7 @@ namespace Confuser.CLI
             {
                 DateTime now = DateTime.Now;
                 string timeString = string.Format(
-                    "at {0}, {1}:{2} elapsed.",
+                    "at {0}, {1}:{2:d2} elapsed.",
                     now.ToShortTimeString(),
                     (int)now.Subtract(begin).TotalMinutes,
                     now.Subtract(begin).Seconds);

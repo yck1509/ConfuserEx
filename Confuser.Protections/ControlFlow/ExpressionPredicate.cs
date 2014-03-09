@@ -58,6 +58,7 @@ namespace Confuser.Protections.ControlFlow
 
             invCompiled = new List<Instruction>();
             new CodeGen(stateVar, ctx, invCompiled).GenerateCIL(inverse);
+            body.MaxStack += (ushort)ctx.Depth;
         }
 
         bool inited = false;

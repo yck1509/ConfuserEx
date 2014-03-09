@@ -302,7 +302,7 @@ namespace Confuser.Renamer.BAML
                 var typeDef = type.ResolveTypeDefThrow();
                 if (context.Modules.Contains((ModuleDefMD)typeDef.Module))
                 {
-                    service.SetRenameMode(typeDef, RenameMode.Letters);
+                    service.ReduceRenameMode(typeDef, RenameMode.Letters);
                     service.AddReference(typeDef, reference);
                 }
             }
@@ -475,7 +475,7 @@ namespace Confuser.Renamer.BAML
                             {
                                 var reference = new BAMLConverterMemberReference(xmlnsCtx, sig, property, rec);
                                 AddTypeSigReference(sig, reference);
-                                service.SetRenameMode(property, RenameMode.Letters);
+                                service.ReduceRenameMode(property, RenameMode.Letters);
                                 service.AddReference(property, reference);
                             }
                             FieldDef field = typeDef.FindField(cmdName);
@@ -483,7 +483,7 @@ namespace Confuser.Renamer.BAML
                             {
                                 var reference = new BAMLConverterMemberReference(xmlnsCtx, sig, field, rec);
                                 AddTypeSigReference(sig, reference);
-                                service.SetRenameMode(field, RenameMode.Letters);
+                                service.ReduceRenameMode(field, RenameMode.Letters);
                                 service.AddReference(field, reference);
                             }
                             if (property == null && field == null)

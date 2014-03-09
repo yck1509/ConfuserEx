@@ -126,6 +126,27 @@ namespace Confuser.Core
         }
 
         /// <summary>
+        /// Determines whether the specified type is inherited from a base type in corlib.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="baseType">The full name of base type.</param>
+        /// <returns><c>true</c> if the specified type is inherited from a base type; otherwise, <c>false</c>.</returns>
+        public static bool InheritsFromCorlib(this TypeDef type, string baseType)
+        {
+            if (type.BaseType == null)
+                return false;
+
+            TypeDef bas = type;
+            do
+            {
+                bas = bas.BaseType.ResolveTypeDefThrow();
+                if (bas.ReflectionFullName == baseType)
+                    return true;
+            } while (bas.BaseType != null && bas.BaseType.DefinitionAssembly.IsCorLib());
+            return false;
+        }
+
+        /// <summary>
         /// Determines whether the specified type implements the specified interface.
         /// </summary>
         /// <param name="type">The type.</param>

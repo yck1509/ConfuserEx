@@ -38,7 +38,7 @@ namespace Confuser.DynCipher.Elements
                     break;
                 case CryptoNumOps.Mul:
                     Key = random.NextUInt32() | 1;
-                    InverseKey = Utils.modInv(Key);
+                    InverseKey = MathsUtils.modInv(Key);
                     break;
                 case CryptoNumOps.Xnor:
                     Key = random.NextUInt32();

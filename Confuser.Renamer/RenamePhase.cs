@@ -54,7 +54,7 @@ namespace Confuser.Renamer
                     typeDef.Namespace = service.ObfuscateName(typeDef.Namespace, mode);
                 }
 
-                foreach (var refer in references)
+                foreach (var refer in references.ToList())
                 {
                     if (!refer.UpdateNameReference(context, service))
                     {
@@ -63,9 +63,6 @@ namespace Confuser.Renamer
                     }
                 }
             }
-
-            foreach (var module in context.Modules)
-                module.ResetTypeDefFindCache();
         }
     }
 }

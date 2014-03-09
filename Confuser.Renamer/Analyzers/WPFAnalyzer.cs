@@ -69,6 +69,13 @@ namespace Confuser.Renamer.Analyzers
             foreach (var instrInfo in dpRegInstrs)
             {
                 int[] args = trace.TraceArguments(instrInfo.Item2);
+                if (args == null)
+                {
+                    if (!erred)
+                        context.Logger.WarnFormat("Failed to extract dependency property name in '{0}'.", method.FullName);
+                    erred = true;
+                    continue;
+                }
                 Instruction ldstr = method.Body.Instructions[args[0]];
                 if (ldstr.OpCode.Code != Code.Ldstr)
                 {
@@ -129,6 +136,13 @@ namespace Confuser.Renamer.Analyzers
             foreach (var instr in routedEvtRegInstrs)
             {
                 int[] args = trace.TraceArguments(instr);
+                if (args == null)
+                {
+                    if (!erred)
+                        context.Logger.WarnFormat("Failed to extract routed event name in '{0}'.", method.FullName);
+                    erred = true;
+                    continue;
+                }
                 Instruction ldstr = method.Body.Instructions[args[0]];
                 if (ldstr.OpCode.Code != Code.Ldstr)
                 {
