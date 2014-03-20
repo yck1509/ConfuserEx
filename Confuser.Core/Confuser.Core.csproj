@@ -45,6 +45,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Annotations.cs" />
+    <Compile Include="LZMA\Common\CRC.cs" />
+    <Compile Include="LZMA\Common\InBuffer.cs" />
+    <Compile Include="LZMA\Common\OutBuffer.cs" />
+    <Compile Include="LZMA\Compress\LZMA\LzmaBase.cs" />
+    <Compile Include="LZMA\Compress\LZMA\LzmaDecoder.cs" />
+    <Compile Include="LZMA\Compress\LZMA\LzmaEncoder.cs" />
+    <Compile Include="LZMA\Compress\LZ\IMatchFinder.cs" />
+    <Compile Include="LZMA\Compress\LZ\LzBinTree.cs" />
+    <Compile Include="LZMA\Compress\LZ\LzInWindow.cs" />
+    <Compile Include="LZMA\Compress\LZ\LzOutWindow.cs" />
+    <Compile Include="LZMA\Compress\RangeCoder\RangeCoder.cs" />
+    <Compile Include="LZMA\Compress\RangeCoder\RangeCoderBit.cs" />
+    <Compile Include="LZMA\Compress\RangeCoder\RangeCoderBitTree.cs" />
+    <Compile Include="LZMA\ICoder.cs" />
     <Compile Include="ConfuserEngine.cs" />
     <Compile Include="ConfuserException.cs" />
     <Compile Include="ConfuserParameters.cs" />
@@ -73,6 +87,7 @@
     <Compile Include="ProtectionPreset.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceRegistry.cs" />
+    <Compile Include="Services\CompressionService.cs" />
     <Compile Include="Services\RuntimeService.cs" />
     <Compile Include="Services\MarkerService.cs" />
     <Compile Include="Services\RandomService.cs" />

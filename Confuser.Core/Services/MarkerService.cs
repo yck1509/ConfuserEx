@@ -10,6 +10,7 @@ namespace Confuser.Core.Services
     {
         Marker marker;
         ConfuserContext context;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkerService"/> class.
         /// </summary>
