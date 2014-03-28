@@ -33,3 +33,4 @@ _ReSharper*/
 packages/
 /Confuser.Test
 *.sln.*
+gh-pages/
