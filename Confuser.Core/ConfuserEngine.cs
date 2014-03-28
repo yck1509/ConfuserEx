@@ -53,7 +53,7 @@ namespace Confuser.Core
                 asmResolver.PostSearchPaths.Add(probePath);
             context.Resolver = asmResolver;
             context.BaseDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.BaseDirectory + "\\");
-            context.OutputDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.OutputDirectory + "\\");
+            context.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.OutputDirectory + "\\");
 
             PrintInfo(context);
 
