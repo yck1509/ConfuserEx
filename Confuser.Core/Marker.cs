@@ -229,27 +229,27 @@ namespace Confuser.Core
             else if (def is TypeDef)
             {
                 TypeDef type = (TypeDef)def;
-                return type.Module.Name + "!!" + type.FullName;
+                return type.FullName;
             }
             else if (def is MethodDef)
             {
                 MethodDef method = (MethodDef)def;
-                return method.Module.Name + "!!" + method.FullName;
+                return method.FullName;
             }
             else if (def is FieldDef)
             {
                 FieldDef field = (FieldDef)def;
-                return field.Module.Name + "!!" + field.FullName;
+                return field.FullName;
             }
             else if (def is PropertyDef)
             {
                 PropertyDef property = (PropertyDef)def;
-                return property.Module.Name + "!!" + property.FullName;
+                return property.FullName;
             }
             else if (def is EventDef)
             {
                 EventDef evt = (EventDef)def;
-                return evt.Module.Name + "!!" + evt.FullName;
+                return evt.FullName;
             }
             else
                 throw new NotSupportedException();

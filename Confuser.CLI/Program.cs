@@ -6,6 +6,7 @@ using Confuser.Core.Project;
 using Confuser.Core;
 using System.Xml;
 using System.Diagnostics;
+using System.IO;
 
 namespace Confuser.CLI
 {
@@ -30,6 +31,7 @@ namespace Confuser.CLI
                     XmlDocument xmlDoc = new XmlDocument();
                     xmlDoc.Load(args[0]);
                     proj.Load(xmlDoc);
+					proj.BaseDirectory = Path.Combine(Path.GetDirectoryName(args[0]), proj.BaseDirectory);
                 }
                 catch (Exception ex)
                 {
