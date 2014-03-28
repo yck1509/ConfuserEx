@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project baseDir="." outputDir="Confused" xmlns="http://confuser.codeplex.com">
+    <rule preset="none" pattern=".*">
+        <protection id="rename">
+            <argument name="mode" value="unicode" />
+        </protection>
+        <protection id="anti ildasm" />
+        <protection id="anti debug" />
+        <protection id="rename">
+            <argument name="mode" value="unicode" />
+        </protection>
+        <protection id="ref proxy" />
+        <protection id="ctrl flow" />
+    </rule>
+    <rule preset="none" pattern="PaintDotNet.Menus\..*Menu(|Item|Base)$">
+        <protection id="rename" action="remove" />
+    </rule>
+    <rule preset="none" pattern="PaintDotNet.Menus\..*Menu::menu.*$">
+        <protection id="rename" action="remove" />
+    </rule>
+    <rule preset="none" pattern="PaintDotNet.Tools\..*Tool(|Base)$">
+        <protection id="rename" action="remove" />
+    </rule>
+    <rule preset="none" pattern="PaintDotNet.IndirectUI\..*PropertyControl.*\(\)$">
+        <protection id="rename" action="remove" />
+    </rule>
+    <module path="PaintDotNet.Base.dll" />
+    <module path="PaintDotNet.Core.dll" />
+    <module path="PaintDotNet.Data.dll" />
+    <module path="PaintDotNet.Effects.dll" />
+    <module path="PaintDotNet.exe" />
+    <module path="PaintDotNet.SystemLayer.dll" />
+</project>
