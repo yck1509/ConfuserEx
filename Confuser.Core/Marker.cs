@@ -118,7 +118,7 @@ namespace Confuser.Core
                 ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
                 var rules = ParseRules(proj, module, context);
 
-                context.Annotations.Set(modDef, SNKey, LoadSNKey(context, Path.Combine(proj.BaseDirectory, module.SNKeyPath), module.SNKeyPassword));
+                context.Annotations.Set(modDef, SNKey, LoadSNKey(context, module.SNKeyPath == null ? null : Path.Combine(proj.BaseDirectory, module.SNKeyPath), module.SNKeyPassword));
                 context.Annotations.Set(modDef, RulesKey, rules);
 
                 foreach (var def in modDef.FindDefinitions())

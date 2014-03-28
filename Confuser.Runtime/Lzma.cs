@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Confuser.Runtime
 {
-    class Lzma
+    static class Lzma
     {
         const uint kNumStates = 12;
 
@@ -30,14 +30,6 @@ namespace Confuser.Runtime
         const uint kNumLenToPosStates = 4;
 
         const uint kMatchMinLen = 2;
-
-        static uint GetLenToPosState(uint len)
-        {
-            len -= kMatchMinLen;
-            if (len < kNumLenToPosStates)
-                return len;
-            return unchecked((uint)(kNumLenToPosStates - 1));
-        }
 
         const int kNumAlignBits = 4;
         const uint kAlignTableSize = 1 << kNumAlignBits;
@@ -521,8 +513,6 @@ namespace Confuser.Runtime
                 UInt64 outSize64 = (UInt64)outSize;
                 if (nowPos64 < outSize64)
                 {
-                    if (m_IsMatchDecoders[state.Index << kNumPosStatesBitsMax].Decode(m_RangeDecoder) != 0)
-                        throw new Exception();
                     state.UpdateChar();
                     byte b = m_LiteralDecoder.DecodeNormal(m_RangeDecoder, 0, 0);
                     m_OutWindow.PutByte(b);
@@ -639,6 +629,14 @@ namespace Confuser.Runtime
                 SetLiteralProperties(lp, lc);
                 SetPosBitsProperties(pb);
             }
+
+            static uint GetLenToPosState(uint len)
+            {
+                len -= kMatchMinLen;
+                if (len < kNumLenToPosStates)
+                    return len;
+                return unchecked((uint)(kNumLenToPosStates - 1));
+            }
         }
 
         public static byte[] Decompress(byte[] data)
@@ -652,8 +650,6 @@ namespace Confuser.Runtime
             for (int i = 0; i < 8; i++)
             {
                 int v = s.ReadByte();
-                if (v < 0)
-                    throw (new Exception());
                 outSize |= ((long)(byte)v) << (8 * i);
             }
             byte[] b = new byte[outSize];

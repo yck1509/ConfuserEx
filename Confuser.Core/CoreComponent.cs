@@ -44,6 +44,11 @@ namespace Confuser.Core
         /// </summary>
         public const string _RuntimeServiceId = "Confuser.Runtime";
 
+        /// <summary>
+        /// The service ID of Compression
+        /// </summary>
+        public const string _CompressionServiceId = "Confuser.Compression";
+
         /// <inheritdoc/>
         protected internal override void Initialize(ConfuserContext context)
         {
@@ -51,6 +56,7 @@ namespace Confuser.Core
             context.Registry.RegisterService(_MarkerServiceId, typeof(IMarkerService), new MarkerService(context, marker));
             context.Registry.RegisterService(_TraceServiceId, typeof(ITraceService), new TraceService(context));
             context.Registry.RegisterService(_RuntimeServiceId, typeof(IRuntimeService), new RuntimeService());
+            context.Registry.RegisterService(_CompressionServiceId, typeof(ICompressionService), new CompressionService(context));
         }
 
         /// <inheritdoc/>
