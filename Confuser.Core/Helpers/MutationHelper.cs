@@ -64,8 +64,8 @@ namespace Confuser.Core.Helpers
         /// Replaces the mutation key placeholders in method with actual keys.
         /// </summary>
         /// <param name="method">The method to process.</param>
-        /// <param name="keyId">The mutation key IDs.</param>
-        /// <param name="key">The actual keys.</param>
+        /// <param name="keyIds">The mutation key IDs.</param>
+        /// <param name="keys">The actual keys.</param>
         public static void InjectKeys(MethodDef method, int[] keyIds, int[] keys)
         {
             foreach (var instr in method.Body.Instructions)
