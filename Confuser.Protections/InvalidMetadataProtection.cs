@@ -135,7 +135,7 @@ namespace Confuser.Protections
 
 					writer.MetaData.TablesHeap.ModuleTable.Add(new RawModuleRow(0, 0x7fff7fff, 0, 0, 0));
 					writer.MetaData.TablesHeap.AssemblyTable.Add(new RawAssemblyRow(0, 0, 0, 0, 0, 0, 0, 0x7fff7fff, 0));
-					
+
 					int r = random.NextInt32(8, 16);
 					for (int i = 0; i < r; i++)
 						writer.MetaData.TablesHeap.ENCLogTable.Add(new RawENCLogRow(random.NextUInt32(), random.NextUInt32()));
@@ -148,12 +148,13 @@ namespace Confuser.Protections
 					//Randomize(writer.MetaData.TablesHeap.GenericParamConstraintTable);
 
 					writer.Options.MetaDataOptions.TablesHeapOptions.ExtraData = random.NextUInt32();
-					writer.Options.MetaDataOptions.TablesHeapOptions.UseENC = true;
+					writer.Options.MetaDataOptions.TablesHeapOptions.UseENC = false;
 					writer.Options.MetaDataOptions.MetaDataHeaderOptions.VersionString += "\0\0\0\0";
-					
-					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Blob", new byte[1]));
+
 					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Strings", new byte[1]));
-					
+					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Blob", new byte[1]));
+					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Schema", new byte[1]));
+
 				}
 				else if (e.WriterEvent == ModuleWriterEvent.MDOnAllTablesSorted)
 				{
@@ -168,6 +169,25 @@ namespace Confuser.Protections
 				{
 					foreach (var section in writer.Sections)
 						section.Name = "";
+				}
+				else if (e.WriterEvent == ModuleWriterEvent.ChunksAddedToSections)
+				{
+					var newSection = new PESection("", 0xE0000040);
+					writer.Sections.Insert(0, newSection);
+
+					uint alignment;
+
+					alignment = writer.TextSection.Remove(writer.MetaData).Value;
+					writer.TextSection.Add(writer.MetaData, alignment);
+
+					alignment = writer.TextSection.Remove(writer.NetResources).Value;
+					writer.TextSection.Add(writer.NetResources, alignment);
+
+					alignment = writer.TextSection.Remove(writer.MethodBodies).Value;
+					newSection.Add(writer.MethodBodies, alignment);
+
+					alignment = writer.TextSection.Remove(writer.Constants).Value;
+					newSection.Add(writer.Constants, alignment);
 				}
 			}
 		}
