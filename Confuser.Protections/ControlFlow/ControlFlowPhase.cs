@@ -42,6 +42,12 @@ namespace Confuser.Protections.ControlFlow
             ret.Context = context;
             ret.DynCipher = context.Registry.GetService<IDynCipherService>();
 
+            if (ret.Predicate == PredicateType.x86)
+            {
+                if ((context.CurrentModule.Cor20HeaderFlags & dnlib.DotNet.MD.ComImageFlags.ILOnly) != 0)
+                    context.CurrentModuleWriterOptions.Cor20HeaderOptions.Flags &= ~dnlib.DotNet.MD.ComImageFlags.ILOnly;
+            }
+
             return ret;
         }
 
