@@ -284,12 +284,7 @@ namespace Confuser.Protections.ReferenceProxy
                 ctx.Module.AddAsNonNestedType(injectedAttr);
 
                 foreach (var def in injectedAttr.FindDefinitions())
-                {
-                    ctx.Marker.Mark(def);
-                    if (def is FieldDef)
-                        def.Name = ctx.Name.RandomName();
-                    ctx.Name.SetCanRename(def, false);
-                }
+                    ctx.Name.MarkHelper(def, ctx.Marker);
             }
             return keyAttrs[index].Item1;
         }

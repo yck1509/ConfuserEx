@@ -31,6 +31,8 @@ namespace Confuser.Renamer
 
         void SetOriginalName(object obj, string name);
         void SetOriginalNamespace(object obj, string ns);
+
+        void MarkHelper(IDefinition def, IMarkerService marker);
     }
 
     class NameService : INameService
@@ -120,7 +122,7 @@ namespace Confuser.Renamer
         #region Charsets
         static char[] asciiCharset = Enumerable.Range(32, 95)
             .Select(ord => (char)ord)
-            .Except(new [] { '.' })
+            .Except(new[] { '.' })
             .ToArray();
         static char[] letterCharset = Enumerable.Range(0, 26)
             .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
@@ -194,6 +196,39 @@ namespace Confuser.Renamer
         public void RegisterRenamer(IRenamer renamer)
         {
             Renamers.Add(renamer);
+        }
+
+
+        public void MarkHelper(IDefinition def, IMarkerService marker)
+        {
+            if (marker.IsMarked(def))
+                return;
+            if (def is MethodDef)
+            {
+                MethodDef method = (MethodDef)def;
+                method.Access = MethodAttributes.Assembly;
+                if (!method.IsSpecialName && !method.IsRuntimeSpecialName)
+                    method.Name = RandomName();
+            }
+            else if (def is FieldDef)
+            {
+                FieldDef field = (FieldDef)def;
+                field.Access = FieldAttributes.Assembly;
+                field.Name = RandomName();
+                if (!field.IsSpecialName && !field.IsRuntimeSpecialName)
+                    field.Name = RandomName();
+            }
+            else if (def is TypeDef)
+            {
+                TypeDef type = (TypeDef)def;
+                type.Visibility = type.DeclaringType == null ? TypeAttributes.NotPublic : TypeAttributes.NestedAssembly;
+                type.Namespace = "";
+                if (!type.IsSpecialName && !type.IsRuntimeSpecialName)
+                    type.Name = RandomName();
+            }
+            SetCanRename(def, false);
+            Analyze(def);
+            marker.Mark(def);
         }
     }
 }

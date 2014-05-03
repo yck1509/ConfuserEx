@@ -80,13 +80,7 @@ namespace Confuser.Protections
                     cctor.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, init));
 
                     foreach (var member in members)
-                    {
-                        member.Name = name.RandomName();
-                        name.SetCanRename(member, false);
-                        ((MethodDef)member).Access = MethodAttributes.Assembly;
-                        marker.Mark(member);
-                        name.Analyze(member);
-                    }
+                        name.MarkHelper(member, marker);
                 }
             }
 
