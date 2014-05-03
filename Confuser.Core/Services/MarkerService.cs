@@ -29,6 +29,8 @@ namespace Confuser.Core.Services
                 throw new ArgumentNullException("member");
             if (member is ModuleDef)
                 throw new ArgumentException("New ModuleDef cannot be marked.");
+            if (IsMarked(member))   // avoid double marking
+                return;
 
             marker.MarkMember(member, context);
         }

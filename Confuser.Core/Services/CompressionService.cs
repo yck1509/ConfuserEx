@@ -28,18 +28,14 @@ namespace Confuser.Core.Services
         /// <inheritdoc/>
         public MethodDef GetRuntimeDecompressor(ModuleDef module, Action<IDefinition> init)
         {
-            return context.Annotations.GetOrCreate(module, Decompressor, m =>
+            var decompressor = context.Annotations.GetOrCreate(module, Decompressor, m =>
             {
                 IRuntimeService rt = context.Registry.GetService<IRuntimeService>();
-                IMarkerService marker = context.Registry.GetService<IMarkerService>();
 
-                var members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Lzma"), module.GlobalType, module);
-                MethodDef ret = null;
+                var members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Lzma"), module.GlobalType, module).ToList();
+                MethodDef decomp = null;
                 foreach (var member in members)
                 {
-                    marker.Mark(member);
-                    init(member);
-
                     if (member is MethodDef)
                     {
                         MethodDef method = (MethodDef)member;
@@ -49,7 +45,7 @@ namespace Confuser.Core.Services
                             method.IsSpecialName = false;
 
                         if (method.Name == "Decompress")
-                            ret = method;
+                            decomp = method;
                     }
                     else if (member is FieldDef)
                     {
@@ -63,10 +59,14 @@ namespace Confuser.Core.Services
                         }
                     }
                 }
+                members.RemoveWhere(def => def is FieldDef && ((FieldDef)def).IsLiteral);
 
-                Debug.Assert(ret != null);
-                return ret;
+                Debug.Assert(decomp != null);
+                return Tuple.Create(decomp, members);
             });
+            foreach (var member in decompressor.Item2)
+                init(member);
+            return decompressor.Item1;
         }
 
         /// <inheritdoc/>
@@ -117,7 +117,7 @@ namespace Confuser.Core.Services
         /// Gets the runtime decompression method in the module and inject if it does not exists.
         /// </summary>
         /// <param name="module">The module which the decompression method resides in.</param>
-        /// <param name="init">The initializing method for newly injected helper definitions.</param>
+        /// <param name="init">The initializing method for injected helper definitions.</param>
         /// <returns>The requested decompression method with signature 'static Byte[] (Byte[])'.</returns>
         MethodDef GetRuntimeDecompressor(ModuleDef module, Action<IDefinition> init);
 

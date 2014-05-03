@@ -94,6 +94,9 @@ namespace Confuser.Core.Helpers
             if (origin.ClassLayout != null)
                 ret.ClassLayout = new ClassLayoutUser(origin.ClassLayout.PackingSize, origin.ClassSize);
 
+            foreach (var genericParam in origin.GenericParameters)
+                ret.GenericParameters.Add(new GenericParamUser(genericParam.Number, genericParam.Flags, "-"));
+
             return ret;
         }
 
@@ -105,6 +108,10 @@ namespace Confuser.Core.Helpers
         static MethodDefUser Clone(MethodDef origin)
         {
             MethodDefUser ret = new MethodDefUser(origin.Name, null, origin.ImplAttributes, origin.Attributes);
+
+            foreach (var genericParam in origin.GenericParameters)
+                ret.GenericParameters.Add(new GenericParamUser(genericParam.Number, genericParam.Flags, "-"));
+
             return ret;
         }
 

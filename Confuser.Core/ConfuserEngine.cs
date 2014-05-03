@@ -70,12 +70,6 @@ namespace Confuser.Core
                 IList<ConfuserComponent> components;
                 parameters.GetPluginDiscovery().GetPlugins(context, out prots, out packers, out components);
 
-                components.Insert(0, new CoreComponent(parameters, marker));
-                foreach (var prot in prots)
-                    components.Add(prot);
-                foreach (var packer in packers)
-                    components.Add(packer);
-
                 context.Logger.InfoFormat("Discovered {0} protections, {1} packers.", prots.Count, packers.Count);
 
                 // 3. Resolve dependency
@@ -90,6 +84,12 @@ namespace Confuser.Core
                     context.Logger.ErrorException("", ex);
                     throw new ConfuserException(ex);
                 }
+
+                components.Insert(0, new CoreComponent(parameters, marker));
+                foreach (var prot in prots)
+                    components.Add(prot);
+                foreach (var packer in packers)
+                    components.Add(packer);
 
                 // 4. Load modules
                 context.Logger.Info("Loading input modules...");

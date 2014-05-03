@@ -513,6 +513,7 @@ namespace Confuser.Runtime
                 UInt64 outSize64 = (UInt64)outSize;
                 if (nowPos64 < outSize64)
                 {
+                    m_IsMatchDecoders[state.Index << kNumPosStatesBitsMax].Decode(m_RangeDecoder);
                     state.UpdateChar();
                     byte b = m_LiteralDecoder.DecodeNormal(m_RangeDecoder, 0, 0);
                     m_OutWindow.PutByte(b);

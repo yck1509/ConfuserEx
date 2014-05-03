@@ -12,40 +12,41 @@ namespace Confuser.Core
     class DependencyResolver
     {
         /// <summary>
-        /// A node of dependency graph.
+        /// An edge of dependency graph.
         /// </summary>
-        class DependencyGraphNode
+        class DependencyGraphEdge
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="DependencyGraphNode"/> class.
+            /// Initializes a new instance of the <see cref="DependencyGraphEdge"/> class.
             /// </summary>
-            /// <param name="protection">Content of the node, or null if this is root node.</param>
-            public DependencyGraphNode(Protection protection)
+            /// <param name="from">The source protection node.</param>
+            /// <param name="to">The destination protection node.</param>
+            public DependencyGraphEdge(Protection from, Protection to)
             {
-                this.Protection = protection;
-                this.TargetNodes = new List<DependencyGraphNode>();
+                this.From = from;
+                this.To = to;
             }
 
             /// <summary>
-            /// The content protection of the node, or null if this is root node.
+            /// The source protection node.
             /// </summary>
-            public Protection Protection { get; private set; }
+            public Protection From { get; private set; }
 
             /// <summary>
-            /// Nodes pointed by this node.
+            /// The destination protection node.
             /// </summary>
-            public List<DependencyGraphNode> TargetNodes { get; private set; }
+            public Protection To { get; private set; }
         }
 
 
-        IList<Protection> protections;
+        List<Protection> protections;
         /// <summary>
         /// Initializes a new instance of the <see cref="DependencyResolver"/> class.
         /// </summary>
         /// <param name="protections">The protections for resolution.</param>
-        public DependencyResolver(IList<Protection> protections)
+        public DependencyResolver(IEnumerable<Protection> protections)
         {
-            this.protections = protections;
+            this.protections = protections.OrderBy(prot => prot.FullId).ToList();
         }
 
         /// <summary>
@@ -59,23 +60,16 @@ namespace Confuser.Core
         {
             /* Here we do a topological sort of the protections.
              * First we construct a dependency graph of the protections.
-             * Every protection has a root node with null content as implicit parent.
+             * The edges in the graph is recorded in a list.
              * Then the graph is sorted starting from the null root node.
              */
 
-            var nodes = protections
-                .ToDictionary(prot => prot, prot => new DependencyGraphNode(prot));
-
-            var id2Nodes = protections
-                .ToDictionary(prot => prot.FullId, prot => nodes[prot]);
-
-            DependencyGraphNode root = new DependencyGraphNode(null);
+            List<DependencyGraphEdge> edges = new List<DependencyGraphEdge>();
+            HashSet<Protection> roots = new HashSet<Protection>(protections);
+            Dictionary<string, Protection> id2prot = protections.ToDictionary(prot => prot.FullId, prot => prot);
 
             foreach (var prot in protections)
             {
-                DependencyGraphNode protNode = nodes[prot];
-                root.TargetNodes.Add(protNode);
-
                 Type protType = prot.GetType();
 
                 BeforeProtectionAttribute before = protType
@@ -84,11 +78,12 @@ namespace Confuser.Core
                     .SingleOrDefault();
                 if (before != null)
                 {
-                    //protNode --> targetNodes
-                    IEnumerable<DependencyGraphNode> targetNodes = before.Ids.Select(id => id2Nodes[id]);
-                    foreach (var node in targetNodes)
+                    // current -> target
+                    IEnumerable<Protection> targets = before.Ids.Select(id => id2prot[id]);
+                    foreach (var target in targets)
                     {
-                        protNode.TargetNodes.Add(node);
+                        edges.Add(new DependencyGraphEdge(prot, target));
+                        roots.Remove(target);
                     }
                 }
 
@@ -98,49 +93,44 @@ namespace Confuser.Core
                     .SingleOrDefault();
                 if (after != null)
                 {
-                    //targetNodes --> protNode
-                    IEnumerable<DependencyGraphNode> targetNodes = after.Ids.Select(id => id2Nodes[id]);
-                    foreach (var node in targetNodes)
+                    // target -> current
+                    IEnumerable<Protection> targets = after.Ids.Select(id => id2prot[id]);
+                    foreach (var target in targets)
                     {
-                        node.TargetNodes.Add(protNode);
+                        edges.Add(new DependencyGraphEdge(target, prot));
+                        roots.Remove(prot);
                     }
                 }
             }
 
-            var sortedNodes = SortNodes(root);
-
-            //First one must be root node.
-            Debug.Assert(sortedNodes.Length >= 1 && sortedNodes[0].Protection == null);
-            return sortedNodes.Skip(1).Select(node => node.Protection).ToList();
+            var sorted = SortGraph(roots, edges);
+            return sorted.ToList();
         }
 
         /// <summary>
-        /// Topologically sort the dependency graph using DFS.
+        /// Topologically sort the dependency graph.
         /// </summary>
-        /// <param name="root">The root node.</param>
-        /// <returns>Topological sorted nodes.</returns>
-        DependencyGraphNode[] SortNodes(DependencyGraphNode root)
+        /// <param name="roots">The root protections.</param>
+        /// <param name="edges">The dependency graph edges.</param>
+        /// <returns>Topological sorted protections.</returns>
+        IEnumerable<Protection> SortGraph(IEnumerable<Protection> roots, IList<DependencyGraphEdge> edges)
         {
-            List<DependencyGraphNode> ret = new List<DependencyGraphNode>();
-            HashSet<DependencyGraphNode> visited = new HashSet<DependencyGraphNode>();
-            Action<DependencyGraphNode> visit = null;
-            visit = node =>
+            Queue<Protection> queue = new Queue<Protection>(roots.OrderBy(prot => prot.FullId));
+            while (queue.Count > 0)
             {
-                if (ret.Contains(node))
-                    return;
-                visited.Add(node);
-                foreach (var targetNode in node.TargetNodes)
+                Protection root = queue.Dequeue();  // Find a node with no incoming edges
+                Debug.Assert(!edges.Where(edge => edge.To == root).Any());
+                yield return root;
+
+                foreach (var edge in edges.Where(edge => edge.From == root).ToList())
                 {
-                    if (visited.Contains(targetNode))
-                        throw new CircularDependencyException(node.Protection, targetNode.Protection);
-                    visit(targetNode);
+                    edges.Remove(edge);
+                    if (!edges.Any(e => e.To == edge.To))   // No more incoming edge to edge.To
+                        queue.Enqueue(edge.To);             // Add new root node
                 }
-                ret.Add(node);
-                visited.Remove(node);
-            };
-            visit(root);
-            ret.Reverse();
-            return ret.ToArray();
+            }
+            if (edges.Count != 0)
+                throw new CircularDependencyException(edges[0].From, edges[0].To);
         }
     }
 
