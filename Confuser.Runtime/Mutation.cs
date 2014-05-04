@@ -18,8 +18,22 @@ class Mutation
     public static readonly int KeyI14 = 14;
     public static readonly int KeyI15 = 15;
 
-    public static int Placeholder(int val)
+    public static T Placeholder<T>(T val)
     {
         return val;
+    }
+
+    public static T Value<T>()
+    {
+        return default(T);
+    }
+
+    public static T Value<T, Arg0>(Arg0 arg0)
+    {
+        return default(T);
+    }
+
+    public static void Crypt(uint[] data, uint[] key)
+    {
     }
 }

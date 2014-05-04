@@ -7,7 +7,7 @@ namespace Confuser.Runtime
 {
     static class AntiDebugWin32
     {
-        static unsafe void Initialize()
+        static void Initialize()
         {
             string x = "COR";
             if (Environment.GetEnvironmentVariable(x + "_PROFILER") != null ||

@@ -43,6 +43,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AntiILDasmProtection.cs" />
+    <Compile Include="Constants\CEContext.cs" />
+    <Compile Include="Constants\ConstantProtection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Constants\EncodeElements.cs" />
+    <Compile Include="Constants\EncodePhase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Constants\IEncodeMode.cs" />
+    <Compile Include="Constants\InjectPhase.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Constants\Mode.cs" />
+    <Compile Include="Constants\NormalMode.cs" />
     <Compile Include="ControlFlow\CFContext.cs" />
     <Compile Include="ControlFlow\ControlFlowPhase.cs" />
     <Compile Include="ControlFlow\ControlFlowProtection.cs" />
