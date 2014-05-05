@@ -9,6 +9,6 @@ namespace Confuser.Protections.Constants
     {
         Normal,
         Dynamic,
-        Native
+        x86
     }
 }

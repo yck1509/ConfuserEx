@@ -47,6 +47,8 @@
     <Compile Include="Constants\ConstantProtection.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Constants\x86Mode.cs" />
+    <Compile Include="Constants\DynamicMode.cs" />
     <Compile Include="Constants\EncodeElements.cs" />
     <Compile Include="Constants\EncodePhase.cs">
       <SubType>Code</SubType>

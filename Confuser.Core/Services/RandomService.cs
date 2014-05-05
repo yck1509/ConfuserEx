@@ -158,6 +158,7 @@ namespace Confuser.Core.Services
         /// <returns>Requested random number.</returns>
         public int NextInt32(int min, int max)
         {
+            if (max <= min) return min;
             return min + (int)(NextUInt32() % (max - min));
         }
 

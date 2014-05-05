@@ -52,6 +52,12 @@ namespace Confuser.Protections.Constants
                     case Mode.Normal:
                         moduleCtx.ModeHandler = new NormalMode();
                         break;
+                    case Mode.Dynamic:
+                        moduleCtx.ModeHandler = new DynamicMode();
+                        break;
+                    case Mode.x86:
+                        moduleCtx.ModeHandler = new x86Mode();
+                        break;
                     default:
                         throw new UnreachableException();
                 }

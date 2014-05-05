@@ -13,7 +13,7 @@ namespace Confuser.DynCipher.Generation
         public CipherGenContext(RandomGenerator random, int dataVarCount)
         {
             this.random = random;
-            Block = new LoopStatement() { Begin = 0, Limit = 4 };
+            Block = new StatementBlock(); // new LoopStatement() { Begin = 0, Limit = 4 };
             dataVars = new Variable[dataVarCount];
             for (int i = 0; i < dataVarCount; i++)
                 dataVars[i] = new Variable("v" + i) { Tag = i };
