@@ -8,9 +8,9 @@ using dnlib.DotNet;
 using Confuser.DynCipher;
 using Confuser.Renamer;
 
-namespace Confuser.Protections.Constants
+namespace Confuser.Protections.Resources
 {
-    class CEContext
+    class REContext
     {
         public RandomGenerator Random;
         public ConfuserContext Context;
@@ -19,26 +19,12 @@ namespace Confuser.Protections.Constants
         public IDynCipherService DynCipher;
         public INameService Name;
 
-        public FieldDef BufferField;
         public FieldDef DataField;
         public TypeDef DataType;
         public MethodDef InitMethod;
 
         public Mode Mode;
-        public EncodeElements Elements;
-        public int DecoderCount;
 
         public IEncodeMode ModeHandler;
-
-        public List<uint> EncodedBuffer;
-        public List<Tuple<MethodDef, DecoderDesc>> Decoders;
-    }
-
-    class DecoderDesc
-    {
-        public byte StringID;
-        public byte NumberID;
-        public byte InitializerID;
-        public object Data;
     }
 }

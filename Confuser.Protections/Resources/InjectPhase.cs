@@ -11,11 +11,11 @@ using Confuser.DynCipher;
 using dnlib.DotNet.Emit;
 using System.Diagnostics;
 
-namespace Confuser.Protections.Constants
+namespace Confuser.Protections.Resources
 {
     class InjectPhase : ProtectionPhase
     {
-        public InjectPhase(ConstantProtection parent)
+        public InjectPhase(ResourceProtection parent)
             : base(parent)
         {
         }
@@ -33,7 +33,7 @@ namespace Confuser.Protections.Constants
                 var name = context.Registry.GetService<INameService>();
                 var marker = context.Registry.GetService<IMarkerService>();
                 var rt = context.Registry.GetService<IRuntimeService>();
-                var moduleCtx = new CEContext()
+                var moduleCtx = new REContext()
                 {
                     Random = context.Registry.GetService<IRandomService>().GetRandomGenerator(Parent.Id),
                     Context = context,
@@ -45,7 +45,6 @@ namespace Confuser.Protections.Constants
 
                 // Extract parameters
                 moduleCtx.Mode = parameters.GetParameter<Mode>(context, context.CurrentModule, "mode", Mode.Normal);
-                moduleCtx.DecoderCount = parameters.GetParameter<int>(context, context.CurrentModule, "decoderCount", 5);
 
                 switch (moduleCtx.Mode)
                 {
@@ -54,9 +53,6 @@ namespace Confuser.Protections.Constants
                         break;
                     case Mode.Dynamic:
                         moduleCtx.ModeHandler = new DynamicMode();
-                        break;
-                    case Mode.x86:
-                        moduleCtx.ModeHandler = new x86Mode();
                         break;
                     default:
                         throw new UnreachableException();
@@ -77,32 +73,25 @@ namespace Confuser.Protections.Constants
                 var cctor = context.CurrentModule.GlobalType.FindStaticConstructor();
                 cctor.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, moduleCtx.InitMethod));
 
-                context.Annotations.Set(context.CurrentModule, ConstantProtection.ContextKey, moduleCtx);
+                new MDPhase(moduleCtx).Hook();
             }
         }
 
-        void InjectHelpers(ConfuserContext context, ICompressionService compression, IRuntimeService rt, CEContext moduleCtx)
+        void InjectHelpers(ConfuserContext context, ICompressionService compression, IRuntimeService rt, REContext moduleCtx)
         {
-            var members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Constant"), context.CurrentModule.GlobalType, context.CurrentModule);
+            var members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Resource"), context.CurrentModule.GlobalType, context.CurrentModule);
             foreach (var member in members)
             {
-                if (member.Name == "Get")
-                {
-                    context.CurrentModule.GlobalType.Remove((MethodDef)member);
-                    continue;
-                }
-                else if (member.Name == "b")
-                    moduleCtx.BufferField = (FieldDef)member;
-                else if (member.Name == "Initialize")
+                if (member.Name == "Initialize")
                     moduleCtx.InitMethod = (MethodDef)member;
                 moduleCtx.Name.MarkHelper(member, moduleCtx.Marker);
             }
-            ProtectionParameters.GetParameters(context, moduleCtx.InitMethod).Remove(Parent);
 
             var dataType = new TypeDefUser("", moduleCtx.Name.RandomName(), context.CurrentModule.CorLibTypes.GetTypeRef("System", "ValueType"));
             dataType.Layout = TypeAttributes.ExplicitLayout;
             dataType.Visibility = TypeAttributes.NestedPrivate;
             dataType.IsSealed = true;
+            dataType.ClassLayout = new ClassLayoutUser(1, 0);
             moduleCtx.DataType = dataType;
             context.CurrentModule.GlobalType.NestedTypes.Add(dataType);
             moduleCtx.Name.MarkHelper(dataType, moduleCtx.Marker);
@@ -110,57 +99,15 @@ namespace Confuser.Protections.Constants
             moduleCtx.DataField = new FieldDefUser(moduleCtx.Name.RandomName(), new FieldSig(dataType.ToTypeSig()))
             {
                 IsStatic = true,
+                HasFieldRVA = true,
+                InitialValue = new byte[0],
                 Access = FieldAttributes.CompilerControlled
             };
             context.CurrentModule.GlobalType.Fields.Add(moduleCtx.DataField);
             moduleCtx.Name.MarkHelper(moduleCtx.DataField, moduleCtx.Marker);
-
-            var decoder = rt.GetRuntimeType("Confuser.Runtime.Constant").FindMethod("Get");
-            moduleCtx.Decoders = new List<Tuple<MethodDef, DecoderDesc>>();
-            for (int i = 0; i < moduleCtx.DecoderCount; i++)
-            {
-                var decoderInst = InjectHelper.Inject(decoder, context.CurrentModule);
-                for (int j = 0; j < decoderInst.Body.Instructions.Count; j++)
-                {
-                    var instr = decoderInst.Body.Instructions[j];
-                    IMethod method = instr.Operand as IMethod;
-                    IField field = instr.Operand as IField;
-                    if (instr.OpCode == OpCodes.Call &&
-                        method.DeclaringType.Name == "Mutation" &&
-                        method.Name == "Value")
-                    {
-                        decoderInst.Body.Instructions[j] = Instruction.Create(OpCodes.Sizeof, new GenericMVar(0).ToTypeDefOrRef());
-                    }
-                    else if (instr.OpCode == OpCodes.Ldsfld &&
-                        method.DeclaringType.Name == "Constant")
-                    {
-                        if (field.Name == "b") instr.Operand = moduleCtx.BufferField;
-                        else throw new UnreachableException();
-                    }
-                }
-                context.CurrentModule.GlobalType.Methods.Add(decoderInst);
-                moduleCtx.Name.MarkHelper(decoderInst, moduleCtx.Marker);
-                ProtectionParameters.GetParameters(context, decoderInst).Remove(Parent);
-
-                var decoderDesc = new DecoderDesc();
-
-                decoderDesc.StringID = (byte)(moduleCtx.Random.NextByte() & 3);
-
-                do decoderDesc.NumberID = (byte)(moduleCtx.Random.NextByte() & 3);
-                while (decoderDesc.NumberID == decoderDesc.StringID);
-
-                do decoderDesc.InitializerID = (byte)(moduleCtx.Random.NextByte() & 3);
-                while (decoderDesc.InitializerID == decoderDesc.StringID || decoderDesc.InitializerID == decoderDesc.NumberID);
-
-                MutationHelper.InjectKeys(decoderInst,
-                    new int[] { 0, 1, 2 },
-                    new int[] { decoderDesc.StringID, decoderDesc.NumberID, decoderDesc.InitializerID });
-                decoderDesc.Data = moduleCtx.ModeHandler.CreateDecoder(decoderInst, moduleCtx);
-                moduleCtx.Decoders.Add(Tuple.Create(decoderInst, decoderDesc));
-            }
         }
 
-        void MutateInitializer(CEContext moduleCtx, MethodDef decomp)
+        void MutateInitializer(REContext moduleCtx, MethodDef decomp)
         {
             moduleCtx.InitMethod.Body.SimplifyMacros(moduleCtx.InitMethod.Parameters);
             List<Instruction> instrs = moduleCtx.InitMethod.Body.Instructions.ToList();
@@ -191,6 +138,20 @@ namespace Confuser.Protections.Constants
             moduleCtx.InitMethod.Body.Instructions.Clear();
             foreach (var instr in instrs)
                 moduleCtx.InitMethod.Body.Instructions.Add(instr);
+
+            MutationHelper.ReplacePlaceholder(moduleCtx.InitMethod, arg =>
+            {
+                List<Instruction> repl = new List<Instruction>();
+                repl.AddRange(arg);
+                repl.Add(Instruction.Create(OpCodes.Dup));
+                repl.Add(Instruction.Create(OpCodes.Ldtoken, moduleCtx.DataField));
+                repl.Add(Instruction.Create(OpCodes.Call, moduleCtx.Module.Import(
+                    typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray"))));
+                return repl.ToArray();
+            });
+            MutationHelper.InjectKeys(moduleCtx.InitMethod,
+                new int[] { 0, 1 },
+                new int[] { 0xdead, 0xbeef });
         }
     }
 }

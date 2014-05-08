@@ -84,6 +84,14 @@
     <Compile Include="ReferenceProxy\ReferenceProxyPhase.cs" />
     <Compile Include="ReferenceProxy\ReferenceProxyProtection.cs" />
     <Compile Include="ReferenceProxy\RPContext.cs" />
+    <Compile Include="Resources\DynamicMode.cs" />
+    <Compile Include="Resources\IEncodeMode.cs" />
+    <Compile Include="Resources\InjectPhase.cs" />
+    <Compile Include="Resources\MDPhase.cs" />
+    <Compile Include="Resources\Mode.cs" />
+    <Compile Include="Resources\NormalMode.cs" />
+    <Compile Include="Resources\REContext.cs" />
+    <Compile Include="Resources\ResourceProtection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
