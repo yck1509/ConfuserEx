@@ -43,6 +43,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AntiILDasmProtection.cs" />
+    <Compile Include="AntiTamper\AntiTamperProtection.cs" />
+    <Compile Include="AntiTamper\DynamicDeriver.cs" />
+    <Compile Include="AntiTamper\IKeyDeriver.cs" />
+    <Compile Include="AntiTamper\IModeHandler.cs" />
+    <Compile Include="AntiTamper\NormalDeriver.cs" />
+    <Compile Include="AntiTamper\NormalMode.cs" />
     <Compile Include="Constants\CEContext.cs" />
     <Compile Include="Constants\ConstantProtection.cs">
       <SubType>Code</SubType>

@@ -48,6 +48,7 @@
     <Compile Include="RefProxy.Strong.cs" />
     <Compile Include="AntiDebug.Safe.cs" />
     <Compile Include="Resource.cs" />
+    <Compile Include="AntiTamper.Normal.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

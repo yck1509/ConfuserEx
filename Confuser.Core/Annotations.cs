@@ -107,7 +107,12 @@ namespace Confuser.Core
                 return defValue;
             if (!objAnno.Contains(key))
                 return defValue;
-            return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
+
+            var valueType = typeof(TValue);
+            if (valueType.IsValueType)
+                return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
+            else
+                return (TValue)objAnno[key];
         }
 
         /// <summary>
@@ -133,7 +138,12 @@ namespace Confuser.Core
                 return defValueFactory(key);
             if (!objAnno.Contains(key))
                 return defValueFactory(key);
-            return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
+
+            var valueType = typeof(TValue);
+            if (valueType.IsValueType)
+                return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
+            else
+                return (TValue)objAnno[key];
         }
 
         /// <summary>
@@ -159,7 +169,13 @@ namespace Confuser.Core
                 objAnno = annotations[new WeakReferenceKey(obj)] = new ListDictionary();
             TValue ret;
             if (objAnno.Contains(key))
-                ret = (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
+            {
+                var valueType = typeof(TValue);
+                if (valueType.IsValueType)
+                    return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
+                else
+                    return (TValue)objAnno[key];
+            }
             else
                 objAnno[key] = ret = factory(key);
             return ret;
