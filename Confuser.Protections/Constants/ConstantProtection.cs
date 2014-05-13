@@ -8,8 +8,13 @@ using dnlib.DotNet;
 
 namespace Confuser.Protections
 {
+    public interface IConstantService
+    {
+        void ExcludeMethod(ConfuserContext context, MethodDef method);
+    }
+
     [BeforeProtection("Ki.ControlFlow"), AfterProtection("Ki.RefProxy")]
-    class ConstantProtection : Protection
+    class ConstantProtection : Protection, IConstantService
     {
         public const string _Id = "constants";
         public const string _FullId = "Ki.Constants";
@@ -17,7 +22,7 @@ namespace Confuser.Protections
 
         protected override void Initialize(ConfuserContext context)
         {
-           // context.Registry.RegisterService(_ServiceId, typeof(IControlFlowService), this);
+            context.Registry.RegisterService(_ServiceId, typeof(IConstantService), this);
         }
 
         protected override void PopulatePipeline(ProtectionPipeline pipeline)

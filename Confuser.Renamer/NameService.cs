@@ -207,7 +207,7 @@ namespace Confuser.Renamer
             {
                 MethodDef method = (MethodDef)def;
                 method.Access = MethodAttributes.Assembly;
-                if (!method.IsSpecialName && !method.IsRuntimeSpecialName)
+                if (!method.IsSpecialName && !method.IsRuntimeSpecialName && !method.DeclaringType.IsDelegate())
                     method.Name = RandomName();
             }
             else if (def is FieldDef)

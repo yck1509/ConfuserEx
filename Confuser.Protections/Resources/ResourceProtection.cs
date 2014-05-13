@@ -8,7 +8,7 @@ using Confuser.Protections.Resources;
 
 namespace Confuser.Protections
 {
-    [BeforeProtection("Ki.ControlFlow")]
+    [BeforeProtection("Ki.ControlFlow"), AfterProtection("Ki.Constants")]
     class ResourceProtection : Protection
     {
         public const string _Id = "resources";
