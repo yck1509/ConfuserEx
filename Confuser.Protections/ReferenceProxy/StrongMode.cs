@@ -284,7 +284,15 @@ namespace Confuser.Protections.ReferenceProxy
                 ctx.Module.AddAsNonNestedType(injectedAttr);
 
                 foreach (var def in injectedAttr.FindDefinitions())
-                    ctx.Name.MarkHelper(def, ctx.Marker);
+                {
+                    if (def.Name == "GetHashCode")
+                    {
+                        ctx.Name.MarkHelper(def, ctx.Marker);
+                        ((MethodDef)def).Access = MethodAttributes.Public;
+                    }
+                    else
+                        ctx.Name.MarkHelper(def, ctx.Marker);
+                }
             }
             return keyAttrs[index].Item1;
         }

@@ -47,6 +47,8 @@
     <Compile Include="AntiTamper\DynamicDeriver.cs" />
     <Compile Include="AntiTamper\IKeyDeriver.cs" />
     <Compile Include="AntiTamper\IModeHandler.cs" />
+    <Compile Include="AntiTamper\JITBody.cs" />
+    <Compile Include="AntiTamper\JITMode.cs" />
     <Compile Include="AntiTamper\NormalDeriver.cs" />
     <Compile Include="AntiTamper\NormalMode.cs" />
     <Compile Include="Constants\CEContext.cs" />

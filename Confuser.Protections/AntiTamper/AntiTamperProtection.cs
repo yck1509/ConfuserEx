@@ -85,6 +85,9 @@ namespace Confuser.Protections
                     case Mode.Normal:
                         modeHandler = new NormalMode();
                         break;
+                    case Mode.JIT:
+                        modeHandler = new JITMode();
+                        break;
                     default:
                         throw new UnreachableException();
                 }
