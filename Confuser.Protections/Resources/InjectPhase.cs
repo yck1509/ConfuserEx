@@ -149,9 +149,6 @@ namespace Confuser.Protections.Resources
                     typeof(System.Runtime.CompilerServices.RuntimeHelpers).GetMethod("InitializeArray"))));
                 return repl.ToArray();
             });
-            MutationHelper.InjectKeys(moduleCtx.InitMethod,
-                new int[] { 0, 1 },
-                new int[] { 0xdead, 0xbeef });
             moduleCtx.Context.Registry.GetService<IConstantService>().ExcludeMethod(moduleCtx.Context, moduleCtx.InitMethod);
         }
     }

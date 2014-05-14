@@ -96,26 +96,10 @@ namespace Confuser.Protections.Resources
                 tblHeap.FieldTable[writer.MetaData.GetRid(ctx.DataField)].Flags |= (ushort)FieldAttributes.HasFieldRVA;
                 this.encryptedResource = writer.Constants.Add(new ByteArrayChunk(encryptedBuffer), 8);
 
-                // rewrite method body
-                Debug.Assert(size / 4 > 0x10);
-                Debug.Assert(keySeed > 0x10);
-
-                foreach (var instr in ctx.InitMethod.Body.Instructions)
-                {
-                    if (instr.OpCode != OpCodes.Ldc_I4) continue;
-
-                    if ((int)instr.Operand == 0xdead) 
-                        instr.Operand = (int)(size / 4);
-                    else if ((int)instr.Operand == 0xbeef)
-                        instr.Operand = (int)(keySeed);
-                }
-                var body = writer.MetaData.GetMethodBody(ctx.InitMethod);
-                var bodyWriter = new MethodBodyWriter(writer.MetaData, ctx.InitMethod.Body);
-                bodyWriter.Write();
-                Debug.Assert(body.Code.Length == bodyWriter.Code.Length);
-                Debug.Assert(body.ExtraSections == null);
-                Debug.Assert(bodyWriter.ExtraSections == null);
-                Buffer.BlockCopy(bodyWriter.Code, 0, body.Code, 0, body.Code.Length);
+                // inject key values
+                MutationHelper.InjectKeys(ctx.InitMethod,
+                    new int[] { 0, 1 },
+                    new int[] { (int)(size / 4), (int)(keySeed) });
             }
             else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets)
             {
