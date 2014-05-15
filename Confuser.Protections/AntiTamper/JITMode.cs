@@ -21,6 +21,7 @@ namespace Confuser.Protections.AntiTamper
         uint name1, name2;
         uint key;
         IKeyDeriver deriver;
+        byte[] fieldLayout;
 
         MethodDef initMethod;
         MethodDef cctor;
@@ -36,6 +37,15 @@ namespace Confuser.Protections.AntiTamper
             name1 = random.NextUInt32() & 0x7f7f7f7f;
             name2 = random.NextUInt32() & 0x7f7f7f7f;
             key = random.NextUInt32();
+
+            fieldLayout = new byte[6];
+            for (int i = 0; i < 6; i++)
+            {
+                int index = random.NextInt32(0, 6);
+                while (fieldLayout[index] != 0)
+                    index = random.NextInt32(0, 6);
+                fieldLayout[index] = (byte)i;
+            }
 
             switch (parameters.GetParameter<Mode>(context, context.CurrentModule, "key", Mode.Normal))
             {
@@ -105,6 +115,20 @@ namespace Confuser.Protections.AntiTamper
                  new int[] { 0 }, new int[] { (int)key });
             foreach (var def in defs)
             {
+                if (def.Name == "MethodData")
+                {
+                    TypeDef dataType = (TypeDef)def;
+                    FieldDef[] fields = dataType.Fields.ToArray();
+                    byte[] layout = fieldLayout.Clone() as byte[];
+                    Array.Sort(layout, fields);
+                    for (byte j = 0; j < 6; j++)
+                        layout[j] = j;
+                    Array.Sort(fieldLayout, layout);
+                    fieldLayout = layout;
+                    dataType.Fields.Clear();
+                    foreach (var f in fields)
+                        dataType.Fields.Add(f);
+                }
                 name.MarkHelper(def, marker);
                 if (def is MethodDef)
                     parent.ExcludeMethod(context, (MethodDef)def);
@@ -205,7 +229,7 @@ namespace Confuser.Protections.AntiTamper
                 var jitBody = new JITMethodBody();
                 var bodyWriter = new JITMethodBodyWriter(writer.MetaData, method.Body, jitBody, random.NextUInt32(), writer.MetaData.KeepOldMaxStack || method.Body.KeepOldMaxStack);
                 bodyWriter.Write();
-                jitBody.Serialize(token.Raw, key);
+                jitBody.Serialize(token.Raw, key, fieldLayout);
                 bodyIndex.Add(token.Raw, jitBody);
 
                 method.Body = NopBody;

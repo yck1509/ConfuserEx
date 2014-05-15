@@ -34,17 +34,21 @@ namespace Confuser.Protections.AntiTamper
         public uint Offset;
         public byte[] Body;
 
-        public void Serialize(uint token, uint key)
+        public void Serialize(uint token, uint key, byte[] fieldLayout)
         {
             using (var ms = new MemoryStream())
             {
                 BinaryWriter writer = new BinaryWriter(ms);
-                writer.Write((uint)ILCode.Length);
-                writer.Write(MaxStack);
-                writer.Write((uint)EHs.Length);
-                writer.Write((uint)LocalVars.Length);
-                writer.Write(Options);
-                writer.Write(MulSeed);
+                foreach (var i in fieldLayout)
+                    switch (i)
+                    {
+                        case 0: writer.Write((uint)ILCode.Length); break;
+                        case 1: writer.Write(MaxStack); break;
+                        case 2: writer.Write((uint)EHs.Length); break;
+                        case 3: writer.Write((uint)LocalVars.Length); break;
+                        case 4: writer.Write(Options); break;
+                        case 5: writer.Write(MulSeed); break;
+                    }
 
                 writer.Write(ILCode);
                 writer.Write(LocalVars);
