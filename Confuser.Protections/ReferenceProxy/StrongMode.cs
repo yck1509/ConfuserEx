@@ -391,6 +391,7 @@ namespace Confuser.Protections.ReferenceProxy
                 ctx.Name.SetCanRename(cctor, false);
             }
 
+            ctx.Context.CurrentModuleWriterOptions.MetaDataOptions.Flags |= MetaDataFlags.PreserveExtraSignatureData;
             ctx.Context.CurrentModuleWriterListener.OnWriterEvent += EncodeField;
             encodeCtx = ctx;
         }
