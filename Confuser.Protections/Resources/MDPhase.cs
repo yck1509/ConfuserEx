@@ -39,7 +39,10 @@ namespace Confuser.Protections.Resources
 
                 // move resources
                 var asmName = ctx.Name.RandomName(Confuser.Renamer.RenameMode.Letters);
-                var assembly = new AssemblyDefUser(asmName);
+                PublicKey pubKey = null;
+                if (writer.Options.StrongNameKey != null)
+                    pubKey = PublicKey.CreatePublicKey(writer.Options.StrongNameKey.PublicKey);
+                var assembly = new AssemblyDefUser(asmName, new Version(0, 0), pubKey);
                 assembly.Modules.Add(new ModuleDefUser(asmName + ".dll"));
                 var module = assembly.ManifestModule;
                 assembly.ManifestModule.Kind = ModuleKind.Dll;
