@@ -87,8 +87,6 @@ namespace Confuser.Runtime
             else
                 moduleHnd = *(IntPtr*)(&hnd);
 
-
-            Init();
             Hook();
         }
 
@@ -139,26 +137,6 @@ namespace Confuser.Runtime
             {
                 return (ICorClassInfo*)((byte*)&ptr->vbptr + ptr->vbptr[3]);
             }
-            public static ICorFieldInfo* ICorFieldInfo(ICorStaticInfo* ptr)
-            {
-                return (ICorFieldInfo*)((byte*)&ptr->vbptr + ptr->vbptr[4]);
-            }
-            public static ICorDebugInfo* ICorDebugInfo(ICorStaticInfo* ptr)
-            {
-                return (ICorDebugInfo*)((byte*)&ptr->vbptr + ptr->vbptr[5]);
-            }
-            public static ICorArgInfo* ICorArgInfo(ICorStaticInfo* ptr)
-            {
-                return (ICorArgInfo*)((byte*)&ptr->vbptr + ptr->vbptr[6]);
-            }
-            public static ICorLinkInfo* ICorLinkInfo(ICorStaticInfo* ptr)
-            {
-                return (ICorLinkInfo*)((byte*)&ptr->vbptr + ptr->vbptr[7]);
-            }
-            public static ICorErrorInfo* ICorErrorInfo(ICorStaticInfo* ptr)
-            {
-                return (ICorErrorInfo*)((byte*)&ptr->vbptr + ptr->vbptr[hasLinkInfo ? 8 : 7]);
-            }
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -176,31 +154,6 @@ namespace Confuser.Runtime
         {
             public IntPtr* vfptr;
         }
-        [StructLayout(LayoutKind.Sequential)]
-        struct ICorFieldInfo
-        {
-            public IntPtr* vfptr;
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        struct ICorDebugInfo
-        {
-            public IntPtr* vfptr;
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        struct ICorArgInfo
-        {
-            public IntPtr* vfptr;
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        struct ICorLinkInfo
-        {
-            public IntPtr* vfptr;
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        struct ICorErrorInfo
-        {
-            public IntPtr* vfptr;
-        }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         struct CORINFO_METHOD_INFO
@@ -211,23 +164,13 @@ namespace Confuser.Runtime
             public uint ILCodeSize;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, Size=16)]
         struct CORINFO_SIG_INST_x86
         {
-            public uint classInstCount;
-            public IntPtr* classInst;
-            public uint methInstCount;
-            public IntPtr* methInst;
         }
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, Size = 32)]
         struct CORINFO_SIG_INST_x64
         {
-            public uint classInstCount;
-            uint pad1;
-            public IntPtr* classInst;
-            public uint methInstCount;
-            uint pad2;
-            public IntPtr* methInst;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -299,12 +242,12 @@ namespace Confuser.Runtime
 
         delegate IntPtr* getJit();
 
-        static IntPtr hookPosition;
-        static IntPtr original;
         static compileMethod originalDelegate;
 
         static bool ver;
-        static void Init()
+
+        static compileMethod handler;
+        static void Hook()
         {
             ulong* ptr = stackalloc ulong[2];
             if (ver)
@@ -320,10 +263,11 @@ namespace Confuser.Runtime
             IntPtr jit = LoadLibrary(new string((sbyte*)ptr));
             ptr[0] = 0x000074694a746567;    //getJit
             getJit get = (getJit)Marshal.GetDelegateForFunctionPointer(GetProcAddress(jit, new string((sbyte*)ptr)), typeof(getJit));
-            hookPosition = *get();
-            original = *(IntPtr*)hookPosition;
+            IntPtr hookPosition = *get();
+            IntPtr original = *(IntPtr*)hookPosition;
 
             IntPtr trampoline;
+            uint oldPl;
             if (IntPtr.Size == 8)
             {
                 trampoline = Marshal.AllocHGlobal(16);
@@ -331,7 +275,6 @@ namespace Confuser.Runtime
                 tptr[0] = 0xffffffffffffb848;
                 tptr[1] = 0x90909090e0ffffff;
 
-                uint oldPl;
                 VirtualProtect(trampoline, 12, 0x40, out oldPl);
                 Marshal.WriteIntPtr(trampoline, 2, original);
             }
@@ -341,22 +284,16 @@ namespace Confuser.Runtime
                 ulong* tptr = (ulong*)trampoline;
                 tptr[0] = 0x90e0ffffffffffb8;
 
-                uint oldPl;
                 VirtualProtect(trampoline, 7, 0x40, out oldPl);
                 Marshal.WriteIntPtr(trampoline, 1, original);
             }
 
             originalDelegate = (compileMethod)Marshal.GetDelegateForFunctionPointer(trampoline, typeof(compileMethod));
-            RuntimeHelpers.PrepareDelegate(originalDelegate);
-        }
-
-        static compileMethod handler;
-        static void Hook()
-        {
             handler = new compileMethod(HookHandler);
+
+            RuntimeHelpers.PrepareDelegate(originalDelegate);
             RuntimeHelpers.PrepareDelegate(handler);
 
-            uint oldPl;
             VirtualProtect(hookPosition, (uint)IntPtr.Size, 0x40, out oldPl);
             Marshal.WriteIntPtr(hookPosition, Marshal.GetFunctionPointerForDelegate(handler));
             VirtualProtect(hookPosition, (uint)IntPtr.Size, oldPl, out oldPl);
@@ -366,8 +303,7 @@ namespace Confuser.Runtime
         {
             public IntPtr ftn;
             public ICorMethodInfo* info;
-            public ICorJitInfo* comp;
-            public IntPtr* oriVfTbl;
+            public IntPtr* oldVfTbl;
             public IntPtr* newVfTbl;
 
             public CORINFO_EH_CLAUSE* clauses;
@@ -389,7 +325,7 @@ namespace Confuser.Runtime
             public void Dispose()
             {
                 Marshal.FreeHGlobal((IntPtr)newVfTbl);
-                info->vfptr = oriVfTbl;
+                info->vfptr = oldVfTbl;
             }
 
             static int ehNum = -1;
@@ -424,10 +360,9 @@ namespace Confuser.Runtime
                 {
                     ftn = ftn,
                     info = mtdInfo,
-                    comp = comp,
                     clauses = clauses,
                     newVfTbl = newVfTbl,
-                    oriVfTbl = vfTbl
+                    oldVfTbl = vfTbl
                 };
 
                 ret.n_getEHinfo = new getEHinfo(ret.hookEHInfo);
