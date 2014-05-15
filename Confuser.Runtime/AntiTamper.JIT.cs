@@ -498,8 +498,6 @@ namespace Confuser.Runtime
 
         static uint HookHandler(IntPtr self, ICorJitInfo* comp, CORINFO_METHOD_INFO* info, uint flags, byte** nativeEntry, uint* nativeSizeOfCode)
         {
-            var sigInfo = (CORINFO_SIG_INFO_x86*)((uint*)(info + 1) + 4);
-
             if (info != null &&
                 info->scope == moduleHnd &&
                 info->ILCode[0] == 0x14)
@@ -546,8 +544,6 @@ namespace Confuser.Runtime
                     }
 
                     info->ILCodeSize = data->ILCodeSize;
-                    RuntimeMethodHandle rmh;
-                    *(IntPtr*)(&rmh) = info->ftn;
                     if (ver)
                     {
                         *((uint*)(info + 1) + 0) = data->MaxStack;
