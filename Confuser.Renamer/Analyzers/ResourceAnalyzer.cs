@@ -13,7 +13,7 @@ namespace Confuser.Renamer.Analyzers
     {
         static readonly Regex ResourceNamePattern = new Regex("^(.*)\\.resources$");
 
-        public void Analyze(ConfuserContext context, INameService service, IDefinition def)
+        public void Analyze(ConfuserContext context, INameService service, IDnlibDef def)
         {
             ModuleDef module = def as ModuleDef;
             if (module == null) return;
@@ -72,12 +72,12 @@ namespace Confuser.Renamer.Analyzers
             }
         }
 
-        public void PreRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PreRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }
 
-        public void PostRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PostRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }

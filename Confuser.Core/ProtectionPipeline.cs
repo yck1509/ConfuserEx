@@ -124,7 +124,7 @@ namespace Confuser.Core
         /// <param name="func">The stage function.</param>
         /// <param name="targets">The target list of the stage.</param>
         /// <param name="context">The working context.</param>
-        internal void ExecuteStage(PipelineStage stage, Action<ConfuserContext> func, Func<IList<IDefinition>> targets, ConfuserContext context)
+        internal void ExecuteStage(PipelineStage stage, Action<ConfuserContext> func, Func<IList<IDnlibDef>> targets, ConfuserContext context)
         {
             foreach (var pre in preStage[stage])
             {
@@ -147,11 +147,11 @@ namespace Confuser.Core
         /// <param name="targets">List of targets.</param>
         /// <param name="phase">The component phase.</param>
         /// <returns>Filtered targets.</returns>
-        static IList<IDefinition> Filter(ConfuserContext context, IList<IDefinition> targets, ProtectionPhase phase)
+        static IList<IDnlibDef> Filter(ConfuserContext context, IList<IDnlibDef> targets, ProtectionPhase phase)
         {
             var targetType = phase.Targets;
 
-            IEnumerable<IDefinition> filter = targets;
+            IEnumerable<IDnlibDef> filter = targets;
             if ((targetType & ProtectionTargets.Modules) == 0)
                 filter = filter.Where(def => !(def is ModuleDef));
             if ((targetType & ProtectionTargets.Types) == 0)

@@ -14,7 +14,7 @@ namespace Confuser.Renamer.Analyzers
     {
         // i.e. Inter-Assembly References, e.g. InternalVisibleToAttributes
 
-        public void Analyze(ConfuserContext context, INameService service, IDefinition def)
+        public void Analyze(ConfuserContext context, INameService service, IDnlibDef def)
         {
             ModuleDefMD module = def as ModuleDefMD;
             if (module == null) return;
@@ -32,7 +32,7 @@ namespace Confuser.Renamer.Analyzers
                 TypeDef declType = memberRef.DeclaringType.ResolveTypeDefThrow();
                 if (declType.Module != module && context.Modules.Contains((ModuleDefMD)declType.Module))
                 {
-                    IDefinition memberDef = (IDefinition)declType.ResolveThrow(memberRef);
+                    IDnlibDef memberDef = (IDnlibDef)declType.ResolveThrow(memberRef);
                     service.AddReference(memberDef, new MemberRefReference(memberRef, memberDef));
                 }
             }
@@ -53,12 +53,12 @@ namespace Confuser.Renamer.Analyzers
 
         }
 
-        public void PreRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PreRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }
 
-        public void PostRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PostRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }

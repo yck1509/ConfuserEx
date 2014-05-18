@@ -52,6 +52,7 @@
     <Compile Include="BAML\IKnownThings.cs" />
     <Compile Include="BAML\KnownThingsv3.cs" />
     <Compile Include="BAML\PropertyPath.cs" />
+    <Compile Include="GenericArgumentResolver.cs" />
     <Compile Include="PostRenamePhase.cs" />
     <Compile Include="IRenamer.cs" />
     <Compile Include="NameProtection.cs" />

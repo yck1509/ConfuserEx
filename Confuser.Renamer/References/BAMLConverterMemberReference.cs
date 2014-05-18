@@ -8,13 +8,13 @@ using Confuser.Core;
 
 namespace Confuser.Renamer.References
 {
-    class BAMLConverterMemberReference : INameReference<IDefinition>
+    class BAMLConverterMemberReference : INameReference<IDnlibDef>
     {
         BAMLAnalyzer.XmlNsContext xmlnsCtx;
         TypeSig sig;
-        IDefinition member;
+        IDnlibDef member;
         PropertyRecord rec;
-        public BAMLConverterMemberReference(BAMLAnalyzer.XmlNsContext xmlnsCtx, TypeSig sig, IDefinition member, PropertyRecord rec)
+        public BAMLConverterMemberReference(BAMLAnalyzer.XmlNsContext xmlnsCtx, TypeSig sig, IDnlibDef member, PropertyRecord rec)
         {
             this.xmlnsCtx = xmlnsCtx;
             this.sig = sig;

@@ -295,7 +295,7 @@ namespace Confuser.Renamer.BAML
                 return attrRefs[attrId];
         }
 
-        void AddTypeSigReference(TypeSig typeSig, INameReference<IDefinition> reference)
+        void AddTypeSigReference(TypeSig typeSig, INameReference<IDnlibDef> reference)
         {
             foreach (var type in typeSig.FindTypeRefs())
             {

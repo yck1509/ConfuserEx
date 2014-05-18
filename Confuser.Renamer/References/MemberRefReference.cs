@@ -7,11 +7,11 @@ using Confuser.Core;
 
 namespace Confuser.Renamer.References
 {
-    public class MemberRefReference : INameReference<IDefinition>
+    public class MemberRefReference : INameReference<IDnlibDef>
     {
         MemberRef memberRef;
-        IDefinition memberDef;
-        public MemberRefReference(MemberRef memberRef, IDefinition memberDef)
+        IDnlibDef memberDef;
+        public MemberRefReference(MemberRef memberRef, IDnlibDef memberDef)
         {
             this.memberRef = memberRef;
             this.memberDef = memberDef;

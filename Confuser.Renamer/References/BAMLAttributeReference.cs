@@ -8,11 +8,11 @@ using Confuser.Core;
 
 namespace Confuser.Renamer.References
 {
-    class BAMLAttributeReference : INameReference<IDefinition>
+    class BAMLAttributeReference : INameReference<IDnlibDef>
     {
-        IDefinition member;
+        IDnlibDef member;
         AttributeInfoRecord rec;
-        public BAMLAttributeReference(IDefinition member, AttributeInfoRecord rec)
+        public BAMLAttributeReference(IDnlibDef member, AttributeInfoRecord rec)
         {
             this.member = member;
             this.rec = rec;

@@ -11,7 +11,7 @@ namespace Confuser.Renamer.Analyzers
 {
     class LdtokenEnumAnalyzer : IRenamer
     {
-        public void Analyze(ConfuserContext context, INameService service, IDefinition def)
+        public void Analyze(ConfuserContext context, INameService service, IDnlibDef def)
         {
             MethodDef method = def as MethodDef;
             if (method == null || !method.HasBody)
@@ -40,10 +40,11 @@ namespace Confuser.Renamer.Analyzers
                     }
                     else if (instr.Operand is ITypeDefOrRef)
                     {
-                        TypeDef type = ((ITypeDefOrRef)instr.Operand).ResolveTypeDefThrow();
-                        if (type != null && context.Modules.Contains((ModuleDefMD)type.Module))
+                        if (!(instr.Operand is TypeSpec))
                         {
-                            DisableRename(service, type);
+                            TypeDef type = ((ITypeDefOrRef)instr.Operand).ResolveTypeDefThrow();
+                            if (context.Modules.Contains((ModuleDefMD)type.Module))
+                                DisableRename(service, type);
                         }
                     }
                     else
@@ -127,12 +128,12 @@ namespace Confuser.Renamer.Analyzers
                 DisableRename(service, nested);
         }
 
-        public void PreRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PreRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }
 
-        public void PostRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PostRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }

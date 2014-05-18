@@ -173,8 +173,8 @@ namespace Confuser.Core
         /// <param name="context">The context.</param>
         static void RunPipeline(ProtectionPipeline pipeline, ConfuserContext context)
         {
-            Func<IList<IDefinition>> getAllDefs = () => context.Modules.SelectMany(module => module.FindDefinitions()).ToList();
-            Func<ModuleDef, IList<IDefinition>> getModuleDefs = module => module.FindDefinitions().ToList();
+            Func<IList<IDnlibDef>> getAllDefs = () => context.Modules.SelectMany(module => module.FindDefinitions()).ToList();
+            Func<ModuleDef, IList<IDnlibDef>> getModuleDefs = module => module.FindDefinitions().ToList();
 
             context.CurrentModuleIndex = -1;
 
@@ -349,7 +349,7 @@ namespace Confuser.Core
             if (context.Packer != null)
             {
                 context.Logger.Info("Packing...");
-                context.Packer.Pack(context, new ProtectionParameters(context.Packer, context.Modules.OfType<IDefinition>().ToList()));
+                context.Packer.Pack(context, new ProtectionParameters(context.Packer, context.Modules.OfType<IDnlibDef>().ToList()));
             }
         }
 

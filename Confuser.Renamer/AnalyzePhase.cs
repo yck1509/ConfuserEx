@@ -21,7 +21,7 @@ namespace Confuser.Renamer
             get { return ProtectionTargets.AllDefinitions; }
         }
 
-        void ParseParameters(IDefinition def, ConfuserContext context, NameService service, ProtectionParameters parameters)
+        void ParseParameters(IDnlibDef def, ConfuserContext context, NameService service, ProtectionParameters parameters)
         {
             RenameMode? mode = parameters.GetParameter<RenameMode?>(context, def, "mode", null);
             if (mode != null)
@@ -60,7 +60,7 @@ namespace Confuser.Renamer
             }
         }
 
-        internal void Analyze(NameService service, ConfuserContext context, IDefinition def, bool runAnalyzer)
+        internal void Analyze(NameService service, ConfuserContext context, IDnlibDef def, bool runAnalyzer)
         {
             if (def is TypeDef)
                 Analyze(service, context, (TypeDef)def);

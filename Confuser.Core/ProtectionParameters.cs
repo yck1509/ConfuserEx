@@ -20,7 +20,7 @@ namespace Confuser.Core
         /// </summary>
         /// <param name="component">The component that this parameters applied to.</param>
         /// <param name="targets">The protection targets.</param>
-        internal ProtectionParameters(ConfuserComponent component, IList<IDefinition> targets)
+        internal ProtectionParameters(ConfuserComponent component, IList<IDnlibDef> targets)
         {
             this.comp = component;
             this.Targets = targets;
@@ -31,7 +31,7 @@ namespace Confuser.Core
         /// Possible targets are module, types, methods, fields, events, properties.
         /// </summary>
         /// <value>A list of protection targets.</value>
-        public IList<IDefinition> Targets { get; private set; }
+        public IList<IDnlibDef> Targets { get; private set; }
 
 
         private static readonly object ParametersKey = new object();
@@ -45,7 +45,7 @@ namespace Confuser.Core
         /// <param name="name">The name of the parameter.</param>
         /// <param name="defValue">Default value if the parameter does not exist.</param>
         /// <returns>The value of the parameter.</returns>
-        public T GetParameter<T>(ConfuserContext context, IDefinition target, string name, T defValue = default(T))
+        public T GetParameter<T>(ConfuserContext context, IDnlibDef target, string name, T defValue = default(T))
         {
             var objParams = context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
             if (objParams == null)
@@ -77,7 +77,7 @@ namespace Confuser.Core
         /// <param name="target">The protection target.</param>
         /// <param name="parameters">The parameters.</param>
         public static void SetParameters(
-            ConfuserContext context, IDefinition target, ProtectionSettings parameters)
+            ConfuserContext context, IDnlibDef target, ProtectionSettings parameters)
         {
             context.Annotations.Set(target, ParametersKey, parameters);
         }
@@ -89,7 +89,7 @@ namespace Confuser.Core
         /// <param name="target">The protection target.</param>
         /// <returns>The parameters.</returns>
         public static ProtectionSettings GetParameters(
-            ConfuserContext context, IDefinition target)
+            ConfuserContext context, IDnlibDef target)
         {
             return context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
         }

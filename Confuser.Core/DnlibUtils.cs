@@ -18,7 +18,7 @@ namespace Confuser.Core
         /// </summary>
         /// <param name="module">The module.</param>
         /// <returns>A collection of all required definitions</returns>
-        public static IEnumerable<IDefinition> FindDefinitions(this ModuleDef module)
+        public static IEnumerable<IDnlibDef> FindDefinitions(this ModuleDef module)
         {
             yield return module;
             foreach (var type in module.GetTypes())
@@ -44,7 +44,7 @@ namespace Confuser.Core
         /// </summary>
         /// <param name="typeDef">The type.</param>
         /// <returns>A collection of all required definitions</returns>
-        public static IEnumerable<IDefinition> FindDefinitions(this TypeDef typeDef)
+        public static IEnumerable<IDnlibDef> FindDefinitions(this TypeDef typeDef)
         {
             yield return typeDef;
 

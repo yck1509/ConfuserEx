@@ -12,7 +12,7 @@ namespace Confuser.Renamer.Analyzers
 {
     class TypeBlobAnalyzer : IRenamer
     {
-        public void Analyze(ConfuserContext context, INameService service, IDefinition def)
+        public void Analyze(ConfuserContext context, INameService service, IDnlibDef def)
         {
             ModuleDefMD module = def as ModuleDefMD;
             if (module == null) return;
@@ -21,12 +21,32 @@ namespace Confuser.Renamer.Analyzers
             uint len;
 
             // MemberRef
-            table = module.TablesStream.Get(Table.MemberRef);
+            table = module.TablesStream.Get(Table.Method);
             len = table.Rows;
-            for (uint i = 1; i <= len; i++)
+            var methods = Enumerable.Range(1, (int)len)
+                .Select(rid => module.ResolveMethod((uint)rid));
+            foreach (var method in methods)
             {
-                MemberRef memberRef = module.ResolveMemberRef(i);
-                AnalyzeMemberRef(context, service, memberRef);
+                foreach (var methodImpl in method.Overrides)
+                {
+                    if (methodImpl.MethodBody is MemberRef)
+                        AnalyzeMemberRef(context, service, (MemberRef)methodImpl.MethodBody);
+                    if (methodImpl.MethodDeclaration is MemberRef)
+                        AnalyzeMemberRef(context, service, (MemberRef)methodImpl.MethodDeclaration);
+                }
+                if (!method.HasBody)
+                    continue;
+                foreach (var instr in method.Body.Instructions)
+                {
+                    if (instr.Operand is MemberRef)
+                        AnalyzeMemberRef(context, service, (MemberRef)instr.Operand);
+                    else if (instr.Operand is MethodSpec)
+                    {
+                        MethodSpec spec = (MethodSpec)instr.Operand;
+                        if (spec.Method is MemberRef)
+                            AnalyzeMemberRef(context, service, (MemberRef)spec.Method);
+                    }
+                }
             }
 
 
@@ -37,9 +57,11 @@ namespace Confuser.Renamer.Analyzers
                 .Select(rid => module.ResolveHasCustomAttribute(module.TablesStream.ReadCustomAttributeRow((uint)rid).Parent))
                 .Distinct()
                 .SelectMany(owner => owner.CustomAttributes);
-            // Just resolving the attributes is enough for dnlib to correct the references.
             foreach (var attr in attrs)
             {
+                if (attr.Constructor is MemberRef)
+                    AnalyzeMemberRef(context, service, (MemberRef)attr.Constructor);
+
                 foreach (var arg in attr.ConstructorArguments)
                     AnalyzeCAArgument(context, service, arg);
 
@@ -105,11 +127,12 @@ namespace Confuser.Renamer.Analyzers
             if (sig is GenericInstSig)
             {
                 GenericInstSig inst = (GenericInstSig)sig;
+                Debug.Assert(!(inst.GenericType.TypeDefOrRef is TypeSpec));
                 TypeDef openType = inst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
-                if (openType == null || !context.Modules.Contains((ModuleDefMD)openType.Module))
+                if (!context.Modules.Contains((ModuleDefMD)openType.Module))
                     return;
 
-                IDefinition member;
+                IDnlibDef member;
                 if (memberRef.IsFieldRef) member = memberRef.ResolveFieldThrow();
                 else if (memberRef.IsMethodRef) member = memberRef.ResolveMethodThrow();
                 else throw new UnreachableException();
@@ -119,12 +142,12 @@ namespace Confuser.Renamer.Analyzers
 
         }
 
-        public void PreRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PreRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }
 
-        public void PostRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PostRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }

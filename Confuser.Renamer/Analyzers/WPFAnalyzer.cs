@@ -18,7 +18,7 @@ namespace Confuser.Renamer.Analyzers
 {
     class WPFAnalyzer : IRenamer
     {
-        public void Analyze(ConfuserContext context, INameService service, IDefinition def)
+        public void Analyze(ConfuserContext context, INameService service, IDnlibDef def)
         {
             MethodDef method = def as MethodDef;
             if (method != null)
@@ -220,12 +220,12 @@ namespace Confuser.Renamer.Analyzers
                 context.Annotations.Set(module, BAMLKey, wpfResInfo);
         }
 
-        public void PreRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PreRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }
 
-        public void PostRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PostRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             ModuleDefMD module = def as ModuleDefMD;
             if (module == null)

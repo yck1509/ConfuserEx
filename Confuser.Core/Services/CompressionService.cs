@@ -26,7 +26,7 @@ namespace Confuser.Core.Services
         static readonly object Decompressor = new object();
 
         /// <inheritdoc/>
-        public MethodDef GetRuntimeDecompressor(ModuleDef module, Action<IDefinition> init)
+        public MethodDef GetRuntimeDecompressor(ModuleDef module, Action<IDnlibDef> init)
         {
             var decompressor = context.Annotations.GetOrCreate(module, Decompressor, m =>
             {
@@ -119,7 +119,7 @@ namespace Confuser.Core.Services
         /// <param name="module">The module which the decompression method resides in.</param>
         /// <param name="init">The initializing method for injected helper definitions.</param>
         /// <returns>The requested decompression method with signature 'static Byte[] (Byte[])'.</returns>
-        MethodDef GetRuntimeDecompressor(ModuleDef module, Action<IDefinition> init);
+        MethodDef GetRuntimeDecompressor(ModuleDef module, Action<IDnlibDef> init);
 
         /// <summary>
         /// Compresses the specified data.

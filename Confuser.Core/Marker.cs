@@ -138,7 +138,7 @@ namespace Confuser.Core
         /// </summary>
         /// <param name="member">The member definition.</param>
         /// <param name="context">The working context.</param>
-        protected internal virtual void MarkMember(IDefinition member, ConfuserContext context)
+        protected internal virtual void MarkMember(IDnlibDef member, ConfuserContext context)
         {
             ModuleDef module = ((IMemberRef)member).Module;
             var rules = context.Annotations.Get<Rules>(module, RulesKey);
@@ -188,7 +188,7 @@ namespace Confuser.Core
         /// <param name="context">The working context.</param>
         /// <param name="target">The target definition.</param>
         /// <param name="rules">The rules.</param>
-        void ApplyRules(ConfuserContext context, IDefinition target, Rules rules)
+        void ApplyRules(ConfuserContext context, IDnlibDef target, Rules rules)
         {
             ProtectionSettings ret = new ProtectionSettings();
             string sig = GetSignature(target);
@@ -220,7 +220,7 @@ namespace Confuser.Core
         /// <exception cref="System.NotSupportedException">
         /// The definition is not supported.
         /// </exception>
-        static string GetSignature(IDefinition def)
+        static string GetSignature(IDnlibDef def)
         {
             if (def is ModuleDef)
             {

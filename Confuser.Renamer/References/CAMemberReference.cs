@@ -7,11 +7,11 @@ using Confuser.Core;
 
 namespace Confuser.Renamer.References
 {
-    class CAMemberReference : INameReference<IDefinition>
+    class CAMemberReference : INameReference<IDnlibDef>
     {
         CANamedArgument namedArg;
-        IDefinition definition;
-        public CAMemberReference(CANamedArgument namedArg, IDefinition definition)
+        IDnlibDef definition;
+        public CAMemberReference(CANamedArgument namedArg, IDnlibDef definition)
         {
             this.namedArg = namedArg;
             this.definition = definition;

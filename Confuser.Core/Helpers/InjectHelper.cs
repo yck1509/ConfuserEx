@@ -35,7 +35,7 @@ namespace Confuser.Core.Helpers
             /// <summary>
             /// The mapping of origin definitions to injected definitions.
             /// </summary>
-            public readonly Dictionary<IDefinition, IDefinition> Map = new Dictionary<IDefinition, IDefinition>();
+            public readonly Dictionary<IDnlibDef, IDnlibDef> Map = new Dictionary<IDnlibDef, IDnlibDef>();
 
             /// <summary>
             /// Initializes a new instance of the <see cref="InjectContext"/> class.
@@ -135,7 +135,7 @@ namespace Confuser.Core.Helpers
         static TypeDef PopulateContext(TypeDef typeDef, InjectContext ctx)
         {
             TypeDef ret;
-            IDefinition existing;
+            IDnlibDef existing;
             if (!ctx.Map.TryGetValue(typeDef, out existing))
             {
                 ret = Clone(typeDef);
@@ -310,7 +310,7 @@ namespace Confuser.Core.Helpers
         /// <param name="newType">The new type.</param>
         /// <param name="target">The target module.</param>
         /// <returns>Injected members.</returns>
-        public static IEnumerable<IDefinition> Inject(TypeDef typeDef, TypeDef newType, ModuleDef target)
+        public static IEnumerable<IDnlibDef> Inject(TypeDef typeDef, TypeDef newType, ModuleDef target)
         {
             InjectContext ctx = new InjectContext(typeDef.Module, target);
             ctx.Map[typeDef] = newType;

@@ -13,7 +13,7 @@ namespace Confuser.Renamer
     {
         VTableStorage GetVTables();
 
-        void Analyze(IDefinition def);
+        void Analyze(IDnlibDef def);
 
         bool CanRename(object obj);
         void SetCanRename(object obj, bool val);
@@ -32,7 +32,7 @@ namespace Confuser.Renamer
         void SetOriginalName(object obj, string name);
         void SetOriginalNamespace(object obj, string ns);
 
-        void MarkHelper(IDefinition def, IMarkerService marker);
+        void MarkHelper(IDnlibDef def, IMarkerService marker);
     }
 
     class NameService : INameService
@@ -105,7 +105,7 @@ namespace Confuser.Renamer
         }
 
         AnalyzePhase analyze;
-        public void Analyze(IDefinition def)
+        public void Analyze(IDnlibDef def)
         {
             if (analyze == null)
                 analyze = context.Pipeline.FindPhase<AnalyzePhase>();
@@ -199,7 +199,7 @@ namespace Confuser.Renamer
         }
 
 
-        public void MarkHelper(IDefinition def, IMarkerService marker)
+        public void MarkHelper(IDnlibDef def, IMarkerService marker)
         {
             if (marker.IsMarked(def))
                 return;

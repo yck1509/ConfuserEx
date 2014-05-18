@@ -11,7 +11,7 @@ namespace Confuser.Renamer.Analyzers
 {
     class VTableAnalyzer : IRenamer
     {
-        public void Analyze(ConfuserContext context, INameService service, IDefinition def)
+        public void Analyze(ConfuserContext context, INameService service, IDnlibDef def)
         {
             MethodDef method = def as MethodDef;
             if (method == null || !method.IsVirtual)
@@ -38,7 +38,7 @@ namespace Confuser.Renamer.Analyzers
         }
 
 
-        public void PreRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PreRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             //
         }
@@ -60,7 +60,7 @@ namespace Confuser.Renamer.Analyzers
             }
         }
 
-        public void PostRename(ConfuserContext context, INameService service, IDefinition def)
+        public void PostRename(ConfuserContext context, INameService service, IDnlibDef def)
         {
             MethodDef method = def as MethodDef;
             if (method == null || !method.IsVirtual || method.Overrides.Count == 0)

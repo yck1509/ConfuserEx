@@ -23,7 +23,7 @@ namespace Confuser.Core.Services
         }
 
         /// <inheritdoc/>
-        public void Mark(IDefinition member)
+        public void Mark(IDnlibDef member)
         {
             if (member == null)
                 throw new ArgumentNullException("member");
@@ -36,7 +36,7 @@ namespace Confuser.Core.Services
         }
 
         /// <inheritdoc/>
-        public bool IsMarked(IDefinition def)
+        public bool IsMarked(IDnlibDef def)
         {
             return ProtectionParameters.GetParameters(context, def) != null;
         }
@@ -53,13 +53,13 @@ namespace Confuser.Core.Services
         /// <param name="member">The helper member.</param>
         /// <exception cref="System.ArgumentException"><paramref name="member"/> is a <see cref="ModuleDef"/>.</exception>
         /// <exception cref="System.ArgumentNullException"><paramref name="member"/> is <c>null</c>.</exception>
-        void Mark(IDefinition member);
+        void Mark(IDnlibDef member);
 
         /// <summary>
         /// Determines whether the specified definition is marked.
         /// </summary>
         /// <param name="def">The definition.</param>
         /// <returns><c>true</c> if the specified definition is marked; otherwise, <c>false</c>.</returns>
-        bool IsMarked(IDefinition def);
+        bool IsMarked(IDnlibDef def);
     }
 }

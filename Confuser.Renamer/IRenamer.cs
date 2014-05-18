@@ -9,8 +9,8 @@ namespace Confuser.Renamer
 {
     public interface IRenamer
     {
-        void Analyze(ConfuserContext context, INameService service, IDefinition def);
-        void PreRename(ConfuserContext context, INameService service, IDefinition def);
-        void PostRename(ConfuserContext context, INameService service, IDefinition def);
+        void Analyze(ConfuserContext context, INameService service, IDnlibDef def);
+        void PreRename(ConfuserContext context, INameService service, IDnlibDef def);
+        void PostRename(ConfuserContext context, INameService service, IDnlibDef def);
     }
 }
