@@ -43,7 +43,8 @@ namespace Confuser.Renamer.Analyzers
                         if (!(instr.Operand is TypeSpec))
                         {
                             TypeDef type = ((ITypeDefOrRef)instr.Operand).ResolveTypeDefThrow();
-                            if (context.Modules.Contains((ModuleDefMD)type.Module))
+                            if (context.Modules.Contains((ModuleDefMD)type.Module) && 
+                                HandleTypeOf(context, service, method, i))
                                 DisableRename(service, type);
                         }
                     }
@@ -108,10 +109,50 @@ namespace Confuser.Renamer.Analyzers
             }
         }
 
+        bool HandleTypeOf(ConfuserContext context, INameService service, MethodDef method, int index)
+        {
+            if (index + 1 >= method.Body.Instructions.Count)
+                return true;
+
+            IMethod gtfh = method.Body.Instructions[index + 1].Operand as IMethod;
+            if (gtfh == null || gtfh.FullName != "System.Type System.Type::GetTypeFromHandle(System.RuntimeTypeHandle)")
+                return true;
+
+            if (index + 2 < method.Body.Instructions.Count)
+            {
+                Instruction instr = method.Body.Instructions[index + 2];
+                IMethod operand = instr.Operand as IMethod;
+                if (instr.OpCode == OpCodes.Newobj && operand.FullName == "System.Void System.ComponentModel.ComponentResourceManager::.ctor(System.Type)")
+                    return false;
+                else if (instr.OpCode == OpCodes.Call)
+                {
+                    switch (operand.FullName)
+                    {
+                        case "System.Int32 System.Runtime.InteropServices.Marshal::SizeOf(System.Type)":
+                        case "System.Object System.Runtime.InteropServices.Marshal::PtrToStructure(System.IntPtr,System.Type)":
+                            return false;
+                    }
+                }
+            }
+            if (index + 3 < method.Body.Instructions.Count)
+            {
+                Instruction instr = method.Body.Instructions[index + 3];
+                IMethod operand = instr.Operand as IMethod;
+                if (instr.OpCode == OpCodes.Call)
+                {
+                    switch (operand.FullName)
+                    {
+                        case "System.IntPtr System.Runtime.InteropServices.Marshal::OffsetOf(System.Type,System.String)":
+                            return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         void DisableRename(INameService service, TypeDef typeDef)
         {
-            service.SetCanRename(typeDef, false);
-
             foreach (var m in typeDef.Methods)
                 service.SetCanRename(m, false);
 

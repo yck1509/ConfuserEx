@@ -92,10 +92,6 @@ namespace Confuser.Renamer
             {
                 service.SetCanRename(type, false);
             }
-            else if (type.IsComImport())
-            {
-                service.SetCanRename(type, false);
-            }
             else if (type.FullName == "ConfusedByAttribute")
             {
                 // Courtesy
