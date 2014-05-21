@@ -26,7 +26,13 @@ namespace Confuser.Renamer.Analyzers
                 var instr = method.Body.Instructions[i];
                 if (instr.OpCode.Code == Code.Ldtoken)
                 {
-                    if (instr.Operand is IField)
+                    if (instr.Operand is MemberRef)
+                    {
+                        var member = ((MemberRef)instr.Operand).ResolveThrow();
+                        if (context.Modules.Contains((ModuleDefMD)member.Module))
+                            service.SetCanRename(member, false);
+                    }
+                    else if (instr.Operand is IField)
                     {
                         FieldDef field = ((IField)instr.Operand).ResolveThrow();
                         if (context.Modules.Contains((ModuleDefMD)field.Module))
