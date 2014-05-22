@@ -32,6 +32,13 @@ namespace Confuser.Renamer
 
             foreach (var def in parameters.Targets)
             {
+                if (def is MethodDef)
+                    if (parameters.GetParameter<bool>(context, def, "renameArgs", true))
+                    {
+                        foreach (var param in ((MethodDef)def).ParamDefs)
+                            param.Name = null;
+                    }
+
                 if (!service.CanRename(def))
                     continue;
 
