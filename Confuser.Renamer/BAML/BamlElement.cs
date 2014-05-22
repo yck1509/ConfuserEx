@@ -17,8 +17,8 @@ namespace Confuser.Renamer.BAML
 
         // Type of this element
         public TypeDef Type { get; set; }
-        // Property this element will be assigned to.
-        public PropertyDef Property { get; set; }
+        // Attribute this element will be assigned to.
+        public IDnlibDef Attribute { get; set; }
 
         static bool IsHeader(BamlRecord rec)
         {

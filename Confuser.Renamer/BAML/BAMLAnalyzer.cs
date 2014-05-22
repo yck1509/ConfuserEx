@@ -74,12 +74,13 @@ namespace Confuser.Renamer.BAML
 
             // Process elements
             BamlElement rootElem = BamlElement.Read(document);
+            BamlElement trueRoot = rootElem.Children.Single();
             Stack<BamlElement> stack = new Stack<BamlElement>();
             stack.Push(rootElem);
             while (stack.Count > 0)
             {
                 BamlElement elem = stack.Pop();
-                ProcessBAMLElement(elem);
+                ProcessBAMLElement(trueRoot, elem);
                 foreach (var child in elem.Children)
                     stack.Push(child);
             }
@@ -89,7 +90,7 @@ namespace Confuser.Renamer.BAML
 
         Dictionary<ushort, AssemblyDef> assemblyRefs = new Dictionary<ushort, AssemblyDef>();
         Dictionary<ushort, TypeSig> typeRefs = new Dictionary<ushort, TypeSig>();
-        Dictionary<ushort, Tuple<PropertyDef, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<PropertyDef, TypeDef>>();
+        Dictionary<ushort, Tuple<IDnlibDef, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<IDnlibDef, TypeDef>>();
         Dictionary<ushort, StringInfoRecord> strings = new Dictionary<ushort, StringInfoRecord>();
         Dictionary<string, List<Tuple<AssemblyDef, string>>> xmlns = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
         XmlNsContext xmlnsCtx;
@@ -292,12 +293,12 @@ namespace Confuser.Renamer.BAML
             return null;
         }
 
-        Tuple<PropertyDef, TypeDef> ResolveAttribute(ushort attrId)
+        Tuple<IDnlibDef, TypeDef> ResolveAttribute(ushort attrId)
         {
             if ((short)attrId < 0)
             {
                 var info = things.Properties((KnownProperties)(-(short)attrId));
-                return Tuple.Create<PropertyDef, TypeDef>(info.Item2, info.Item3);
+                return Tuple.Create<IDnlibDef, TypeDef>(info.Item2, info.Item3);
             }
             else
                 return attrRefs[attrId];
@@ -316,10 +317,10 @@ namespace Confuser.Renamer.BAML
             }
         }
 
-        void ProcessBAMLElement(BamlElement elem)
+        void ProcessBAMLElement(BamlElement root, BamlElement elem)
         {
             ProcessElementHeader(elem);
-            ProcessElementBody(elem);
+            ProcessElementBody(root, elem);
         }
 
         void ProcessElementHeader(BamlElement elem)
@@ -329,7 +330,7 @@ namespace Confuser.Renamer.BAML
             {
                 case BamlRecordType.ConstructorParametersStart:
                     elem.Type = elem.Parent.Type;
-                    elem.Property = elem.Parent.Property;
+                    elem.Attribute = elem.Parent.Attribute;
                     break;
 
                 case BamlRecordType.DocumentStart:
@@ -375,9 +376,9 @@ namespace Confuser.Renamer.BAML
                             }
                         }
                     }
-                    elem.Property = elem.Parent.Property;
-                    if (elem.Property != null)
-                        elem.Type = elem.Property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+                    elem.Attribute = elem.Parent.Attribute;
+                    if (elem.Attribute != null)
+                        elem.Type = GetAttributeType(elem.Attribute);
                     break;
 
                 case BamlRecordType.PropertyArrayStart:
@@ -386,15 +387,15 @@ namespace Confuser.Renamer.BAML
                 case BamlRecordType.PropertyListStart:
                     var attrInfo = ResolveAttribute(((PropertyComplexStartRecord)elem.Header).AttributeId);
                     elem.Type = attrInfo.Item2;
-                    elem.Property = attrInfo.Item1;
-                    if (elem.Property != null)
-                        elem.Type = elem.Property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+                    elem.Attribute = attrInfo.Item1;
+                    if (elem.Attribute != null)
+                        elem.Type = GetAttributeType(elem.Attribute);
                     break;
 
                 case BamlRecordType.KeyElementStart:
                     // i.e. <x:Key></x:Key>
                     elem.Type = module.CorLibTypes.Object.TypeDefOrRef.ResolveTypeDef();
-                    elem.Property = null;
+                    elem.Attribute = null;
                     break;
 
                 case BamlRecordType.StaticResourceStart:
@@ -402,21 +403,42 @@ namespace Confuser.Renamer.BAML
             }
         }
 
-        void ProcessElementBody(BamlElement elem)
+        TypeDef GetAttributeType(IDnlibDef attr)
+        {
+            if (attr is PropertyDef)
+                return ((PropertyDef)attr).PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+            else if (attr is EventDef)
+                return ((EventDef)attr).EventType.ResolveTypeDefThrow();
+            else
+                throw new UnreachableException();
+        }
+
+        void ProcessElementBody(BamlElement root, BamlElement elem)
         {
             foreach (var rec in elem.Body)
             {
                 // Resolve the type & property for simple property record too.
                 TypeDef type = null;
-                PropertyDef property = null;
+                IDnlibDef attr = null;
                 if (rec is PropertyRecord)
                 {
                     PropertyRecord propRec = (PropertyRecord)rec;
                     var attrInfo = ResolveAttribute(propRec.AttributeId);
                     type = attrInfo.Item2;
-                    property = attrInfo.Item1;
-                    if (property != null)
-                        type = property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+                    attr = attrInfo.Item1;
+                    if (attr != null)
+                        type = GetAttributeType(attr);
+
+                    if (attrInfo.Item1 is EventDef)
+                    {
+                        var method = root.Type.FindMethod(propRec.Value);
+                        if (method == null)
+                        {
+                            context.Logger.Warn("Cannot resolve method '{0}' in '{1}'.", root.Type.FullName, propRec.Value);
+                        }
+                        var reference = new BAMLAttributeReference(attrInfo.Item1, propRec);
+                        service.AddReference(attrInfo.Item1, reference);
+                    }
 
                     if (rec is PropertyWithConverterRecord)
                     {
@@ -427,21 +449,21 @@ namespace Confuser.Renamer.BAML
                 {
                     var attrInfo = ResolveAttribute(((PropertyComplexStartRecord)rec).AttributeId);
                     type = attrInfo.Item2;
-                    property = attrInfo.Item1;
-                    if (property != null)
-                        type = property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+                    attr = attrInfo.Item1;
+                    if (attr != null)
+                        type = GetAttributeType(attr);
                 }
                 else if (rec is ContentPropertyRecord)
                 {
                     var attrInfo = ResolveAttribute(((ContentPropertyRecord)rec).AttributeId);
                     type = attrInfo.Item2;
-                    property = attrInfo.Item1;
-                    if (elem.Property != null)
-                        type = property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+                    attr = attrInfo.Item1;
+                    if (elem.Attribute != null)
+                        type = GetAttributeType(attr);
                     foreach (var child in elem.Children)
                     {
                         child.Type = type;
-                        child.Property = property;
+                        child.Attribute = attr;
                     }
                 }
                 else if (rec is PropertyCustomRecord)
@@ -449,9 +471,9 @@ namespace Confuser.Renamer.BAML
                     PropertyCustomRecord customRec = (PropertyCustomRecord)rec;
                     var attrInfo = ResolveAttribute(customRec.AttributeId);
                     type = attrInfo.Item2;
-                    property = attrInfo.Item1;
-                    if (elem.Property != null)
-                        type = property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+                    attr = attrInfo.Item1;
+                    if (elem.Attribute != null)
+                        type = GetAttributeType(attr);
 
                     if ((customRec.SerializerTypeId & 0x4000) != 0 && (customRec.SerializerTypeId & 0x4000) == 0x89)
                     {
@@ -464,9 +486,9 @@ namespace Confuser.Renamer.BAML
                     PropertyWithExtensionRecord extRec = (PropertyWithExtensionRecord)rec;
                     var attrInfo = ResolveAttribute(extRec.AttributeId);
                     type = attrInfo.Item2;
-                    property = attrInfo.Item1;
-                    if (elem.Property != null)
-                        type = property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+                    attr = attrInfo.Item1;
+                    if (elem.Attribute != null)
+                        type = GetAttributeType(attr);
 
                     // Umm... Nothing to do here too, since the value only contains either typeId/memberId, which already have references attached.
                 }
@@ -548,16 +570,16 @@ namespace Confuser.Renamer.BAML
             }
         }
 
-        Tuple<PropertyDef, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec)
+        Tuple<IDnlibDef, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec)
         {
-            PropertyDef retProp = null;
+            IDnlibDef retDef = null;
             TypeDef retType = null;
             while (declType != null)
             {
                 PropertyDef property = declType.FindProperty(rec.Name);
                 if (property != null)
                 {
-                    retProp = property;
+                    retDef = property;
                     retType = property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
                     if (context.Modules.Contains((ModuleDefMD)declType.Module))
                         service.AddReference(property, new BAMLAttributeReference(property, rec));
@@ -567,6 +589,7 @@ namespace Confuser.Renamer.BAML
                 EventDef evt = declType.FindEvent(rec.Name);
                 if (evt != null)
                 {
+                    retDef = evt;
                     retType = evt.EventType.ResolveTypeDefThrow();
                     if (context.Modules.Contains((ModuleDefMD)declType.Module))
                         service.AddReference(evt, new BAMLAttributeReference(evt, rec));
@@ -578,7 +601,7 @@ namespace Confuser.Renamer.BAML
                 else
                     declType = declType.BaseType.ResolveTypeDefThrow();
             }
-            return Tuple.Create(retProp, retType);
+            return Tuple.Create(retDef, retType);
         }
 
         void AnalyzePropertyPath(string path)

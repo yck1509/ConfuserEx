@@ -11,16 +11,25 @@ namespace Confuser.Renamer.References
     class BAMLAttributeReference : INameReference<IDnlibDef>
     {
         IDnlibDef member;
-        AttributeInfoRecord rec;
+        AttributeInfoRecord attrRec;
+        PropertyRecord propRec;
         public BAMLAttributeReference(IDnlibDef member, AttributeInfoRecord rec)
         {
             this.member = member;
-            this.rec = rec;
+            this.attrRec = rec;
+        }
+        public BAMLAttributeReference(IDnlibDef member, PropertyRecord rec)
+        {
+            this.member = member;
+            this.propRec = rec;
         }
 
         public bool UpdateNameReference(ConfuserContext context, INameService service)
         {
-            rec.Name = member.Name;
+            if (attrRec != null)
+                attrRec.Name = member.Name;
+            else
+                propRec.Value = member.Name;
             return true;
         }
 

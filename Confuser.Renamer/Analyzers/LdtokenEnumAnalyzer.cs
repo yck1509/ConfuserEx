@@ -130,13 +130,24 @@ namespace Confuser.Renamer.Analyzers
                 IMethod operand = instr.Operand as IMethod;
                 if (instr.OpCode == OpCodes.Newobj && operand.FullName == "System.Void System.ComponentModel.ComponentResourceManager::.ctor(System.Type)")
                     return false;
-                else if (instr.OpCode == OpCodes.Call)
+                else if (instr.OpCode == OpCodes.Call || instr.OpCode == OpCodes.Callvirt)
                 {
-                    switch (operand.FullName)
+                    switch (operand.DeclaringType.FullName)
                     {
-                        case "System.Int32 System.Runtime.InteropServices.Marshal::SizeOf(System.Type)":
-                        case "System.Object System.Runtime.InteropServices.Marshal::PtrToStructure(System.IntPtr,System.Type)":
+                        case "System.Runtime.InteropServices.Marshal":
                             return false;
+                        case "System.Type":
+                            if (operand.Name.StartsWith("Get") || operand.Name == "InvokeMember")
+                                return true;
+                            if (operand.Name == "get_AssemblyQualifiedName" ||
+                                operand.Name == "get_FullName" ||
+                                operand.Name == "get_Namespace")
+                                return true;
+                            return false;
+                        case "System.Reflection.MemberInfo":
+                            return operand.Name == "get_Name";
+                        case "System.Object":
+                            return operand.Name == "ToString";
                     }
                 }
             }
@@ -144,11 +155,11 @@ namespace Confuser.Renamer.Analyzers
             {
                 Instruction instr = method.Body.Instructions[index + 3];
                 IMethod operand = instr.Operand as IMethod;
-                if (instr.OpCode == OpCodes.Call)
+                if (instr.OpCode == OpCodes.Call || instr.OpCode == OpCodes.Callvirt)
                 {
-                    switch (operand.FullName)
+                    switch (operand.DeclaringType.FullName)
                     {
-                        case "System.IntPtr System.Runtime.InteropServices.Marshal::OffsetOf(System.Type,System.String)":
+                        case "System.Runtime.InteropServices.Marshal":
                             return false;
                     }
                 }
