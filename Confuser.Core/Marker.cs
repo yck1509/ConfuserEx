@@ -60,7 +60,7 @@ namespace Confuser.Core
         /// <param name="pass">The password of the certificate at <paramref name="path"/> if 
         /// it is a pfx file; otherwise, <c>null</c>.</param>
         /// <returns>The loaded Strong Name Key.</returns>
-        static StrongNameKey LoadSNKey(ConfuserContext context, string path, string pass)
+        public static StrongNameKey LoadSNKey(ConfuserContext context, string path, string pass)
         {
             if (path == null) return null;
 
@@ -155,7 +155,7 @@ namespace Confuser.Core
         /// <exception cref="System.ArgumentException">
         /// One of the rules has invalid RegEx pattern.
         /// </exception>
-        Rules ParseRules(ConfuserProject proj, ProjectModule module, ConfuserContext context)
+        protected Rules ParseRules(ConfuserProject proj, ProjectModule module, ConfuserContext context)
         {
             var ret = new Rules();
             foreach (var rule in module.Rules.Concat(proj.Rules))
@@ -188,7 +188,7 @@ namespace Confuser.Core
         /// <param name="context">The working context.</param>
         /// <param name="target">The target definition.</param>
         /// <param name="rules">The rules.</param>
-        void ApplyRules(ConfuserContext context, IDnlibDef target, Rules rules)
+        protected void ApplyRules(ConfuserContext context, IDnlibDef target, Rules rules)
         {
             ProtectionSettings ret = new ProtectionSettings();
             string sig = GetSignature(target);
@@ -220,7 +220,7 @@ namespace Confuser.Core
         /// <exception cref="System.NotSupportedException">
         /// The definition is not supported.
         /// </exception>
-        static string GetSignature(IDnlibDef def)
+        public static string GetSignature(IDnlibDef def)
         {
             if (def is ModuleDef)
             {

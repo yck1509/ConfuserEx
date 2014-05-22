@@ -51,6 +51,13 @@
     <Compile Include="AntiTamper\JITMode.cs" />
     <Compile Include="AntiTamper\NormalDeriver.cs" />
     <Compile Include="AntiTamper\NormalMode.cs" />
+    <Compile Include="Compress\Compressor.cs" />
+    <Compile Include="Compress\CompressorContext.cs" />
+    <Compile Include="Compress\DynamicDeriver.cs" />
+    <Compile Include="Compress\ExtractPhase.cs" />
+    <Compile Include="Compress\IKeyDeriver.cs" />
+    <Compile Include="Compress\NormalDeriver.cs" />
+    <Compile Include="Compress\StubProtection.cs" />
     <Compile Include="Constants\CEContext.cs" />
     <Compile Include="Constants\ConstantProtection.cs">
       <SubType>Code</SubType>

@@ -36,6 +36,13 @@ namespace Confuser.Core
             GetPluginsInternal(context, protections, packers, components);
         }
 
+        static bool HasAccessibleDefConstructor(Type type)
+        {
+            ConstructorInfo ctor = type.GetConstructor(Type.EmptyTypes);
+            if (ctor == null) return false;
+            return ctor.IsPublic;
+        }
+
         /// <summary>
         /// Adds plugins in the assembly to the protection list.
         /// </summary>
@@ -50,7 +57,7 @@ namespace Confuser.Core
         {
             foreach (var i in asm.GetTypes())
             {
-                if (i.IsAbstract) 
+                if (i.IsAbstract || !HasAccessibleDefConstructor(i)) 
                     continue;
 
                 if (typeof(Protection).IsAssignableFrom(i))

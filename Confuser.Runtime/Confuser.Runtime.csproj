@@ -41,6 +41,7 @@
     <Compile Include="antinet\AntiManagedProfiler.cs" />
     <Compile Include="antinet\HandleProcessCorruptedStateExceptionsAttribute.cs" />
     <Compile Include="antinet\PEInfo.cs" />
+    <Compile Include="Compressor.cs" />
     <Compile Include="Constant.cs" />
     <Compile Include="AntiTamper.JIT.cs" />
     <Compile Include="Lzma.cs" />

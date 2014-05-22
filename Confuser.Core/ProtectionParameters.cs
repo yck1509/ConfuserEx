@@ -47,14 +47,24 @@ namespace Confuser.Core
         /// <returns>The value of the parameter.</returns>
         public T GetParameter<T>(ConfuserContext context, IDnlibDef target, string name, T defValue = default(T))
         {
-            var objParams = context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
-            if (objParams == null)
-                return defValue;
-            Dictionary<string, string> protParams;
-            if (!objParams.TryGetValue(comp, out protParams))
-                return defValue;
+            Dictionary<string, string> parameters;
+
+            // For packers
+            if (comp is Packer)
+            {
+                parameters = new Dictionary<string, string>(context.Project.Packer, StringComparer.OrdinalIgnoreCase);
+            }
+            else
+            {
+                // For protections
+                var objParams = context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
+                if (objParams == null)
+                    return defValue;
+                if (!objParams.TryGetValue(comp, out parameters))
+                    return defValue;
+            }
             string ret;
-            if (protParams.TryGetValue(name, out ret))
+            if (parameters.TryGetValue(name, out ret))
             {
                 Type paramType = typeof(T);
                 Type nullable = Nullable.GetUnderlyingType(paramType);

@@ -5,6 +5,7 @@ using System.Text;
 using dnlib.DotNet;
 using dnlib.DotNet.Writer;
 using System.Threading;
+using Confuser.Core.Project;
 
 namespace Confuser.Core
 {
@@ -18,6 +19,12 @@ namespace Confuser.Core
         /// </summary>
         /// <value>The logger.</value>
         public ILogger Logger { get; internal set; }
+
+        /// <summary>
+        /// Gets the project being processed.
+        /// </summary>
+        /// <value>The project.</value>
+        public ConfuserProject Project { get; internal set; }
 
 
         internal CancellationToken token;

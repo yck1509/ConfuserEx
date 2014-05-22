@@ -45,6 +45,7 @@ namespace Confuser.Core
             // 1. Setup context
             ConfuserContext context = new ConfuserContext();
             context.Logger = parameters.GetLogger();
+            context.Project = parameters.Project;
             context.token = token;
             var asmResolver = new AssemblyResolver(); 
             asmResolver.EnableTypeDefCache = true;
@@ -100,6 +101,7 @@ namespace Confuser.Core
                 context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToArray();
                 foreach (var module in context.Modules)
                     asmResolver.AddToCache(module);
+                context.Packer = markings.Packer;
 
                 // 5. Initialize components
                 context.Logger.Info("Initializing...");
@@ -181,26 +183,32 @@ namespace Confuser.Core
             pipeline.ExecuteStage(PipelineStage.Inspection, Inspection, () => getAllDefs(), context);
 
             ModuleWriterOptionsBase[] options = new ModuleWriterOptionsBase[context.Modules.Count];
+            ModuleWriterListener[] listeners = new ModuleWriterListener[context.Modules.Count];
             for (int i = 0; i < context.Modules.Count; i++)
             {
                 context.CurrentModuleIndex = i;
+                context.CurrentModuleWriterOptions = null;
+                context.CurrentModuleWriterListener = null;
 
                 pipeline.ExecuteStage(PipelineStage.BeginModule, BeginModule, () => getModuleDefs(context.CurrentModule), context);
                 pipeline.ExecuteStage(PipelineStage.OptimizeMethods, OptimizeMethods, () => getModuleDefs(context.CurrentModule), context);
                 pipeline.ExecuteStage(PipelineStage.EndModule, EndModule, () => getModuleDefs(context.CurrentModule), context);
 
                 options[i] = context.CurrentModuleWriterOptions;
+                listeners[i] = context.CurrentModuleWriterListener;
             }
 
             for (int i = 0; i < context.Modules.Count; i++)
             {
                 context.CurrentModuleIndex = i;
                 context.CurrentModuleWriterOptions = options[i];
+                context.CurrentModuleWriterListener = listeners[i];
 
                 pipeline.ExecuteStage(PipelineStage.WriteModule, WriteModule, () => getModuleDefs(context.CurrentModule), context);
 
                 context.OutputModules[i] = context.CurrentModuleOutput;
                 context.CurrentModuleWriterOptions = null;
+                context.CurrentModuleWriterListener = null;
                 context.CurrentModuleOutput = null;
             }
 
@@ -355,7 +363,7 @@ namespace Confuser.Core
 
         static void SaveModules(ConfuserContext context)
         {
-            for (int i = 0; i < context.Modules.Count; i++)
+            for (int i = 0; i < context.OutputModules.Count; i++)
             {
                 string path = Path.GetFullPath(Path.Combine(context.OutputDirectory, context.OutputPaths[i]));
                 var dir = Path.GetDirectoryName(path);

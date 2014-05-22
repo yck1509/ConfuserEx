@@ -136,7 +136,7 @@ namespace Confuser.Runtime
                 if (importDir != 0)
                 {
                     for (int i = 0; i < sectNum; i++)
-                        if (vAdrs[i] < importDir && importDir < vAdrs[i] + vSizes[i])
+                        if (vAdrs[i] <= importDir && importDir < vAdrs[i] + vSizes[i])
                         {
                             importDir = importDir - vAdrs[i] + rAdrs[i];
                             break;
@@ -144,7 +144,7 @@ namespace Confuser.Runtime
                     byte* importDirPtr = bas + importDir;
                     uint oftMod = *(uint*)importDirPtr;
                     for (int i = 0; i < sectNum; i++)
-                        if (vAdrs[i] < oftMod && oftMod < vAdrs[i] + vSizes[i])
+                        if (vAdrs[i] <= oftMod && oftMod < vAdrs[i] + vSizes[i])
                         {
                             oftMod = oftMod - vAdrs[i] + rAdrs[i];
                             break;
@@ -152,14 +152,14 @@ namespace Confuser.Runtime
                     byte* oftModPtr = bas + oftMod;
                     uint modName = *(uint*)(importDirPtr + 12);
                     for (int i = 0; i < sectNum; i++)
-                        if (vAdrs[i] < modName && modName < vAdrs[i] + vSizes[i])
+                        if (vAdrs[i] <= modName && modName < vAdrs[i] + vSizes[i])
                         {
                             modName = modName - vAdrs[i] + rAdrs[i];
                             break;
                         }
                     uint funcName = *(uint*)oftModPtr + 2;
                     for (int i = 0; i < sectNum; i++)
-                        if (vAdrs[i] < funcName && funcName < vAdrs[i] + vSizes[i])
+                        if (vAdrs[i] <= funcName && funcName < vAdrs[i] + vSizes[i])
                         {
                             funcName = funcName - vAdrs[i] + rAdrs[i];
                             break;
@@ -187,7 +187,7 @@ namespace Confuser.Runtime
 
 
                 for (int i = 0; i < sectNum; i++)
-                    if (vAdrs[i] < mdDir && mdDir < vAdrs[i] + vSizes[i])
+                    if (vAdrs[i] <= mdDir && mdDir < vAdrs[i] + vSizes[i])
                     {
                         mdDir = mdDir - vAdrs[i] + rAdrs[i];
                         break;
@@ -196,7 +196,7 @@ namespace Confuser.Runtime
                 VirtualProtect(mdDirPtr, 0x48, 0x40, out old);
                 uint mdHdr = *(uint*)(mdDirPtr + 8);
                 for (int i = 0; i < sectNum; i++)
-                    if (vAdrs[i] < mdHdr && mdHdr < vAdrs[i] + vSizes[i])
+                    if (vAdrs[i] <= mdHdr && mdHdr < vAdrs[i] + vSizes[i])
                     {
                         mdHdr = mdHdr - vAdrs[i] + rAdrs[i];
                         break;
