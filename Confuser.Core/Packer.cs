@@ -67,16 +67,60 @@ namespace Confuser.Core
                 discovery = new PackerDiscovery(prot);
             }
 
-            ConfuserEngine.Run(new ConfuserParameters()
+            try
             {
-                Logger = context.Logger,
-                PluginDiscovery = discovery,
-                Marker = new PackerMarker(snKey),
-                Project = proj
-            }, context.token).Wait();
+                ConfuserEngine.Run(new ConfuserParameters()
+                {
+                    Logger = new PackerLogger(context.Logger),
+                    PluginDiscovery = discovery,
+                    Marker = new PackerMarker(snKey),
+                    Project = proj,
+                    PackerInitiated = true
+                }, context.token).Wait();
+            }
+            catch (AggregateException ex)
+            {
+                context.Logger.Error("Failed to protect packer stub.");
+                throw new ConfuserException(ex);
+            }
 
             context.OutputModules = new[] { File.ReadAllBytes(Path.Combine(outDir, fileName)) };
             context.OutputPaths = new[] { fileName };
+        }
+    }
+
+    class PackerLogger : ILogger
+    {
+        ILogger baseLogger;
+        public PackerLogger(ILogger baseLogger)
+        {
+            this.baseLogger = baseLogger;
+        }
+
+        public void Debug(string msg) { baseLogger.Debug(msg); }
+        public void DebugFormat(string format, params object[] args) { baseLogger.DebugFormat(format, args); }
+
+        public void Info(string msg) { baseLogger.Info(msg); }
+        public void InfoFormat(string format, params object[] args) { baseLogger.InfoFormat(format, args); }
+
+        public void Warn(string msg) { baseLogger.Warn(msg); }
+        public void WarnFormat(string format, params object[] args) { baseLogger.WarnFormat(format, args); }
+        public void WarnException(string msg, Exception ex) { baseLogger.WarnException(msg, ex); }
+
+        public void Error(string msg) { baseLogger.Error(msg); }
+        public void ErrorFormat(string format, params object[] args) { baseLogger.ErrorFormat(format, args); }
+        public void ErrorException(string msg, Exception ex) { baseLogger.ErrorException(msg, ex); }
+
+        public void Progress(int overall, int progress) { baseLogger.Progress(overall, progress); }
+
+        public void Finish(bool successful)
+        {
+            if (!successful)
+                throw new ConfuserException(null);
+            else
+            {
+                baseLogger.Info("Finish protecting packer stub.");
+            }
         }
     }
 

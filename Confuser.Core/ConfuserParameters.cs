@@ -23,6 +23,8 @@ namespace Confuser.Core
         /// <value>The logger, or <c>null</c> if logging is not needed.</value>
         public ILogger Logger { get; set; }
 
+        internal bool PackerInitiated { get; set; }
+
         /// <summary>
         /// Gets the actual non-null logger.
         /// </summary>

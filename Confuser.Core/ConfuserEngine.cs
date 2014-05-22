@@ -46,8 +46,11 @@ namespace Confuser.Core
             ConfuserContext context = new ConfuserContext();
             context.Logger = parameters.GetLogger();
             context.Project = parameters.Project;
+            context.PackerInitiated = parameters.PackerInitiated;
             context.token = token;
-            var asmResolver = new AssemblyResolver(); 
+
+
+            var asmResolver = new AssemblyResolver();
             asmResolver.EnableTypeDefCache = true;
             asmResolver.DefaultModuleContext = new ModuleContext(asmResolver);
             foreach (var probePath in parameters.Project.ProbePaths)
@@ -218,7 +221,8 @@ namespace Confuser.Core
             pipeline.ExecuteStage(PipelineStage.Pack, Pack, () => getAllDefs(), context);
             pipeline.ExecuteStage(PipelineStage.SaveModules, SaveModules, () => getAllDefs(), context);
 
-            context.Logger.Info("Done.");
+            if (!context.PackerInitiated)
+                context.Logger.Info("Done.");
         }
 
         static void Inspection(ConfuserContext context)
@@ -379,15 +383,22 @@ namespace Confuser.Core
         /// <param name="context">The working context.</param>
         static void PrintInfo(ConfuserContext context)
         {
-            context.Logger.Info("ConfuserEx v0.1 Copyright (C) Ki 2014");
+            if (context.PackerInitiated)
+            {
+                context.Logger.Info("Protecting packer stub...");
+            }
+            else
+            {
+                context.Logger.Info("ConfuserEx v0.1 Copyright (C) Ki 2014");
 
-            Type mono = Type.GetType("Mono.Runtime");
-            context.Logger.InfoFormat("Running on {0}, {1}, {2} bits",
-                Environment.OSVersion,
-                mono == null ?
-                ".NET Framework v" + Environment.Version :
-                mono.GetMethod("GetDisplayName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, null),
-                IntPtr.Size * 8);
+                Type mono = Type.GetType("Mono.Runtime");
+                context.Logger.InfoFormat("Running on {0}, {1}, {2} bits",
+                    Environment.OSVersion,
+                    mono == null ?
+                    ".NET Framework v" + Environment.Version :
+                    mono.GetMethod("GetDisplayName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static).Invoke(null, null),
+                    IntPtr.Size * 8);
+            }
         }
     }
 }

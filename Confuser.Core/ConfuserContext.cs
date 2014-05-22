@@ -26,6 +26,7 @@ namespace Confuser.Core
         /// <value>The project.</value>
         public ConfuserProject Project { get; internal set; }
 
+        internal bool PackerInitiated { get; set; }
 
         internal CancellationToken token;
         /// <summary>

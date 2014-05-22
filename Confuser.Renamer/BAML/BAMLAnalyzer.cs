@@ -433,11 +433,12 @@ namespace Confuser.Renamer.BAML
                     {
                         var method = root.Type.FindMethod(propRec.Value);
                         if (method == null)
+                            context.Logger.WarnFormat("Cannot resolve method '{0}' in '{1}'.", root.Type.FullName, propRec.Value);
+                        else
                         {
-                            context.Logger.Warn("Cannot resolve method '{0}' in '{1}'.", root.Type.FullName, propRec.Value);
+                            var reference = new BAMLAttributeReference(method, propRec);
+                            service.AddReference(method, reference);
                         }
-                        var reference = new BAMLAttributeReference(attrInfo.Item1, propRec);
-                        service.AddReference(attrInfo.Item1, reference);
                     }
 
                     if (rec is PropertyWithConverterRecord)
