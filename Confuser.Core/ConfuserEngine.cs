@@ -243,12 +243,12 @@ namespace Confuser.Core
             {
                 StrongNameKey snKey = context.Annotations.Get<StrongNameKey>(module, Marker.SNKey);
                 if (snKey == null && module.IsStrongNameSigned)
-                    context.Logger.WarnFormat("SN Key is not provided for a signed module, the output may not be working.");
+                    context.Logger.WarnFormat("[{0}] SN Key is not provided for a signed module, the output may not be working.", module.Name);
                 else if (snKey != null && !module.IsStrongNameSigned)
-                    context.Logger.WarnFormat("SN Key is provided for a unsigned module, the output may not be working.");
+                    context.Logger.WarnFormat("[{0}] SN Key is provided for a unsigned module, the output may not be working.", module.Name);
                 else if (snKey != null && module.IsStrongNameSigned &&
                          !module.Assembly.PublicKey.Data.SequenceEqual(snKey.PublicKey))
-                    context.Logger.WarnFormat("Provided SN Key and signed module's public key do not match, the output may not be working.");
+                    context.Logger.WarnFormat("[{0}] Provided SN Key and signed module's public key do not match, the output may not be working.", module.Name);
             }
 
             IMarkerService marker = context.Registry.GetService<IMarkerService>();

@@ -49,9 +49,9 @@ namespace Confuser.Renamer.Analyzers
                         if (!(instr.Operand is TypeSpec))
                         {
                             TypeDef type = ((ITypeDefOrRef)instr.Operand).ResolveTypeDefThrow();
-                            if (context.Modules.Contains((ModuleDefMD)type.Module) && 
+                            if (context.Modules.Contains((ModuleDefMD)type.Module) &&
                                 HandleTypeOf(context, service, method, i))
-                                DisableRename(service, type);
+                                DisableRename(service, type, false);
                         }
                     }
                     else
@@ -157,8 +157,10 @@ namespace Confuser.Renamer.Analyzers
             return true;
         }
 
-        void DisableRename(INameService service, TypeDef typeDef)
+        void DisableRename(INameService service, TypeDef typeDef, bool memberOnly = true)
         {
+            service.SetCanRename(typeDef, false);
+
             foreach (var m in typeDef.Methods)
                 service.SetCanRename(m, false);
 
@@ -172,7 +174,7 @@ namespace Confuser.Renamer.Analyzers
                 service.SetCanRename(evt, false);
 
             foreach (var nested in typeDef.NestedTypes)
-                DisableRename(service, nested);
+                DisableRename(service, nested, false);
         }
 
         public void PreRename(ConfuserContext context, INameService service, IDnlibDef def)

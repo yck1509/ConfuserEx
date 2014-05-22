@@ -90,6 +90,7 @@ namespace Confuser.Renamer.BAML
         Dictionary<ushort, AssemblyDef> assemblyRefs = new Dictionary<ushort, AssemblyDef>();
         Dictionary<ushort, TypeSig> typeRefs = new Dictionary<ushort, TypeSig>();
         Dictionary<ushort, Tuple<PropertyDef, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<PropertyDef, TypeDef>>();
+        Dictionary<ushort, StringInfoRecord> strings = new Dictionary<ushort, StringInfoRecord>();
         Dictionary<string, List<Tuple<AssemblyDef, string>>> xmlns = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
         XmlNsContext xmlnsCtx;
 
@@ -112,7 +113,7 @@ namespace Confuser.Renamer.BAML
                 for (int i = 0; i < doc.Count; i++)
                     if (doc[i] is ElementStartRecord)
                     {
-                        rootIndex = i;
+                        rootIndex = i + 1;
                         break;
                     }
                 Debug.Assert(rootIndex != -1);
@@ -130,18 +131,19 @@ namespace Confuser.Renamer.BAML
                 {
                     prefix = "_" + x++;
                     ushort assemblyId = assemblyRefs[assembly];
-                    doc.Insert(rootIndex, new PIMappingRecord()
-                    {
-                        AssemblyId = assemblyId,
-                        ClrNamespace = clrNs,
-                        XmlNamespace = prefix
-                    });
                     doc.Insert(rootIndex, new XmlnsPropertyRecord()
                     {
                         AssemblyIds = new ushort[] { assemblyId },
                         Prefix = prefix,
-                        XmlNamespace = prefix
+                        XmlNamespace = "clr-namespace:" + clrNs
                     });
+                    doc.Insert(rootIndex - 1, new PIMappingRecord()
+                    {
+                        AssemblyId = assemblyId,
+                        ClrNamespace = clrNs,
+                        XmlNamespace = "clr-namespace:" + clrNs
+                    });
+                    rootIndex++;
                 }
                 return prefix;
             }
@@ -219,6 +221,12 @@ namespace Confuser.Renamer.BAML
                     TypeDef declTypeDef = things.Types((KnownTypes)(-(short)rec.OwnerTypeId));
                     attrRefs[rec.AttributeId] = AnalyzeAttributeReference(declTypeDef, rec);
                 }
+            }
+
+            strings.Clear();
+            foreach (var rec in document.OfType<StringInfoRecord>())
+            {
+                strings[rec.StringId] = rec;
             }
 
             foreach (var rec in document.OfType<PIMappingRecord>())
@@ -339,7 +347,31 @@ namespace Confuser.Renamer.BAML
                             if (child.Header.Type == BamlRecordType.ConstructorParametersStart)
                             {
                                 TextRecord cnt = (TextRecord)child.Body[0];
+                                string value = cnt.Value;
+                                if (cnt is TextWithIdRecord)
+                                    value = strings[((TextWithIdRecord)cnt).ValueId].Value;
                                 AnalyzePropertyPath(cnt.Value);
+                            }
+                        }
+                    }
+                    else if (elem.Type.FullName == "System.Windows.Markup.TypeExtension")
+                    {
+                        foreach (var child in elem.Children)
+                        {
+                            if (child.Header.Type == BamlRecordType.ConstructorParametersStart)
+                            {
+                                TextRecord cnt = (TextRecord)child.Body[0];
+                                string value = cnt.Value;
+                                if (cnt is TextWithIdRecord)
+                                    value = strings[((TextWithIdRecord)cnt).ValueId].Value;
+
+                                string prefix;
+                                TypeSig sig = ResolveType(value.Trim(), out prefix);
+                                if (sig != null && context.Modules.Contains((ModuleDefMD)sig.ToBasicTypeDefOrRef().ResolveTypeDefThrow().Module))
+                                {
+                                    var reference = new BAMLConverterTypeReference(xmlnsCtx, sig, cnt);
+                                    AddTypeSigReference(sig, reference);
+                                }
                             }
                         }
                     }

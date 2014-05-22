@@ -12,12 +12,19 @@ namespace Confuser.Renamer.References
     {
         BAMLAnalyzer.XmlNsContext xmlnsCtx;
         TypeSig sig;
-        PropertyRecord rec;
+        PropertyRecord propRec;
+        TextRecord textRec;
         public BAMLConverterTypeReference(BAMLAnalyzer.XmlNsContext xmlnsCtx, TypeSig sig, PropertyRecord rec)
         {
             this.xmlnsCtx = xmlnsCtx;
             this.sig = sig;
-            this.rec = rec;
+            this.propRec = rec;
+        }
+        public BAMLConverterTypeReference(BAMLAnalyzer.XmlNsContext xmlnsCtx, TypeSig sig, TextRecord rec)
+        {
+            this.xmlnsCtx = xmlnsCtx;
+            this.sig = sig;
+            this.textRec = rec;
         }
 
         public bool UpdateNameReference(ConfuserContext context, INameService service)
@@ -26,7 +33,10 @@ namespace Confuser.Renamer.References
             string prefix = xmlnsCtx.GetPrefix(sig.ReflectionNamespace, sig.ToBasicTypeDefOrRef().ResolveTypeDefThrow().Module.Assembly);
             if (!string.IsNullOrEmpty(prefix))
                 name = prefix + ":" + name;
-            rec.Value = name;
+            if (propRec != null)
+                propRec.Value = name;
+            else
+                textRec.Value = name;
             return true;
         }
 

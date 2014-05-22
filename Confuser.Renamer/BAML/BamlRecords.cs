@@ -82,6 +82,7 @@ namespace Confuser.Renamer.BAML
             int size = reader.ReadEncodedInt();
 
             ReadData(reader, size - (int)(reader.BaseStream.Position - pos));
+            Debug.Assert(reader.BaseStream.Position - pos == size);
         }
         int SizeofEncodedInt(int val)
         {
@@ -523,12 +524,10 @@ namespace Confuser.Renamer.BAML
 
         protected override void ReadData(BamlBinaryReader reader, int size)
         {
-            base.ReadData(reader, size);
             ValueId = reader.ReadUInt16();
         }
         protected override void WriteData(BamlBinaryWriter writer)
         {
-            base.WriteData(writer);
             writer.Write(ValueId);
         }
     }
