@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Confuser.Core.Project;
-using System.Text.RegularExpressions;
+using Confuser.Core.Project.Patterns;
 using dnlib.DotNet;
 using System.IO;
 
 namespace Confuser.Core
 {
-    using Rules = Dictionary<Rule, Regex>;
+    using Rules = Dictionary<Rule, PatternExpression>;
 
     /// <summary>
     /// Resolves and marks the modules with protection settings according to the rules.
@@ -158,14 +158,14 @@ namespace Confuser.Core
         protected Rules ParseRules(ConfuserProject proj, ProjectModule module, ConfuserContext context)
         {
             var ret = new Rules();
+            var parser = new PatternParser();
             foreach (var rule in module.Rules.Concat(proj.Rules))
             {
                 try
                 {
-                    Regex regex = new Regex(rule.Pattern);
-                    ret.Add(rule, regex);
+                    ret.Add(rule, parser.Parse(rule.Pattern));
                 }
-                catch (Exception ex)
+                catch (InvalidPatternException ex)
                 {
                     context.Logger.ErrorFormat("Invalid rule pattern: " + rule.Pattern + ".", ex);
                     throw new ConfuserException(ex);
@@ -191,10 +191,9 @@ namespace Confuser.Core
         protected void ApplyRules(ConfuserContext context, IDnlibDef target, Rules rules)
         {
             ProtectionSettings ret = new ProtectionSettings();
-            string sig = GetSignature(target);
             foreach (var i in rules)
             {
-                if (!i.Value.IsMatch(sig)) continue;
+                if (!(bool)i.Value.Evaluate(target)) continue;
 
                 if (!i.Key.Inherit)
                     ret.Clear();
@@ -210,49 +209,6 @@ namespace Confuser.Core
             }
 
             ProtectionParameters.SetParameters(context, target, ret);
-        }
-
-        /// <summary>
-        /// Gets the signature of a target definition.
-        /// </summary>
-        /// <param name="def">The target definition.</param>
-        /// <returns>The signature of the definition.</returns>
-        /// <exception cref="System.NotSupportedException">
-        /// The definition is not supported.
-        /// </exception>
-        public static string GetSignature(IDnlibDef def)
-        {
-            if (def is ModuleDef)
-            {
-                return ((ModuleDef)def).Name;
-            }
-            else if (def is TypeDef)
-            {
-                TypeDef type = (TypeDef)def;
-                return type.FullName;
-            }
-            else if (def is MethodDef)
-            {
-                MethodDef method = (MethodDef)def;
-                return method.FullName;
-            }
-            else if (def is FieldDef)
-            {
-                FieldDef field = (FieldDef)def;
-                return field.FullName;
-            }
-            else if (def is PropertyDef)
-            {
-                PropertyDef property = (PropertyDef)def;
-                return property.FullName;
-            }
-            else if (def is EventDef)
-            {
-                EventDef evt = (EventDef)def;
-                return evt.FullName;
-            }
-            else
-                throw new NotSupportedException();
         }
     }
 }

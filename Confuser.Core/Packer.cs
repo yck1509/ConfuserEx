@@ -56,7 +56,7 @@ namespace Confuser.Core
                 {
                     Preset = ProtectionPreset.None,
                     Inherit = true,
-                    Pattern = ".*"
+                    Pattern = "true"
                 };
                 rule.Add(new SettingItem<Protection>()
                 {
