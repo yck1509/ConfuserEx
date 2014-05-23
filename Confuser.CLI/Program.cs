@@ -166,9 +166,15 @@ namespace Confuser.CLI
                     (int)now.Subtract(begin).TotalMinutes,
                     now.Subtract(begin).Seconds);
                 if (successful)
+                {
                     WriteLineWithColor(ConsoleColor.Green, "Finished " + timeString);
+                    ReturnValue = 0;
+                }
                 else
+                {
                     WriteLineWithColor(ConsoleColor.Red, "Failed " + timeString);
+                    ReturnValue = 1;
+                }
             }
         }
     }
