@@ -153,7 +153,7 @@ namespace Confuser.Core
         /// <param name="context">The working context.</param>
         /// <returns>Parsed rule patterns.</returns>
         /// <exception cref="System.ArgumentException">
-        /// One of the rules has invalid RegEx pattern.
+        /// One of the rules has invalid pattern.
         /// </exception>
         protected Rules ParseRules(ConfuserProject proj, ProjectModule module, ConfuserContext context)
         {

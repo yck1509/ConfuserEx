@@ -6,16 +6,22 @@ using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns
 {
-    class NotOperator : PatternOperator
+    /// <summary>
+    /// The NOT operator.
+    /// </summary>
+    public class NotOperator : PatternOperator
     {
-        public const string OpName = "not";
+        internal const string OpName = "not";
+        /// <inheritdoc/>
         public override string Name { get { return OpName; } }
 
+        /// <inheritdoc/>
         public override bool IsUnary { get { return true; } }
 
+        /// <inheritdoc/>
         public override object Evaluate(IDnlibDef definition)
         {
-            return !(bool)ArgumentA.Evaluate(definition);
+            return !(bool)OperandA.Evaluate(definition);
         }
     }
 }

@@ -6,13 +6,19 @@ using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns
 {
-    class ModuleFunction : PatternFunction
+    /// <summary>
+    /// A function that compare the module of definition.
+    /// </summary>
+    public class ModuleFunction : PatternFunction
     {
-        public const string FnName = "module";
+        internal const string FnName = "module";
+        /// <inheritdoc/>
         public override string Name { get { return FnName; } }
 
+        /// <inheritdoc/>
         public override int ArgumentCount { get { return 1; } }
 
+        /// <inheritdoc/>
         public override object Evaluate(IDnlibDef definition)
         {
             if (!(definition is IOwnerModule))

@@ -6,18 +6,24 @@ using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns
 {
-    class AndOperator : PatternOperator
+    /// <summary>
+    /// The AND operator.
+    /// </summary>
+    public class AndOperator : PatternOperator
     {
-        public const string OpName = "and";
+        internal const string OpName = "and";
+        /// <inheritdoc/>
         public override string Name { get { return OpName; } }
 
+        /// <inheritdoc/>
         public override bool IsUnary { get { return false; } }
 
+        /// <inheritdoc/>
         public override object Evaluate(IDnlibDef definition)
         {
-            bool a = (bool)ArgumentA.Evaluate(definition);
+            bool a = (bool)OperandA.Evaluate(definition);
             if (!a) return false;
-            return (bool)ArgumentB.Evaluate(definition);
+            return (bool)OperandB.Evaluate(definition);
         }
     }
 }

@@ -6,13 +6,19 @@ using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns
 {
-    class MemberTypeFunction : PatternFunction
+    /// <summary>
+    /// A function that compare the type of definition.
+    /// </summary>
+    public class MemberTypeFunction : PatternFunction
     {
-        public const string FnName = "member-type";
+        internal const string FnName = "member-type";
+        /// <inheritdoc/>
         public override string Name { get { return FnName; } }
 
+        /// <inheritdoc/>
         public override int ArgumentCount { get { return 1; } }
 
+        /// <inheritdoc/>
         public override object Evaluate(IDnlibDef definition)
         {
             object type = Arguments[0].Evaluate(definition);

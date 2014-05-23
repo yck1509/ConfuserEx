@@ -6,13 +6,19 @@ using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns
 {
-    class NamespaceFunction : PatternFunction
+    /// <summary>
+    /// A function that compare the namespace of definition.
+    /// </summary>
+    public class NamespaceFunction : PatternFunction
     {
-        public const string FnName = "namespace";
+        internal const string FnName = "namespace";
+        /// <inheritdoc/>
         public override string Name { get { return FnName; } }
 
+        /// <inheritdoc/>
         public override int ArgumentCount { get { return 1; } }
 
+        /// <inheritdoc/>
         public override object Evaluate(IDnlibDef definition)
         {
             if (!(definition is TypeDef) && !(definition is IMemberDef))
@@ -21,7 +27,7 @@ namespace Confuser.Core.Project.Patterns
             var type = definition as TypeDef;
             if (type == null)
                 type = ((IMemberDef)definition).DeclaringType;
-            return type.Namespace == ns.ToString();
+            return type != null && type.Namespace == ns.ToString();
         }
     }
 }

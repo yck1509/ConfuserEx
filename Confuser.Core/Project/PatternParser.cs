@@ -7,10 +7,21 @@ using System.Diagnostics;
 
 namespace Confuser.Core.Project
 {
+    /// <summary>
+    /// Parser of pattern expressions.
+    /// </summary>
     public class PatternParser
     {
         PatternTokenizer tokenizer = new PatternTokenizer();
 
+        /// <summary>
+        /// Parses the specified pattern into expression.
+        /// </summary>
+        /// <param name="pattern">The pattern to parse.</param>
+        /// <returns>The parsed expression.</returns>
+        /// <exception cref="InvalidPatternException">
+        /// The pattern is invalid.
+        /// </exception>
         public PatternExpression Parse(string pattern)
         {
             try
@@ -126,7 +137,7 @@ namespace Confuser.Core.Project
                         var op = ops[token.Value]();
                         if (!op.IsUnary)
                             throw UnexpectedToken(token);
-                        op.ArgumentA = ParseExpression();
+                        op.OperandA = ParseExpression();
                         ret = op;
                     }
                     else if (IsFunction(token))
@@ -192,8 +203,8 @@ namespace Confuser.Core.Project
                 var binOp = ops[binOpToken.Value]();
                 if (binOp.IsUnary)
                     throw UnexpectedToken(binOpToken);
-                binOp.ArgumentA = ret;
-                binOp.ArgumentB = ParseExpression();
+                binOp.OperandA = ret;
+                binOp.OperandB = ParseExpression();
                 ret = binOp;
 
                 peek = PeekToken();

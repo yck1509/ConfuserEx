@@ -7,39 +7,59 @@ using System.Text.RegularExpressions;
 
 namespace Confuser.Core.Project.Patterns
 {
-    class MatchFunction : PatternFunction
+    /// <summary>
+    /// A function that match the full name of the definition with specified RegEx.
+    /// </summary>
+    public class MatchFunction : PatternFunction
     {
-        public const string FnName = "match";
+        internal const string FnName = "match";
+        /// <inheritdoc/>
         public override string Name { get { return FnName; } }
 
+        /// <inheritdoc/>
         public override int ArgumentCount { get { return 1; } }
 
+        /// <inheritdoc/>
         public override object Evaluate(IDnlibDef definition)
         {
             var regex = Arguments[0].Evaluate(definition).ToString();
             return Regex.IsMatch(definition.FullName, regex);
         }
     }
-    class MatchNameFunction : PatternFunction
+
+    /// <summary>
+    /// A function that match the name of the definition with specified RegEx.
+    /// </summary>
+    public class MatchNameFunction : PatternFunction
     {
-        public const string FnName = "match-name";
+        internal const string FnName = "match-name";
+        /// <inheritdoc/>
         public override string Name { get { return FnName; } }
 
+        /// <inheritdoc/>
         public override int ArgumentCount { get { return 1; } }
 
+        /// <inheritdoc/>
         public override object Evaluate(IDnlibDef definition)
         {
             var regex = Arguments[0].Evaluate(definition).ToString();
             return Regex.IsMatch(definition.Name, regex);
         }
     }
-    class MatchTypeNameFunction : PatternFunction
+
+    /// <summary>
+    /// A function that match the name of declaring type with specified RegEx.
+    /// </summary>
+    public class MatchTypeNameFunction : PatternFunction
     {
-        public const string FnName = "match-type-name";
+        internal const string FnName = "match-type-name";
+        /// <inheritdoc/>
         public override string Name { get { return FnName; } }
 
+        /// <inheritdoc/>
         public override int ArgumentCount { get { return 1; } }
 
+        /// <inheritdoc/>
         public override object Evaluate(IDnlibDef definition)
         {
             if (definition is TypeDef)
@@ -47,7 +67,7 @@ namespace Confuser.Core.Project.Patterns
                 var regex = Arguments[0].Evaluate(definition).ToString();
                 return Regex.IsMatch(definition.Name, regex);
             }
-            else if (definition is IMemberDef)
+            else if (definition is IMemberDef && ((IMemberDef)definition).DeclaringType != null)
             {
                 var regex = Arguments[0].Evaluate(definition).ToString();
                 return Regex.IsMatch(((IMemberDef)definition).DeclaringType.Name, regex);
