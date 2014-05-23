@@ -54,12 +54,22 @@ namespace Confuser.Renamer
                 if (cancel)
                     continue;
 
-                def.Name = service.ObfuscateName(def.Name, mode);
                 if (def is TypeDef)
                 {
                     var typeDef = (TypeDef)def;
-                    typeDef.Namespace = service.ObfuscateName(typeDef.Namespace, mode);
+                    if (parameters.GetParameter<bool>(context, def, "flatten", true))
+                    {
+                        typeDef.Namespace = "";
+                        typeDef.Name = service.ObfuscateName(typeDef.FullName, mode);
+                    }
+                    else
+                    {
+                        typeDef.Namespace = service.ObfuscateName(typeDef.Namespace, mode);
+                        typeDef.Name = service.ObfuscateName(typeDef.Name, mode);
+                    }
                 }
+                else
+                    def.Name = service.ObfuscateName(def.Name, mode);
 
                 foreach (var refer in references.ToList())
                 {
