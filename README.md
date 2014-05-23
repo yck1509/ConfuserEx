@@ -6,11 +6,16 @@ It is the successor of [Confuser](http://confuser.codeplex.com) project.
 Features
 --------
 * Supports .NET Framework 2.0/3.0/3.5/4.0/4.5
-* Symbol renaming
+* Symbol renaming (Support WPF/BAML)
 * Protection against debuggers/profilers
 * Protection against memory dumping
+* Protection against tampering (method encryption)
 * Control flow obfuscation
+* Constant/resources encryption
 * Reference hiding proxies
+* Disable decompilers
+* Embedding dependency
+* Compressing output
 * Extensible plugin API
 * Many more are coming!
 

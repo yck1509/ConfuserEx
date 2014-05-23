@@ -1,33 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project baseDir="." outputDir="Confused" xmlns="http://confuser.codeplex.com">
-    <rule preset="none" pattern=".*">
-        <protection id="rename">
-            <argument name="mode" value="unicode" />
-        </protection>
-        <protection id="anti ildasm" />
+    <rule preset="none" pattern="true">
         <protection id="anti debug" />
-        <protection id="rename">
-            <argument name="mode" value="unicode" />
-        </protection>
-        <protection id="ref proxy" />
+        <protection id="anti dump" />
+        <protection id="anti ildasm" />
+        <protection id="anti tamper" />
+        <protection id="constants" />
         <protection id="ctrl flow" />
+        <protection id="invalid metadata" />
+        <protection id="ref proxy" />
+        <protection id="rename" />
+        <protection id="resources" />
     </rule>
-    <rule preset="none" pattern="PaintDotNet.Menus\..*Menu(|Item|Base)$">
+    <rule preset="none" pattern="namespace('PaintDotNet.Menus') and match-name('Menu(|Item|Base)$')">
         <protection id="rename" action="remove" />
     </rule>
-    <rule preset="none" pattern="PaintDotNet.Menus\..*Menu::menu.*$">
+    <rule preset="none" pattern="namespace('PaintDotNet.Menus') and match-type-name('Menu$') and match-name('^menu')">
         <protection id="rename" action="remove" />
     </rule>
-    <rule preset="none" pattern="PaintDotNet.Tools\..*Tool(|Base)$">
+    <rule preset="none" pattern="namespace('PaintDotNet.Tools') and match-name('Tool(|Base)$')">
         <protection id="rename" action="remove" />
     </rule>
-    <rule preset="none" pattern="PaintDotNet.IndirectUI\..*PropertyControl.*\(\)$">
+    <rule preset="none" pattern="namespace('PaintDotNet.IndirectUI') and match-type-name('PropertyControl') and (member-type('method') or member-type('property'))">
         <protection id="rename" action="remove" />
     </rule>
+    <module path="PaintDotNet.exe" />
     <module path="PaintDotNet.Base.dll" />
     <module path="PaintDotNet.Core.dll" />
     <module path="PaintDotNet.Data.dll" />
     <module path="PaintDotNet.Effects.dll" />
-    <module path="PaintDotNet.exe" />
+    <module path="PaintDotNet.Resources.dll" />
     <module path="PaintDotNet.SystemLayer.dll" />
 </project>

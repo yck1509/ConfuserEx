@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project baseDir="." outputDir="Confused" xmlns="http://confuser.codeplex.com">
-    <rule preset="none" pattern=".*">
-        <protection id="rename">
-            <argument name="mode" value="unicode" />
-        </protection>
-        <protection id="anti ildasm" />
+    <rule preset="none" pattern="true">
         <protection id="anti debug" />
-        <protection id="rename">
-            <argument name="mode" value="unicode" />
-        </protection>
-        <protection id="ref proxy" />
+        <protection id="anti dump" />
+        <protection id="anti ildasm" />
+        <protection id="anti tamper" />
+        <protection id="constants" />
         <protection id="ctrl flow" />
+        <protection id="invalid metadata" />
+        <protection id="ref proxy" />
+        <protection id="rename" />
+        <protection id="resources" />
     </rule>
     <module path="ICSharpCode.AvalonEdit.dll" />
     <module path="ICSharpCode.Decompiler.dll" />

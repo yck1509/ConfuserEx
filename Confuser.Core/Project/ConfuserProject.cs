@@ -223,11 +223,10 @@ namespace Confuser.Core.Project
     public class Rule : List<SettingItem<Protection>>
     {
         /// <summary>
-        /// Gets or sets the Regular Expression pattern that determine the target components of the rule.
+        /// Gets or sets the pattern that determine the target components of the rule.
         /// </summary>
-        /// <value>The RegEx pattern.</value>
+        /// <value>The pattern expression.</value>
         public string Pattern { get; set; }
-
 
         /// <summary>
         /// Gets or sets the protection preset this rule uses.

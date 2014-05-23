@@ -81,7 +81,7 @@ Indicates whether this rule inherits the settings from the previous rules.
 Default to `true`.
 
 `pattern`:  
-The RegEx pattern used to match the target components of this rule.
+The pattern expression used to match the target components of this rule.
 
 `preset`:  
 The protection preset of the rule.
@@ -117,28 +117,25 @@ Optional.
 
 Applying rules
 --------------
-The rules are applied from local to global, from begin to end.
-ConfuserEx will keep a list of protections for every components, and applies matching rules in order.
+The rules are applied from global rules (in `project` element) to local rules (in `module` element), from begin to end.
+ConfuserEx will keep a list of protections for every items, and applies the rules in order.
 
 For each rules, ConfuserEx will do:
 
-1. If the component does not match with the rule's pattern, skip the rule.
-2. If the rule does not inherit previous settings (i.e. no `inherit`), clear the current protection list.
-3. Fill the protection list with the protections contained in the specified `preset` value of the rule.
+1. If the item does not match with the rule's pattern, skip the rule.
+2. If the rule does not inherit previous settings (i.e. no `inherit`), clear the marking on the item.
+3. Mark the items with the protections contained in the specified `preset` value of the rule.
 4. For each protection settings in the rule:
-5. If `action` is remove, remove the protection from the list.
-6. If `action` is add, add the protection settings to the list.
+5. If `action` is remove, remove the protection from the marking.
+6. If `action` is add, add the protection settings to marking.
 
-The value of the component that used to match with rules' patterns is basically the full name provided by dnlib.
-Here's some examples:
+The pattern is a simple function-based expression that evaluated for every items. If it is evaluated to `true`, the item is matched with the pattern.
 
-Type: `Namespace.Type/NestedType`  
-Method: `System.Void Namespace.Type::Method<!!0,!!1>(System.String,System.Int32)`  
-Field: `System.String Namespace.Type::Field`  
-Property: `System.String Namespace.Type::Property`  
-Indexer: `System.String Namespace.Type::Items(System.Int32)`  
-Event: `System.EventHandler Namespace.Type::Event`
+Here are some example expressions:
+`true`: Matches all items.
+`name('X')`: Matches all items that has name 'X'.
+`member-type('type') and full-name('NS.Type')`: Matches types that have full name 'NS.Type'.
 
 Examples
 ----------------
-ConfuserEx projects that are working for ILSpy and PaintDotNet can be found under `additional` directory as examples.
+ConfuserEx projects that work for ILSpy and PaintDotNet can be found under `additional` directory as examples.
