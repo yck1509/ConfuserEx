@@ -51,6 +51,7 @@ namespace Confuser.Core.Project
             fns.Add(DeclTypeFunction.FnName, () => new DeclTypeFunction());
             fns.Add(NamespaceFunction.FnName, () => new NamespaceFunction());
             fns.Add(NameFunction.FnName, () => new NameFunction());
+            fns.Add(FullNameFunction.FnName, () => new FullNameFunction());
             fns.Add(MatchFunction.FnName, () => new MatchFunction());
             fns.Add(MatchNameFunction.FnName, () => new MatchNameFunction());
             fns.Add(MatchTypeNameFunction.FnName, () => new MatchTypeNameFunction());

@@ -159,7 +159,7 @@ namespace Confuser.Core
         {
             var ret = new Rules();
             var parser = new PatternParser();
-            foreach (var rule in module.Rules.Concat(proj.Rules))
+            foreach (var rule in proj.Rules.Concat(module.Rules))
             {
                 try
                 {

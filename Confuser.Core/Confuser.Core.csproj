@@ -79,6 +79,7 @@
     <Compile Include="Project\InvalidPatternException.cs" />
     <Compile Include="Project\PatternParser.cs" />
     <Compile Include="Project\Patterns\AndOperator.cs" />
+    <Compile Include="Project\Patterns\FullNameFunction.cs" />
     <Compile Include="Project\Patterns\NotOperator.cs" />
     <Compile Include="Project\Patterns\MemberTypeFunction.cs" />
     <Compile Include="Project\Patterns\DeclTypeFunction.cs" />
