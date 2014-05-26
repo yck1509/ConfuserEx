@@ -16,6 +16,8 @@ namespace Confuser.CLI
         {
             var original = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.White;
+            var originalTitle = Console.Title;
+            Console.Title = "ConfuserEx";
 
             try
             {
@@ -45,6 +47,7 @@ namespace Confuser.CLI
                 var logger = new ConsoleLogger();
                 parameters.Logger = new ConsoleLogger();
 
+                Console.Title = "ConfuserEx - Running...";
                 ConfuserEngine.Run(parameters).Wait();
 
                 if (NeedPause())
@@ -58,6 +61,7 @@ namespace Confuser.CLI
             finally
             {
                 Console.ForegroundColor = original;
+                Console.Title = originalTitle;
             }
         }
 
@@ -167,11 +171,13 @@ namespace Confuser.CLI
                     now.Subtract(begin).Seconds);
                 if (successful)
                 {
+                    Console.Title = "ConfuserEx - Success";
                     WriteLineWithColor(ConsoleColor.Green, "Finished " + timeString);
                     ReturnValue = 0;
                 }
                 else
                 {
+                    Console.Title = "ConfuserEx - Fail";
                     WriteLineWithColor(ConsoleColor.Red, "Failed " + timeString);
                     ReturnValue = 1;
                 }
