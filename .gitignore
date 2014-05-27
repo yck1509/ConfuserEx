@@ -34,3 +34,4 @@ packages/
 /Confuser.Test
 *.sln.*
 gh-pages/
+ConfuserEx.snk
