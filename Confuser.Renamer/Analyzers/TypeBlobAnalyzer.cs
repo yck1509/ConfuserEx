@@ -1,155 +1,134 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Confuser.Core;
-using dnlib.DotNet;
-using dnlib.DotNet.MD;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using Confuser.Core;
 using Confuser.Renamer.References;
+using dnlib.DotNet;
+using dnlib.DotNet.Emit;
+using dnlib.DotNet.MD;
 
-namespace Confuser.Renamer.Analyzers
-{
-    class TypeBlobAnalyzer : IRenamer
-    {
-        public void Analyze(ConfuserContext context, INameService service, IDnlibDef def)
-        {
-            ModuleDefMD module = def as ModuleDefMD;
-            if (module == null) return;
+namespace Confuser.Renamer.Analyzers {
+	internal class TypeBlobAnalyzer : IRenamer {
+		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
+			var module = def as ModuleDefMD;
+			if (module == null) return;
 
-            MDTable table;
-            uint len;
+			MDTable table;
+			uint len;
 
-            // MemberRef
-            table = module.TablesStream.Get(Table.Method);
-            len = table.Rows;
-            var methods = Enumerable.Range(1, (int)len)
-                .Select(rid => module.ResolveMethod((uint)rid));
-            foreach (var method in methods)
-            {
-                foreach (var methodImpl in method.Overrides)
-                {
-                    if (methodImpl.MethodBody is MemberRef)
-                        AnalyzeMemberRef(context, service, (MemberRef)methodImpl.MethodBody);
-                    if (methodImpl.MethodDeclaration is MemberRef)
-                        AnalyzeMemberRef(context, service, (MemberRef)methodImpl.MethodDeclaration);
-                }
-                if (!method.HasBody)
-                    continue;
-                foreach (var instr in method.Body.Instructions)
-                {
-                    if (instr.Operand is MemberRef)
-                        AnalyzeMemberRef(context, service, (MemberRef)instr.Operand);
-                    else if (instr.Operand is MethodSpec)
-                    {
-                        MethodSpec spec = (MethodSpec)instr.Operand;
-                        if (spec.Method is MemberRef)
-                            AnalyzeMemberRef(context, service, (MemberRef)spec.Method);
-                    }
-                }
-            }
+			// MemberRef
+			table = module.TablesStream.Get(Table.Method);
+			len = table.Rows;
+			IEnumerable<MethodDef> methods = Enumerable.Range(1, (int) len)
+			                                           .Select(rid => module.ResolveMethod((uint) rid));
+			foreach (MethodDef method in methods) {
+				foreach (MethodOverride methodImpl in method.Overrides) {
+					if (methodImpl.MethodBody is MemberRef)
+						AnalyzeMemberRef(context, service, (MemberRef) methodImpl.MethodBody);
+					if (methodImpl.MethodDeclaration is MemberRef)
+						AnalyzeMemberRef(context, service, (MemberRef) methodImpl.MethodDeclaration);
+				}
+				if (!method.HasBody)
+					continue;
+				foreach (Instruction instr in method.Body.Instructions) {
+					if (instr.Operand is MemberRef)
+						AnalyzeMemberRef(context, service, (MemberRef) instr.Operand);
+					else if (instr.Operand is MethodSpec) {
+						var spec = (MethodSpec) instr.Operand;
+						if (spec.Method is MemberRef)
+							AnalyzeMemberRef(context, service, (MemberRef) spec.Method);
+					}
+				}
+			}
 
 
-            // CustomAttribute
-            table = module.TablesStream.Get(Table.CustomAttribute);
-            len = table.Rows;
-            var attrs = Enumerable.Range(1, (int)len)
-                .Select(rid => module.ResolveHasCustomAttribute(module.TablesStream.ReadCustomAttributeRow((uint)rid).Parent))
-                .Distinct()
-                .SelectMany(owner => owner.CustomAttributes);
-            foreach (var attr in attrs)
-            {
-                if (attr.Constructor is MemberRef)
-                    AnalyzeMemberRef(context, service, (MemberRef)attr.Constructor);
+			// CustomAttribute
+			table = module.TablesStream.Get(Table.CustomAttribute);
+			len = table.Rows;
+			IEnumerable<CustomAttribute> attrs = Enumerable.Range(1, (int) len)
+			                                               .Select(rid => module.ResolveHasCustomAttribute(module.TablesStream.ReadCustomAttributeRow((uint) rid).Parent))
+			                                               .Distinct()
+			                                               .SelectMany(owner => owner.CustomAttributes);
+			foreach (CustomAttribute attr in attrs) {
+				if (attr.Constructor is MemberRef)
+					AnalyzeMemberRef(context, service, (MemberRef) attr.Constructor);
 
-                foreach (var arg in attr.ConstructorArguments)
-                    AnalyzeCAArgument(context, service, arg);
+				foreach (CAArgument arg in attr.ConstructorArguments)
+					AnalyzeCAArgument(context, service, arg);
 
-                foreach (var arg in attr.Fields)
-                    AnalyzeCAArgument(context, service, arg.Argument);
+				foreach (CANamedArgument arg in attr.Fields)
+					AnalyzeCAArgument(context, service, arg.Argument);
 
-                foreach (var arg in attr.Properties)
-                    AnalyzeCAArgument(context, service, arg.Argument);
+				foreach (CANamedArgument arg in attr.Properties)
+					AnalyzeCAArgument(context, service, arg.Argument);
 
-                TypeDef attrType = attr.AttributeType.ResolveTypeDefThrow();
-                if (!context.Modules.Contains((ModuleDefMD)attrType.Module))
-                    continue;
+				TypeDef attrType = attr.AttributeType.ResolveTypeDefThrow();
+				if (!context.Modules.Contains((ModuleDefMD) attrType.Module))
+					continue;
 
-                foreach (var fieldArg in attr.Fields)
-                {
-                    FieldDef field = attrType.FindField(fieldArg.Name, new FieldSig(fieldArg.Type));
-                    service.AddReference(field, new CAMemberReference(fieldArg, field));
-                }
-                foreach (var propertyArg in attr.Properties)
-                {
-                    PropertyDef property = attrType.FindProperty(propertyArg.Name, new PropertySig(true, propertyArg.Type));
-                    service.AddReference(property, new CAMemberReference(propertyArg, property));
-                }
-            }
-        }
+				foreach (CANamedArgument fieldArg in attr.Fields) {
+					FieldDef field = attrType.FindField(fieldArg.Name, new FieldSig(fieldArg.Type));
+					service.AddReference(field, new CAMemberReference(fieldArg, field));
+				}
+				foreach (CANamedArgument propertyArg in attr.Properties) {
+					PropertyDef property = attrType.FindProperty(propertyArg.Name, new PropertySig(true, propertyArg.Type));
+					service.AddReference(property, new CAMemberReference(propertyArg, property));
+				}
+			}
+		}
 
-        void AnalyzeCAArgument(ConfuserContext context, INameService service, CAArgument arg)
-        {
-            if (arg.Type.DefinitionAssembly.IsCorLib() && arg.Type.FullName == "System.Type")
-            {
-                TypeSig typeSig = (TypeSig)arg.Value;
-                foreach (var typeRef in typeSig.FindTypeRefs())
-                {
-                    TypeDef typeDef = typeRef.ResolveTypeDefThrow();
-                    if (context.Modules.Contains((ModuleDefMD)typeDef.Module))
-                    {
-                        if (typeRef is TypeRef)
-                            service.AddReference(typeDef, new TypeRefReference((TypeRef)typeRef, typeDef));
-                        service.ReduceRenameMode(typeDef, RenameMode.ASCII);
-                    }
-                }
-            }
-            else if (arg.Value is CAArgument[])
-            {
-                foreach (var elem in (CAArgument[])arg.Value)
-                    AnalyzeCAArgument(context, service, elem);
-            }
-        }
+		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
+			//
+		}
 
-        void AnalyzeMemberRef(ConfuserContext context, INameService service, MemberRef memberRef)
-        {
-            var declType = memberRef.DeclaringType;
-            TypeSpec typeSpec = declType as TypeSpec;
-            if (typeSpec == null)
-                return;
+		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
+			//
+		}
 
-            TypeSig sig = typeSpec.TypeSig;
-            while (sig.Next != null)
-                sig = sig.Next;
+		private void AnalyzeCAArgument(ConfuserContext context, INameService service, CAArgument arg) {
+			if (arg.Type.DefinitionAssembly.IsCorLib() && arg.Type.FullName == "System.Type") {
+				var typeSig = (TypeSig) arg.Value;
+				foreach (ITypeDefOrRef typeRef in typeSig.FindTypeRefs()) {
+					TypeDef typeDef = typeRef.ResolveTypeDefThrow();
+					if (context.Modules.Contains((ModuleDefMD) typeDef.Module)) {
+						if (typeRef is TypeRef)
+							service.AddReference(typeDef, new TypeRefReference((TypeRef) typeRef, typeDef));
+						service.ReduceRenameMode(typeDef, RenameMode.ASCII);
+					}
+				}
+			}
+			else if (arg.Value is CAArgument[]) {
+				foreach (CAArgument elem in (CAArgument[]) arg.Value)
+					AnalyzeCAArgument(context, service, elem);
+			}
+		}
+
+		private void AnalyzeMemberRef(ConfuserContext context, INameService service, MemberRef memberRef) {
+			ITypeDefOrRef declType = memberRef.DeclaringType;
+			var typeSpec = declType as TypeSpec;
+			if (typeSpec == null)
+				return;
+
+			TypeSig sig = typeSpec.TypeSig;
+			while (sig.Next != null)
+				sig = sig.Next;
 
 
-            Debug.Assert(sig is TypeDefOrRefSig || sig is GenericInstSig);
-            if (sig is GenericInstSig)
-            {
-                GenericInstSig inst = (GenericInstSig)sig;
-                Debug.Assert(!(inst.GenericType.TypeDefOrRef is TypeSpec));
-                TypeDef openType = inst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
-                if (!context.Modules.Contains((ModuleDefMD)openType.Module))
-                    return;
+			Debug.Assert(sig is TypeDefOrRefSig || sig is GenericInstSig);
+			if (sig is GenericInstSig) {
+				var inst = (GenericInstSig) sig;
+				Debug.Assert(!(inst.GenericType.TypeDefOrRef is TypeSpec));
+				TypeDef openType = inst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
+				if (!context.Modules.Contains((ModuleDefMD) openType.Module))
+					return;
 
-                IDnlibDef member;
-                if (memberRef.IsFieldRef) member = memberRef.ResolveFieldThrow();
-                else if (memberRef.IsMethodRef) member = memberRef.ResolveMethodThrow();
-                else throw new UnreachableException();
+				IDnlibDef member;
+				if (memberRef.IsFieldRef) member = memberRef.ResolveFieldThrow();
+				else if (memberRef.IsMethodRef) member = memberRef.ResolveMethodThrow();
+				else throw new UnreachableException();
 
-                service.AddReference(member, new MemberRefReference(memberRef, member));
-            }
-
-        }
-
-        public void PreRename(ConfuserContext context, INameService service, IDnlibDef def)
-        {
-            //
-        }
-
-        public void PostRename(ConfuserContext context, INameService service, IDnlibDef def)
-        {
-            //
-        }
-    }
+				service.AddReference(member, new MemberRefReference(memberRef, member));
+			}
+		}
+	}
 }

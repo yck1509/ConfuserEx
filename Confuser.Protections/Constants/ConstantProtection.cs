@@ -1,66 +1,50 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Confuser.Core;
+﻿using Confuser.Core;
 using Confuser.Protections.Constants;
 using dnlib.DotNet;
 
-namespace Confuser.Protections
-{
-    public interface IConstantService
-    {
-        void ExcludeMethod(ConfuserContext context, MethodDef method);
-    }
+namespace Confuser.Protections {
+	public interface IConstantService {
+		void ExcludeMethod(ConfuserContext context, MethodDef method);
+	}
 
-    [BeforeProtection("Ki.ControlFlow"), AfterProtection("Ki.RefProxy")]
-    class ConstantProtection : Protection, IConstantService
-    {
-        public const string _Id = "constants";
-        public const string _FullId = "Ki.Constants";
-        public const string _ServiceId = "Ki.Constants";
+	[BeforeProtection("Ki.ControlFlow"), AfterProtection("Ki.RefProxy")]
+	internal class ConstantProtection : Protection, IConstantService {
+		public const string _Id = "constants";
+		public const string _FullId = "Ki.Constants";
+		public const string _ServiceId = "Ki.Constants";
+		internal static readonly object ContextKey = new object();
 
-        protected override void Initialize(ConfuserContext context)
-        {
-            context.Registry.RegisterService(_ServiceId, typeof(IConstantService), this);
-        }
+		public override string Name {
+			get { return "Constants Protection"; }
+		}
 
-        protected override void PopulatePipeline(ProtectionPipeline pipeline)
-        {
-            pipeline.InsertPostStage(PipelineStage.BeginModule, new InjectPhase(this));
-            pipeline.InsertPreStage(PipelineStage.OptimizeMethods, new EncodePhase(this));
-        }
+		public override string Description {
+			get { return "This protection encodes and compresses constants in the code."; }
+		}
 
-        public override string Name
-        {
-            get { return "Constants Protection"; }
-        }
+		public override string Id {
+			get { return _Id; }
+		}
 
-        public override string Description
-        {
-            get { return "This protection encodes and compresses constants in the code."; }
-        }
+		public override string FullId {
+			get { return _FullId; }
+		}
 
-        public override string Id
-        {
-            get { return _Id; }
-        }
+		public override ProtectionPreset Preset {
+			get { return ProtectionPreset.Normal; }
+		}
 
-        public override string FullId
-        {
-            get { return _FullId; }
-        }
+		public void ExcludeMethod(ConfuserContext context, MethodDef method) {
+			ProtectionParameters.GetParameters(context, method).Remove(this);
+		}
 
-        public override ProtectionPreset Preset
-        {
-            get { return ProtectionPreset.Normal; }
-        }
+		protected override void Initialize(ConfuserContext context) {
+			context.Registry.RegisterService(_ServiceId, typeof (IConstantService), this);
+		}
 
-        internal static readonly object ContextKey = new object();
-
-        public void ExcludeMethod(ConfuserContext context, MethodDef method)
-        {
-            ProtectionParameters.GetParameters(context, method).Remove(this);
-        }
-    }
+		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
+			pipeline.InsertPostStage(PipelineStage.BeginModule, new InjectPhase(this));
+			pipeline.InsertPreStage(PipelineStage.OptimizeMethods, new EncodePhase(this));
+		}
+	}
 }

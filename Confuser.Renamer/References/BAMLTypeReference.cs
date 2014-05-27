@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using dnlib.DotNet;
+﻿using Confuser.Core;
 using Confuser.Renamer.BAML;
-using Confuser.Core;
+using dnlib.DotNet;
 
-namespace Confuser.Renamer.References
-{
-    class BAMLTypeReference : INameReference<TypeDef>
-    {
-        TypeSig sig;
-        TypeInfoRecord rec;
-        public BAMLTypeReference(TypeSig sig, TypeInfoRecord rec)
-        {
-            this.sig = sig;
-            this.rec = rec;
-        }
+namespace Confuser.Renamer.References {
+	internal class BAMLTypeReference : INameReference<TypeDef> {
+		private readonly TypeInfoRecord rec;
+		private readonly TypeSig sig;
 
-        public bool UpdateNameReference(ConfuserContext context, INameService service)
-        {
-            rec.TypeFullName = sig.ReflectionFullName;
-            return true;
-        }
+		public BAMLTypeReference(TypeSig sig, TypeInfoRecord rec) {
+			this.sig = sig;
+			this.rec = rec;
+		}
 
-        public bool ShouldCancelRename()
-        {
-            return false;
-        }
-    }
+		public bool UpdateNameReference(ConfuserContext context, INameService service) {
+			rec.TypeFullName = sig.ReflectionFullName;
+			return true;
+		}
+
+		public bool ShouldCancelRename() {
+			return false;
+		}
+	}
 }

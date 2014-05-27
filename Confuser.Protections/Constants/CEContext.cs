@@ -1,44 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Confuser.Core.Services;
+﻿using System.Collections.Generic;
 using Confuser.Core;
-using dnlib.DotNet;
+using Confuser.Core.Services;
 using Confuser.DynCipher;
 using Confuser.Renamer;
+using dnlib.DotNet;
 
-namespace Confuser.Protections.Constants
-{
-    class CEContext
-    {
-        public RandomGenerator Random;
-        public ConfuserContext Context;
-        public ModuleDef Module;
-        public IMarkerService Marker;
-        public IDynCipherService DynCipher;
-        public INameService Name;
+namespace Confuser.Protections.Constants {
+	internal class CEContext {
+		public FieldDef BufferField;
+		public ConfuserContext Context;
+		public FieldDef DataField;
+		public TypeDef DataType;
+		public int DecoderCount;
+		public List<Tuple<MethodDef, DecoderDesc>> Decoders;
+		public IDynCipherService DynCipher;
+		public EncodeElements Elements;
+		public List<uint> EncodedBuffer;
+		public MethodDef InitMethod;
+		public IMarkerService Marker;
 
-        public FieldDef BufferField;
-        public FieldDef DataField;
-        public TypeDef DataType;
-        public MethodDef InitMethod;
+		public Mode Mode;
 
-        public Mode Mode;
-        public EncodeElements Elements;
-        public int DecoderCount;
+		public IEncodeMode ModeHandler;
+		public ModuleDef Module;
+		public INameService Name;
+		public RandomGenerator Random;
+	}
 
-        public IEncodeMode ModeHandler;
-
-        public List<uint> EncodedBuffer;
-        public List<Tuple<MethodDef, DecoderDesc>> Decoders;
-    }
-
-    class DecoderDesc
-    {
-        public byte StringID;
-        public byte NumberID;
-        public byte InitializerID;
-        public object Data;
-    }
+	internal class DecoderDesc {
+		public object Data;
+		public byte InitializerID;
+		public byte NumberID;
+		public byte StringID;
+	}
 }

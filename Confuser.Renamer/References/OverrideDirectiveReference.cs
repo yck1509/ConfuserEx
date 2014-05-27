@@ -1,56 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using dnlib.DotNet;
+﻿using System.Linq;
 using Confuser.Core;
-using System.Diagnostics;
+using dnlib.DotNet;
 
-namespace Confuser.Renamer.References
-{
-    class OverrideDirectiveReference : INameReference<MethodDef>
-    {
-        VTableSlot thisSlot;
-        VTableSlot baseSlot;
-        public OverrideDirectiveReference(VTableSlot thisSlot, VTableSlot baseSlot)
-        {
-            this.thisSlot = thisSlot;
-            this.baseSlot = baseSlot;
-        }
+namespace Confuser.Renamer.References {
+	internal class OverrideDirectiveReference : INameReference<MethodDef> {
+		private readonly VTableSlot baseSlot;
+		private readonly VTableSlot thisSlot;
 
-        public bool UpdateNameReference(ConfuserContext context, INameService service)
-        {
-            var method = thisSlot.MethodDef;
+		public OverrideDirectiveReference(VTableSlot thisSlot, VTableSlot baseSlot) {
+			this.thisSlot = thisSlot;
+			this.baseSlot = baseSlot;
+		}
 
-            IMethodDefOrRef target;
-            if (baseSlot.DeclaringType is GenericInstSig)
-            {
-                var declType = (GenericInstSig)baseSlot.DeclaringType;
-                target = new MemberRefUser(method.Module, baseSlot.MethodDef.Name, baseSlot.MethodDef.MethodSig, declType.ToTypeDefOrRef());
-                target = (IMethodDefOrRef)new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(target);
-            }
-            else
-            {
-                target = baseSlot.MethodDef;
-                if (target.Module != method.Module)
-                    target = (IMethodDefOrRef)new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(baseSlot.MethodDef);
-            }
-            if(target is MemberRef)
-                service.AddReference(baseSlot.MethodDef, new MemberRefReference((MemberRef)target, baseSlot.MethodDef));
+		public bool UpdateNameReference(ConfuserContext context, INameService service) {
+			MethodDef method = thisSlot.MethodDef;
 
-            if (method.Overrides.Any(impl =>
-                new SigComparer().Equals(impl.MethodDeclaration.MethodSig, target.MethodSig) &&
-                new SigComparer().Equals(impl.MethodDeclaration.DeclaringType.ResolveTypeDef(), target.DeclaringType.ResolveTypeDef())))
-                return true;
+			IMethodDefOrRef target;
+			if (baseSlot.DeclaringType is GenericInstSig) {
+				var declType = (GenericInstSig) baseSlot.DeclaringType;
+				target = new MemberRefUser(method.Module, baseSlot.MethodDef.Name, baseSlot.MethodDef.MethodSig, declType.ToTypeDefOrRef());
+				target = (IMethodDefOrRef) new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(target);
+			}
+			else {
+				target = baseSlot.MethodDef;
+				if (target.Module != method.Module)
+					target = (IMethodDefOrRef) new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(baseSlot.MethodDef);
+			}
+			if (target is MemberRef)
+				service.AddReference(baseSlot.MethodDef, new MemberRefReference((MemberRef) target, baseSlot.MethodDef));
 
-            method.Overrides.Add(new MethodOverride(method, target));
+			if (method.Overrides.Any(impl =>
+			                         new SigComparer().Equals(impl.MethodDeclaration.MethodSig, target.MethodSig) &&
+			                         new SigComparer().Equals(impl.MethodDeclaration.DeclaringType.ResolveTypeDef(), target.DeclaringType.ResolveTypeDef())))
+				return true;
 
-            return true;
-        }
+			method.Overrides.Add(new MethodOverride(method, target));
 
-        public bool ShouldCancelRename()
-        {
-            return false;
-        }
-    }
+			return true;
+		}
+
+		public bool ShouldCancelRename() {
+			return false;
+		}
+	}
 }

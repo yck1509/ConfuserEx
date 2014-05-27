@@ -1,41 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using dnlib.DotNet;
+﻿using Confuser.Core;
 using Confuser.Renamer.BAML;
-using Confuser.Core;
+using dnlib.DotNet;
 
-namespace Confuser.Renamer.References
-{
-    class BAMLAttributeReference : INameReference<IDnlibDef>
-    {
-        IDnlibDef member;
-        AttributeInfoRecord attrRec;
-        PropertyRecord propRec;
-        public BAMLAttributeReference(IDnlibDef member, AttributeInfoRecord rec)
-        {
-            this.member = member;
-            this.attrRec = rec;
-        }
-        public BAMLAttributeReference(IDnlibDef member, PropertyRecord rec)
-        {
-            this.member = member;
-            this.propRec = rec;
-        }
+namespace Confuser.Renamer.References {
+	internal class BAMLAttributeReference : INameReference<IDnlibDef> {
+		private readonly AttributeInfoRecord attrRec;
+		private readonly IDnlibDef member;
+		private readonly PropertyRecord propRec;
 
-        public bool UpdateNameReference(ConfuserContext context, INameService service)
-        {
-            if (attrRec != null)
-                attrRec.Name = member.Name;
-            else
-                propRec.Value = member.Name;
-            return true;
-        }
+		public BAMLAttributeReference(IDnlibDef member, AttributeInfoRecord rec) {
+			this.member = member;
+			attrRec = rec;
+		}
 
-        public bool ShouldCancelRename()
-        {
-            return false;
-        }
-    }
+		public BAMLAttributeReference(IDnlibDef member, PropertyRecord rec) {
+			this.member = member;
+			propRec = rec;
+		}
+
+		public bool UpdateNameReference(ConfuserContext context, INameService service) {
+			if (attrRec != null)
+				attrRec.Name = member.Name;
+			else
+				propRec.Value = member.Name;
+			return true;
+		}
+
+		public bool ShouldCancelRename() {
+			return false;
+		}
+	}
 }

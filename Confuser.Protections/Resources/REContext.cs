@@ -1,30 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Confuser.Core;
 using Confuser.Core.Services;
-using Confuser.Core;
-using dnlib.DotNet;
 using Confuser.DynCipher;
 using Confuser.Renamer;
+using dnlib.DotNet;
 
-namespace Confuser.Protections.Resources
-{
-    class REContext
-    {
-        public RandomGenerator Random;
-        public ConfuserContext Context;
-        public ModuleDef Module;
-        public IMarkerService Marker;
-        public IDynCipherService DynCipher;
-        public INameService Name;
+namespace Confuser.Protections.Resources {
+	internal class REContext {
+		public ConfuserContext Context;
 
-        public FieldDef DataField;
-        public TypeDef DataType;
-        public MethodDef InitMethod;
+		public FieldDef DataField;
+		public TypeDef DataType;
+		public IDynCipherService DynCipher;
+		public MethodDef InitMethod;
+		public IMarkerService Marker;
 
-        public Mode Mode;
+		public Mode Mode;
 
-        public IEncodeMode ModeHandler;
-    }
+		public IEncodeMode ModeHandler;
+		public ModuleDef Module;
+		public INameService Name;
+		public RandomGenerator Random;
+	}
 }

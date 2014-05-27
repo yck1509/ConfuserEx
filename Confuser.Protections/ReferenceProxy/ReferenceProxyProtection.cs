@@ -1,64 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Confuser.Core;
-using dnlib.DotNet;
+﻿using Confuser.Core;
 using Confuser.Protections.ReferenceProxy;
+using dnlib.DotNet;
 
-namespace Confuser.Protections
-{
-    public interface IReferenceProxyService
-    {
-        void ExcludeMethod(ConfuserContext context, MethodDef method);
-    }
+namespace Confuser.Protections {
+	public interface IReferenceProxyService {
+		void ExcludeMethod(ConfuserContext context, MethodDef method);
+	}
 
-    [AfterProtection("Ki.AntiDebug", "Ki.AntiDump")]
-    [BeforeProtection("Ki.ControlFlow")]
-    class ReferenceProxyProtection : Protection, IReferenceProxyService
-    {
-        public const string _Id = "ref proxy";
-        public const string _FullId = "Ki.RefProxy";
-        public const string _ServiceId = "Ki.RefProxy";
+	[AfterProtection("Ki.AntiDebug", "Ki.AntiDump")]
+	[BeforeProtection("Ki.ControlFlow")]
+	internal class ReferenceProxyProtection : Protection, IReferenceProxyService {
+		public const string _Id = "ref proxy";
+		public const string _FullId = "Ki.RefProxy";
+		public const string _ServiceId = "Ki.RefProxy";
 
-        protected override void Initialize(ConfuserContext context)
-        {
-            context.Registry.RegisterService(_ServiceId, typeof(IReferenceProxyService), this);
-        }
+		public override string Name {
+			get { return "Reference Proxy Protection"; }
+		}
 
-        protected override void PopulatePipeline(ProtectionPipeline pipeline)
-        {
-            pipeline.InsertPostStage(PipelineStage.BeginModule, new ReferenceProxyPhase(this));
-        }
+		public override string Description {
+			get { return "This protection encodes and hides references to type/method/fields."; }
+		}
 
-        public override string Name
-        {
-            get { return "Reference Proxy Protection"; }
-        }
+		public override string Id {
+			get { return _Id; }
+		}
 
-        public override string Description
-        {
-            get { return "This protection encodes and hides references to type/method/fields."; }
-        }
+		public override string FullId {
+			get { return _FullId; }
+		}
 
-        public override string Id
-        {
-            get { return _Id; }
-        }
+		public override ProtectionPreset Preset {
+			get { return ProtectionPreset.Normal; }
+		}
 
-        public override string FullId
-        {
-            get { return _FullId; }
-        }
+		public void ExcludeMethod(ConfuserContext context, MethodDef method) {
+			ProtectionParameters.GetParameters(context, method).Remove(this);
+		}
 
-        public override ProtectionPreset Preset
-        {
-            get { return ProtectionPreset.Normal; }
-        }
+		protected override void Initialize(ConfuserContext context) {
+			context.Registry.RegisterService(_ServiceId, typeof (IReferenceProxyService), this);
+		}
 
-        public void ExcludeMethod(ConfuserContext context, MethodDef method)
-        {
-            ProtectionParameters.GetParameters(context, method).Remove(this);
-        }
-    }
+		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
+			pipeline.InsertPostStage(PipelineStage.BeginModule, new ReferenceProxyPhase(this));
+		}
+	}
 }

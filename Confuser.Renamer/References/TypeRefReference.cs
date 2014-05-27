@@ -1,32 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Confuser.Core;
 using dnlib.DotNet;
-using Confuser.Core;
 
-namespace Confuser.Renamer.References
-{
-    public class TypeRefReference : INameReference<TypeDef>
-    {
-        TypeRef typeRef;
-        TypeDef typeDef;
-        public TypeRefReference(TypeRef typeRef, TypeDef typeDef)
-        {
-            this.typeRef = typeRef;
-            this.typeDef = typeDef;
-        }
+namespace Confuser.Renamer.References {
+	public class TypeRefReference : INameReference<TypeDef> {
+		private readonly TypeDef typeDef;
+		private readonly TypeRef typeRef;
 
-        public bool UpdateNameReference(ConfuserContext context, INameService service)
-        {
-            typeRef.Namespace = typeDef.Namespace;
-            typeRef.Name = typeDef.Name;
-            return true;
-        }
+		public TypeRefReference(TypeRef typeRef, TypeDef typeDef) {
+			this.typeRef = typeRef;
+			this.typeDef = typeDef;
+		}
 
-        public bool ShouldCancelRename()
-        {
-            return false;
-        }
-    }
+		public bool UpdateNameReference(ConfuserContext context, INameService service) {
+			typeRef.Namespace = typeDef.Namespace;
+			typeRef.Name = typeDef.Name;
+			return true;
+		}
+
+		public bool ShouldCancelRename() {
+			return false;
+		}
+	}
 }

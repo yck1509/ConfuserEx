@@ -1,31 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Confuser.Core;
 using dnlib.DotNet;
-using Confuser.Core;
 
-namespace Confuser.Renamer.References
-{
-    class CAMemberReference : INameReference<IDnlibDef>
-    {
-        CANamedArgument namedArg;
-        IDnlibDef definition;
-        public CAMemberReference(CANamedArgument namedArg, IDnlibDef definition)
-        {
-            this.namedArg = namedArg;
-            this.definition = definition;
-        }
+namespace Confuser.Renamer.References {
+	internal class CAMemberReference : INameReference<IDnlibDef> {
+		private readonly IDnlibDef definition;
+		private readonly CANamedArgument namedArg;
 
-        public bool UpdateNameReference(ConfuserContext context, INameService service)
-        {
-            namedArg.Name = definition.Name;
-            return true;
-        }
+		public CAMemberReference(CANamedArgument namedArg, IDnlibDef definition) {
+			this.namedArg = namedArg;
+			this.definition = definition;
+		}
 
-        public bool ShouldCancelRename()
-        {
-            return false;
-        }
-    }
+		public bool UpdateNameReference(ConfuserContext context, INameService service) {
+			namedArg.Name = definition.Name;
+			return true;
+		}
+
+		public bool ShouldCancelRename() {
+			return false;
+		}
+	}
 }

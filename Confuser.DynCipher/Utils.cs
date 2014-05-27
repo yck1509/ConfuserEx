@@ -1,55 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using Confuser.DynCipher.Generation;
-using System.IO;
-using Confuser.DynCipher.AST;
-using Confuser.Core.Services;
 
-namespace Confuser.DynCipher
-{
-    public static class MathsUtils
-    {
-        const ulong MODULO32 = 0x100000000;
-        public static ulong modInv(ulong num, ulong mod)
-        {
-            ulong a = mod, b = num % mod;
-            ulong p0 = 0, p1 = 1;
-            while (b != 0)
-            {
-                if (b == 1) return p1;
-                p0 += (a / b) * p1;
-                a = a % b;
+namespace Confuser.DynCipher {
+	public static class MathsUtils {
+		private const ulong MODULO32 = 0x100000000;
 
-                if (a == 0) break;
-                if (a == 1) return mod - p0;
+		public static ulong modInv(ulong num, ulong mod) {
+			ulong a = mod, b = num % mod;
+			ulong p0 = 0, p1 = 1;
+			while (b != 0) {
+				if (b == 1) return p1;
+				p0 += (a / b) * p1;
+				a = a % b;
 
-                p1 += (b / a) * p0;
-                b = b % a;
-            }
-            return 0;
-        }
+				if (a == 0) break;
+				if (a == 1) return mod - p0;
 
-        public static uint modInv(uint num)
-        {
-            return (uint)modInv(num, MODULO32);
-        }
+				p1 += (b / a) * p0;
+				b = b % a;
+			}
+			return 0;
+		}
 
-        public static byte modInv(byte num)
-        {
-            return (byte)modInv(num, 0x100);
-        }
-    }
+		public static uint modInv(uint num) {
+			return (uint) modInv(num, MODULO32);
+		}
 
-    public static class CodeGenUtils
-    {
-        public static byte[] AssembleCode(x86CodeGen codeGen, x86Register reg)
-        {
-            MemoryStream stream = new MemoryStream();
-            using (BinaryWriter writer = new BinaryWriter(stream))
-            {
-                /* 
+		public static byte modInv(byte num) {
+			return (byte) modInv(num, 0x100);
+		}
+	}
+
+	public static class CodeGenUtils {
+		public static byte[] AssembleCode(x86CodeGen codeGen, x86Register reg) {
+			var stream = new MemoryStream();
+			using (var writer = new BinaryWriter(stream)) {
+				/* 
                  *      mov eax, esp
                  *      push ebx
                  *      push edi
@@ -68,30 +54,30 @@ namespace Confuser.DynCipher
                  *      pop ret
                  *      
                  */
-                writer.Write(new byte[] { 0x89, 0xe0 });
-                writer.Write(new byte[] { 0x53 });
-                writer.Write(new byte[] { 0x57 });
-                writer.Write(new byte[] { 0x56 });
-                writer.Write(new byte[] { 0x29, 0xe0 });
-                writer.Write(new byte[] { 0x83, 0xf8, 0x18 });
-                writer.Write(new byte[] { 0x74, 0x07 });
-                writer.Write(new byte[] { 0x8b, 0x44, 0x24, 0x10 });
-                writer.Write(new byte[] { 0x50 });
-                writer.Write(new byte[] { 0xeb, 0x01 });
-                writer.Write(new byte[] { 0x51 });
+				writer.Write(new byte[] { 0x89, 0xe0 });
+				writer.Write(new byte[] { 0x53 });
+				writer.Write(new byte[] { 0x57 });
+				writer.Write(new byte[] { 0x56 });
+				writer.Write(new byte[] { 0x29, 0xe0 });
+				writer.Write(new byte[] { 0x83, 0xf8, 0x18 });
+				writer.Write(new byte[] { 0x74, 0x07 });
+				writer.Write(new byte[] { 0x8b, 0x44, 0x24, 0x10 });
+				writer.Write(new byte[] { 0x50 });
+				writer.Write(new byte[] { 0xeb, 0x01 });
+				writer.Write(new byte[] { 0x51 });
 
-                foreach (var i in codeGen.Instructions)
-                    writer.Write(i.Assemble());
+				foreach (x86Instruction i in codeGen.Instructions)
+					writer.Write(i.Assemble());
 
-                if (reg != x86Register.EAX)
-                    writer.Write(x86Instruction.Create(x86OpCode.MOV, new x86RegisterOperand(x86Register.EAX), new x86RegisterOperand(reg)).Assemble());
+				if (reg != x86Register.EAX)
+					writer.Write(x86Instruction.Create(x86OpCode.MOV, new x86RegisterOperand(x86Register.EAX), new x86RegisterOperand(reg)).Assemble());
 
-                writer.Write(new byte[] { 0x5e });
-                writer.Write(new byte[] { 0x5f });
-                writer.Write(new byte[] { 0x5b });
-                writer.Write(new byte[] { 0xc3 });
-            }
-            return stream.ToArray();
-        }
-    }
+				writer.Write(new byte[] { 0x5e });
+				writer.Write(new byte[] { 0x5f });
+				writer.Write(new byte[] { 0x5b });
+				writer.Write(new byte[] { 0xc3 });
+			}
+			return stream.ToArray();
+		}
+	}
 }
