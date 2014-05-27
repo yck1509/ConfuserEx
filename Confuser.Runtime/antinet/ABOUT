@@ -1,0 +1,7 @@
+﻿antinet --- Code to prevent a managed .NET debugger/profiler from working
+Official site: https://bitbucket.org/0xd4d/antinet
+
+Written by de4dot@gmail.com
+Modified by Ki for use in ConfuserEx
+
+The source code in this folder is in the public domain.

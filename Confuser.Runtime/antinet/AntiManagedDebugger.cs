@@ -1,7 +1,7 @@
 ﻿/*
  * Anti managed debugger code. Written by de4dot@gmail.com
  * This code is in the public domain.
- * Official site: https://bitbucket.org/0xd4d/antinet
+ * Official site: https://github.com/0xd4d/antinet
  */
 
 using System;
