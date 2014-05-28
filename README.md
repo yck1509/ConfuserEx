@@ -28,16 +28,7 @@ The format of project file can be found in ProjectFormat.md
 
 Bug Report
 ----------
-If your application does not work with ConfuserEx, feel free to submit a bug report!
-
-If you decided to submit a bug report, please include the following information:
-
-1. The version of ConfuserEx you are using.
-2. The protection and packer settings you used.
-3. The input and output sample files that does not work.  
-   If you can't disclose the application, you can try reducing it to a minimum case that does not work in ConfuserEx,  
-   or you can sent it to me through email to <confuser.net@gmail.com> if you prefer not to disclose it publicly.
-4. If it sometimes works and sometimes does not work, it might be better to include the seed since ConfuserEx uses random mechanism in protection.
+See the [Issues Report](http://yck1509.github.io/ConfuserEx/issues/) section of website.
 
 
 License
@@ -46,5 +37,5 @@ See LICENSE file for details.
 
 Credits
 -------
-**[0xd4d](http://bitbucket.org/0xd4d)** for his awesome work and extensive knowledge!  
+**[0xd4d](https://github.com/0xd4d)** for his awesome work and extensive knowledge!  
 Members of **[Black Storm Forum](http://board.b-at-s.info/)** for their help!
