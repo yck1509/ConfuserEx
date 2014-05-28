@@ -49,16 +49,16 @@ namespace Confuser.Protections.ControlFlow {
 			CustomAttribute debugAttr = module.Assembly.CustomAttributes.Find("System.Diagnostics.DebuggableAttribute");
 			if (debugAttr != null) {
 				if (debugAttr.ConstructorArguments.Count == 1)
-					disableOpti |= ((DebuggableAttribute.DebuggingModes) (int) debugAttr.ConstructorArguments[0].Value & DebuggableAttribute.DebuggingModes.DisableOptimizations) != 0;
+					disableOpti |= ((DebuggableAttribute.DebuggingModes)(int)debugAttr.ConstructorArguments[0].Value & DebuggableAttribute.DebuggingModes.DisableOptimizations) != 0;
 				else
-					disableOpti |= (bool) debugAttr.ConstructorArguments[1].Value;
+					disableOpti |= (bool)debugAttr.ConstructorArguments[1].Value;
 			}
 			debugAttr = module.CustomAttributes.Find("System.Diagnostics.DebuggableAttribute");
 			if (debugAttr != null) {
 				if (debugAttr.ConstructorArguments.Count == 1)
-					disableOpti |= ((DebuggableAttribute.DebuggingModes) (int) debugAttr.ConstructorArguments[0].Value & DebuggableAttribute.DebuggingModes.DisableOptimizations) != 0;
+					disableOpti |= ((DebuggableAttribute.DebuggingModes)(int)debugAttr.ConstructorArguments[0].Value & DebuggableAttribute.DebuggingModes.DisableOptimizations) != 0;
 				else
-					disableOpti |= (bool) debugAttr.ConstructorArguments[1].Value;
+					disableOpti |= (bool)debugAttr.ConstructorArguments[1].Value;
 			}
 			return disableOpti;
 		}
@@ -85,7 +85,7 @@ namespace Confuser.Protections.ControlFlow {
 				ctx.Context.Logger.Error("Failed to calcuate maxstack.");
 				throw new ConfuserException(null);
 			}
-			body.MaxStack = (ushort) maxStack;
+			body.MaxStack = (ushort)maxStack;
 			ScopeBlock root = BlockParser.ParseBody(body);
 
 			GetMangler(ctx.Type).Mangle(body, root, ctx);

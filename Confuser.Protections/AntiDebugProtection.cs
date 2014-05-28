@@ -85,7 +85,7 @@ namespace Confuser.Protections {
 					IEnumerable<IDnlibDef> members = InjectHelper.Inject(rtType, module.GlobalType, module);
 
 					MethodDef cctor = module.GlobalType.FindStaticConstructor();
-					var init = (MethodDef) members.Single(method => method.Name == "Initialize");
+					var init = (MethodDef)members.Single(method => method.Name == "Initialize");
 					cctor.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, init));
 
 					foreach (IDnlibDef member in members) {
@@ -94,7 +94,7 @@ namespace Confuser.Protections {
 
 						bool ren = true;
 						if (member is MethodDef) {
-							var method = (MethodDef) member;
+							var method = (MethodDef)member;
 							if (method.Access == MethodAttributes.Public)
 								method.Access = MethodAttributes.Assembly;
 							if (!method.IsConstructor)
@@ -107,7 +107,7 @@ namespace Confuser.Protections {
 								ca.Constructor = attr.FindMethod(".ctor");
 						}
 						else if (member is FieldDef) {
-							var field = (FieldDef) member;
+							var field = (FieldDef)member;
 							if (field.Access == FieldAttributes.Public)
 								field.Access = FieldAttributes.Assembly;
 							if (field.IsLiteral) {

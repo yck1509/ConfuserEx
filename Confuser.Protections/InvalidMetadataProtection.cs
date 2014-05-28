@@ -65,7 +65,7 @@ namespace Confuser.Protections {
 			}
 
 			private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
-				var writer = (ModuleWriter) sender;
+				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndCreateTables) {
 					// These hurts reflection
 
@@ -140,7 +140,7 @@ namespace Confuser.Protections {
 			}
 
 			public override uint GetRawLength() {
-				return (uint) content.Length;
+				return (uint)content.Length;
 			}
 
 			protected override void WriteToImpl(BinaryWriter writer) {

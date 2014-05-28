@@ -64,7 +64,7 @@ namespace Confuser.Protections {
 					default:
 						throw new UnreachableException();
 				}
-				modeHandler.HandleInject((AntiTamperProtection) Parent, context, parameters);
+				modeHandler.HandleInject((AntiTamperProtection)Parent, context, parameters);
 				context.Annotations.Set(context.CurrentModule, HandlerKey, modeHandler);
 			}
 		}
@@ -79,7 +79,7 @@ namespace Confuser.Protections {
 
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 				var modeHandler = context.Annotations.Get<IModeHandler>(context.CurrentModule, HandlerKey);
-				modeHandler.HandleMD((AntiTamperProtection) Parent, context, parameters);
+				modeHandler.HandleMD((AntiTamperProtection)Parent, context, parameters);
 			}
 		}
 

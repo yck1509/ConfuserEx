@@ -24,7 +24,7 @@ namespace Confuser.Core.Project.Patterns {
 			object ns = Arguments[0].Evaluate(definition);
 			var type = definition as TypeDef;
 			if (type == null)
-				type = ((IMemberDef) definition).DeclaringType;
+				type = ((IMemberDef)definition).DeclaringType;
 			return type != null && type.Namespace == ns.ToString();
 		}
 	}

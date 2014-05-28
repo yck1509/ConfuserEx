@@ -19,10 +19,10 @@ namespace Confuser.Core.Project.Patterns {
 
 		/// <inheritdoc />
 		public override object Evaluate(IDnlibDef definition) {
-			if (!(definition is IMemberDef) || ((IMemberDef) definition).DeclaringType == null)
+			if (!(definition is IMemberDef) || ((IMemberDef)definition).DeclaringType == null)
 				return false;
 			object fullName = Arguments[0].Evaluate(definition);
-			return ((IMemberDef) definition).DeclaringType.FullName == fullName.ToString();
+			return ((IMemberDef)definition).DeclaringType.FullName == fullName.ToString();
 		}
 	}
 }

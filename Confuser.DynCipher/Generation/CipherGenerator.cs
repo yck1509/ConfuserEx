@@ -35,7 +35,7 @@ namespace Confuser.DynCipher.Generation {
 
 		public static void GeneratePair(RandomGenerator random, out StatementBlock encrypt, out StatementBlock decrypt) {
 			double varPrecentage = 1 + ((random.NextDouble() * 2) - 1) * VARIANCE;
-			var totalElements = (int) (((random.NextDouble() + 1) * RATIO_SUM) * varPrecentage);
+			var totalElements = (int)(((random.NextDouble() + 1) * RATIO_SUM) * varPrecentage);
 
 			var elems = new List<CryptoElement>();
 			for (int i = 0; i < totalElements * MAT_RATIO / RATIO_SUM; i++)

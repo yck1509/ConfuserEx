@@ -19,24 +19,24 @@ namespace Confuser.Renamer.Analyzers {
 			// MemberRef
 			table = module.TablesStream.Get(Table.Method);
 			len = table.Rows;
-			IEnumerable<MethodDef> methods = Enumerable.Range(1, (int) len)
-			                                           .Select(rid => module.ResolveMethod((uint) rid));
+			IEnumerable<MethodDef> methods = Enumerable.Range(1, (int)len)
+			                                           .Select(rid => module.ResolveMethod((uint)rid));
 			foreach (MethodDef method in methods) {
 				foreach (MethodOverride methodImpl in method.Overrides) {
 					if (methodImpl.MethodBody is MemberRef)
-						AnalyzeMemberRef(context, service, (MemberRef) methodImpl.MethodBody);
+						AnalyzeMemberRef(context, service, (MemberRef)methodImpl.MethodBody);
 					if (methodImpl.MethodDeclaration is MemberRef)
-						AnalyzeMemberRef(context, service, (MemberRef) methodImpl.MethodDeclaration);
+						AnalyzeMemberRef(context, service, (MemberRef)methodImpl.MethodDeclaration);
 				}
 				if (!method.HasBody)
 					continue;
 				foreach (Instruction instr in method.Body.Instructions) {
 					if (instr.Operand is MemberRef)
-						AnalyzeMemberRef(context, service, (MemberRef) instr.Operand);
+						AnalyzeMemberRef(context, service, (MemberRef)instr.Operand);
 					else if (instr.Operand is MethodSpec) {
-						var spec = (MethodSpec) instr.Operand;
+						var spec = (MethodSpec)instr.Operand;
 						if (spec.Method is MemberRef)
-							AnalyzeMemberRef(context, service, (MemberRef) spec.Method);
+							AnalyzeMemberRef(context, service, (MemberRef)spec.Method);
 					}
 				}
 			}
@@ -45,13 +45,13 @@ namespace Confuser.Renamer.Analyzers {
 			// CustomAttribute
 			table = module.TablesStream.Get(Table.CustomAttribute);
 			len = table.Rows;
-			IEnumerable<CustomAttribute> attrs = Enumerable.Range(1, (int) len)
-			                                               .Select(rid => module.ResolveHasCustomAttribute(module.TablesStream.ReadCustomAttributeRow((uint) rid).Parent))
+			IEnumerable<CustomAttribute> attrs = Enumerable.Range(1, (int)len)
+			                                               .Select(rid => module.ResolveHasCustomAttribute(module.TablesStream.ReadCustomAttributeRow((uint)rid).Parent))
 			                                               .Distinct()
 			                                               .SelectMany(owner => owner.CustomAttributes);
 			foreach (CustomAttribute attr in attrs) {
 				if (attr.Constructor is MemberRef)
-					AnalyzeMemberRef(context, service, (MemberRef) attr.Constructor);
+					AnalyzeMemberRef(context, service, (MemberRef)attr.Constructor);
 
 				foreach (CAArgument arg in attr.ConstructorArguments)
 					AnalyzeCAArgument(context, service, arg);
@@ -63,7 +63,7 @@ namespace Confuser.Renamer.Analyzers {
 					AnalyzeCAArgument(context, service, arg.Argument);
 
 				TypeDef attrType = attr.AttributeType.ResolveTypeDefThrow();
-				if (!context.Modules.Contains((ModuleDefMD) attrType.Module))
+				if (!context.Modules.Contains((ModuleDefMD)attrType.Module))
 					continue;
 
 				foreach (CANamedArgument fieldArg in attr.Fields) {
@@ -87,18 +87,18 @@ namespace Confuser.Renamer.Analyzers {
 
 		private void AnalyzeCAArgument(ConfuserContext context, INameService service, CAArgument arg) {
 			if (arg.Type.DefinitionAssembly.IsCorLib() && arg.Type.FullName == "System.Type") {
-				var typeSig = (TypeSig) arg.Value;
+				var typeSig = (TypeSig)arg.Value;
 				foreach (ITypeDefOrRef typeRef in typeSig.FindTypeRefs()) {
 					TypeDef typeDef = typeRef.ResolveTypeDefThrow();
-					if (context.Modules.Contains((ModuleDefMD) typeDef.Module)) {
+					if (context.Modules.Contains((ModuleDefMD)typeDef.Module)) {
 						if (typeRef is TypeRef)
-							service.AddReference(typeDef, new TypeRefReference((TypeRef) typeRef, typeDef));
+							service.AddReference(typeDef, new TypeRefReference((TypeRef)typeRef, typeDef));
 						service.ReduceRenameMode(typeDef, RenameMode.ASCII);
 					}
 				}
 			}
 			else if (arg.Value is CAArgument[]) {
-				foreach (CAArgument elem in (CAArgument[]) arg.Value)
+				foreach (CAArgument elem in (CAArgument[])arg.Value)
 					AnalyzeCAArgument(context, service, elem);
 			}
 		}
@@ -116,10 +116,10 @@ namespace Confuser.Renamer.Analyzers {
 
 			Debug.Assert(sig is TypeDefOrRefSig || sig is GenericInstSig);
 			if (sig is GenericInstSig) {
-				var inst = (GenericInstSig) sig;
+				var inst = (GenericInstSig)sig;
 				Debug.Assert(!(inst.GenericType.TypeDefOrRef is TypeSpec));
 				TypeDef openType = inst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
-				if (!context.Modules.Contains((ModuleDefMD) openType.Module))
+				if (!context.Modules.Contains((ModuleDefMD)openType.Module))
 					return;
 
 				IDnlibDef member;

@@ -23,11 +23,11 @@ namespace Confuser.DynCipher {
 		}
 
 		public static uint modInv(uint num) {
-			return (uint) modInv(num, MODULO32);
+			return (uint)modInv(num, MODULO32);
 		}
 
 		public static byte modInv(byte num) {
-			return (byte) modInv(num, 0x100);
+			return (byte)modInv(num, 0x100);
 		}
 	}
 

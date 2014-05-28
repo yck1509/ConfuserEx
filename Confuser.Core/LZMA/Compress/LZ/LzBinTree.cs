@@ -11,7 +11,7 @@ namespace SevenZip.Compression.LZ {
 		private const UInt32 kStartMaxLen = 1;
 		private const UInt32 kHash3Offset = kHash2Size;
 		private const UInt32 kEmptyHashValue = 0;
-		private const UInt32 kMaxValForNormalize = ((UInt32) 1 << 31) - 1;
+		private const UInt32 kMaxValForNormalize = ((UInt32)1 << 31) - 1;
 		private bool HASH_ARRAY = true;
 		private UInt32 _cutValue = 0xFF;
 		private UInt32 _cyclicBufferPos;
@@ -113,12 +113,12 @@ namespace SevenZip.Compression.LZ {
 			if (HASH_ARRAY) {
 				UInt32 temp = CRC.Table[_bufferBase[cur]] ^ _bufferBase[cur + 1];
 				hash2Value = temp & (kHash2Size - 1);
-				temp ^= ((UInt32) (_bufferBase[cur + 2]) << 8);
+				temp ^= ((UInt32)(_bufferBase[cur + 2]) << 8);
 				hash3Value = temp & (kHash3Size - 1);
 				hashValue = (temp ^ (CRC.Table[_bufferBase[cur + 3]] << 5)) & _hashMask;
 			}
 			else
-				hashValue = _bufferBase[cur] ^ ((UInt32) (_bufferBase[cur + 1]) << 8);
+				hashValue = _bufferBase[cur] ^ ((UInt32)(_bufferBase[cur + 1]) << 8);
 
 			UInt32 curMatch = _hash[kFixHashSize + hashValue];
 			if (HASH_ARRAY) {
@@ -230,13 +230,13 @@ namespace SevenZip.Compression.LZ {
 					UInt32 temp = CRC.Table[_bufferBase[cur]] ^ _bufferBase[cur + 1];
 					UInt32 hash2Value = temp & (kHash2Size - 1);
 					_hash[hash2Value] = _pos;
-					temp ^= ((UInt32) (_bufferBase[cur + 2]) << 8);
+					temp ^= ((UInt32)(_bufferBase[cur + 2]) << 8);
 					UInt32 hash3Value = temp & (kHash3Size - 1);
 					_hash[kHash3Offset + hash3Value] = _pos;
 					hashValue = (temp ^ (CRC.Table[_bufferBase[cur + 3]] << 5)) & _hashMask;
 				}
 				else
-					hashValue = _bufferBase[cur] ^ ((UInt32) (_bufferBase[cur + 1]) << 8);
+					hashValue = _bufferBase[cur] ^ ((UInt32)(_bufferBase[cur + 1]) << 8);
 
 				UInt32 curMatch = _hash[kFixHashSize + hashValue];
 				_hash[kFixHashSize + hashValue] = _pos;
@@ -325,7 +325,7 @@ namespace SevenZip.Compression.LZ {
 			UInt32 subValue = _pos - _cyclicBufferSize;
 			NormalizeLinks(_son, _cyclicBufferSize * 2, subValue);
 			NormalizeLinks(_hash, _hashSizeSum, subValue);
-			ReduceOffsets((Int32) subValue);
+			ReduceOffsets((Int32)subValue);
 		}
 
 		public void SetCutValue(UInt32 cutValue) {

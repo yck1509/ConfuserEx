@@ -46,7 +46,7 @@ namespace Confuser.Protections.AntiTamper {
 		}
 
 		public uint GetFileLength() {
-			return (uint) Body.Length + 4;
+			return (uint)Body.Length + 4;
 		}
 
 		public uint GetVirtualSize() {
@@ -54,7 +54,7 @@ namespace Confuser.Protections.AntiTamper {
 		}
 
 		public void WriteTo(BinaryWriter writer) {
-			writer.Write((uint) (Body.Length >> 2));
+			writer.Write((uint)(Body.Length >> 2));
 			writer.Write(Body);
 		}
 
@@ -64,16 +64,16 @@ namespace Confuser.Protections.AntiTamper {
 				foreach (byte i in fieldLayout)
 					switch (i) {
 						case 0:
-							writer.Write((uint) ILCode.Length);
+							writer.Write((uint)ILCode.Length);
 							break;
 						case 1:
 							writer.Write(MaxStack);
 							break;
 						case 2:
-							writer.Write((uint) EHs.Length);
+							writer.Write((uint)EHs.Length);
 							break;
 						case 3:
-							writer.Write((uint) LocalVars.Length);
+							writer.Write((uint)LocalVars.Length);
 							break;
 						case 4:
 							writer.Write(Options);
@@ -93,7 +93,7 @@ namespace Confuser.Protections.AntiTamper {
 					writer.Write(clause.HandlerLength);
 					writer.Write(clause.ClassTokenOrFilterOffset);
 				}
-				writer.WriteZeros(4 - ((int) ms.Length & 3)); // pad to 4 bytes
+				writer.WriteZeros(4 - ((int)ms.Length & 3)); // pad to 4 bytes
 				Body = ms.ToArray();
 			}
 			Debug.Assert(Body.Length % 4 == 0);
@@ -101,11 +101,11 @@ namespace Confuser.Protections.AntiTamper {
 			uint state = token * key;
 			uint counter = state;
 			for (uint i = 0; i < Body.Length; i += 4) {
-				uint data = Body[i] | (uint) (Body[i + 1] << 8) | (uint) (Body[i + 2] << 16) | (uint) (Body[i + 3] << 24);
-				Body[i + 0] ^= (byte) (state >> 0);
-				Body[i + 1] ^= (byte) (state >> 8);
-				Body[i + 2] ^= (byte) (state >> 16);
-				Body[i + 3] ^= (byte) (state >> 24);
+				uint data = Body[i] | (uint)(Body[i + 1] << 8) | (uint)(Body[i + 2] << 16) | (uint)(Body[i + 3] << 24);
+				Body[i + 0] ^= (byte)(state >> 0);
+				Body[i + 1] ^= (byte)(state >> 8);
+				Body[i + 2] ^= (byte)(state >> 16);
+				Body[i + 3] ^= (byte)(state >> 24);
 				state += data ^ counter;
 				counter ^= (state >> 5) | (state << 27);
 			}
@@ -153,7 +153,7 @@ namespace Confuser.Protections.AntiTamper {
 				jitBody.Options |= 8;
 				for (int i = 0; i < exceptionHandlers.Count; i++) {
 					ExceptionHandler eh = exceptionHandlers[i];
-					jitBody.EHs[i].Flags = (uint) eh.HandlerType;
+					jitBody.EHs[i].Flags = (uint)eh.HandlerType;
 
 					uint tryStart = GetOffset(eh.TryStart);
 					uint tryEnd = GetOffset(eh.TryEnd);
@@ -211,7 +211,7 @@ namespace Confuser.Protections.AntiTamper {
 		private RVA rva;
 
 		public JITBodyIndex(IEnumerable<uint> tokens) {
-			bodies = tokens.ToDictionary(token => token, token => (JITMethodBody) null);
+			bodies = tokens.ToDictionary(token => token, token => (JITMethodBody)null);
 		}
 
 		public FileOffset FileOffset {
@@ -228,7 +228,7 @@ namespace Confuser.Protections.AntiTamper {
 		}
 
 		public uint GetFileLength() {
-			return (uint) bodies.Count * 8 + 4;
+			return (uint)bodies.Count * 8 + 4;
 		}
 
 		public uint GetVirtualSize() {
@@ -237,7 +237,7 @@ namespace Confuser.Protections.AntiTamper {
 
 		public void WriteTo(BinaryWriter writer) {
 			uint length = GetFileLength() - 4; // minus length field
-			writer.Write((uint) bodies.Count);
+			writer.Write((uint)bodies.Count);
 			foreach (var entry in bodies.OrderBy(entry => entry.Key)) {
 				writer.Write(entry.Key);
 				Debug.Assert(entry.Value != null);

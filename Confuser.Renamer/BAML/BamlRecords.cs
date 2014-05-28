@@ -75,7 +75,7 @@ namespace Confuser.Renamer.BAML {
 			long pos = reader.BaseStream.Position;
 			int size = reader.ReadEncodedInt();
 
-			ReadData(reader, size - (int) (reader.BaseStream.Position - pos));
+			ReadData(reader, size - (int)(reader.BaseStream.Position - pos));
 			Debug.Assert(reader.BaseStream.Position - pos == size);
 		}
 
@@ -98,7 +98,7 @@ namespace Confuser.Renamer.BAML {
 		public override void Write(BamlBinaryWriter writer) {
 			long pos = writer.BaseStream.Position;
 			WriteData(writer);
-			var size = (int) (writer.BaseStream.Position - pos);
+			var size = (int)(writer.BaseStream.Position - pos);
 			size = SizeofEncodedInt(SizeofEncodedInt(size) + size) + size;
 			writer.BaseStream.Position = pos;
 			writer.WriteEncodedInt(size);
@@ -135,7 +135,7 @@ namespace Confuser.Renamer.BAML {
 		protected override void WriteData(BamlBinaryWriter writer) {
 			writer.Write(Prefix);
 			writer.Write(XmlNamespace);
-			writer.Write((ushort) AssemblyIds.Length);
+			writer.Write((ushort)AssemblyIds.Length);
 			foreach (ushort i in AssemblyIds)
 				writer.Write(i);
 		}
@@ -251,7 +251,7 @@ namespace Confuser.Renamer.BAML {
 			long pos = reader.BaseStream.Position;
 			AttributeId = reader.ReadUInt16();
 			SerializerTypeId = reader.ReadUInt16();
-			Data = reader.ReadBytes(size - (int) (reader.BaseStream.Position - pos));
+			Data = reader.ReadBytes(size - (int)(reader.BaseStream.Position - pos));
 		}
 
 		protected override void WriteData(BamlBinaryWriter writer) {
@@ -345,7 +345,7 @@ namespace Confuser.Renamer.BAML {
 				index++;
 			} while (keys);
 			wtr.BaseStream.Seek(pos, SeekOrigin.Begin);
-			wtr.Write((uint) (Record.Position - doc[index].Position));
+			wtr.Write((uint)(Record.Position - doc[index].Position));
 		}
 
 		protected override void ReadData(BamlBinaryReader reader, int size) {
@@ -357,8 +357,8 @@ namespace Confuser.Renamer.BAML {
 
 		protected override void WriteData(BamlBinaryWriter writer) {
 			writer.Write(ValueId);
-			pos = (uint) writer.BaseStream.Position;
-			writer.Write((uint) 0);
+			pos = (uint)writer.BaseStream.Position;
+			writer.Write((uint)0);
 			writer.Write(Shared);
 			writer.Write(SharedSet);
 		}
@@ -780,7 +780,7 @@ namespace Confuser.Renamer.BAML {
 				index++;
 			} while (keys);
 			wtr.BaseStream.Seek(pos, SeekOrigin.Begin);
-			wtr.Write((uint) (Record.Position - doc[index].Position));
+			wtr.Write((uint)(Record.Position - doc[index].Position));
 		}
 
 		public override void Read(BamlBinaryReader reader) {
@@ -792,8 +792,8 @@ namespace Confuser.Renamer.BAML {
 
 		public override void Write(BamlBinaryWriter writer) {
 			base.Write(writer);
-			pos = (uint) writer.BaseStream.Position;
-			writer.Write((uint) 0);
+			pos = (uint)writer.BaseStream.Position;
+			writer.Write((uint)0);
 			writer.Write(Shared);
 			writer.Write(SharedSet);
 		}
@@ -930,7 +930,7 @@ namespace Confuser.Renamer.BAML {
 
 		public void WriteDefer(BamlDocument doc, int index, BinaryWriter wtr) {
 			wtr.BaseStream.Seek(pos, SeekOrigin.Begin);
-			wtr.Write((uint) (Record.Position - (pos + 4)));
+			wtr.Write((uint)(Record.Position - (pos + 4)));
 		}
 
 		public override void Read(BamlBinaryReader reader) {
@@ -940,7 +940,7 @@ namespace Confuser.Renamer.BAML {
 
 		public override void Write(BamlBinaryWriter writer) {
 			pos = writer.BaseStream.Position;
-			writer.Write((uint) 0);
+			writer.Write((uint)0);
 		}
 	}
 

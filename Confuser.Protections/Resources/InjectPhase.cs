@@ -70,7 +70,7 @@ namespace Confuser.Protections.Resources {
 			IEnumerable<IDnlibDef> members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Resource"), context.CurrentModule.GlobalType, context.CurrentModule);
 			foreach (IDnlibDef member in members) {
 				if (member.Name == "Initialize")
-					moduleCtx.InitMethod = (MethodDef) member;
+					moduleCtx.InitMethod = (MethodDef)member;
 				moduleCtx.Name.MarkHelper(member, moduleCtx.Marker);
 			}
 
@@ -108,7 +108,7 @@ namespace Confuser.Protections.Resources {
 						instrs.RemoveAt(i);
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
-						instrs.InsertRange(i - 2, moduleCtx.ModeHandler.EmitDecrypt(moduleCtx.InitMethod, moduleCtx, (Local) ldBlock.Operand, (Local) ldKey.Operand));
+						instrs.InsertRange(i - 2, moduleCtx.ModeHandler.EmitDecrypt(moduleCtx.InitMethod, moduleCtx, (Local)ldBlock.Operand, (Local)ldKey.Operand));
 					}
 					else if (method.DeclaringType.Name == "Lzma" &&
 					         method.Name == "Decompress") {

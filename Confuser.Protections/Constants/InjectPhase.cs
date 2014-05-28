@@ -73,13 +73,13 @@ namespace Confuser.Protections.Constants {
 			IEnumerable<IDnlibDef> members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Constant"), context.CurrentModule.GlobalType, context.CurrentModule);
 			foreach (IDnlibDef member in members) {
 				if (member.Name == "Get") {
-					context.CurrentModule.GlobalType.Remove((MethodDef) member);
+					context.CurrentModule.GlobalType.Remove((MethodDef)member);
 					continue;
 				}
 				if (member.Name == "b")
-					moduleCtx.BufferField = (FieldDef) member;
+					moduleCtx.BufferField = (FieldDef)member;
 				else if (member.Name == "Initialize")
-					moduleCtx.InitMethod = (MethodDef) member;
+					moduleCtx.InitMethod = (MethodDef)member;
 				moduleCtx.Name.MarkHelper(member, moduleCtx.Marker);
 			}
 			ProtectionParameters.GetParameters(context, moduleCtx.InitMethod).Remove(Parent);
@@ -124,11 +124,11 @@ namespace Confuser.Protections.Constants {
 
 				var decoderDesc = new DecoderDesc();
 
-				decoderDesc.StringID = (byte) (moduleCtx.Random.NextByte() & 3);
+				decoderDesc.StringID = (byte)(moduleCtx.Random.NextByte() & 3);
 
-				do decoderDesc.NumberID = (byte) (moduleCtx.Random.NextByte() & 3); while (decoderDesc.NumberID == decoderDesc.StringID);
+				do decoderDesc.NumberID = (byte)(moduleCtx.Random.NextByte() & 3); while (decoderDesc.NumberID == decoderDesc.StringID);
 
-				do decoderDesc.InitializerID = (byte) (moduleCtx.Random.NextByte() & 3); while (decoderDesc.InitializerID == decoderDesc.StringID || decoderDesc.InitializerID == decoderDesc.NumberID);
+				do decoderDesc.InitializerID = (byte)(moduleCtx.Random.NextByte() & 3); while (decoderDesc.InitializerID == decoderDesc.StringID || decoderDesc.InitializerID == decoderDesc.NumberID);
 
 				MutationHelper.InjectKeys(decoderInst,
 				                          new[] { 0, 1, 2 },
@@ -153,7 +153,7 @@ namespace Confuser.Protections.Constants {
 						instrs.RemoveAt(i);
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
-						instrs.InsertRange(i - 2, moduleCtx.ModeHandler.EmitDecrypt(moduleCtx.InitMethod, moduleCtx, (Local) ldBlock.Operand, (Local) ldKey.Operand));
+						instrs.InsertRange(i - 2, moduleCtx.ModeHandler.EmitDecrypt(moduleCtx.InitMethod, moduleCtx, (Local)ldBlock.Operand, (Local)ldKey.Operand));
 					}
 					else if (method.DeclaringType.Name == "Lzma" &&
 					         method.Name == "Decompress") {

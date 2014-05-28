@@ -53,16 +53,16 @@ namespace SevenZip.Compression.RangeCoder {
 		}
 
 		public void ShiftLow() {
-			if ((uint) Low < 0xFF000000 || (uint) (Low >> 32) == 1) {
+			if ((uint)Low < 0xFF000000 || (uint)(Low >> 32) == 1) {
 				byte temp = _cache;
 				do {
-					Stream.WriteByte((byte) (temp + (Low >> 32)));
+					Stream.WriteByte((byte)(temp + (Low >> 32)));
 					temp = 0xFF;
 				} while (--_cacheSize != 0);
-				_cache = (byte) (((uint) Low) >> 24);
+				_cache = (byte)(((uint)Low) >> 24);
 			}
 			_cacheSize++;
-			Low = ((uint) Low) << 8;
+			Low = ((uint)Low) << 8;
 		}
 
 		public void EncodeDirectBits(uint v, int numTotalBits) {
@@ -112,7 +112,7 @@ namespace SevenZip.Compression.RangeCoder {
 			Code = 0;
 			Range = 0xFFFFFFFF;
 			for (int i = 0; i < 5; i++)
-				Code = (Code << 8) | (byte) Stream.ReadByte();
+				Code = (Code << 8) | (byte)Stream.ReadByte();
 		}
 
 		public void ReleaseStream() {
@@ -126,14 +126,14 @@ namespace SevenZip.Compression.RangeCoder {
 
 		public void Normalize() {
 			while (Range < kTopValue) {
-				Code = (Code << 8) | (byte) Stream.ReadByte();
+				Code = (Code << 8) | (byte)Stream.ReadByte();
 				Range <<= 8;
 			}
 		}
 
 		public void Normalize2() {
 			if (Range < kTopValue) {
-				Code = (Code << 8) | (byte) Stream.ReadByte();
+				Code = (Code << 8) | (byte)Stream.ReadByte();
 				Range <<= 8;
 			}
 		}
@@ -167,7 +167,7 @@ namespace SevenZip.Compression.RangeCoder {
 				result = (result << 1) | (1 - t);
 
 				if (range < kTopValue) {
-					code = (code << 8) | (byte) Stream.ReadByte();
+					code = (code << 8) | (byte)Stream.ReadByte();
 					range <<= 8;
 				}
 			}

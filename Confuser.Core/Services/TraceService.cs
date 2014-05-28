@@ -142,10 +142,10 @@ namespace Confuser.Core.Services {
 
 				switch (instr.OpCode.FlowControl) {
 					case FlowControl.Branch:
-						int index = offset2index[((Instruction) instr.Operand).Offset];
+						int index = offset2index[((Instruction)instr.Operand).Offset];
 						if (beforeDepths[index] == int.MinValue)
 							beforeDepths[index] = currentStack;
-						fromInstrs.AddListEntry(offset2index[((Instruction) instr.Operand).Offset], instr);
+						fromInstrs.AddListEntry(offset2index[((Instruction)instr.Operand).Offset], instr);
 						currentStack = 0;
 						break;
 					case FlowControl.Break:
@@ -156,7 +156,7 @@ namespace Confuser.Core.Services {
 						break;
 					case FlowControl.Cond_Branch:
 						if (instr.OpCode.Code == Code.Switch) {
-							foreach (Instruction target in (Instruction[]) instr.Operand) {
+							foreach (Instruction target in (Instruction[])instr.Operand) {
 								int targetIndex = offset2index[target.Offset];
 								if (beforeDepths[targetIndex] == int.MinValue)
 									beforeDepths[targetIndex] = currentStack;
@@ -164,10 +164,10 @@ namespace Confuser.Core.Services {
 							}
 						}
 						else {
-							int targetIndex = offset2index[((Instruction) instr.Operand).Offset];
+							int targetIndex = offset2index[((Instruction)instr.Operand).Offset];
 							if (beforeDepths[targetIndex] == int.MinValue)
 								beforeDepths[targetIndex] = currentStack;
-							fromInstrs.AddListEntry(offset2index[((Instruction) instr.Operand).Offset], instr);
+							fromInstrs.AddListEntry(offset2index[((Instruction)instr.Operand).Offset], instr);
 						}
 						break;
 					case FlowControl.Meta:
@@ -275,7 +275,7 @@ namespace Confuser.Core.Services {
 
 					object instrOperand = currentInstr.Operand;
 					if (currentInstr.Operand is Instruction) {
-						int targetIndex = offset2index[((Instruction) currentInstr.Operand).Offset];
+						int targetIndex = offset2index[((Instruction)currentInstr.Operand).Offset];
 						if (currentInstr.OpCode.FlowControl == FlowControl.Branch)
 							index = targetIndex;
 						else {
@@ -285,7 +285,7 @@ namespace Confuser.Core.Services {
 					}
 
 					else if (currentInstr.Operand is Instruction[]) {
-						foreach (Instruction targetInstr in (Instruction[]) currentInstr.Operand)
+						foreach (Instruction targetInstr in (Instruction[])currentInstr.Operand)
 							working2.Enqueue(Tuple.Create(offset2index[targetInstr.Offset], new Stack<int>(evalStack)));
 						index++;
 					}

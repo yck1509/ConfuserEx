@@ -102,7 +102,7 @@ namespace SevenZip.Compression.RangeCoder {
 			uint m = 1;
 			for (int bitIndex = NumBitLevels; bitIndex > 0; bitIndex--)
 				m = (m << 1) + Models[m].Decode(rangeDecoder);
-			return m - ((uint) 1 << NumBitLevels);
+			return m - ((uint)1 << NumBitLevels);
 		}
 
 		public uint ReverseDecode(Decoder rangeDecoder) {

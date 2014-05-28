@@ -19,9 +19,9 @@ namespace Confuser.Core.Project.Patterns {
 
 		/// <inheritdoc />
 		public override object Evaluate(IDnlibDef definition) {
-			var a = (bool) OperandA.Evaluate(definition);
+			var a = (bool)OperandA.Evaluate(definition);
 			if (a) return true;
-			return (bool) OperandB.Evaluate(definition);
+			return (bool)OperandB.Evaluate(definition);
 		}
 	}
 }

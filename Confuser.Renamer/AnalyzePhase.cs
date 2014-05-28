@@ -22,13 +22,13 @@ namespace Confuser.Renamer {
 		}
 
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
-			var service = (NameService) context.Registry.GetService<INameService>();
+			var service = (NameService)context.Registry.GetService<INameService>();
 			context.Logger.Debug("Building VTables & identifier list...");
 			foreach (IDnlibDef def in parameters.Targets) {
 				ParseParameters(def, context, service, parameters);
 
 				if (def is ModuleDef) {
-					var module = (ModuleDef) def;
+					var module = (ModuleDef)def;
 					foreach (Resource res in module.Resources)
 						service.SetOriginalName(res, res.Name);
 				}
@@ -36,8 +36,8 @@ namespace Confuser.Renamer {
 					service.SetOriginalName(def, def.Name);
 
 				if (def is TypeDef) {
-					service.GetVTables().GetVTable((TypeDef) def);
-					service.SetOriginalNamespace(def, ((TypeDef) def).Namespace);
+					service.GetVTables().GetVTable((TypeDef)def);
+					service.SetOriginalNamespace(def, ((TypeDef)def).Namespace);
 				}
 			}
 
@@ -50,15 +50,15 @@ namespace Confuser.Renamer {
 
 		internal void Analyze(NameService service, ConfuserContext context, IDnlibDef def, bool runAnalyzer) {
 			if (def is TypeDef)
-				Analyze(service, context, (TypeDef) def);
+				Analyze(service, context, (TypeDef)def);
 			else if (def is MethodDef)
-				Analyze(service, context, (MethodDef) def);
+				Analyze(service, context, (MethodDef)def);
 			else if (def is FieldDef)
-				Analyze(service, context, (FieldDef) def);
+				Analyze(service, context, (FieldDef)def);
 			else if (def is PropertyDef)
-				Analyze(service, context, (PropertyDef) def);
+				Analyze(service, context, (PropertyDef)def);
 			else if (def is EventDef)
-				Analyze(service, context, (EventDef) def);
+				Analyze(service, context, (EventDef)def);
 			else if (def is ModuleDef)
 				service.SetCanRename(def, false);
 

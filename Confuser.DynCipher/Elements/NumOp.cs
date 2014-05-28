@@ -19,7 +19,7 @@ namespace Confuser.DynCipher.Elements {
 		public CryptoNumOps Operation { get; private set; }
 
 		public override void Initialize(RandomGenerator random) {
-			Operation = (CryptoNumOps) (random.NextInt32(4));
+			Operation = (CryptoNumOps)(random.NextInt32(4));
 			switch (Operation) {
 				case CryptoNumOps.Add:
 				case CryptoNumOps.Xor:
@@ -41,25 +41,25 @@ namespace Confuser.DynCipher.Elements {
 			switch (Operation) {
 				case CryptoNumOps.Add:
 					context.Emit(new AssignmentStatement {
-						Value = val + (LiteralExpression) Key,
+						Value = val + (LiteralExpression)Key,
 						Target = val
 					});
 					break;
 				case CryptoNumOps.Xor:
 					context.Emit(new AssignmentStatement {
-						Value = val ^ (LiteralExpression) Key,
+						Value = val ^ (LiteralExpression)Key,
 						Target = val
 					});
 					break;
 				case CryptoNumOps.Mul:
 					context.Emit(new AssignmentStatement {
-						Value = val * (LiteralExpression) Key,
+						Value = val * (LiteralExpression)Key,
 						Target = val
 					});
 					break;
 				case CryptoNumOps.Xnor:
 					context.Emit(new AssignmentStatement {
-						Value = ~(val ^ (LiteralExpression) Key),
+						Value = ~(val ^ (LiteralExpression)Key),
 						Target = val
 					});
 					break;
@@ -71,25 +71,25 @@ namespace Confuser.DynCipher.Elements {
 			switch (Operation) {
 				case CryptoNumOps.Add:
 					context.Emit(new AssignmentStatement {
-						Value = val - (LiteralExpression) InverseKey,
+						Value = val - (LiteralExpression)InverseKey,
 						Target = val
 					});
 					break;
 				case CryptoNumOps.Xor:
 					context.Emit(new AssignmentStatement {
-						Value = val ^ (LiteralExpression) InverseKey,
+						Value = val ^ (LiteralExpression)InverseKey,
 						Target = val
 					});
 					break;
 				case CryptoNumOps.Mul:
 					context.Emit(new AssignmentStatement {
-						Value = val * (LiteralExpression) InverseKey,
+						Value = val * (LiteralExpression)InverseKey,
 						Target = val
 					});
 					break;
 				case CryptoNumOps.Xnor:
 					context.Emit(new AssignmentStatement {
-						Value = val ^ (LiteralExpression) InverseKey,
+						Value = val ^ (LiteralExpression)InverseKey,
 						Target = val
 					});
 					break;

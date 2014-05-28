@@ -25,7 +25,7 @@ namespace Confuser.Protections.ControlFlow {
 					ehScopes[eh] = Tuple.Create(tryBlock, handlerBlock, filterBlock);
 				}
 				else
-					ehScopes[eh] = Tuple.Create(tryBlock, handlerBlock, (ScopeBlock) null);
+					ehScopes[eh] = Tuple.Create(tryBlock, handlerBlock, (ScopeBlock)null);
 			}
 
 			var root = new ScopeBlock(BlockType.Normal, null);

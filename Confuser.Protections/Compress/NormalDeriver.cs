@@ -47,17 +47,17 @@ namespace Confuser.Protections.Compress {
 				switch (i % 3) {
 					case 0:
 						yield return Instruction.Create(OpCodes.Xor);
-						yield return Instruction.Create(OpCodes.Ldc_I4, (int) k1);
+						yield return Instruction.Create(OpCodes.Ldc_I4, (int)k1);
 						yield return Instruction.Create(OpCodes.Add);
 						break;
 					case 1:
 						yield return Instruction.Create(OpCodes.Mul);
-						yield return Instruction.Create(OpCodes.Ldc_I4, (int) k2);
+						yield return Instruction.Create(OpCodes.Ldc_I4, (int)k2);
 						yield return Instruction.Create(OpCodes.Xor);
 						break;
 					case 2:
 						yield return Instruction.Create(OpCodes.Add);
-						yield return Instruction.Create(OpCodes.Ldc_I4, (int) k3);
+						yield return Instruction.Create(OpCodes.Ldc_I4, (int)k3);
 						yield return Instruction.Create(OpCodes.Mul);
 						break;
 				}

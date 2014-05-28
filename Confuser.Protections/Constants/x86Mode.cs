@@ -53,8 +53,8 @@ namespace Confuser.Protections.Constants {
 		}
 
 		public uint Encode(object data, CEContext ctx, uint id) {
-			var encoding = (x86Encoding) data;
-			return (uint) encoding.expCompiled((int) id);
+			var encoding = (x86Encoding)data;
+			return (uint)encoding.expCompiled((int)id);
 		}
 
 		private class CipherCodeGen : CILCodeGen {
@@ -122,13 +122,13 @@ namespace Confuser.Protections.Constants {
 			}
 
 			private void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
-				var writer = (ModuleWriter) sender;
+				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 					codeChunk = writer.MethodBodies.Add(new MethodBody(code));
 				}
 				else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 					uint rid = writer.MetaData.GetRid(native);
-					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint) codeChunk.RVA;
+					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)codeChunk.RVA;
 				}
 			}
 		}

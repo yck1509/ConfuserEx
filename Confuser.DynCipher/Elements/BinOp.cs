@@ -16,7 +16,7 @@ namespace Confuser.DynCipher.Elements {
 		public CryptoBinOps Operation { get; private set; }
 
 		public override void Initialize(RandomGenerator random) {
-			Operation = (CryptoBinOps) random.NextInt32(3);
+			Operation = (CryptoBinOps)random.NextInt32(3);
 		}
 
 		public override void Emit(CipherGenContext context) {

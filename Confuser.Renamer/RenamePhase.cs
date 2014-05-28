@@ -13,7 +13,7 @@ namespace Confuser.Renamer {
 		}
 
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
-			var service = (NameService) context.Registry.GetService<INameService>();
+			var service = (NameService)context.Registry.GetService<INameService>();
 
 			context.Logger.Debug("Renaming...");
 			foreach (IRenamer renamer in service.Renamers) {
@@ -24,7 +24,7 @@ namespace Confuser.Renamer {
 			foreach (IDnlibDef def in parameters.Targets) {
 				if (def is MethodDef)
 					if (parameters.GetParameter(context, def, "renameArgs", true)) {
-						foreach (ParamDef param in ((MethodDef) def).ParamDefs)
+						foreach (ParamDef param in ((MethodDef)def).ParamDefs)
 							param.Name = null;
 					}
 
@@ -43,7 +43,7 @@ namespace Confuser.Renamer {
 					continue;
 
 				if (def is TypeDef) {
-					var typeDef = (TypeDef) def;
+					var typeDef = (TypeDef)def;
 					if (parameters.GetParameter(context, def, "flatten", true)) {
 						typeDef.Name = service.ObfuscateName(typeDef.FullName, mode);
 						typeDef.Namespace = "";

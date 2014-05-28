@@ -61,7 +61,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				.GenerateCIL(expression)
 				.Compile<Func<int, int>>();
 
-			nativeCodes.Add(Tuple.Create(native, code, (MethodBody) null));
+			nativeCodes.Add(Tuple.Create(native, code, (MethodBody)null));
 			if (!addedHandler) {
 				ctx.Context.CurrentModuleWriterListener.OnWriterEvent += InjectNativeCode;
 				addedHandler = true;
@@ -69,7 +69,7 @@ namespace Confuser.Protections.ReferenceProxy {
 		}
 
 		private void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
-			var writer = (ModuleWriter) sender;
+			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 				foreach (var native in nativeCodes)
 					native.Item3 = writer.MethodBodies.Add(new MethodBody(native.Item2));
@@ -77,7 +77,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 				foreach (var native in nativeCodes) {
 					uint rid = writer.MetaData.GetRid(native.Item1);
-					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint) native.Item3.RVA;
+					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)native.Item3.RVA;
 				}
 			}
 		}

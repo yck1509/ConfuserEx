@@ -54,7 +54,7 @@ namespace Confuser.Core {
 
 				if (typeof (Protection).IsAssignableFrom(i)) {
 					try {
-						protections.Add((Protection) Activator.CreateInstance(i));
+						protections.Add((Protection)Activator.CreateInstance(i));
 					}
 					catch (Exception ex) {
 						context.Logger.ErrorException("Failed to instantiate protection '" + i.Name + "'.", ex);
@@ -62,7 +62,7 @@ namespace Confuser.Core {
 				}
 				else if (typeof (Packer).IsAssignableFrom(i)) {
 					try {
-						packers.Add((Packer) Activator.CreateInstance(i));
+						packers.Add((Packer)Activator.CreateInstance(i));
 					}
 					catch (Exception ex) {
 						context.Logger.ErrorException("Failed to instantiate packer '" + i.Name + "'.", ex);
@@ -70,7 +70,7 @@ namespace Confuser.Core {
 				}
 				else if (typeof (ConfuserComponent).IsAssignableFrom(i)) {
 					try {
-						components.Add((ConfuserComponent) Activator.CreateInstance(i));
+						components.Add((ConfuserComponent)Activator.CreateInstance(i));
 					}
 					catch (Exception ex) {
 						context.Logger.ErrorException("Failed to instantiate component '" + i.Name + "'.", ex);

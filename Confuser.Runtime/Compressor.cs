@@ -14,8 +14,8 @@ namespace Confuser.Runtime {
 			ulong s = seed;
 			for (int i = 0; i < 0x10; i++) {
 				s = (s * s) % 0x143fc089;
-				k[i] = (uint) s;
-				w[i] = (uint) ((s * s) % 0x444d56fb);
+				k[i] = (uint)s;
+				w[i] = (uint)((s * s) % 0x444d56fb);
 			}
 			Mutation.Crypt(w, k);
 			Array.Clear(k, 0, 0x10);
@@ -25,10 +25,10 @@ namespace Confuser.Runtime {
 			for (int i = 0; i < data.Length; i++) {
 				uint d = data[i] ^ w[i & 0xf];
 				w[i & 0xf] = (w[i & 0xf] ^ d) + 0x3ddb2819;
-				b[h + 0] = (byte) (d >> 0);
-				b[h + 1] = (byte) (d >> 8);
-				b[h + 2] = (byte) (d >> 16);
-				b[h + 3] = (byte) (d >> 24);
+				b[h + 0] = (byte)(d >> 0);
+				b[h + 1] = (byte)(d >> 8);
+				b[h + 2] = (byte)(d >> 16);
+				b[h + 3] = (byte)(d >> 24);
 				h += 4;
 			}
 			Array.Clear(w, 0, 0x10);
@@ -36,9 +36,9 @@ namespace Confuser.Runtime {
 			Array.Clear(b, 0, b.Length);
 
 			GCHandle g = GCHandle.Alloc(j, GCHandleType.Pinned);
-			var z = (uint) (s % 0x8a5cb7);
+			var z = (uint)(s % 0x8a5cb7);
 			for (int i = 0; i < j.Length; i++) {
-				j[i] ^= (byte) s;
+				j[i] ^= (byte)s;
 				if ((i & 0xff) == 0)
 					s = (s * s) % 0x8a5cb7;
 			}
@@ -46,11 +46,11 @@ namespace Confuser.Runtime {
 		}
 
 		private static int Main(string[] args) {
-			var l = (uint) Mutation.KeyI0;
+			var l = (uint)Mutation.KeyI0;
 			uint[] q = Mutation.Placeholder(new uint[Mutation.KeyI0]);
 
-			GCHandle h = Decrypt(q, (uint) Mutation.KeyI1);
-			var b = (byte[]) h.Target;
+			GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
+			var b = (byte[])h.Target;
 			Assembly a = Assembly.GetExecutingAssembly();
 			Module n = a.ManifestModule;
 			Module m = a.LoadModule("koi", b);
@@ -67,7 +67,7 @@ namespace Confuser.Runtime {
 				g[0] = args;
 			object r = e.Invoke(null, g);
 			if (r is int)
-				return (int) r;
+				return (int)r;
 			return 0;
 		}
 
@@ -91,7 +91,7 @@ namespace Confuser.Runtime {
 					s = s * 0x5e3f1f + c;
 				GCHandle h = Decrypt(d, s);
 
-				var f = (byte[]) h.Target;
+				var f = (byte[])h.Target;
 				Assembly a = Assembly.Load(f);
 				Array.Clear(f, 0, f.Length);
 				h.Free();

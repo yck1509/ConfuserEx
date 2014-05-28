@@ -7,23 +7,23 @@ namespace Confuser.Runtime {
 			Module m = typeof (AntiTamperNormal).Module;
 			string n = m.FullyQualifiedName;
 			bool f = n.Length > 0 && n[0] == '<';
-			var b = (byte*) Marshal.GetHINSTANCE(m);
-			byte* p = b + *(uint*) (b + 0x3c);
-			ushort s = *(ushort*) (p + 0x6);
-			ushort o = *(ushort*) (p + 0x14);
+			var b = (byte*)Marshal.GetHINSTANCE(m);
+			byte* p = b + *(uint*)(b + 0x3c);
+			ushort s = *(ushort*)(p + 0x6);
+			ushort o = *(ushort*)(p + 0x14);
 
 			uint* e = null;
 			uint l = 0;
-			var r = (uint*) (p + 0x18 + o);
-			uint z = (uint) Mutation.KeyI1, x = (uint) Mutation.KeyI2, c = (uint) Mutation.KeyI3, v = (uint) Mutation.KeyI4;
+			var r = (uint*)(p + 0x18 + o);
+			uint z = (uint)Mutation.KeyI1, x = (uint)Mutation.KeyI2, c = (uint)Mutation.KeyI3, v = (uint)Mutation.KeyI4;
 			for (int i = 0; i < s; i++) {
 				uint g = (*r++) * (*r++);
-				if (g == (uint) Mutation.KeyI0) {
-					e = (uint*) (b + (f ? *(r + 3) : *(r + 1)));
+				if (g == (uint)Mutation.KeyI0) {
+					e = (uint*)(b + (f ? *(r + 3) : *(r + 1)));
 					l = (f ? *(r + 2) : *(r + 0)) >> 2;
 				}
 				else if (g != 0) {
-					var q = (uint*) (b + (f ? *(r + 3) : *(r + 1)));
+					var q = (uint*)(b + (f ? *(r + 3) : *(r + 1)));
 					uint j = *(r + 2) >> 2;
 					for (uint k = 0; k < j; k++) {
 						uint t = (z ^ (*q++)) + x + c * v;

@@ -38,8 +38,8 @@ namespace Confuser.Core {
 
 			Type valueType = typeof (TValue);
 			if (valueType.IsValueType)
-				return (TValue) Convert.ChangeType(objAnno[key], typeof (TValue));
-			return (TValue) objAnno[key];
+				return (TValue)Convert.ChangeType(objAnno[key], typeof (TValue));
+			return (TValue)objAnno[key];
 		}
 
 		/// <summary>
@@ -67,8 +67,8 @@ namespace Confuser.Core {
 
 			Type valueType = typeof (TValue);
 			if (valueType.IsValueType)
-				return (TValue) Convert.ChangeType(objAnno[key], typeof (TValue));
-			return (TValue) objAnno[key];
+				return (TValue)Convert.ChangeType(objAnno[key], typeof (TValue));
+			return (TValue)objAnno[key];
 		}
 
 		/// <summary>
@@ -95,8 +95,8 @@ namespace Confuser.Core {
 			if (objAnno.Contains(key)) {
 				Type valueType = typeof (TValue);
 				if (valueType.IsValueType)
-					return (TValue) Convert.ChangeType(objAnno[key], typeof (TValue));
-				return (TValue) objAnno[key];
+					return (TValue)Convert.ChangeType(objAnno[key], typeof (TValue));
+				return (TValue)objAnno[key];
 			}
 			objAnno[key] = ret = factory(key);
 			return ret;
@@ -128,7 +128,7 @@ namespace Confuser.Core {
 		///     Trims the annotations of unreachable objects from this instance.
 		/// </summary>
 		public void Trim() {
-			foreach (object key in annotations.Where(kvp => !((WeakReferenceKey) kvp.Key).IsAlive).Select(kvp => kvp.Key))
+			foreach (object key in annotations.Where(kvp => !((WeakReferenceKey)kvp.Key).IsAlive).Select(kvp => kvp.Key))
 				annotations.Remove(key);
 		}
 
@@ -167,7 +167,7 @@ namespace Confuser.Core {
 			/// <inheritdoc />
 			public int GetHashCode(object obj) {
 				if (obj is WeakReferenceKey)
-					return ((WeakReferenceKey) obj).HashCode;
+					return ((WeakReferenceKey)obj).HashCode;
 				return obj.GetHashCode();
 			}
 		}

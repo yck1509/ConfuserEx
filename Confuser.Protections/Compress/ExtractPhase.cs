@@ -55,7 +55,7 @@ namespace Confuser.Protections.Compress {
 
 			public void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
 				if (e.WriterEvent == ModuleWriterEvent.MDEndAddResources) {
-					var writer = (ModuleWriter) sender;
+					var writer = (ModuleWriter)sender;
 					ctx.ManifestResources = new List<Tuple<uint, uint, string>>();
 					Dictionary<uint, byte[]> stringDict = writer.MetaData.StringsHeap.GetAllRawData().ToDictionary(pair => pair.Key, pair => pair.Value);
 					foreach (RawManifestResourceRow resource in writer.MetaData.TablesHeap.ManifestResourceTable)

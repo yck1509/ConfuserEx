@@ -6,9 +6,9 @@ namespace Confuser.Protections.ControlFlow {
 		protected static IEnumerable<InstrBlock> GetAllBlocks(ScopeBlock scope) {
 			foreach (BlockBase child in scope.Children) {
 				if (child is InstrBlock)
-					yield return (InstrBlock) child;
+					yield return (InstrBlock)child;
 				else {
-					foreach (InstrBlock block in GetAllBlocks((ScopeBlock) child))
+					foreach (InstrBlock block in GetAllBlocks((ScopeBlock)child))
 						yield return block;
 				}
 			}

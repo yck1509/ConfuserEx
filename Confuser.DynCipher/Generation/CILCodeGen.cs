@@ -56,13 +56,13 @@ namespace Confuser.DynCipher.Generation {
 
 		private void EmitLoad(Expression exp) {
 			if (exp is ArrayIndexExpression) {
-				var arrIndex = (ArrayIndexExpression) exp;
+				var arrIndex = (ArrayIndexExpression)exp;
 				EmitLoad(arrIndex.Array);
 				Emit(Instruction.CreateLdcI4(arrIndex.Index));
 				Emit(Instruction.Create(OpCodes.Ldelem_U4));
 			}
 			else if (exp is BinOpExpression) {
-				var binOp = (BinOpExpression) exp;
+				var binOp = (BinOpExpression)exp;
 				EmitLoad(binOp.Left);
 				EmitLoad(binOp.Right);
 				OpCode op;
@@ -100,7 +100,7 @@ namespace Confuser.DynCipher.Generation {
 				Emit(Instruction.Create(op));
 			}
 			else if (exp is UnaryOpExpression) {
-				var unaryOp = (UnaryOpExpression) exp;
+				var unaryOp = (UnaryOpExpression)exp;
 				EmitLoad(unaryOp.Value);
 				OpCode op;
 				switch (unaryOp.Operation) {
@@ -116,11 +116,11 @@ namespace Confuser.DynCipher.Generation {
 				Emit(Instruction.Create(op));
 			}
 			else if (exp is LiteralExpression) {
-				var literal = (LiteralExpression) exp;
-				Emit(Instruction.CreateLdcI4((int) literal.Value));
+				var literal = (LiteralExpression)exp;
+				Emit(Instruction.CreateLdcI4((int)literal.Value));
 			}
 			else if (exp is VariableExpression) {
-				var var = (VariableExpression) exp;
+				var var = (VariableExpression)exp;
 				LoadVar(var.Variable);
 			}
 			else
@@ -129,14 +129,14 @@ namespace Confuser.DynCipher.Generation {
 
 		private void EmitStore(Expression exp, Expression value) {
 			if (exp is ArrayIndexExpression) {
-				var arrIndex = (ArrayIndexExpression) exp;
+				var arrIndex = (ArrayIndexExpression)exp;
 				EmitLoad(arrIndex.Array);
 				Emit(Instruction.CreateLdcI4(arrIndex.Index));
 				EmitLoad(value);
 				Emit(Instruction.Create(OpCodes.Stelem_I4));
 			}
 			else if (exp is VariableExpression) {
-				var var = (VariableExpression) exp;
+				var var = (VariableExpression)exp;
 				EmitLoad(value);
 				StoreVar(var.Variable);
 			}
@@ -146,11 +146,11 @@ namespace Confuser.DynCipher.Generation {
 
 		private void EmitStatement(Statement statement) {
 			if (statement is AssignmentStatement) {
-				var assignment = (AssignmentStatement) statement;
+				var assignment = (AssignmentStatement)statement;
 				EmitStore(assignment.Target, assignment.Value);
 			}
 			else if (statement is LoopStatement) {
-				var loop = (LoopStatement) statement;
+				var loop = (LoopStatement)statement;
 				/*
                  *      ldc.i4  begin
                  *      br      cmp
@@ -183,7 +183,7 @@ namespace Confuser.DynCipher.Generation {
 				Emit(Instruction.Create(OpCodes.Pop));
 			}
 			else if (statement is StatementBlock) {
-				foreach (Statement child in ((StatementBlock) statement).Statements)
+				foreach (Statement child in ((StatementBlock)statement).Statements)
 					EmitStatement(child);
 			}
 			else

@@ -4,7 +4,7 @@ namespace Confuser.DynCipher.Transforms {
 	internal class NormalizeBinOpTransform {
 		private static Expression ProcessExpression(Expression exp) {
 			if (exp is BinOpExpression) {
-				var binOp = (BinOpExpression) exp;
+				var binOp = (BinOpExpression)exp;
 				var binOpRight = binOp.Right as BinOpExpression;
 				//  a + (b + c) => (a + b) + c
 				if (binOpRight != null && binOpRight.Operation == binOp.Operation &&
@@ -22,22 +22,22 @@ namespace Confuser.DynCipher.Transforms {
 				binOp.Left = ProcessExpression(binOp.Left);
 				binOp.Right = ProcessExpression(binOp.Right);
 
-				if (binOp.Right is LiteralExpression && ((LiteralExpression) binOp.Right).Value == 0 &&
+				if (binOp.Right is LiteralExpression && ((LiteralExpression)binOp.Right).Value == 0 &&
 				    binOp.Operation == BinOps.Add) // x + 0 => x
 					return binOp.Left;
 			}
 			else if (exp is ArrayIndexExpression) {
-				((ArrayIndexExpression) exp).Array = ProcessExpression(((ArrayIndexExpression) exp).Array);
+				((ArrayIndexExpression)exp).Array = ProcessExpression(((ArrayIndexExpression)exp).Array);
 			}
 			else if (exp is UnaryOpExpression) {
-				((UnaryOpExpression) exp).Value = ProcessExpression(((UnaryOpExpression) exp).Value);
+				((UnaryOpExpression)exp).Value = ProcessExpression(((UnaryOpExpression)exp).Value);
 			}
 			return exp;
 		}
 
 		private static void ProcessStatement(Statement st) {
 			if (st is AssignmentStatement) {
-				var assign = (AssignmentStatement) st;
+				var assign = (AssignmentStatement)st;
 				assign.Target = ProcessExpression(assign.Target);
 				assign.Value = ProcessExpression(assign.Value);
 			}

@@ -92,13 +92,13 @@ namespace Confuser.Protections.ControlFlow {
 			}
 
 			private void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
-				var writer = (ModuleWriter) sender;
+				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 					codeChunk = writer.MethodBodies.Add(new MethodBody(code));
 				}
 				else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 					uint rid = writer.MetaData.GetRid(native);
-					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint) codeChunk.RVA;
+					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)codeChunk.RVA;
 				}
 			}
 		}

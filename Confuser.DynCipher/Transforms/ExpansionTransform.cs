@@ -5,9 +5,9 @@ namespace Confuser.DynCipher.Transforms {
 	internal class ExpansionTransform {
 		private static bool ProcessStatement(Statement st, StatementBlock block) {
 			if (st is AssignmentStatement) {
-				var assign = (AssignmentStatement) st;
+				var assign = (AssignmentStatement)st;
 				if (assign.Value is BinOpExpression) {
-					var exp = (BinOpExpression) assign.Value;
+					var exp = (BinOpExpression)assign.Value;
 					if ((exp.Left is BinOpExpression || exp.Right is BinOpExpression) &&
 					    exp.Left != assign.Target) {
 						block.Statements.Add(new AssignmentStatement {

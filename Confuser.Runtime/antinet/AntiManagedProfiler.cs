@@ -145,7 +145,7 @@ namespace Confuser.Runtime {
 				unsafe {
 					if (profilerStatusFlag == IntPtr.Zero)
 						return false;
-					return (*(uint*) profilerStatusFlag & 6) != 0;
+					return (*(uint*)profilerStatusFlag & 6) != 0;
 				}
 			}
 
@@ -178,17 +178,17 @@ namespace Confuser.Runtime {
 						return false;
 
 					const int MAX_COUNTS = 50;
-					var p = (byte*) sectionAddr;
-					byte* end = (byte*) sectionAddr + sectionSize;
+					var p = (byte*)sectionAddr;
+					byte* end = (byte*)sectionAddr + sectionSize;
 					for (; p < end; p++) {
 						IntPtr addr;
 
 						// F6 05 XX XX XX XX 06	test byte ptr [mem],6
 						if (*p == 0xF6 && p[1] == 0x05 && p[6] == 0x06) {
 							if (IntPtr.Size == 4)
-								addr = new IntPtr((void*) *(uint*) (p + 2));
+								addr = new IntPtr((void*)*(uint*)(p + 2));
 							else
-								addr = new IntPtr(p + 7 + *(int*) (p + 2));
+								addr = new IntPtr(p + 7 + *(int*)(p + 2));
 						}
 						else
 							continue;
@@ -199,7 +199,7 @@ namespace Confuser.Runtime {
 							continue;
 
 						try {
-							*(uint*) addr = *(uint*) addr;
+							*(uint*)addr = *(uint*)addr;
 						}
 						catch {
 							continue;
@@ -225,7 +225,7 @@ namespace Confuser.Runtime {
 			public override unsafe void PreventActiveProfilerFromReceivingProfilingMessages() {
 				if (profilerStatusFlag == IntPtr.Zero)
 					return;
-				*(uint*) profilerStatusFlag &= ~6U;
+				*(uint*)profilerStatusFlag &= ~6U;
 			}
 		}
 
@@ -241,7 +241,7 @@ namespace Confuser.Runtime {
 
 			private const uint ConfigDWORDInfo_name = 0;
 			private const string ProfAPIMaxWaitForTriggerMs_name = "ProfAPIMaxWaitForTriggerMs";
-			private static readonly uint ConfigDWORDInfo_defValue = (uint) IntPtr.Size;
+			private static readonly uint ConfigDWORDInfo_defValue = (uint)IntPtr.Size;
 
 			/// <summary>
 			///     Address of the profiler control block. Only some fields are interesting and
@@ -285,7 +285,7 @@ namespace Confuser.Runtime {
 				unsafe {
 					if (profilerControlBlock == IntPtr.Zero)
 						return false;
-					return *(uint*) ((byte*) profilerControlBlock + IntPtr.Size + 4) != 0;
+					return *(uint*)((byte*)profilerControlBlock + IntPtr.Size + 4) != 0;
 				}
 			}
 
@@ -334,8 +334,8 @@ namespace Confuser.Runtime {
 						return false;
 
 					// Make sure the thread can exit. If this value is 2, it will never exit.
-					if (threadingModeAddr != IntPtr.Zero && *(uint*) threadingModeAddr == 2)
-						*(uint*) threadingModeAddr = 1;
+					if (threadingModeAddr != IntPtr.Zero && *(uint*)threadingModeAddr == 2)
+						*(uint*)threadingModeAddr = 1;
 
 					// Set default timeout to 0 and rename timeout option
 					FixTimeOutOption(timeOutOptionAddr);
@@ -375,23 +375,23 @@ namespace Confuser.Runtime {
 					return;
 
 				uint oldProtect;
-				VirtualProtect(timeOutOptionAddr, (int) ConfigDWORDInfo_defValue + 4, PAGE_EXECUTE_READWRITE, out oldProtect);
+				VirtualProtect(timeOutOptionAddr, (int)ConfigDWORDInfo_defValue + 4, PAGE_EXECUTE_READWRITE, out oldProtect);
 				try {
 					// Set default timeout to 0 to make sure it fails immediately
-					*(uint*) ((byte*) timeOutOptionAddr + ConfigDWORDInfo_defValue) = 0;
+					*(uint*)((byte*)timeOutOptionAddr + ConfigDWORDInfo_defValue) = 0;
 				}
 				finally {
-					VirtualProtect(timeOutOptionAddr, (int) ConfigDWORDInfo_defValue + 4, oldProtect, out oldProtect);
+					VirtualProtect(timeOutOptionAddr, (int)ConfigDWORDInfo_defValue + 4, oldProtect, out oldProtect);
 				}
 
 				// Rename the option to make sure the user can't override the value
-				char* name = *(char**) ((byte*) timeOutOptionAddr + ConfigDWORDInfo_name);
+				char* name = *(char**)((byte*)timeOutOptionAddr + ConfigDWORDInfo_name);
 				var nameAddr = new IntPtr(name);
 				VirtualProtect(nameAddr, ProfAPIMaxWaitForTriggerMs_name.Length * 2, PAGE_EXECUTE_READWRITE, out oldProtect);
 				try {
 					var rand = new Random();
 					for (int i = 0; i < ProfAPIMaxWaitForTriggerMs_name.Length; i++)
-						name[i] = (char) rand.Next(1, ushort.MaxValue);
+						name[i] = (char)rand.Next(1, ushort.MaxValue);
 				}
 				finally {
 					VirtualProtect(nameAddr, IntPtr.Size, oldProtect, out oldProtect);
@@ -464,8 +464,8 @@ namespace Confuser.Runtime {
 					if (!peInfo.FindSection(".text", out sectionAddr, out sectionSize))
 						return IntPtr.Zero;
 
-					var ptr = (byte*) sectionAddr;
-					byte* end = (byte*) sectionAddr + sectionSize;
+					var ptr = (byte*)sectionAddr;
+					byte* end = (byte*)sectionAddr + sectionSize;
 					for (; ptr < end; ptr++) {
 						IntPtr addr;
 
@@ -475,9 +475,9 @@ namespace Confuser.Runtime {
 							if (*p != 0x83 || p[1] != 0x3D || p[6] != 2)
 								continue;
 							if (IntPtr.Size == 4)
-								addr = new IntPtr((void*) *(uint*) (p + 2));
+								addr = new IntPtr((void*)*(uint*)(p + 2));
 							else
-								addr = new IntPtr(p + 7 + *(int*) (p + 2));
+								addr = new IntPtr(p + 7 + *(int*)(p + 2));
 							if (!PEInfo.IsAligned(addr, 4))
 								continue;
 							if (!peInfo.IsValidImageAddress(addr))
@@ -485,9 +485,9 @@ namespace Confuser.Runtime {
 							p += 7;
 
 							// 1 = normal lazy thread creation. 2 = thread is always present
-							if (*(uint*) addr < 1 || *(uint*) addr > 2)
+							if (*(uint*)addr < 1 || *(uint*)addr > 2)
 								continue;
-							*(uint*) addr = *(uint*) addr;
+							*(uint*)addr = *(uint*)addr;
 
 							//	74 / 0F 84 XX			je there
 							if (!NextJz(ref p))
@@ -496,7 +496,7 @@ namespace Confuser.Runtime {
 							//	83 E8+r 00 / 85 C0+rr	sub reg,0 / test reg,reg
 							SkipRex(ref p);
 							if (*p == 0x83 && p[2] == 0) {
-								if ((uint) (p[1] - 0xE8) > 7)
+								if ((uint)(p[1] - 0xE8) > 7)
 									continue;
 								p += 3;
 							}
@@ -552,11 +552,11 @@ namespace Confuser.Runtime {
 					    !peInfo.FindSection(".text", out sectionAddr, out sectionSize))
 						return IntPtr.Zero;
 
-					var p = (byte*) sectionAddr;
-					byte* end = (byte*) sectionAddr + sectionSize;
+					var p = (byte*)sectionAddr;
+					byte* end = (byte*)sectionAddr + sectionSize;
 					for (; p < end; p++) {
 						try {
-							char* name = *(char**) (p + ConfigDWORDInfo_name);
+							char* name = *(char**)(p + ConfigDWORDInfo_name);
 							if (!PEInfo.IsAligned(new IntPtr(name), 2))
 								continue;
 							if (!peInfo.IsValidImageAddress(name))
@@ -624,7 +624,7 @@ namespace Confuser.Runtime {
 				if (threadProc == IntPtr.Zero)
 					return false;
 
-				var p = (byte*) threadProc;
+				var p = (byte*)threadProc;
 				uint oldProtect;
 				VirtualProtect(new IntPtr(p), 5, PAGE_EXECUTE_READWRITE, out oldProtect);
 				try {
@@ -663,9 +663,9 @@ namespace Confuser.Runtime {
 					if (!peInfo.FindSection(".text", out sectionAddr, out sectionSize))
 						return IntPtr.Zero;
 
-					var p = (byte*) sectionAddr;
+					var p = (byte*)sectionAddr;
 					byte* start = p;
-					byte* end = (byte*) sectionAddr + sectionSize;
+					byte* end = (byte*)sectionAddr + sectionSize;
 
 					if (IntPtr.Size == 4) {
 						for (; p < end; p++) {
@@ -688,7 +688,7 @@ namespace Confuser.Runtime {
 							if (p[10] != 0xFF || p[11] != 0x15)
 								continue;
 
-							var threadProc = new IntPtr((void*) *(uint*) (p + 4));
+							var threadProc = new IntPtr((void*)*(uint*)(p + 4));
 							if (!CheckThreadProc(start, end, threadProc))
 								continue;
 
@@ -715,7 +715,7 @@ namespace Confuser.Runtime {
 							if (p[14] != 0xFF && p[15] != 0x15)
 								continue;
 
-							var threadProc = new IntPtr(p + 10 + *(int*) (p + 6));
+							var threadProc = new IntPtr(p + 10 + *(int*)(p + 6));
 							if (!CheckThreadProc(start, end, threadProc))
 								continue;
 
@@ -738,7 +738,7 @@ namespace Confuser.Runtime {
 			[HandleProcessCorruptedStateExceptions, SecurityCritical] // Req'd on .NET 4.0
 			private static unsafe bool CheckThreadProc(byte* codeStart, byte* codeEnd, IntPtr threadProc) {
 				try {
-					var p = (byte*) threadProc;
+					var p = (byte*)threadProc;
 
 					// Must be in .text section
 					if (p < codeStart || p >= codeEnd)
@@ -746,7 +746,7 @@ namespace Confuser.Runtime {
 
 					// It has a constant that is present in the first N bytes
 					for (int i = 0; i < 0x20; i++) {
-						if (*(uint*) (p + i) == 0x4000)
+						if (*(uint*)(p + i) == 0x4000)
 							return true;
 					}
 				}
@@ -774,8 +774,8 @@ namespace Confuser.Runtime {
 						return false;
 
 					const int MAX_COUNTS = 50;
-					var p = (byte*) sectionAddr;
-					byte* end = (byte*) sectionAddr + sectionSize;
+					var p = (byte*)sectionAddr;
+					byte* end = (byte*)sectionAddr + sectionSize;
 					for (; p < end; p++) {
 						IntPtr addr;
 
@@ -783,24 +783,24 @@ namespace Confuser.Runtime {
 						// 83 F8 04				cmp eax,4
 						if (*p == 0xA1 && p[5] == 0x83 && p[6] == 0xF8 && p[7] == 0x04) {
 							if (IntPtr.Size == 4)
-								addr = new IntPtr((void*) *(uint*) (p + 1));
+								addr = new IntPtr((void*)*(uint*)(p + 1));
 							else
-								addr = new IntPtr(p + 5 + *(int*) (p + 1));
+								addr = new IntPtr(p + 5 + *(int*)(p + 1));
 						}
 							// 8B 05 xx xx xx xx	mov eax,[mem]
 							// 83 F8 04				cmp eax,4
 						else if (*p == 0x8B && p[1] == 0x05 && p[6] == 0x83 && p[7] == 0xF8 && p[8] == 0x04) {
 							if (IntPtr.Size == 4)
-								addr = new IntPtr((void*) *(uint*) (p + 2));
+								addr = new IntPtr((void*)*(uint*)(p + 2));
 							else
-								addr = new IntPtr(p + 6 + *(int*) (p + 2));
+								addr = new IntPtr(p + 6 + *(int*)(p + 2));
 						}
 							// 83 3D XX XX XX XX 04	cmp dword ptr [mem],4
 						else if (*p == 0x83 && p[1] == 0x3D && p[6] == 0x04) {
 							if (IntPtr.Size == 4)
-								addr = new IntPtr((void*) *(uint*) (p + 2));
+								addr = new IntPtr((void*)*(uint*)(p + 2));
 							else
-								addr = new IntPtr(p + 7 + *(int*) (p + 2));
+								addr = new IntPtr(p + 7 + *(int*)(p + 2));
 						}
 						else
 							continue;
@@ -812,9 +812,9 @@ namespace Confuser.Runtime {
 
 						// Valid values are 0-4. 4 being attached.
 						try {
-							if (*(uint*) addr > 4)
+							if (*(uint*)addr > 4)
 								continue;
-							*(uint*) addr = *(uint*) addr;
+							*(uint*)addr = *(uint*)addr;
 						}
 						catch {
 							continue;
@@ -833,14 +833,14 @@ namespace Confuser.Runtime {
 				if (foundAddr == IntPtr.Zero)
 					return false;
 
-				profilerControlBlock = new IntPtr((byte*) foundAddr - (IntPtr.Size + 4));
+				profilerControlBlock = new IntPtr((byte*)foundAddr - (IntPtr.Size + 4));
 				return true;
 			}
 
 			public override unsafe void PreventActiveProfilerFromReceivingProfilingMessages() {
 				if (profilerControlBlock == IntPtr.Zero)
 					return;
-				*(uint*) ((byte*) profilerControlBlock + IntPtr.Size + 4) = 0;
+				*(uint*)((byte*)profilerControlBlock + IntPtr.Size + 4) = 0;
 			}
 		}
 	}

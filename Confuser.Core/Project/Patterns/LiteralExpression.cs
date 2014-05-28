@@ -28,7 +28,7 @@ namespace Confuser.Core.Project.Patterns {
 		/// <inheritdoc />
 		public override void Serialize(IList<PatternToken> tokens) {
 			if (Literal is bool) {
-				var value = (bool) Literal;
+				var value = (bool)Literal;
 				tokens.Add(new PatternToken(TokenType.Identifier, value.ToString().ToLowerInvariant()));
 			}
 			else

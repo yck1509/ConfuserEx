@@ -118,7 +118,7 @@ namespace Confuser.Core {
 				throw new ArgumentException("Length mismatched.");
 			var ret = new byte[buffer1.Length];
 			for (int i = 0; i < ret.Length; i++)
-				ret[i] = (byte) (buffer1[i] ^ buffer2[i]);
+				ret[i] = (byte)(buffer1[i] ^ buffer2[i]);
 			return ret;
 		}
 

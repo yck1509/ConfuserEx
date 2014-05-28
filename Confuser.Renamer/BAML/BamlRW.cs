@@ -29,8 +29,8 @@ namespace Confuser.Renamer.BAML {
 			{
 				var rdr = new BinaryReader(str, Encoding.Unicode);
 				uint len = rdr.ReadUInt32();
-				ret.Signature = new string(rdr.ReadChars((int) (len >> 1)));
-				rdr.ReadBytes((int) (((len + 3) & ~3) - len));
+				ret.Signature = new string(rdr.ReadChars((int)(len >> 1)));
+				rdr.ReadBytes((int)(((len + 3) & ~3) - len));
 			}
 			if (ret.Signature != "MSBAML") throw new NotSupportedException();
 			ret.ReaderVersion = new BamlDocument.BamlVersion { Major = reader.ReadUInt16(), Minor = reader.ReadUInt16() };
@@ -44,7 +44,7 @@ namespace Confuser.Renamer.BAML {
 			var recs = new Dictionary<long, BamlRecord>();
 			while (str.Position < str.Length) {
 				long pos = str.Position;
-				var type = (BamlRecordType) reader.ReadByte();
+				var type = (BamlRecordType)reader.ReadByte();
 				BamlRecord rec = null;
 				switch (type) {
 					case BamlRecordType.AssemblyInfo:
@@ -242,7 +242,7 @@ namespace Confuser.Renamer.BAML {
 			for (int i = 0; i < doc.Count; i++) {
 				BamlRecord rec = doc[i];
 				rec.Position = str.Position;
-				writer.Write((byte) rec.Type);
+				writer.Write((byte)rec.Type);
 				rec.Write(writer);
 				if (rec is IBamlDeferRecord) defers.Add(i);
 			}

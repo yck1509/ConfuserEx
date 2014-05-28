@@ -194,7 +194,7 @@ namespace Confuser.Core.Project {
 			Id = elem.Attributes["id"].Value;
 
 			if (elem.Attributes["action"] != null)
-				Action = (SettingItemAction) Enum.Parse(typeof (SettingItemAction), elem.Attributes["action"].Value, true);
+				Action = (SettingItemAction)Enum.Parse(typeof (SettingItemAction), elem.Attributes["action"].Value, true);
 			else
 				Action = SettingItemAction.Add;
 
@@ -265,7 +265,7 @@ namespace Confuser.Core.Project {
 			Pattern = elem.Attributes["pattern"].Value;
 
 			if (elem.Attributes["preset"] != null)
-				Preset = (ProtectionPreset) Enum.Parse(typeof (ProtectionPreset), elem.Attributes["preset"].Value, true);
+				Preset = (ProtectionPreset)Enum.Parse(typeof (ProtectionPreset), elem.Attributes["preset"].Value, true);
 			else
 				Preset = ProtectionPreset.None;
 

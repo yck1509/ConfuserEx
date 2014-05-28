@@ -128,7 +128,7 @@ namespace Confuser.Core {
 		/// <param name="member">The member definition.</param>
 		/// <param name="context">The working context.</param>
 		protected internal virtual void MarkMember(IDnlibDef member, ConfuserContext context) {
-			ModuleDef module = ((IMemberRef) member).Module;
+			ModuleDef module = ((IMemberRef)member).Module;
 			var rules = context.Annotations.Get<Rules>(module, RulesKey);
 			ApplyRules(context, member, rules);
 		}
@@ -173,7 +173,7 @@ namespace Confuser.Core {
 		protected void ApplyRules(ConfuserContext context, IDnlibDef target, Rules rules) {
 			var ret = new ProtectionSettings();
 			foreach (var i in rules) {
-				if (!(bool) i.Value.Evaluate(target)) continue;
+				if (!(bool)i.Value.Evaluate(target)) continue;
 
 				if (!i.Key.Inherit)
 					ret.Clear();

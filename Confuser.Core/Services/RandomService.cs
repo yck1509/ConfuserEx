@@ -23,7 +23,7 @@ namespace Confuser.Core.Services {
 		/// </summary>
 		/// <param name="seed">The seed.</param>
 		internal RandomGenerator(byte[] seed) {
-			state = (byte[]) seed.Clone();
+			state = (byte[])seed.Clone();
 			stateFilled = 32;
 			mixIndex = 0;
 		}
@@ -132,7 +132,7 @@ namespace Confuser.Core.Services {
 		/// <param name="max">The exclusive upper bound.</param>
 		/// <returns>Requested random number.</returns>
 		public int NextInt32(int max) {
-			return (int) (NextUInt32() % max);
+			return (int)(NextUInt32() % max);
 		}
 
 		/// <summary>
@@ -143,7 +143,7 @@ namespace Confuser.Core.Services {
 		/// <returns>Requested random number.</returns>
 		public int NextInt32(int min, int max) {
 			if (max <= min) return min;
-			return min + (int) (NextUInt32() % (max - min));
+			return min + (int)(NextUInt32() % (max - min));
 		}
 
 		/// <summary>
@@ -159,7 +159,7 @@ namespace Confuser.Core.Services {
 		/// </summary>
 		/// <returns>Requested random number.</returns>
 		public double NextDouble() {
-			return NextUInt32() / ((double) uint.MaxValue + 1);
+			return NextUInt32() / ((double)uint.MaxValue + 1);
 		}
 
 		/// <summary>

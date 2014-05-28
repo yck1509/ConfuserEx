@@ -97,10 +97,10 @@ namespace Confuser.Protections {
 			}
 
 			byte[] key = random.NextBytes(4 + maxLen);
-			key[0] = (byte) (compCtx.EntryPointToken >> 0);
-			key[1] = (byte) (compCtx.EntryPointToken >> 8);
-			key[2] = (byte) (compCtx.EntryPointToken >> 16);
-			key[3] = (byte) (compCtx.EntryPointToken >> 24);
+			key[0] = (byte)(compCtx.EntryPointToken >> 0);
+			key[1] = (byte)(compCtx.EntryPointToken >> 8);
+			key[2] = (byte)(compCtx.EntryPointToken >> 16);
+			key[3] = (byte)(compCtx.EntryPointToken >> 24);
 			for (int i = 4; i < key.Length; i++) // no zero bytes
 				key[i] |= 1;
 			compCtx.KeySig = key;
@@ -125,7 +125,7 @@ namespace Confuser.Protections {
 			dataType.Layout = TypeAttributes.ExplicitLayout;
 			dataType.Visibility = TypeAttributes.NestedPrivate;
 			dataType.IsSealed = true;
-			dataType.ClassLayout = new ClassLayoutUser(1, (uint) data.Length);
+			dataType.ClassLayout = new ClassLayoutUser(1, (uint)data.Length);
 			stubModule.GlobalType.NestedTypes.Add(dataType);
 
 			var dataField = new FieldDefUser("DataField", new FieldSig(dataType.ToTypeSig())) {
@@ -176,7 +176,7 @@ namespace Confuser.Protections {
 
 			MutationHelper.InjectKeys(entryPoint,
 			                          new[] { 0, 1 },
-			                          new[] { encryptedModule.Length >> 2, (int) seed });
+			                          new[] { encryptedModule.Length >> 2, (int)seed });
 			InjectData(stubModule, entryPoint, encryptedModule);
 
 			// Decrypt
@@ -186,7 +186,7 @@ namespace Confuser.Protections {
 			for (int i = 0; i < instrs.Count; i++) {
 				Instruction instr = instrs[i];
 				if (instr.OpCode == OpCodes.Call) {
-					var method = (IMethod) instr.Operand;
+					var method = (IMethod)instr.Operand;
 					if (method.DeclaringType.Name == "Mutation" &&
 					    method.Name == "Crypt") {
 						Instruction ldDst = instrs[i - 2];
@@ -195,7 +195,7 @@ namespace Confuser.Protections {
 						instrs.RemoveAt(i);
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
-						instrs.InsertRange(i - 2, compCtx.Deriver.EmitDerivation(decrypter, context, (Local) ldDst.Operand, (Local) ldSrc.Operand));
+						instrs.InsertRange(i - 2, compCtx.Deriver.EmitDerivation(decrypter, context, (Local)ldDst.Operand, (Local)ldSrc.Operand));
 					}
 					else if (method.DeclaringType.Name == "Lzma" &&
 					         method.Name == "Decompress") {
@@ -227,7 +227,7 @@ namespace Confuser.Protections {
 					Debug.Assert(sigRid == 1);
 					uint sigToken = 0x11000000 | sigRid;
 					ctx.KeyToken = sigToken;
-					MutationHelper.InjectKey(writer.Module.EntryPoint, 2, (int) sigToken);
+					MutationHelper.InjectKey(writer.Module.EntryPoint, 2, (int)sigToken);
 				}
 				else if (evt == ModuleWriterEvent.MDBeginAddResources) {
 					// Compute hash
@@ -236,7 +236,7 @@ namespace Confuser.Protections {
 
 					MDTable<RawFileRow> fileTbl = writer.MetaData.TablesHeap.FileTable;
 					uint fileRid = fileTbl.Add(new RawFileRow(
-						                           (uint) FileAttributes.ContainsMetaData,
+						                           (uint)FileAttributes.ContainsMetaData,
 						                           writer.MetaData.StringsHeap.Add("koi"),
 						                           hashBlob));
 					uint impl = CodedToken.Implementation.Encode(new MDToken(Table.File, fileRid));

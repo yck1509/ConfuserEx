@@ -64,7 +64,7 @@ namespace Confuser.Protections.ReferenceProxy {
 		public override void ProcessCall(RPContext ctx, int instrIndex) {
 			Instruction invoke = ctx.Body.Instructions[instrIndex];
 
-			TypeDef declType = ((IMethod) invoke.Operand).DeclaringType.ResolveTypeDefThrow();
+			TypeDef declType = ((IMethod)invoke.Operand).DeclaringType.ResolveTypeDefThrow();
 			if (!declType.Module.IsILOnly) // Reflection doesn't like mixed mode modules.
 				return;
 			if (declType.IsGlobalModuleType) // Reflection doesn't like global methods too.
@@ -86,7 +86,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 		private void ProcessBridge(RPContext ctx, int instrIndex) {
 			Instruction instr = ctx.Body.Instructions[instrIndex];
-			var target = (IMethod) instr.Operand;
+			var target = (IMethod)instr.Operand;
 
 			TypeDef declType = target.DeclaringType.ResolveTypeDefThrow();
 			if (!declType.Module.IsILOnly) // Reflection doesn't like mixed mode modules.
@@ -126,7 +126,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 		private void ProcessInvoke(RPContext ctx, int instrIndex, int argBeginIndex) {
 			Instruction instr = ctx.Body.Instructions[instrIndex];
-			var target = (IMethod) instr.Operand;
+			var target = (IMethod)instr.Operand;
 
 			MethodSig sig = CreateProxySignature(ctx, target, instr.OpCode.Code == Code.Newobj);
 			TypeDef delegateType = GetDelegateType(ctx, sig);
@@ -234,7 +234,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				foreach (IDnlibDef def in injectedAttr.FindDefinitions()) {
 					if (def.Name == "GetHashCode") {
 						ctx.Name.MarkHelper(def, ctx.Marker);
-						((MethodDef) def).Access = MethodAttributes.Public;
+						((MethodDef)def).Access = MethodAttributes.Public;
 					}
 					else
 						ctx.Name.MarkHelper(def, ctx.Marker);
@@ -293,7 +293,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				do {
 					// No zero bytes
 					opKey = ctx.Random.NextByte();
-				} while (opKey == (byte) field.Key.Item1);
+				} while (opKey == (byte)field.Key.Item1);
 
 				TypeDef delegateType = field.Value.Item1.DeclaringType;
 
@@ -323,7 +323,7 @@ namespace Confuser.Protections.ReferenceProxy {
 		}
 
 		private void EncodeField(object sender, ModuleWriterListenerEventArgs e) {
-			var writer = (ModuleWriter) sender;
+			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDMemberDefRidsAllocated) {
 				Dictionary<TypeDef, Func<int, int>> keyFuncs = keyAttrs
 					.Where(entry => entry != null)
@@ -334,16 +334,16 @@ namespace Confuser.Protections.ReferenceProxy {
 
 					// CA
 					CustomAttribute ca = desc.Field.CustomAttributes[0];
-					int encodedKey = keyFuncs[(TypeDef) ca.AttributeType]((int) MathsUtils.modInv(key));
+					int encodedKey = keyFuncs[(TypeDef)ca.AttributeType]((int)MathsUtils.modInv(key));
 					ca.ConstructorArguments.Add(new CAArgument(encodeCtx.Module.CorLibTypes.Int32, encodedKey));
 					token *= key;
 
 					// Encoding
-					token = (uint) desc.InitDesc.Encoding.Encode(desc.InitDesc.Method, encodeCtx, (int) token);
+					token = (uint)desc.InitDesc.Encoding.Encode(desc.InitDesc.Method, encodeCtx, (int)token);
 
 					// Field name
 					var name = new char[5];
-					name[desc.InitDesc.OpCodeIndex] = (char) ((byte) desc.OpCode ^ desc.OpKey);
+					name[desc.InitDesc.OpCodeIndex] = (char)((byte)desc.OpCode ^ desc.OpKey);
 
 					byte[] nameKey = encodeCtx.Random.NextBytes(4);
 					uint encodedNameKey = 0;
@@ -351,23 +351,23 @@ namespace Confuser.Protections.ReferenceProxy {
 						// No zero bytes
 						while (nameKey[i] == 0)
 							nameKey[i] = encodeCtx.Random.NextByte();
-						name[desc.InitDesc.TokenNameOrder[i]] = (char) nameKey[i];
-						encodedNameKey |= (uint) nameKey[i] << desc.InitDesc.TokenByteOrder[i];
+						name[desc.InitDesc.TokenNameOrder[i]] = (char)nameKey[i];
+						encodedNameKey |= (uint)nameKey[i] << desc.InitDesc.TokenByteOrder[i];
 					}
 					desc.Field.Name = new string(name);
 
 					// Field sig
 					FieldSig sig = desc.Field.FieldSig;
-					uint encodedToken = (token - writer.MetaData.GetToken(((CModOptSig) sig.Type).Modifier).Raw) ^ encodedNameKey;
+					uint encodedToken = (token - writer.MetaData.GetToken(((CModOptSig)sig.Type).Modifier).Raw) ^ encodedNameKey;
 
 
 					var extra = new byte[8];
 					extra[0] = 0xc0;
-					extra[3] = (byte) (encodedToken >> desc.InitDesc.TokenByteOrder[3]);
+					extra[3] = (byte)(encodedToken >> desc.InitDesc.TokenByteOrder[3]);
 					extra[4] = 0xc0;
-					extra[5] = (byte) (encodedToken >> desc.InitDesc.TokenByteOrder[2]);
-					extra[6] = (byte) (encodedToken >> desc.InitDesc.TokenByteOrder[1]);
-					extra[7] = (byte) (encodedToken >> desc.InitDesc.TokenByteOrder[0]);
+					extra[5] = (byte)(encodedToken >> desc.InitDesc.TokenByteOrder[2]);
+					extra[6] = (byte)(encodedToken >> desc.InitDesc.TokenByteOrder[1]);
+					extra[7] = (byte)(encodedToken >> desc.InitDesc.TokenByteOrder[0]);
 					sig.ExtraData = extra;
 				}
 			}

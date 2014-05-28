@@ -18,9 +18,9 @@ namespace Confuser.Renamer {
 		public static VTableSignature FromMethod(IMethod method) {
 			MethodSig sig = method.MethodSig;
 			if (method.DeclaringType is TypeSpec) {
-				var typeSpec = (TypeSpec) method.DeclaringType;
+				var typeSpec = (TypeSpec)method.DeclaringType;
 				if (typeSpec.TypeSig is GenericInstSig) {
-					sig = GenericArgumentResolver.Resolve(sig, ((GenericInstSig) typeSpec.TypeSig).GenericArguments);
+					sig = GenericArgumentResolver.Resolve(sig, ((GenericInstSig)typeSpec.TypeSig).GenericArguments);
 				}
 			}
 			return new VTableSignature(sig, method.Name);
@@ -244,17 +244,17 @@ namespace Confuser.Renamer {
 			if (type == null)
 				return null;
 			if (type is TypeDef)
-				return GetOrConstruct((TypeDef) type);
+				return GetOrConstruct((TypeDef)type);
 			else if (type is TypeRef)
-				return GetOrConstruct(((TypeRef) type).ResolveThrow());
+				return GetOrConstruct(((TypeRef)type).ResolveThrow());
 			else if (type is TypeSpec) {
-				TypeSig sig = ((TypeSpec) type).TypeSig;
+				TypeSig sig = ((TypeSpec)type).TypeSig;
 				if (sig is TypeDefOrRefSig) {
-					TypeDef typeDef = ((TypeDefOrRefSig) sig).TypeDefOrRef.ResolveTypeDefThrow();
+					TypeDef typeDef = ((TypeDefOrRefSig)sig).TypeDefOrRef.ResolveTypeDefThrow();
 					return GetOrConstruct(typeDef);
 				}
 				else if (sig is GenericInstSig) {
-					var genInst = (GenericInstSig) sig;
+					var genInst = (GenericInstSig)sig;
 					TypeDef openType = genInst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
 					VTable vTable = GetOrConstruct(openType);
 
@@ -275,7 +275,7 @@ namespace Confuser.Renamer {
 				MethodSig newSig = GenericArgumentResolver.Resolve(slot.Signature.MethodSig, genInst.GenericArguments);
 				TypeSig newDecl = slot.DeclaringType;
 				if (new SigComparer().Equals(newDecl, openType))
-					newDecl = new GenericInstSig((ClassOrValueTypeSig) openType.ToTypeSig(), genInst.GenericArguments.ToArray());
+					newDecl = new GenericInstSig((ClassOrValueTypeSig)openType.ToTypeSig(), genInst.GenericArguments.ToArray());
 				else
 					newDecl = GenericArgumentResolver.Resolve(newDecl, genInst.GenericArguments);
 				ret.Slots.Add(new VTableSlot(ret, slot.MethodDef, newDecl, new VTableSignature(newSig, slot.Signature.Name)).Override(slot));

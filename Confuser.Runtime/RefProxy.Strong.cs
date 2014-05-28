@@ -34,7 +34,7 @@ namespace Confuser.Runtime {
 			MethodBase method = fieldInfo.Module.ResolveMethod(token);
 			Type delegateType = fieldInfo.FieldType;
 			if (method.IsStatic)
-				fieldInfo.SetValue(null, Delegate.CreateDelegate(delegateType, (MethodInfo) method));
+				fieldInfo.SetValue(null, Delegate.CreateDelegate(delegateType, (MethodInfo)method));
 
 			else {
 				DynamicMethod dm = null;
@@ -58,14 +58,14 @@ namespace Confuser.Runtime {
 				int index = 0;
 				for (int i = 0; i < argTypes.Length; i++) {
 					code[index++] = 0x0e;
-					code[index++] = (byte) i;
+					code[index++] = (byte)i;
 				}
-				code[index++] = (byte) ((byte) fieldInfo.Name[Mutation.KeyI8] ^ opKey);
+				code[index++] = (byte)((byte)fieldInfo.Name[Mutation.KeyI8] ^ opKey);
 				int dmToken = info.GetTokenFor(method.MethodHandle);
-				code[index++] = (byte) dmToken;
-				code[index++] = (byte) (dmToken >> 8);
-				code[index++] = (byte) (dmToken >> 16);
-				code[index++] = (byte) (dmToken >> 24);
+				code[index++] = (byte)dmToken;
+				code[index++] = (byte)(dmToken >> 8);
+				code[index++] = (byte)(dmToken >> 16);
+				code[index++] = (byte)(dmToken >> 24);
 				code[index] = 0x2a;
 				info.SetCode(code, argTypes.Length + 1);
 

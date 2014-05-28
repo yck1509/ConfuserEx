@@ -62,8 +62,8 @@ namespace Confuser.Core {
 					paramType = nullable;
 
 				if (paramType.IsEnum)
-					return (T) Enum.Parse(paramType, ret, true);
-				return (T) Convert.ChangeType(ret, typeof (T));
+					return (T)Enum.Parse(paramType, ret, true);
+				return (T)Convert.ChangeType(ret, typeof (T));
 			}
 			return defValue;
 		}

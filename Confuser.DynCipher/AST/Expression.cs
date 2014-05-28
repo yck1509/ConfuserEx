@@ -30,7 +30,7 @@
 		public static BinOpExpression operator >>(Expression a, int b) {
 			return new BinOpExpression {
 				Left = a,
-				Right = (LiteralExpression) (uint) b,
+				Right = (LiteralExpression)(uint)b,
 				Operation = BinOps.Rsh
 			};
 		}
@@ -38,7 +38,7 @@
 		public static BinOpExpression operator <<(Expression a, int b) {
 			return new BinOpExpression {
 				Left = a,
-				Right = (LiteralExpression) (uint) b,
+				Right = (LiteralExpression)(uint)b,
 				Operation = BinOps.Lsh
 			};
 		}

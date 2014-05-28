@@ -12,11 +12,11 @@ namespace Confuser.DynCipher.Transforms {
 
 		private static Expression ProcessExpression(Expression exp) {
 			if (exp is BinOpExpression) {
-				var binOp = (BinOpExpression) exp;
+				var binOp = (BinOpExpression)exp;
 				if (binOp.Operation == BinOps.Mul && binOp.Right is LiteralExpression) {
 					// Decompose multiplication into shifts, e.g. x * 3 => x << 1 + x
-					uint literal = ((LiteralExpression) binOp.Right).Value;
-					if (literal == 0) return (LiteralExpression) 0;
+					uint literal = ((LiteralExpression)binOp.Right).Value;
+					if (literal == 0) return (LiteralExpression)0;
 					if (literal == 1) return binOp.Left;
 
 					uint bits = NumberOfSetBits(literal);
@@ -45,17 +45,17 @@ namespace Confuser.DynCipher.Transforms {
 				}
 			}
 			else if (exp is ArrayIndexExpression) {
-				((ArrayIndexExpression) exp).Array = ProcessExpression(((ArrayIndexExpression) exp).Array);
+				((ArrayIndexExpression)exp).Array = ProcessExpression(((ArrayIndexExpression)exp).Array);
 			}
 			else if (exp is UnaryOpExpression) {
-				((UnaryOpExpression) exp).Value = ProcessExpression(((UnaryOpExpression) exp).Value);
+				((UnaryOpExpression)exp).Value = ProcessExpression(((UnaryOpExpression)exp).Value);
 			}
 			return exp;
 		}
 
 		private static void ProcessStatement(Statement st) {
 			if (st is AssignmentStatement) {
-				var assign = (AssignmentStatement) st;
+				var assign = (AssignmentStatement)st;
 				assign.Target = ProcessExpression(assign.Target);
 				assign.Value = ProcessExpression(assign.Value);
 			}

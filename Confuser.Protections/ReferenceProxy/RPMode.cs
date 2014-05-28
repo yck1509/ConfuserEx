@@ -13,8 +13,8 @@ namespace Confuser.Protections.ReferenceProxy {
 
 		private static ITypeDefOrRef Import(RPContext ctx, TypeDef typeDef) {
 			ITypeDefOrRef retTypeRef = new Importer(ctx.Module, ImporterOptions.TryToUseTypeDefs).Import(typeDef);
-			if (typeDef.Module != ctx.Module && ctx.Context.Modules.Contains((ModuleDefMD) typeDef.Module))
-				ctx.Name.AddReference(typeDef, new TypeRefReference((TypeRef) retTypeRef, typeDef));
+			if (typeDef.Module != ctx.Module && ctx.Context.Modules.Contains((ModuleDefMD)typeDef.Module))
+				ctx.Name.AddReference(typeDef, new TypeRefReference((TypeRef)retTypeRef, typeDef));
 			return retTypeRef;
 		}
 

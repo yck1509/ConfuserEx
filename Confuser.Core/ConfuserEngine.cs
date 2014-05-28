@@ -9,29 +9,29 @@ using Confuser.Core.Services;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using dnlib.DotNet.Writer;
-using MethodAttributes = dnlib.DotNet.MethodAttributes;
-using MethodImplAttributes = dnlib.DotNet.MethodImplAttributes;
-using TypeAttributes = dnlib.DotNet.TypeAttributes;
 using InformationalAttribute = System.Reflection.AssemblyInformationalVersionAttribute;
 using ProductAttribute = System.Reflection.AssemblyProductAttribute;
 using CopyrightAttribute = System.Reflection.AssemblyCopyrightAttribute;
+using MethodAttributes = dnlib.DotNet.MethodAttributes;
+using MethodImplAttributes = dnlib.DotNet.MethodImplAttributes;
+using TypeAttributes = dnlib.DotNet.TypeAttributes;
 
 namespace Confuser.Core {
 	/// <summary>
 	///     The processing engine of Confuser.
 	/// </summary>
 	public static class ConfuserEngine {
-        public static readonly string Version;
-        static readonly string Copyright;
-        static ConfuserEngine()
-        {
-            var assembly = typeof(ConfuserEngine).Assembly;
-            var nameAttr = (ProductAttribute)assembly.GetCustomAttributes(typeof(ProductAttribute), false)[0];
-            var verAttr = (InformationalAttribute)assembly.GetCustomAttributes(typeof(InformationalAttribute), false)[0];
-            var cpAttr = (CopyrightAttribute)assembly.GetCustomAttributes(typeof(CopyrightAttribute), false)[0];
-            Version = string.Format("{0} {1}", nameAttr.Product, verAttr.InformationalVersion);
-            Copyright = cpAttr.Copyright;
-        }
+		public static readonly string Version;
+		private static readonly string Copyright;
+
+		static ConfuserEngine() {
+			Assembly assembly = typeof (ConfuserEngine).Assembly;
+			var nameAttr = (ProductAttribute)assembly.GetCustomAttributes(typeof (ProductAttribute), false)[0];
+			var verAttr = (InformationalAttribute)assembly.GetCustomAttributes(typeof (InformationalAttribute), false)[0];
+			var cpAttr = (CopyrightAttribute)assembly.GetCustomAttributes(typeof (CopyrightAttribute), false)[0];
+			Version = string.Format("{0} {1}", nameAttr.Product, verAttr.InformationalVersion);
+			Copyright = cpAttr.Copyright;
+		}
 
 		/// <summary>
 		///     Runs the engine with the specified parameters.
@@ -326,9 +326,9 @@ namespace Confuser.Core {
 
 			var ms = new MemoryStream();
 			if (context.CurrentModuleWriterOptions is ModuleWriterOptions)
-				context.CurrentModule.Write(ms, (ModuleWriterOptions) context.CurrentModuleWriterOptions);
+				context.CurrentModule.Write(ms, (ModuleWriterOptions)context.CurrentModuleWriterOptions);
 			else
-				context.CurrentModule.NativeWrite(ms, (NativeModuleWriterOptions) context.CurrentModuleWriterOptions);
+				context.CurrentModule.NativeWrite(ms, (NativeModuleWriterOptions)context.CurrentModuleWriterOptions);
 			context.CurrentModuleOutput = ms.ToArray();
 		}
 
@@ -363,7 +363,7 @@ namespace Confuser.Core {
 				context.Logger.Info("Protecting packer stub...");
 			}
 			else {
-                context.Logger.InfoFormat("{0} {1}", Version, Copyright);
+				context.Logger.InfoFormat("{0} {1}", Version, Copyright);
 
 				Type mono = Type.GetType("Mono.Runtime");
 				context.Logger.InfoFormat("Running on {0}, {1}, {2} bits",

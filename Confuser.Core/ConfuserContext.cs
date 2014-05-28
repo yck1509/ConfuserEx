@@ -148,7 +148,7 @@ namespace Confuser.Core {
 				CurrentModuleWriterOptions = new NativeModuleWriterOptions(CurrentModule);
 
 			if (CurrentModuleWriterOptions is NativeModuleWriterOptions)
-				return (NativeModuleWriterOptions) CurrentModuleWriterOptions;
+				return (NativeModuleWriterOptions)CurrentModuleWriterOptions;
 			var newOptions = new NativeModuleWriterOptions(CurrentModule, CurrentModuleWriterOptions.Listener);
 			// Clone the current options to the new options
 			newOptions.AddCheckSum = CurrentModuleWriterOptions.AddCheckSum;

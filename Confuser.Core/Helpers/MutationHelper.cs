@@ -40,7 +40,7 @@ namespace Confuser.Core.Helpers {
 		public static void InjectKey(MethodDef method, int keyId, int key) {
 			foreach (Instruction instr in method.Body.Instructions) {
 				if (instr.OpCode == OpCodes.Ldsfld) {
-					var field = (IField) instr.Operand;
+					var field = (IField)instr.Operand;
 					int _keyId;
 					if (field.DeclaringType.FullName == mutationType &&
 					    field2index.TryGetValue(field.Name, out _keyId) &&
@@ -61,7 +61,7 @@ namespace Confuser.Core.Helpers {
 		public static void InjectKeys(MethodDef method, int[] keyIds, int[] keys) {
 			foreach (Instruction instr in method.Body.Instructions) {
 				if (instr.OpCode == OpCodes.Ldsfld) {
-					var field = (IField) instr.Operand;
+					var field = (IField)instr.Operand;
 					int _keyIndex;
 					if (field.DeclaringType.FullName == mutationType &&
 					    field2index.TryGetValue(field.Name, out _keyIndex) &&
@@ -83,7 +83,7 @@ namespace Confuser.Core.Helpers {
 			for (int i = 0; i < method.Body.Instructions.Count; i++) {
 				Instruction instr = method.Body.Instructions[i];
 				if (instr.OpCode == OpCodes.Call) {
-					var operand = (IMethod) instr.Operand;
+					var operand = (IMethod)instr.Operand;
 					if (operand.DeclaringType.FullName == mutationType &&
 					    operand.Name == "Placeholder") {
 						int[] argIndexes = trace.TraceArguments(instr);

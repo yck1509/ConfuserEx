@@ -30,33 +30,33 @@ namespace Confuser.DynCipher.Elements {
                  */
 				using (context.AcquireTempVar(out tmp)) {
 					context.Emit(new AssignmentStatement {
-						Value = a * (LiteralExpression) Key,
+						Value = a * (LiteralExpression)Key,
 						Target = tmp
 					}).Emit(new AssignmentStatement {
 						Value = b,
 						Target = a
 					}).Emit(new AssignmentStatement {
-						Value = tmp * (LiteralExpression) MathsUtils.modInv(Key),
+						Value = tmp * (LiteralExpression)MathsUtils.modInv(Key),
 						Target = b
 					});
 				}
 			}
 			else {
-				var mask = (LiteralExpression) Mask;
-				var notMask = (LiteralExpression) ~Mask;
+				var mask = (LiteralExpression)Mask;
+				var notMask = (LiteralExpression)~Mask;
 				/*  t = (a & mask) * k;
                     a = a & (~mask) | (b & mask);
                     b = b & (~mask) | (t * k^-1);
                  */
 				using (context.AcquireTempVar(out tmp)) {
 					context.Emit(new AssignmentStatement {
-						Value = (a & mask) * (LiteralExpression) Key,
+						Value = (a & mask) * (LiteralExpression)Key,
 						Target = tmp
 					}).Emit(new AssignmentStatement {
 						Value = (a & notMask) | (b & mask),
 						Target = a
 					}).Emit(new AssignmentStatement {
-						Value = (b & notMask) | (tmp * (LiteralExpression) MathsUtils.modInv(Key)),
+						Value = (b & notMask) | (tmp * (LiteralExpression)MathsUtils.modInv(Key)),
 						Target = b
 					});
 				}

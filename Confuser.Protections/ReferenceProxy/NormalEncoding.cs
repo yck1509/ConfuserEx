@@ -33,7 +33,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			Tuple<int, int> ret;
 			if (!keys.TryGetValue(init, out ret)) {
 				int key = random.NextInt32() | 1;
-				keys[init] = ret = Tuple.Create(key, (int) MathsUtils.modInv((uint) key));
+				keys[init] = ret = Tuple.Create(key, (int)MathsUtils.modInv((uint)key));
 			}
 			return ret;
 		}

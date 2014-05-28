@@ -9,37 +9,37 @@ namespace Confuser.DynCipher.Transforms {
 
 		private static IEnumerable<Variable> GetVariableUsage(Expression exp) {
 			if (exp is VariableExpression)
-				yield return ((VariableExpression) exp).Variable;
+				yield return ((VariableExpression)exp).Variable;
 			else if (exp is ArrayIndexExpression) {
-				foreach (Variable i in GetVariableUsage(((ArrayIndexExpression) exp).Array))
+				foreach (Variable i in GetVariableUsage(((ArrayIndexExpression)exp).Array))
 					yield return i;
 			}
 			else if (exp is BinOpExpression) {
-				foreach (Variable i in GetVariableUsage(((BinOpExpression) exp).Left)
-					.Concat(GetVariableUsage(((BinOpExpression) exp).Right)))
+				foreach (Variable i in GetVariableUsage(((BinOpExpression)exp).Left)
+					.Concat(GetVariableUsage(((BinOpExpression)exp).Right)))
 					yield return i;
 			}
 			else if (exp is UnaryOpExpression) {
-				foreach (Variable i in GetVariableUsage(((UnaryOpExpression) exp).Value))
+				foreach (Variable i in GetVariableUsage(((UnaryOpExpression)exp).Value))
 					yield return i;
 			}
 		}
 
 		private static IEnumerable<Variable> GetVariableUsage(Statement st) {
 			if (st is AssignmentStatement) {
-				foreach (Variable i in GetVariableUsage(((AssignmentStatement) st).Value))
+				foreach (Variable i in GetVariableUsage(((AssignmentStatement)st).Value))
 					yield return i;
 			}
 		}
 
 		private static IEnumerable<Variable> GetVariableDefinition(Expression exp) {
 			if (exp is VariableExpression)
-				yield return ((VariableExpression) exp).Variable;
+				yield return ((VariableExpression)exp).Variable;
 		}
 
 		private static IEnumerable<Variable> GetVariableDefinition(Statement st) {
 			if (st is AssignmentStatement) {
-				foreach (Variable i in GetVariableDefinition(((AssignmentStatement) st).Target))
+				foreach (Variable i in GetVariableDefinition(((AssignmentStatement)st).Target))
 					yield return i;
 			}
 		}

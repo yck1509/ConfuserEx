@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using dnlib.DotNet;
 using Confuser.Core;
+using dnlib.DotNet;
 
 namespace Confuser.Renamer.BAML {
 	internal class KnownThingsv4 : IKnownThings {
@@ -39,7 +37,7 @@ namespace Confuser.Renamer.BAML {
 		private Tuple<KnownTypes, PropertyDef, TypeDef> InitProperty(KnownTypes parent, string propertyName, TypeDef propertyType) {
 			if (propertyName != null)
 				return Tuple.Create(parent, types[parent].FindProperty(propertyName), propertyType);
-			return Tuple.Create(parent, (PropertyDef) null, propertyType);
+			return Tuple.Create(parent, (PropertyDef)null, propertyType);
 		}
 
 		// Following codes are auto-generated, do not modify.

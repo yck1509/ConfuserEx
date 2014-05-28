@@ -6,11 +6,11 @@ namespace Confuser.Runtime {
 		private static byte[] b;
 
 		private static void Initialize() {
-			var l = (uint) Mutation.KeyI0;
+			var l = (uint)Mutation.KeyI0;
 			uint[] q = Mutation.Placeholder(new uint[Mutation.KeyI0]);
 
 			var k = new uint[0x10];
-			var n = (uint) Mutation.KeyI1;
+			var n = (uint)Mutation.KeyI1;
 			for (int i = 0; i < 0x10; i++) {
 				n ^= n >> 12;
 				n ^= n << 25;
@@ -27,10 +27,10 @@ namespace Confuser.Runtime {
 				Mutation.Crypt(w, k);
 				for (int j = 0; j < 0x10; j++) {
 					uint e = w[j];
-					o[d++] = (byte) e;
-					o[d++] = (byte) (e >> 8);
-					o[d++] = (byte) (e >> 16);
-					o[d++] = (byte) (e >> 24);
+					o[d++] = (byte)e;
+					o[d++] = (byte)(e >> 8);
+					o[d++] = (byte)(e >> 16);
+					o[d++] = (byte)(e >> 24);
 					k[j] ^= e;
 				}
 				s += 0x10;
@@ -40,7 +40,7 @@ namespace Confuser.Runtime {
 		}
 
 		private static T Get<T>(uint id) {
-			id = (uint) Mutation.Placeholder((int) id);
+			id = (uint)Mutation.Placeholder((int)id);
 			uint t = id >> 30;
 
 			T ret = default(T);
@@ -49,20 +49,20 @@ namespace Confuser.Runtime {
 
 			if (t == Mutation.KeyI0) {
 				int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
-				ret = (T) (object) Encoding.UTF8.GetString(b, (int) id, l);
+				ret = (T)(object)Encoding.UTF8.GetString(b, (int)id, l);
 			}
 				// NOTE: Assume little-endian
 			else if (t == Mutation.KeyI1) {
 				var v = new T[1];
-				Buffer.BlockCopy(b, (int) id, v, 0, Mutation.Value<int>());
+				Buffer.BlockCopy(b, (int)id, v, 0, Mutation.Value<int>());
 				ret = v[0];
 			}
 			else if (t == Mutation.KeyI2) {
 				int s = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
 				int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
 				Array v = Array.CreateInstance(typeof (T).GetElementType(), l);
-				Buffer.BlockCopy(b, (int) id, v, 0, s - 4);
-				ret = (T) (object) v;
+				Buffer.BlockCopy(b, (int)id, v, 0, s - 4);
+				ret = (T)(object)v;
 			}
 			return ret;
 		}

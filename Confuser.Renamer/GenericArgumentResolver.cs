@@ -132,13 +132,13 @@ namespace Confuser.Renamer {
 					throw new NotSupportedException("FnPtr is not supported.");
 
 				case ElementType.Array:
-					var arraySig = (ArraySig) typeSig;
+					var arraySig = (ArraySig)typeSig;
 					var sizes = new List<uint>(arraySig.Sizes);
 					var lbounds = new List<int>(arraySig.LowerBounds);
 					result = new ArraySig(ResolveGenericArgs(typeSig.Next), arraySig.Rank, sizes, lbounds);
 					break;
 				case ElementType.GenericInst:
-					var gis = (GenericInstSig) typeSig;
+					var gis = (GenericInstSig)typeSig;
 					var genArgs = new List<TypeSig>(gis.GenericArguments.Count);
 					foreach (TypeSig ga in gis.GenericArguments) {
 						genArgs.Add(ResolveGenericArgs(ga));

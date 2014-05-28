@@ -17,7 +17,7 @@ namespace Confuser.Runtime {
 		private const uint kStartPosModelIndex = 4;
 		private const uint kEndPosModelIndex = 14;
 
-		private const uint kNumFullDistances = 1 << ((int) kEndPosModelIndex / 2);
+		private const uint kNumFullDistances = 1 << ((int)kEndPosModelIndex / 2);
 
 		private const int kNumPosStatesBitsMax = 4;
 		private const uint kNumPosStatesMax = (1 << kNumPosStatesBitsMax);
@@ -37,7 +37,7 @@ namespace Confuser.Runtime {
 			long outSize = 0;
 			for (int i = 0; i < 8; i++) {
 				int v = s.ReadByte();
-				outSize |= ((long) (byte) v) << (8 * i);
+				outSize |= ((long)(byte)v) << (8 * i);
 			}
 			var b = new byte[outSize];
 			var z = new MemoryStream(b, true);
@@ -63,7 +63,7 @@ namespace Confuser.Runtime {
 					rangeDecoder.Range = newBound;
 					Prob += (kBitModelTotal - Prob) >> kNumMoveBits;
 					if (rangeDecoder.Range < Decoder.kTopValue) {
-						rangeDecoder.Code = (rangeDecoder.Code << 8) | (byte) rangeDecoder.Stream.ReadByte();
+						rangeDecoder.Code = (rangeDecoder.Code << 8) | (byte)rangeDecoder.Stream.ReadByte();
 						rangeDecoder.Range <<= 8;
 					}
 					return 0;
@@ -72,7 +72,7 @@ namespace Confuser.Runtime {
 				rangeDecoder.Code -= newBound;
 				Prob -= (Prob) >> kNumMoveBits;
 				if (rangeDecoder.Range < Decoder.kTopValue) {
-					rangeDecoder.Code = (rangeDecoder.Code << 8) | (byte) rangeDecoder.Stream.ReadByte();
+					rangeDecoder.Code = (rangeDecoder.Code << 8) | (byte)rangeDecoder.Stream.ReadByte();
 					rangeDecoder.Range <<= 8;
 				}
 				return 1;
@@ -97,7 +97,7 @@ namespace Confuser.Runtime {
 				uint m = 1;
 				for (int bitIndex = NumBitLevels; bitIndex > 0; bitIndex--)
 					m = (m << 1) + Models[m].Decode(rangeDecoder);
-				return m - ((uint) 1 << NumBitLevels);
+				return m - ((uint)1 << NumBitLevels);
 			}
 
 			public uint ReverseDecode(Decoder rangeDecoder) {
@@ -139,7 +139,7 @@ namespace Confuser.Runtime {
 				Code = 0;
 				Range = 0xFFFFFFFF;
 				for (int i = 0; i < 5; i++)
-					Code = (Code << 8) | (byte) Stream.ReadByte();
+					Code = (Code << 8) | (byte)Stream.ReadByte();
 			}
 
 			public void ReleaseStream() {
@@ -148,7 +148,7 @@ namespace Confuser.Runtime {
 
 			public void Normalize() {
 				while (Range < kTopValue) {
-					Code = (Code << 8) | (byte) Stream.ReadByte();
+					Code = (Code << 8) | (byte)Stream.ReadByte();
 					Range <<= 8;
 				}
 			}
@@ -172,7 +172,7 @@ namespace Confuser.Runtime {
 					result = (result << 1) | (1 - t);
 
 					if (range < kTopValue) {
-						code = (code << 8) | (byte) Stream.ReadByte();
+						code = (code << 8) | (byte)Stream.ReadByte();
 						range <<= 8;
 					}
 				}
@@ -226,7 +226,7 @@ namespace Confuser.Runtime {
 			}
 
 			private void SetPosBitsProperties(int pb) {
-				uint numPosStates = (uint) 1 << pb;
+				uint numPosStates = (uint)1 << pb;
 				m_LenDecoder.Create(numPosStates);
 				m_RepLenDecoder.Create(numPosStates);
 				m_PosStateMask = numPosStates - 1;
@@ -270,7 +270,7 @@ namespace Confuser.Runtime {
 				uint rep0 = 0, rep1 = 0, rep2 = 0, rep3 = 0;
 
 				UInt64 nowPos64 = 0;
-				var outSize64 = (UInt64) outSize;
+				var outSize64 = (UInt64)outSize;
 				if (nowPos64 < outSize64) {
 					m_IsMatchDecoders[state.Index << kNumPosStatesBitsMax].Decode(m_RangeDecoder);
 					state.UpdateChar();
@@ -282,15 +282,15 @@ namespace Confuser.Runtime {
 					// UInt64 next = Math.Min(nowPos64 + (1 << 18), outSize64);
 					// while(nowPos64 < next)
 					{
-						uint posState = (uint) nowPos64 & m_PosStateMask;
+						uint posState = (uint)nowPos64 & m_PosStateMask;
 						if (m_IsMatchDecoders[(state.Index << kNumPosStatesBitsMax) + posState].Decode(m_RangeDecoder) == 0) {
 							byte b;
 							byte prevByte = m_OutWindow.GetByte(0);
 							if (!state.IsCharState())
 								b = m_LiteralDecoder.DecodeWithMatchByte(m_RangeDecoder,
-								                                         (uint) nowPos64, prevByte, m_OutWindow.GetByte(rep0));
+								                                         (uint)nowPos64, prevByte, m_OutWindow.GetByte(rep0));
 							else
-								b = m_LiteralDecoder.DecodeNormal(m_RangeDecoder, (uint) nowPos64, prevByte);
+								b = m_LiteralDecoder.DecodeNormal(m_RangeDecoder, (uint)nowPos64, prevByte);
 							m_OutWindow.PutByte(b);
 							state.UpdateChar();
 							nowPos64++;
@@ -334,7 +334,7 @@ namespace Confuser.Runtime {
 								state.UpdateMatch();
 								uint posSlot = m_PosSlotDecoder[GetLenToPosState(len)].Decode(m_RangeDecoder);
 								if (posSlot >= kStartPosModelIndex) {
-									var numDirectBits = (int) ((posSlot >> 1) - 1);
+									var numDirectBits = (int)((posSlot >> 1) - 1);
 									rep0 = ((2 | (posSlot & 1)) << numDirectBits);
 									if (posSlot < kEndPosModelIndex)
 										rep0 += BitTreeDecoder.ReverseDecode(m_PosDecoders,
@@ -369,7 +369,7 @@ namespace Confuser.Runtime {
 				int pb = remainder / 5;
 				UInt32 dictionarySize = 0;
 				for (int i = 0; i < 4; i++)
-					dictionarySize += ((UInt32) (properties[1 + i])) << (i * 8);
+					dictionarySize += ((UInt32)(properties[1 + i])) << (i * 8);
 				SetDictionarySize(dictionarySize);
 				SetLiteralProperties(lp, lc);
 				SetPosBitsProperties(pb);
@@ -433,22 +433,22 @@ namespace Confuser.Runtime {
 					    m_NumPosBits == numPosBits)
 						return;
 					m_NumPosBits = numPosBits;
-					m_PosMask = ((uint) 1 << numPosBits) - 1;
+					m_PosMask = ((uint)1 << numPosBits) - 1;
 					m_NumPrevBits = numPrevBits;
-					uint numStates = (uint) 1 << (m_NumPrevBits + m_NumPosBits);
+					uint numStates = (uint)1 << (m_NumPrevBits + m_NumPosBits);
 					m_Coders = new Decoder2[numStates];
 					for (uint i = 0; i < numStates; i++)
 						m_Coders[i].Create();
 				}
 
 				public void Init() {
-					uint numStates = (uint) 1 << (m_NumPrevBits + m_NumPosBits);
+					uint numStates = (uint)1 << (m_NumPrevBits + m_NumPosBits);
 					for (uint i = 0; i < numStates; i++)
 						m_Coders[i].Init();
 				}
 
 				private uint GetState(uint pos, byte prevByte) {
-					return ((pos & m_PosMask) << m_NumPrevBits) + (uint) (prevByte >> (8 - m_NumPrevBits));
+					return ((pos & m_PosMask) << m_NumPrevBits) + (uint)(prevByte >> (8 - m_NumPrevBits));
 				}
 
 				public byte DecodeNormal(Decoder rangeDecoder, uint pos, byte prevByte) {
@@ -474,13 +474,13 @@ namespace Confuser.Runtime {
 						uint symbol = 1;
 						do
 							symbol = (symbol << 1) | m_Decoders[symbol].Decode(rangeDecoder); while (symbol < 0x100);
-						return (byte) symbol;
+						return (byte)symbol;
 					}
 
 					public byte DecodeWithMatchByte(Decoder rangeDecoder, byte matchByte) {
 						uint symbol = 1;
 						do {
-							uint matchBit = (uint) (matchByte >> 7) & 1;
+							uint matchBit = (uint)(matchByte >> 7) & 1;
 							matchByte <<= 1;
 							uint bit = m_Decoders[((1 + matchBit) << 8) + symbol].Decode(rangeDecoder);
 							symbol = (symbol << 1) | bit;
@@ -490,7 +490,7 @@ namespace Confuser.Runtime {
 								break;
 							}
 						} while (symbol < 0x100);
-						return (byte) symbol;
+						return (byte)symbol;
 					}
 				}
 			};
@@ -531,7 +531,7 @@ namespace Confuser.Runtime {
 				uint size = _pos - _streamPos;
 				if (size == 0)
 					return;
-				_stream.Write(_buffer, (int) _streamPos, (int) size);
+				_stream.Write(_buffer, (int)_streamPos, (int)size);
 				if (_pos >= _windowSize)
 					_pos = 0;
 				_streamPos = _pos;
@@ -578,15 +578,15 @@ namespace Confuser.Runtime {
 			}
 
 			public void UpdateMatch() {
-				Index = (uint) (Index < 7 ? 7 : 10);
+				Index = (uint)(Index < 7 ? 7 : 10);
 			}
 
 			public void UpdateRep() {
-				Index = (uint) (Index < 7 ? 8 : 11);
+				Index = (uint)(Index < 7 ? 8 : 11);
 			}
 
 			public void UpdateShortRep() {
-				Index = (uint) (Index < 7 ? 9 : 11);
+				Index = (uint)(Index < 7 ? 9 : 11);
 			}
 
 			public bool IsCharState() {

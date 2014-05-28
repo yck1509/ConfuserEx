@@ -24,7 +24,7 @@ namespace Confuser.Protections.Resources {
 		}
 
 		private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
-			var writer = (ModuleWriter) sender;
+			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginAddResources) {
 				List<EmbeddedResource> resources = ctx.Module.Resources.OfType<EmbeddedResource>().ToList();
 				ctx.Module.Resources.RemoveWhere(res => res is EmbeddedResource);
@@ -53,7 +53,7 @@ namespace Confuser.Protections.Resources {
 				// compress
 				moduleBuff = ctx.Context.Registry.GetService<ICompressionService>().Compress(moduleBuff);
 
-				uint compressedLen = (uint) (moduleBuff.Length + 3) / 4;
+				uint compressedLen = (uint)(moduleBuff.Length + 3) / 4;
 				compressedLen = (compressedLen + 0xfu) & ~0xfu;
 				var compressedBuff = new uint[compressedLen];
 				Buffer.BlockCopy(moduleBuff, 0, compressedBuff, 0, moduleBuff.Length);
@@ -80,21 +80,21 @@ namespace Confuser.Protections.Resources {
 					buffIndex += 0x10;
 				}
 				Debug.Assert(buffIndex == compressedBuff.Length);
-				var size = (uint) encryptedBuffer.Length;
+				var size = (uint)encryptedBuffer.Length;
 
 				TablesHeap tblHeap = writer.MetaData.TablesHeap;
 				tblHeap.ClassLayoutTable[writer.MetaData.GetClassLayoutRid(ctx.DataType)].ClassSize = size;
-				tblHeap.FieldTable[writer.MetaData.GetRid(ctx.DataField)].Flags |= (ushort) FieldAttributes.HasFieldRVA;
+				tblHeap.FieldTable[writer.MetaData.GetRid(ctx.DataField)].Flags |= (ushort)FieldAttributes.HasFieldRVA;
 				encryptedResource = writer.Constants.Add(new ByteArrayChunk(encryptedBuffer), 8);
 
 				// inject key values
 				MutationHelper.InjectKeys(ctx.InitMethod,
 				                          new[] { 0, 1 },
-				                          new[] { (int) (size / 4), (int) (keySeed) });
+				                          new[] { (int)(size / 4), (int)(keySeed) });
 			}
 			else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 				TablesHeap tblHeap = writer.MetaData.TablesHeap;
-				tblHeap.FieldRVATable[writer.MetaData.GetFieldRVARid(ctx.DataField)].RVA = (uint) encryptedResource.RVA;
+				tblHeap.FieldRVATable[writer.MetaData.GetFieldRVARid(ctx.DataField)].RVA = (uint)encryptedResource.RVA;
 			}
 		}
 	}

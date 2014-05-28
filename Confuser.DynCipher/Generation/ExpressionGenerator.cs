@@ -10,21 +10,21 @@ namespace Confuser.DynCipher.Generation {
 			if (currentDepth == targetDepth || (currentDepth > targetDepth / 3 && random.NextInt32(100) > 85))
 				return current;
 
-			switch ((ExpressionOps) random.NextInt32(6)) {
+			switch ((ExpressionOps)random.NextInt32(6)) {
 				case ExpressionOps.Add:
 					return GenerateExpression(random, current, currentDepth + 1, targetDepth) +
-					       GenerateExpression(random, (LiteralExpression) random.NextUInt32(), currentDepth + 1, targetDepth);
+					       GenerateExpression(random, (LiteralExpression)random.NextUInt32(), currentDepth + 1, targetDepth);
 
 				case ExpressionOps.Sub:
 					return GenerateExpression(random, current, currentDepth + 1, targetDepth) -
-					       GenerateExpression(random, (LiteralExpression) random.NextUInt32(), currentDepth + 1, targetDepth);
+					       GenerateExpression(random, (LiteralExpression)random.NextUInt32(), currentDepth + 1, targetDepth);
 
 				case ExpressionOps.Mul:
-					return GenerateExpression(random, current, currentDepth + 1, targetDepth) * (LiteralExpression) (random.NextUInt32() | 1);
+					return GenerateExpression(random, current, currentDepth + 1, targetDepth) * (LiteralExpression)(random.NextUInt32() | 1);
 
 				case ExpressionOps.Xor:
 					return GenerateExpression(random, current, currentDepth + 1, targetDepth) ^
-					       GenerateExpression(random, (LiteralExpression) random.NextUInt32(), currentDepth + 1, targetDepth);
+					       GenerateExpression(random, (LiteralExpression)random.NextUInt32(), currentDepth + 1, targetDepth);
 
 				case ExpressionOps.Not:
 					return ~GenerateExpression(random, current, currentDepth + 1, targetDepth);
@@ -37,7 +37,7 @@ namespace Confuser.DynCipher.Generation {
 
 		private static void SwapOperands(RandomGenerator random, Expression exp) {
 			if (exp is BinOpExpression) {
-				var binExp = (BinOpExpression) exp;
+				var binExp = (BinOpExpression)exp;
 				if (random.NextBoolean()) {
 					Expression tmp = binExp.Left;
 					binExp.Left = binExp.Right;
@@ -47,7 +47,7 @@ namespace Confuser.DynCipher.Generation {
 				SwapOperands(random, binExp.Right);
 			}
 			else if (exp is UnaryOpExpression)
-				SwapOperands(random, ((UnaryOpExpression) exp).Value);
+				SwapOperands(random, ((UnaryOpExpression)exp).Value);
 			else if (exp is LiteralExpression || exp is VariableExpression)
 				return;
 			else
@@ -62,11 +62,11 @@ namespace Confuser.DynCipher.Generation {
 				else if (exp is LiteralExpression)
 					ret = false;
 				else if (exp is BinOpExpression) {
-					var binExp = (BinOpExpression) exp;
+					var binExp = (BinOpExpression)exp;
 					ret = HasVariable(binExp.Left, hasVar) || HasVariable(binExp.Right, hasVar);
 				}
 				else if (exp is UnaryOpExpression) {
-					ret = HasVariable(((UnaryOpExpression) exp).Value, hasVar);
+					ret = HasVariable(((UnaryOpExpression)exp).Value, hasVar);
 				}
 				else
 					throw new UnreachableException();
@@ -80,7 +80,7 @@ namespace Confuser.DynCipher.Generation {
 			while (!(exp is VariableExpression)) {
 				Debug.Assert(hasVar[exp]);
 				if (exp is UnaryOpExpression) {
-					var unaryOp = (UnaryOpExpression) exp;
+					var unaryOp = (UnaryOpExpression)exp;
 					result = new UnaryOpExpression {
 						Operation = unaryOp.Operation,
 						Value = result
@@ -88,7 +88,7 @@ namespace Confuser.DynCipher.Generation {
 					exp = unaryOp.Value;
 				}
 				else if (exp is BinOpExpression) {
-					var binOp = (BinOpExpression) exp;
+					var binOp = (BinOpExpression)exp;
 					bool leftHasVar = hasVar[binOp.Left];
 					Expression varExp = leftHasVar ? binOp.Left : binOp.Right;
 					Expression constExp = leftHasVar ? binOp.Right : binOp.Left;
@@ -121,12 +121,12 @@ namespace Confuser.DynCipher.Generation {
 
 					else if (binOp.Operation == BinOps.Mul) {
 						Debug.Assert(constExp is LiteralExpression);
-						uint val = ((LiteralExpression) constExp).Value;
+						uint val = ((LiteralExpression)constExp).Value;
 						val = MathsUtils.modInv(val);
 						result = new BinOpExpression {
 							Operation = BinOps.Mul,
 							Left = result,
-							Right = (LiteralExpression) val
+							Right = (LiteralExpression)val
 						};
 					}
 

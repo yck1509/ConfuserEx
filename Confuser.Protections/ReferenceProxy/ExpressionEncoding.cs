@@ -15,7 +15,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 			var invCompiled = new List<Instruction>();
 			new CodeGen(arg, ctx.Method, invCompiled).GenerateCIL(key.Item1);
-			init.Body.MaxStack += (ushort) ctx.Depth;
+			init.Body.MaxStack += (ushort)ctx.Depth;
 			return invCompiled.ToArray();
 		}
 

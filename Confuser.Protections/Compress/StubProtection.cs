@@ -53,8 +53,8 @@ namespace Confuser.Protections.Compress {
 				context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => {
 					                                                     if (e.WriterEvent == ModuleWriterEvent.MDBeginCreateTables) {
 						                                                     // Add key signature
-						                                                     var writer = (ModuleWriter) sender;
-						                                                     var prot = (StubProtection) Parent;
+						                                                     var writer = (ModuleWriter)sender;
+						                                                     var prot = (StubProtection)Parent;
 						                                                     uint blob = writer.MetaData.BlobHeap.Add(prot.ctx.KeySig);
 						                                                     uint rid = writer.MetaData.TablesHeap.StandAloneSigTable.Add(new RawStandAloneSigRow(blob));
 						                                                     Debug.Assert((0x11000000 | rid) == prot.ctx.KeyToken);
@@ -65,7 +65,7 @@ namespace Confuser.Protections.Compress {
 
 						                                                     MDTable<RawFileRow> fileTbl = writer.MetaData.TablesHeap.FileTable;
 						                                                     uint fileRid = fileTbl.Add(new RawFileRow(
-							                                                                                (uint) FileAttributes.ContainsMetaData,
+							                                                                                (uint)FileAttributes.ContainsMetaData,
 							                                                                                writer.MetaData.StringsHeap.Add("koi"),
 							                                                                                hashBlob));
 					                                                     }

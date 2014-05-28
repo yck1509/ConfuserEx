@@ -59,7 +59,7 @@ namespace Confuser.Protections {
 					IEnumerable<IDnlibDef> members = InjectHelper.Inject(rtType, module.GlobalType, module);
 
 					MethodDef cctor = module.GlobalType.FindStaticConstructor();
-					var init = (MethodDef) members.Single(method => method.Name == "Initialize");
+					var init = (MethodDef)members.Single(method => method.Name == "Initialize");
 					cctor.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, init));
 
 					foreach (IDnlibDef member in members)

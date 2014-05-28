@@ -137,7 +137,7 @@ namespace Confuser.CLI {
 				string timeString = string.Format(
 					"at {0}, {1}:{2:d2} elapsed.",
 					now.ToShortTimeString(),
-					(int) now.Subtract(begin).TotalMinutes,
+					(int)now.Subtract(begin).TotalMinutes,
 					now.Subtract(begin).Seconds);
 				if (successful) {
 					Console.Title = "ConfuserEx - Success";

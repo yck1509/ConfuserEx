@@ -22,7 +22,7 @@ namespace Confuser.Core.Project.Patterns {
 			if (!(definition is IOwnerModule))
 				return false;
 			object name = Arguments[0].Evaluate(definition);
-			return ((IOwnerModule) definition).Module.Name == name.ToString();
+			return ((IOwnerModule)definition).Module.Name == name.ToString();
 		}
 	}
 }

@@ -80,7 +80,7 @@ namespace Confuser.Protections.ControlFlow {
 						newStatement.AddRange(statements.First.Value);
 						Instruction lastInstr = statements.First.Value.Last();
 						statements.RemoveFirst();
-						if (lastInstr.OpCode == OpCodes.Call && ((IMethod) lastInstr.Operand).Name == ".ctor")
+						if (lastInstr.OpCode == OpCodes.Call && ((IMethod)lastInstr.Operand).Name == ".ctor")
 							break;
 					}
 					statements.AddFirst(newStatement.ToArray());
@@ -132,7 +132,7 @@ namespace Confuser.Protections.ControlFlow {
 						if (newStatement.Last().IsBr()) {
 							// Unconditional
 
-							var target = (Instruction) newStatement.Last().Operand;
+							var target = (Instruction)newStatement.Last().Operand;
 							int brKey;
 							if (!trace.IsBranchTarget(trace.OffsetToIndexMap(newStatement.Last().Offset)) &&
 							    statementKeys.TryGetValue(target, out brKey)) {
@@ -148,7 +148,7 @@ namespace Confuser.Protections.ControlFlow {
 						else if (newStatement.Last().IsConditionalBranch()) {
 							// Conditional
 
-							var target = (Instruction) newStatement.Last().Operand;
+							var target = (Instruction)newStatement.Last().Operand;
 							int brKey;
 							if (!trace.IsBranchTarget(trace.OffsetToIndexMap(newStatement.Last().Offset)) &&
 							    statementKeys.TryGetValue(target, out brKey)) {

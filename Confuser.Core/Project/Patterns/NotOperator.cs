@@ -19,7 +19,7 @@ namespace Confuser.Core.Project.Patterns {
 
 		/// <inheritdoc />
 		public override object Evaluate(IDnlibDef definition) {
-			return !(bool) OperandA.Evaluate(definition);
+			return !(bool)OperandA.Evaluate(definition);
 		}
 	}
 }

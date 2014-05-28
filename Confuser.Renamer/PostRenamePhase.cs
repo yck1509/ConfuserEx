@@ -15,7 +15,7 @@ namespace Confuser.Renamer {
 		}
 
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
-			var service = (NameService) context.Registry.GetService<INameService>();
+			var service = (NameService)context.Registry.GetService<INameService>();
 
 			foreach (IRenamer renamer in service.Renamers) {
 				foreach (IDnlibDef def in parameters.Targets)

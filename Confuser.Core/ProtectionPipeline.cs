@@ -69,7 +69,7 @@ namespace Confuser.Core {
 		///     Initializes a new instance of the <see cref="ProtectionPipeline" /> class.
 		/// </summary>
 		public ProtectionPipeline() {
-			var stages = (PipelineStage[]) Enum.GetValues(typeof (PipelineStage));
+			var stages = (PipelineStage[])Enum.GetValues(typeof (PipelineStage));
 			preStage = stages.ToDictionary(stage => stage, stage => new List<ProtectionPhase>());
 			postStage = stages.ToDictionary(stage => stage, stage => new List<ProtectionPhase>());
 		}
@@ -101,12 +101,12 @@ namespace Confuser.Core {
 			foreach (var phases in preStage.Values)
 				foreach (ProtectionPhase phase in phases) {
 					if (phase is T)
-						return (T) phase;
+						return (T)phase;
 				}
 			foreach (var phases in postStage.Values)
 				foreach (ProtectionPhase phase in phases) {
 					if (phase is T)
-						return (T) phase;
+						return (T)phase;
 				}
 			return null;
 		}

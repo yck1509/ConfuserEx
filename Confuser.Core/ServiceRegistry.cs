@@ -20,7 +20,7 @@ namespace Confuser.Core {
 		/// <typeparam name="T">The type of service.</typeparam>
 		/// <returns>The service instance.</returns>
 		public T GetService<T>() {
-			return (T) services.GetValueOrDefault(typeof (T), null);
+			return (T)services.GetValueOrDefault(typeof (T), null);
 		}
 
 		/// <summary>

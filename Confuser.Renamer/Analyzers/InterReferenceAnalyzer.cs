@@ -21,8 +21,8 @@ namespace Confuser.Renamer.Analyzers {
 				MemberRef memberRef = module.ResolveMemberRef(i);
 
 				TypeDef declType = memberRef.DeclaringType.ResolveTypeDefThrow();
-				if (declType.Module != module && context.Modules.Contains((ModuleDefMD) declType.Module)) {
-					var memberDef = (IDnlibDef) declType.ResolveThrow(memberRef);
+				if (declType.Module != module && context.Modules.Contains((ModuleDefMD)declType.Module)) {
+					var memberDef = (IDnlibDef)declType.ResolveThrow(memberRef);
 					service.AddReference(memberDef, new MemberRefReference(memberRef, memberDef));
 				}
 			}
@@ -34,7 +34,7 @@ namespace Confuser.Renamer.Analyzers {
 				TypeRef typeRef = module.ResolveTypeRef(i);
 
 				TypeDef typeDef = typeRef.ResolveTypeDefThrow();
-				if (typeDef.Module != module && context.Modules.Contains((ModuleDefMD) typeDef.Module)) {
+				if (typeDef.Module != module && context.Modules.Contains((ModuleDefMD)typeDef.Module)) {
 					service.AddReference(typeDef, new TypeRefReference(typeRef, typeDef));
 				}
 			}

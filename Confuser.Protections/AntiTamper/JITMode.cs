@@ -51,7 +51,7 @@ namespace Confuser.Protections.AntiTamper {
 				int index = random.NextInt32(0, 6);
 				while (fieldLayout[index] != 0)
 					index = random.NextInt32(0, 6);
-				fieldLayout[index] = (byte) i;
+				fieldLayout[index] = (byte)i;
 			}
 
 			switch (parameters.GetParameter(context, context.CurrentModule, "key", Mode.Normal)) {
@@ -79,7 +79,7 @@ namespace Confuser.Protections.AntiTamper {
 					instr.Operand = context.CurrentModule.GlobalType;
 				}
 				else if (instr.OpCode == OpCodes.Call) {
-					var method = (IMethod) instr.Operand;
+					var method = (IMethod)instr.Operand;
 					if (method.DeclaringType.Name == "Mutation" &&
 					    method.Name == "Crypt") {
 						Instruction ldDst = instrs[i - 2];
@@ -88,7 +88,7 @@ namespace Confuser.Protections.AntiTamper {
 						instrs.RemoveAt(i);
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
-						instrs.InsertRange(i - 2, deriver.EmitDerivation(initMethod, context, (Local) ldDst.Operand, (Local) ldSrc.Operand));
+						instrs.InsertRange(i - 2, deriver.EmitDerivation(initMethod, context, (Local)ldDst.Operand, (Local)ldSrc.Operand));
 					}
 				}
 			}
@@ -98,7 +98,7 @@ namespace Confuser.Protections.AntiTamper {
 
 			MutationHelper.InjectKeys(initMethod,
 			                          new[] { 0, 1, 2, 3, 4 },
-			                          new[] { (int) (name1 * name2), (int) z, (int) x, (int) c, (int) v });
+			                          new[] { (int)(name1 * name2), (int)z, (int)x, (int)c, (int)v });
 
 			var name = context.Registry.GetService<INameService>();
 			var marker = context.Registry.GetService<IMarkerService>();
@@ -114,10 +114,10 @@ namespace Confuser.Protections.AntiTamper {
 			name.MarkHelper(cctorRepl, marker);
 
 			MutationHelper.InjectKeys(defs.OfType<MethodDef>().Single(method => method.Name == "HookHandler"),
-			                          new[] { 0 }, new[] { (int) key });
+			                          new[] { 0 }, new[] { (int)key });
 			foreach (IDnlibDef def in defs) {
 				if (def.Name == "MethodData") {
-					var dataType = (TypeDef) def;
+					var dataType = (TypeDef)def;
 					FieldDef[] fields = dataType.Fields.ToArray();
 					var layout = fieldLayout.Clone() as byte[];
 					Array.Sort(layout, fields);
@@ -131,7 +131,7 @@ namespace Confuser.Protections.AntiTamper {
 				}
 				name.MarkHelper(def, marker);
 				if (def is MethodDef)
-					parent.ExcludeMethod(context, (MethodDef) def);
+					parent.ExcludeMethod(context, (MethodDef)def);
 			}
 			parent.ExcludeMethod(context, cctor);
 		}
@@ -142,7 +142,7 @@ namespace Confuser.Protections.AntiTamper {
 		}
 
 		private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
-			var writer = (ModuleWriter) sender;
+			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginWriteMethodBodies) {
 				CreateSection(writer);
 			}
@@ -176,14 +176,14 @@ namespace Confuser.Protections.AntiTamper {
 
 			// create section
 			var nameBuffer = new byte[8];
-			nameBuffer[0] = (byte) (name1 >> 0);
-			nameBuffer[1] = (byte) (name1 >> 8);
-			nameBuffer[2] = (byte) (name1 >> 16);
-			nameBuffer[3] = (byte) (name1 >> 24);
-			nameBuffer[4] = (byte) (name2 >> 0);
-			nameBuffer[5] = (byte) (name2 >> 8);
-			nameBuffer[6] = (byte) (name2 >> 16);
-			nameBuffer[7] = (byte) (name2 >> 24);
+			nameBuffer[0] = (byte)(name1 >> 0);
+			nameBuffer[1] = (byte)(name1 >> 8);
+			nameBuffer[2] = (byte)(name1 >> 16);
+			nameBuffer[3] = (byte)(name1 >> 24);
+			nameBuffer[4] = (byte)(name2 >> 0);
+			nameBuffer[5] = (byte)(name2 >> 8);
+			nameBuffer[6] = (byte)(name2 >> 16);
+			nameBuffer[7] = (byte)(name2 >> 24);
 			var newSection = new PESection(Encoding.ASCII.GetString(nameBuffer), 0xE0000040);
 			writer.Sections.Insert(random.NextInt32(writer.Sections.Count), newSection);
 
@@ -215,7 +215,7 @@ namespace Confuser.Protections.AntiTamper {
 				bodyIndex.Add(token.Raw, jitBody);
 
 				method.Body = NopBody;
-				writer.MetaData.TablesHeap.MethodTable[token.Rid].ImplFlags |= (ushort) MethodImplAttributes.NoInlining;
+				writer.MetaData.TablesHeap.MethodTable[token.Rid].ImplFlags |= (ushort)MethodImplAttributes.NoInlining;
 			}
 			bodyIndex.PopulateSection(newSection);
 

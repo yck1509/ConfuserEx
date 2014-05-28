@@ -30,7 +30,7 @@ namespace Confuser.Core.Services {
 				                                                                                                       MethodDef decomp = null;
 				                                                                                                       foreach (IDnlibDef member in members) {
 					                                                                                                       if (member is MethodDef) {
-						                                                                                                       var method = (MethodDef) member;
+						                                                                                                       var method = (MethodDef)member;
 						                                                                                                       if (method.Access == MethodAttributes.Public)
 							                                                                                                       method.Access = MethodAttributes.Assembly;
 						                                                                                                       if (!method.IsConstructor)
@@ -40,7 +40,7 @@ namespace Confuser.Core.Services {
 							                                                                                                       decomp = method;
 					                                                                                                       }
 					                                                                                                       else if (member is FieldDef) {
-						                                                                                                       var field = (FieldDef) member;
+						                                                                                                       var field = (FieldDef)member;
 						                                                                                                       if (field.Access == FieldAttributes.Public)
 							                                                                                                       field.Access = FieldAttributes.Assembly;
 						                                                                                                       if (field.IsLiteral) {
@@ -48,7 +48,7 @@ namespace Confuser.Core.Services {
 						                                                                                                       }
 					                                                                                                       }
 				                                                                                                       }
-				                                                                                                       members.RemoveWhere(def => def is FieldDef && ((FieldDef) def).IsLiteral);
+				                                                                                                       members.RemoveWhere(def => def is FieldDef && ((FieldDef)def).IsLiteral);
 
 				                                                                                                       Debug.Assert(decomp != null);
 				                                                                                                       return Tuple.Create(decomp, members);
@@ -88,7 +88,7 @@ namespace Confuser.Core.Services {
 			Int64 fileSize;
 			fileSize = data.Length;
 			for (int i = 0; i < 8; i++)
-				x.WriteByte((Byte) (fileSize >> (8 * i)));
+				x.WriteByte((Byte)(fileSize >> (8 * i)));
 			encoder.Code(new MemoryStream(data), x, -1, -1, null);
 			return x.ToArray();
 		}

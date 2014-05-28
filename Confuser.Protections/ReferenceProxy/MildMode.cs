@@ -10,7 +10,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 		public override void ProcessCall(RPContext ctx, int instrIndex) {
 			Instruction invoke = ctx.Body.Instructions[instrIndex];
-			var target = (IMethod) invoke.Operand;
+			var target = (IMethod)invoke.Operand;
 
 			// Value type proxy is not supported in mild mode.
 			if (target.DeclaringType.ResolveTypeDefThrow().IsValueType)
@@ -59,7 +59,7 @@ namespace Confuser.Protections.ReferenceProxy {
 					ctx.Module,
 					proxy.Name,
 					proxy.MethodSig,
-					new GenericInstSig((ClassOrValueTypeSig) ctx.Method.DeclaringType.ToTypeSig(), genArgs).ToTypeDefOrRef());
+					new GenericInstSig((ClassOrValueTypeSig)ctx.Method.DeclaringType.ToTypeSig(), genArgs).ToTypeDefOrRef());
 			}
 			else
 				invoke.Operand = proxy;

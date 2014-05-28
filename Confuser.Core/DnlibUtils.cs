@@ -168,7 +168,7 @@ namespace Confuser.Core {
 			if (spec != null)
 				return spec.Method.ResolveThrow();
 
-			return ((MemberRef) method).ResolveMethodThrow();
+			return ((MemberRef)method).ResolveMethodThrow();
 		}
 
 		/// <summary>
@@ -182,7 +182,7 @@ namespace Confuser.Core {
 			if (def != null)
 				return def;
 
-			return ((MemberRef) field).ResolveFieldThrow();
+			return ((MemberRef)field).ResolveFieldThrow();
 		}
 
 		/// <summary>
@@ -195,9 +195,9 @@ namespace Confuser.Core {
 				typeSig = typeSig.Next;
 
 			if (typeSig is GenericInstSig)
-				return ((GenericInstSig) typeSig).GenericType.TypeDefOrRef;
+				return ((GenericInstSig)typeSig).GenericType.TypeDefOrRef;
 			if (typeSig is TypeDefOrRefSig)
-				return ((TypeDefOrRefSig) typeSig).TypeDefOrRef;
+				return ((TypeDefOrRefSig)typeSig).TypeDefOrRef;
 			return null;
 		}
 
@@ -215,18 +215,18 @@ namespace Confuser.Core {
 		private static void FindTypeRefsInternal(TypeSig typeSig, IList<ITypeDefOrRef> ret) {
 			while (typeSig.Next != null) {
 				if (typeSig is ModifierSig)
-					ret.Add(((ModifierSig) typeSig).Modifier);
+					ret.Add(((ModifierSig)typeSig).Modifier);
 				typeSig = typeSig.Next;
 			}
 
 			if (typeSig is GenericInstSig) {
-				var genInst = (GenericInstSig) typeSig;
+				var genInst = (GenericInstSig)typeSig;
 				ret.Add(genInst.GenericType.TypeDefOrRef);
 				foreach (TypeSig genArg in genInst.GenericArguments)
 					FindTypeRefsInternal(genArg, ret);
 			}
 			else if (typeSig is TypeDefOrRefSig)
-				ret.Add(((TypeDefOrRefSig) typeSig).TypeDefOrRef);
+				ret.Add(((TypeDefOrRefSig)typeSig).TypeDefOrRef);
 		}
 
 		/// <summary>

@@ -28,7 +28,7 @@ namespace SevenZip.Compression.LZMA {
 		public const uint kEndPosModelIndex = 14;
 		public const uint kNumPosModels = kEndPosModelIndex - kStartPosModelIndex;
 
-		public const uint kNumFullDistances = 1 << ((int) kEndPosModelIndex / 2);
+		public const uint kNumFullDistances = 1 << ((int)kEndPosModelIndex / 2);
 
 		public const uint kNumLitPosStatesBitsEncodingMax = 4;
 		public const uint kNumLitContextBitsMax = 8;
@@ -70,15 +70,15 @@ namespace SevenZip.Compression.LZMA {
 			}
 
 			public void UpdateMatch() {
-				Index = (uint) (Index < 7 ? 7 : 10);
+				Index = (uint)(Index < 7 ? 7 : 10);
 			}
 
 			public void UpdateRep() {
-				Index = (uint) (Index < 7 ? 8 : 11);
+				Index = (uint)(Index < 7 ? 8 : 11);
 			}
 
 			public void UpdateShortRep() {
-				Index = (uint) (Index < 7 ? 9 : 11);
+				Index = (uint)(Index < 7 ? 9 : 11);
 			}
 
 			public bool IsCharState() {

@@ -12,7 +12,7 @@ namespace Confuser.DynCipher.Elements {
 		public uint[,] InverseKey { get; private set; }
 
 		private static uint[,] GenerateUnimodularMatrix(RandomGenerator random) {
-			Func<uint> next = () => (uint) random.NextInt32(4);
+			Func<uint> next = () => (uint)random.NextInt32(4);
 
 			uint[,] l = {
 				{ 1, 0, 0, 0 },
@@ -62,7 +62,7 @@ namespace Confuser.DynCipher.Elements {
 			}
 			uint ret = det3(sub);
 			if ((i + j) % 2 == 0) return ret;
-			return (uint) (-ret);
+			return (uint)(-ret);
 		}
 
 		private static uint det3(uint[,] mat) {
@@ -100,7 +100,7 @@ namespace Confuser.DynCipher.Elements {
 
 			VariableExpression ta, tb, tc, td;
 
-			Func<uint, LiteralExpression> l = v => (LiteralExpression) v;
+			Func<uint, LiteralExpression> l = v => (LiteralExpression)v;
 			using (context.AcquireTempVar(out ta))
 			using (context.AcquireTempVar(out tb))
 			using (context.AcquireTempVar(out tc))

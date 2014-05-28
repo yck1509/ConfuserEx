@@ -59,7 +59,7 @@ namespace Confuser.Renamer.Analyzers {
 				var reader = new ResourceReader(new ImageStream(res.Data));
 				IDictionaryEnumerator enumerator = reader.GetEnumerator();
 				while (enumerator.MoveNext()) {
-					var name = (string) enumerator.Key;
+					var name = (string)enumerator.Key;
 					string typeName;
 					byte[] data;
 					reader.GetResourceData(name, out typeName, out data);
@@ -70,7 +70,7 @@ namespace Confuser.Renamer.Analyzers {
 						docStream.Position = 4;
 						BamlWriter.WriteDocument(document, docStream);
 						docStream.Position = 0;
-						docStream.Write(BitConverter.GetBytes((int) docStream.Length - 4), 0, 4);
+						docStream.Write(BitConverter.GetBytes((int)docStream.Length - 4), 0, 4);
 						data = docStream.ToArray();
 					}
 
@@ -86,7 +86,7 @@ namespace Confuser.Renamer.Analyzers {
 			var routedEvtRegInstrs = new List<Instruction>();
 			foreach (Instruction instr in method.Body.Instructions) {
 				if ((instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt)) {
-					var regMethod = (IMethod) instr.Operand;
+					var regMethod = (IMethod)instr.Operand;
 
 					if (regMethod.DeclaringType.FullName == "System.Windows.DependencyProperty" &&
 					    regMethod.Name.String.StartsWith("Register")) {
@@ -123,7 +123,7 @@ namespace Confuser.Renamer.Analyzers {
 					continue;
 				}
 
-				var name = (string) ldstr.Operand;
+				var name = (string)ldstr.Operand;
 				TypeDef declType = method.DeclaringType;
 				bool found = false;
 				if (instrInfo.Item1) // Attached DP
@@ -182,7 +182,7 @@ namespace Confuser.Renamer.Analyzers {
 					continue;
 				}
 
-				var name = (string) ldstr.Operand;
+				var name = (string)ldstr.Operand;
 				TypeDef declType = method.DeclaringType;
 
 				EventDef eventDef = null;
@@ -223,7 +223,7 @@ namespace Confuser.Renamer.Analyzers {
 				var reader = new ResourceReader(new ImageStream(res.Data));
 				IDictionaryEnumerator enumerator = reader.GetEnumerator();
 				while (enumerator.MoveNext()) {
-					var name = (string) enumerator.Key;
+					var name = (string)enumerator.Key;
 					if (!name.EndsWith(".baml"))
 						continue;
 

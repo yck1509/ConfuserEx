@@ -70,9 +70,9 @@ namespace Confuser.Core.Project.Patterns {
 				string regex = Arguments[0].Evaluate(definition).ToString();
 				return Regex.IsMatch(definition.Name, regex);
 			}
-			if (definition is IMemberDef && ((IMemberDef) definition).DeclaringType != null) {
+			if (definition is IMemberDef && ((IMemberDef)definition).DeclaringType != null) {
 				string regex = Arguments[0].Evaluate(definition).ToString();
-				return Regex.IsMatch(((IMemberDef) definition).DeclaringType.Name, regex);
+				return Regex.IsMatch(((IMemberDef)definition).DeclaringType.Name, regex);
 			}
 			return false;
 		}

@@ -32,7 +32,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				      .Select(instr => instr.Operand as Instruction)
 				      .Concat(method.Body.Instructions
 				                    .Where(instr => instr.Operand is Instruction[])
-				                    .SelectMany(instr => (Instruction[]) instr.Operand))
+				                    .SelectMany(instr => (Instruction[])instr.Operand))
 				      .Where(target => target != null));
 
 			ret.Random = store.random;
@@ -111,7 +111,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			for (int i = 0; i < ctx.Body.Instructions.Count; i++) {
 				Instruction instr = ctx.Body.Instructions[i];
 				if (instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt || instr.OpCode.Code == Code.Newobj) {
-					var operand = (IMethod) instr.Operand;
+					var operand = (IMethod)instr.Operand;
 					// Call constructor
 					if (instr.OpCode.Code != Code.Newobj && operand.Name == ".ctor")
 						continue;
