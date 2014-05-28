@@ -9,12 +9,12 @@ It is the successor of [Confuser](http://confuser.codeplex.com) project.
 ---
 <div class="row">
   <div class="col-md-12">
-    <img class="img-responsive" alt="Screenshot of Command-line interface" src="{{ site.url }}/assets/screenshot1.png">
+    <img class="img-responsive" alt="Screenshot of Command-line interface" src="{{ ASSET_PATH }}/screenshot1.png">
     <small>Command-line interface</small>
   </div>
   <!--  Umm... not really. WIP.
   <div class="col-md-6">
-    <img class="img-responsive" alt="Screenshot of Graphical interface" src="{{ site.url }}/assets/screenshot2.png">
+    <img class="img-responsive" alt="Screenshot of Graphical interface" src="{{ ASSET_PATH }}/screenshot2.png">
     <small>Graphical interface</small>
   </div>
   -->
@@ -52,7 +52,7 @@ It supports most of the protections you'll find in commerical protectors, and so
 ---
 <div class="row">
   <div class="col-md-6">
-    <img class="img-responsive" alt="Assembly loaded in ILSpy before protection" src="{{ site.url }}/assets/prot1.png">
+    <img class="img-responsive" alt="Assembly loaded in ILSpy before protection" src="{{ ASSET_PATH }}/prot1.png">
     <small>Before protection</small>
   </div>
   <!--
@@ -61,7 +61,7 @@ It supports most of the protections you'll find in commerical protectors, and so
       very good! :)
   -->
   <div class="col-md-6">
-    <img class="img-responsive" alt="Assembly loaded in ILSpy after protection" src="{{ site.url }}/assets/prot2.png">
+    <img class="img-responsive" alt="Assembly loaded in ILSpy after protection" src="{{ ASSET_PATH }}/prot2.png">
     <small>After protection</small>
   </div>
 </div>
@@ -71,7 +71,7 @@ Downloads
 ---------
 You could obtain the latest source code and releases at [GitHub project page](https://github.com/yck1509/ConfuserEx/releases).
 ConfuserEx requires only .NET Framework 3.5 to run.
-It might be helpful to read the [FAQ]({{ site.url }}/faq/)!
+It might be helpful to read the [FAQ]({{ BASE_PATH }}/faq/)!
 
 ---
 
@@ -79,7 +79,7 @@ Contribution
 ------------
 ConfuserEx is licensed under [MIT license](http://opensource.org/licenses/MIT), 
 so you're free to fork and modify it to suit your need!
-You could also contribute to the project by creating pull requests and [reporting bugs]({{ site.url }}/issues/)!
+You could also contribute to the project by creating pull requests and [reporting bugs]({{ BASE_PATH }}/issues/)!
 
 ---
 
