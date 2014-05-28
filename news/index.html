@@ -10,7 +10,7 @@ group : navigation
   <div class="post panel panel-default">
   <div class="panel-heading">
     <h3 class="post-title">
-      <a href="{{ post.url }}">
+      <a href="{{ BASE_PATH }}{{ post.url }}">
         {{ post.title }}
       </a>
       <span class="post-date">{{ post.date | date_to_string }}</span>
