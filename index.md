@@ -86,5 +86,7 @@ You could also contribute to the project by creating pull requests and [reportin
 Dontation
 ---------
 If you find ConfuserEx is useful to you, feel free to support the project by making a donation!  
+
+<a href='https://pledgie.com/campaigns/25438'><img alt='Click here to lend your support to: ConfuserEx - open-source protector for .NET applications and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/25438.png?skin_name=chrome' border='0' ></a>  
 `BTC : 12wzXhmMtjhn9dEFXdtoVAFwSx3MmV4Afx`  
 `DOGE: DM8NpgvQhzPKcdca6AbSxPiV9QCcix9BYJ`
