@@ -17,17 +17,17 @@ namespace Confuser.Renamer.References {
 
 			IMethodDefOrRef target;
 			if (baseSlot.DeclaringType is GenericInstSig) {
-				var declType = (GenericInstSig) baseSlot.DeclaringType;
+				var declType = (GenericInstSig)baseSlot.DeclaringType;
 				target = new MemberRefUser(method.Module, baseSlot.MethodDef.Name, baseSlot.MethodDef.MethodSig, declType.ToTypeDefOrRef());
-				target = (IMethodDefOrRef) new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(target);
+				target = (IMethodDefOrRef)new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(target);
 			}
 			else {
 				target = baseSlot.MethodDef;
 				if (target.Module != method.Module)
-					target = (IMethodDefOrRef) new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(baseSlot.MethodDef);
+					target = (IMethodDefOrRef)new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(baseSlot.MethodDef);
 			}
 			if (target is MemberRef)
-				service.AddReference(baseSlot.MethodDef, new MemberRefReference((MemberRef) target, baseSlot.MethodDef));
+				service.AddReference(baseSlot.MethodDef, new MemberRefReference((MemberRef)target, baseSlot.MethodDef));
 
 			if (method.Overrides.Any(impl =>
 			                         new SigComparer().Equals(impl.MethodDeclaration.MethodSig, target.MethodSig) &&

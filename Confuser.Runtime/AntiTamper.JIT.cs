@@ -322,13 +322,13 @@ namespace Confuser.Runtime {
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct ICorClassInfo {
-			public readonly IntPtr* vfptr;
+			public IntPtr* vfptr;
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct ICorDynamicInfo {
-			public readonly IntPtr* vfptr;
-			public readonly int* vbptr;
+			public IntPtr* vfptr;
+			public int* vbptr;
 
 			public static ICorStaticInfo* ICorStaticInfo(ICorDynamicInfo* ptr) {
 				return (ICorStaticInfo*)((byte*)&ptr->vbptr + ptr->vbptr[hasLinkInfo ? 9 : 8]);
@@ -337,8 +337,8 @@ namespace Confuser.Runtime {
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct ICorJitInfo {
-			public readonly IntPtr* vfptr;
-			public readonly int* vbptr;
+			public IntPtr* vfptr;
+			public int* vbptr;
 
 			public static ICorDynamicInfo* ICorDynamicInfo(ICorJitInfo* ptr) {
 				hasLinkInfo = ptr->vbptr[10] > 0 && ptr->vbptr[10] >> 16 == 0; // != 0 and hiword byte == 0
@@ -353,13 +353,13 @@ namespace Confuser.Runtime {
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct ICorModuleInfo {
-			public readonly IntPtr* vfptr;
+			public IntPtr* vfptr;
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct ICorStaticInfo {
-			public readonly IntPtr* vfptr;
-			public readonly int* vbptr;
+			public IntPtr* vfptr;
+			public int* vbptr;
 
 			public static ICorMethodInfo* ICorMethodInfo(ICorStaticInfo* ptr) {
 				return (ICorMethodInfo*)((byte*)&ptr->vbptr + ptr->vbptr[1]);
