@@ -48,6 +48,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AntiILDasmProtection.cs" />
     <Compile Include="AntiTamper\AntiTamperProtection.cs" />
     <Compile Include="AntiTamper\DynamicDeriver.cs" />

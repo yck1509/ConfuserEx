@@ -40,6 +40,9 @@
     <AssemblyOriginatorKeyFile>..\ConfuserEx.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AntiDump.cs" />
     <Compile Include="AntiDebug.Win32.cs" />
     <Compile Include="AntiDebug.Antinet.cs" />

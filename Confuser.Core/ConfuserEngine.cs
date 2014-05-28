@@ -12,12 +12,27 @@ using dnlib.DotNet.Writer;
 using MethodAttributes = dnlib.DotNet.MethodAttributes;
 using MethodImplAttributes = dnlib.DotNet.MethodImplAttributes;
 using TypeAttributes = dnlib.DotNet.TypeAttributes;
+using InformationalAttribute = System.Reflection.AssemblyInformationalVersionAttribute;
+using ProductAttribute = System.Reflection.AssemblyProductAttribute;
+using CopyrightAttribute = System.Reflection.AssemblyCopyrightAttribute;
 
 namespace Confuser.Core {
 	/// <summary>
 	///     The processing engine of Confuser.
 	/// </summary>
 	public static class ConfuserEngine {
+        public static readonly string Version;
+        static readonly string Copyright;
+        static ConfuserEngine()
+        {
+            var assembly = typeof(ConfuserEngine).Assembly;
+            var nameAttr = (ProductAttribute)assembly.GetCustomAttributes(typeof(ProductAttribute), false)[0];
+            var verAttr = (InformationalAttribute)assembly.GetCustomAttributes(typeof(InformationalAttribute), false)[0];
+            var cpAttr = (CopyrightAttribute)assembly.GetCustomAttributes(typeof(CopyrightAttribute), false)[0];
+            Version = string.Format("{0} {1}", nameAttr.Product, verAttr.InformationalVersion);
+            Copyright = cpAttr.Copyright;
+        }
+
 		/// <summary>
 		///     Runs the engine with the specified parameters.
 		/// </summary>
@@ -268,7 +283,7 @@ namespace Confuser.Core {
 				marker.Mark(ctor);
 
 				var attr = new CustomAttribute(ctor);
-				attr.ConstructorArguments.Add(new CAArgument(module.CorLibTypes.String, "ConfuserEx 0.1"));
+				attr.ConstructorArguments.Add(new CAArgument(module.CorLibTypes.String, Version));
 
 				module.CustomAttributes.Add(attr);
 			}
@@ -348,7 +363,7 @@ namespace Confuser.Core {
 				context.Logger.Info("Protecting packer stub...");
 			}
 			else {
-				context.Logger.Info("ConfuserEx v0.1 Copyright (C) Ki 2014");
+                context.Logger.InfoFormat("{0} {1}", Version, Copyright);
 
 				Type mono = Type.GetType("Mono.Runtime");
 				context.Logger.InfoFormat("Running on {0}, {1}, {2} bits",

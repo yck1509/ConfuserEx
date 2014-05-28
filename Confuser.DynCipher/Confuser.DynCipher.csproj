@@ -41,6 +41,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AST\ArrayIndexExpression.cs" />
     <Compile Include="AST\AssignmentStatement.cs" />
     <Compile Include="AST\BinOpExpression.cs" />

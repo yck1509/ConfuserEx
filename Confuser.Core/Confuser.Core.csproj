@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Annotations.cs" />
     <Compile Include="LZMA\Common\CRC.cs" />
     <Compile Include="LZMA\Common\InBuffer.cs" />
