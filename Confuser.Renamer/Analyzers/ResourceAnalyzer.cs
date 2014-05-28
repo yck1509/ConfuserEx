@@ -24,7 +24,7 @@ namespace Confuser.Renamer.Analyzers {
 					throw new ConfuserException(null);
 				}
 
-				string format = "{0}.{1}." + module.Assembly.Culture + ".resources";
+				string format = "{0}." + module.Assembly.Culture + ".resources";
 				foreach (Resource res in module.Resources) {
 					Match match = satellitePattern.Match(res.Name);
 					if (!match.Success)
@@ -39,7 +39,7 @@ namespace Confuser.Renamer.Analyzers {
 				}
 			}
 			else {
-				string format = "{0}.{1}.resources";
+				string format = "{0}.resources";
 				foreach (Resource res in module.Resources) {
 					Match match = ResourceNamePattern.Match(res.Name);
 					if (!match.Success)

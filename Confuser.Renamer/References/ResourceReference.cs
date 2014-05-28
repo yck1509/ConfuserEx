@@ -14,7 +14,7 @@ namespace Confuser.Renamer.References {
 		}
 
 		public bool UpdateNameReference(ConfuserContext context, INameService service) {
-			resource.Name = string.Format(format, typeDef.Namespace, typeDef.Name);
+			resource.Name = string.Format(format, typeDef.ReflectionFullName);
 			return true;
 		}
 
