@@ -69,9 +69,12 @@ namespace Confuser.Renamer {
 		}
 
 		public bool CanRename(object obj) {
-			if(obj is IDnlibDef){
+			if (obj is IDnlibDef) {
+				if (analyze == null)
+					analyze = context.Pipeline.FindPhase<AnalyzePhase>();
+
 				var prot = (NameProtection)analyze.Parent;
-				var parameters = ProtectionParameters.GetParameters(context, (IDnlibDef)obj);
+				ProtectionSettings parameters = ProtectionParameters.GetParameters(context, (IDnlibDef)obj);
 				if (!parameters.ContainsKey(prot))
 					return false;
 			}
@@ -106,8 +109,8 @@ namespace Confuser.Renamer {
 
 			SetOriginalName(def, def.Name);
 			if (def is TypeDef) {
-				GetVTables().GetVTable((TypeDef) def);
-				SetOriginalNamespace(def, ((TypeDef) def).Namespace);
+				GetVTables().GetVTable((TypeDef)def);
+				SetOriginalNamespace(def, ((TypeDef)def).Namespace);
 			}
 			analyze.Analyze(this, context, def, true);
 		}
@@ -162,20 +165,20 @@ namespace Confuser.Renamer {
 			if (marker.IsMarked(def))
 				return;
 			if (def is MethodDef) {
-				var method = (MethodDef) def;
+				var method = (MethodDef)def;
 				method.Access = MethodAttributes.Assembly;
 				if (!method.IsSpecialName && !method.IsRuntimeSpecialName && !method.DeclaringType.IsDelegate())
 					method.Name = RandomName();
 			}
 			else if (def is FieldDef) {
-				var field = (FieldDef) def;
+				var field = (FieldDef)def;
 				field.Access = FieldAttributes.Assembly;
 				field.Name = RandomName();
 				if (!field.IsSpecialName && !field.IsRuntimeSpecialName)
 					field.Name = RandomName();
 			}
 			else if (def is TypeDef) {
-				var type = (TypeDef) def;
+				var type = (TypeDef)def;
 				type.Visibility = type.DeclaringType == null ? TypeAttributes.NotPublic : TypeAttributes.NestedAssembly;
 				type.Namespace = "";
 				if (!type.IsSpecialName && !type.IsRuntimeSpecialName)
@@ -189,20 +192,20 @@ namespace Confuser.Renamer {
 		#region Charsets
 
 		private static readonly char[] asciiCharset = Enumerable.Range(32, 95)
-		                                                        .Select(ord => (char) ord)
+		                                                        .Select(ord => (char)ord)
 		                                                        .Except(new[] { '.' })
 		                                                        .ToArray();
 
 		private static readonly char[] letterCharset = Enumerable.Range(0, 26)
-		                                                         .SelectMany(ord => new[] { (char) ('a' + ord), (char) ('A' + ord) })
+		                                                         .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
 		                                                         .ToArray();
 
 		// Especially chosen, just to mess with people.
 		// Inspired by: http://xkcd.com/1137/ :D
 		private static readonly char[] unicodeCharset = new char[] { }
-			.Concat(Enumerable.Range(0x200b, 5).Select(ord => (char) ord))
-			.Concat(Enumerable.Range(0x2028, 7).Select(ord => (char) ord))
-			.Concat(Enumerable.Range(0x206a, 6).Select(ord => (char) ord))
+			.Concat(Enumerable.Range(0x200b, 5).Select(ord => (char)ord))
+			.Concat(Enumerable.Range(0x2028, 7).Select(ord => (char)ord))
+			.Concat(Enumerable.Range(0x206a, 6).Select(ord => (char)ord))
 			.Except(new[] { '\u2029' })
 			.ToArray();
 
