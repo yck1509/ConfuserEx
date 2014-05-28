@@ -1,4 +1,5 @@
-permalink: /:year/:month/:day/:title 
+permalink: /:year/:month/:day/:title
+markdown: kramdown
 
 exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
 highlighter: pygments
