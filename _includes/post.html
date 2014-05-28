@@ -1,0 +1,33 @@
+{% if page.title or page.tagline %}
+<div class="page-header">
+  <h1>{{ page.title }} {% if page.tagline %} <small>{{ page.tagline }}</small>{% endif %}</h1>
+</div>
+{% endif %}
+
+<div class="row post-full">
+  <div class="col-xs-12">
+    <div class="date">
+      <span>{{ page.date | date_to_long_string }}</span>
+    </div>
+    <div class="content">
+      {{ content }}
+    </div>
+  
+    <hr>
+    <div class="text-center">
+      <ul class="pagination">
+      {% if page.previous %}
+        <li><a href="{{ BASE_PATH }}{{ page.previous.url }}" title="{{ page.previous.title }}">&laquo;</a></li>
+      {% else %}
+        <li class="disabled"><a>&laquo;</a></li>
+      {% endif %}
+        <li><a href="{{ BASE_PATH }}{{ site.JB.archive_path }}">Archive</a></li>
+      {% if page.next %}
+        <li><a href="{{ BASE_PATH }}{{ page.next.url }}" title="{{ page.next.title }}">&raquo;</a></li>
+      {% else %}
+        <li class="disabled"><a>&raquo;</a>
+      {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>

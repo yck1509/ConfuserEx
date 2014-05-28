@@ -1,0 +1,26 @@
+permalink: /:year/:month/:day/:title 
+
+exclude: [".rvmrc", ".rbenv-version", "README.md", "Rakefile", "changelog.md"]
+highlighter: pygments
+paginate: 5
+paginate_path: "news/page/:num"
+excerpt_separator: "\n\n\n"
+
+title : ConfuserEx
+description: ConfuserEx is an open-source protector for .NET applications.
+repo : "https://github.com/yck1509/ConfuserEx"
+author:
+  name: Ki
+  email: confuser.net@gmail.com
+
+production_url : http://yck1509.github.io/ConfuserEx
+
+JB :
+  version : 0.3.0
+  BASE_PATH : http://yck1509.github.io/ConfuserEx
+
+  ASSET_PATH : false
+
+  archive_path: /archive/
+  atom_path : /atom.xml
+  rss_path : /rss.xml

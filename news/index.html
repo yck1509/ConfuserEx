@@ -1,0 +1,56 @@
+---
+layout: page
+title : News
+group : navigation
+---
+{% include setup %}
+
+<div class="posts">
+  {% for post in paginator.posts %}
+  <div class="post panel panel-default">
+  <div class="panel-heading">
+    <h3 class="post-title">
+      <a href="{{ post.url }}">
+        {{ post.title }}
+      </a>
+      <span class="post-date">{{ post.date | date_to_string }}</span>
+    </h3>
+  </div>
+
+  <div class="panel-body">
+    {{ post.excerpt }}
+  </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="text-center">
+  <ul class="pagination">
+  {% if paginator.previous_page %}
+    <li><a href="{{ BASE_PATH }}{{ paginator.previous_page_path }}">&laquo;</a></li>
+  {% else %}
+    <li class="disabled"><a>&laquo;</a></li>
+  {% endif %}
+  
+  {% for i in (1..paginator.total_pages) %}
+    {% assign url = BASE_PATH | append: '/news/' %}
+    {% if i != 1 %}
+    {% assign url = url | append: 'page/' | append: i | append: '/' %}
+    {% endif %}
+    
+    {% assign indexUrl = url | append: 'index.html' %}
+    {% if page.url == indexUrl %}
+    {% assign active = "active" %}
+    {% else %}
+    {% assign active = "" %}
+    {% endif %}
+    <li class="{{ active }}"><a href="{{ url }}">{{ i }}</a></li>
+  {% endfor %}
+    
+  {% if paginator.next_page %}
+    <li><a href="{{ BASE_PATH }}{{ paginator.next_page_path }}">&raquo;</a></li>
+  {% else %}
+    <li class="disabled"><a>&raquo;</a>
+  {% endif %}
+  </ul>
+</div>
