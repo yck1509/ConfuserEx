@@ -3,7 +3,7 @@ layout: page
 ---
 {% include setup %}
 
-ConfuserEx is an open-source protector for .NET applications.
+ConfuserEx is an free, open-source protector for .NET applications.
 It is the successor of [Confuser](http://confuser.codeplex.com) project.
 
 ---
@@ -87,6 +87,6 @@ Dontation
 ---------
 If you find ConfuserEx is useful to you, feel free to support the project by making a donation!  
 
-<a href='https://pledgie.com/campaigns/25438'><img alt='Click here to lend your support to: ConfuserEx - open-source protector for .NET applications and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/25438.png?skin_name=chrome' border='0' ></a>  
+<a href='https://pledgie.com/campaigns/25451'><img alt='Click here to lend your support to: ConfuserEx --- an open-source .NET protector and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/25451.png?skin_name=chrome' border='0' ></a>
 `BTC : 12wzXhmMtjhn9dEFXdtoVAFwSx3MmV4Afx`  
 `DOGE: DM8NpgvQhzPKcdca6AbSxPiV9QCcix9BYJ`
