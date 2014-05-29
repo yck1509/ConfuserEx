@@ -52,8 +52,8 @@ namespace Confuser.Protections {
 			}
 
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
-                if (parameters.Targets.Count == 0)
-                    return;
+				if (parameters.Targets.Count == 0)
+					return;
 
 				Mode mode = parameters.GetParameter(context, context.CurrentModule, "mode", Mode.Normal);
 				IModeHandler modeHandler;
@@ -81,8 +81,8 @@ namespace Confuser.Protections {
 			}
 
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
-                if (parameters.Targets.Count == 0)
-                    return;
+				if (parameters.Targets.Count == 0)
+					return;
 
 				var modeHandler = context.Annotations.Get<IModeHandler>(context.CurrentModule, HandlerKey);
 				modeHandler.HandleMD((AntiTamperProtection)Parent, context, parameters);
