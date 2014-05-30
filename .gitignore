@@ -35,3 +35,5 @@ packages/
 *.sln.*
 gh-pages/
 ConfuserEx.snk
+GlobalAssemblyInfo.cs
+/Build/*.zip

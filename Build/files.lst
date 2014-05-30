@@ -1,0 +1,9 @@
+..\Release\bin\Confuser.CLI.exe
+..\Release\bin\Confuser.CLI.pdb
+..\Release\bin\Confuser.Core.*
+..\Release\bin\Confuser.DynCipher.*
+..\Release\bin\Confuser.Protections.*
+..\Release\bin\Confuser.Renamer.*
+..\Release\bin\Confuser.Runtime.*
+..\Release\bin\dnlib.*
+..\Release\bin\System.Threading.dll

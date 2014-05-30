@@ -149,11 +149,8 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
+    <MSBuild Projects="$(SolutionDir)\Build\UpdateVersion.csproj" Targets="Build" Properties="Configuration=Release" />
+    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="UpdateVersion.exe $(SolutionDir)" Timeout="5000" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

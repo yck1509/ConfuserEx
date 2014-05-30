@@ -20,6 +20,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confuser.DynCipher", "Confuser.DynCipher\Confuser.DynCipher.csproj", "{E832E9B8-2158-4FC0-89A1-56C6ECC10F6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confuser.Runtime", "Confuser.Runtime\Confuser.Runtime.csproj", "{A45C184F-F98F-4258-A928-BFF437034791}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BEB67A6E-4C54-4DE5-8C6B-2C12F44A7B92} = {BEB67A6E-4C54-4DE5-8C6B-2C12F44A7B92}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
