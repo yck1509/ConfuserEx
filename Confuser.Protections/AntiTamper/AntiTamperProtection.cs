@@ -1,4 +1,6 @@
-﻿using Confuser.Core;
+﻿using System;
+using System.Linq;
+using Confuser.Core;
 using Confuser.Protections.AntiTamper;
 using dnlib.DotNet;
 
@@ -48,10 +50,13 @@ namespace Confuser.Protections {
 				: base(parent) { }
 
 			public override ProtectionTargets Targets {
-				get { return ProtectionTargets.Modules; }
+				get { return ProtectionTargets.Methods; }
 			}
 
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
+				if (!parameters.Targets.Any())
+					return;
+
 				Mode mode = parameters.GetParameter(context, context.CurrentModule, "mode", Mode.Normal);
 				IModeHandler modeHandler;
 				switch (mode) {
@@ -78,6 +83,9 @@ namespace Confuser.Protections {
 			}
 
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
+				if (!parameters.Targets.Any())
+					return;
+
 				var modeHandler = context.Annotations.Get<IModeHandler>(context.CurrentModule, HandlerKey);
 				modeHandler.HandleMD((AntiTamperProtection)Parent, context, parameters);
 			}
