@@ -1,4 +1,7 @@
-﻿using dnlib.DotNet;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using dnlib.DotNet;
 
 namespace Confuser.Core.Services {
 	internal class RuntimeService : IRuntimeService {
@@ -7,7 +10,11 @@ namespace Confuser.Core.Services {
 		/// <inheritdoc />
 		public TypeDef GetRuntimeType(string fullName) {
 			if (rtModule == null) {
-				rtModule = ModuleDefMD.Load("Confuser.Runtime.dll");
+				Module module = typeof (RuntimeService).Assembly.ManifestModule;
+				string rtPath = "Confuser.Runtime.dll";
+				if (module.FullyQualifiedName[0] != '<')
+					rtPath = Path.Combine(Path.GetDirectoryName(module.FullyQualifiedName), rtPath);
+				rtModule = ModuleDefMD.Load(rtPath);
 				rtModule.EnableTypeDefFindCache = true;
 			}
 			return rtModule.Find(fullName, true);
