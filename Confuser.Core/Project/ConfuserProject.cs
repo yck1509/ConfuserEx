@@ -343,6 +343,7 @@ namespace Confuser.Core.Project {
 		/// </summary>
 		public ConfuserProject() {
 			ProbePaths = new List<string>();
+			PluginPaths = new List<string>();
 			Rules = new List<Rule>();
 		}
 
@@ -389,6 +390,12 @@ namespace Confuser.Core.Project {
 		public IList<string> ProbePaths { get; private set; }
 
 		/// <summary>
+		///     Gets a list of paths to plugin.
+		/// </summary>
+		/// <value>The list of plugins.</value>
+		public IList<string> PluginPaths { get; private set; }
+
+		/// <summary>
 		///     Saves the project as XML document.
 		/// </summary>
 		/// <returns>The serialized project XML.</returns>
@@ -426,6 +433,12 @@ namespace Confuser.Core.Project {
 
 			foreach (string i in ProbePaths) {
 				XmlElement path = xmlDoc.CreateElement("probePath");
+				path.Value = i;
+				elem.AppendChild(path);
+			}
+
+			foreach (string i in PluginPaths) {
+				XmlElement path = xmlDoc.CreateElement("plugin");
 				path.Value = i;
 				elem.AppendChild(path);
 			}
@@ -470,6 +483,7 @@ namespace Confuser.Core.Project {
 			Packer = null;
 			Clear();
 			ProbePaths.Clear();
+			PluginPaths.Clear();
 			Rules.Clear();
 			foreach (XmlElement i in docElem.ChildNodes.OfType<XmlElement>()) {
 				if (i.Name == "rule") {
@@ -482,7 +496,10 @@ namespace Confuser.Core.Project {
 					Packer.Load(i);
 				}
 				else if (i.Name == "probePath") {
-					ProbePaths.Add(i.Value);
+					ProbePaths.Add(i.InnerText);
+				}
+				else if (i.Name == "plugin") {
+					PluginPaths.Add(i.InnerText);
 				}
 				else {
 					var asm = new ProjectModule();
