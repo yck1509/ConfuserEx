@@ -63,7 +63,10 @@ namespace Confuser.Protections.ReferenceProxy {
 					break;
 				case EncodingType.x86:
 					ret.EncodingHandler = store.x86 ?? (store.x86 = new x86Encoding());
-					break;
+                    
+                        		if ((context.CurrentModule.Cor20HeaderFlags & dnlib.DotNet.MD.ComImageFlags.ILOnly) != 0)
+                        			context.CurrentModuleWriterOptions.Cor20HeaderOptions.Flags &= ~dnlib.DotNet.MD.ComImageFlags.ILOnly;
+                        		break;
 				default:
 					throw new UnreachableException();
 			}
