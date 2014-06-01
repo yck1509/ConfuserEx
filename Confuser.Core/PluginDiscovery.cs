@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace Confuser.Core {
@@ -112,6 +113,17 @@ namespace Confuser.Core {
 			}
 			catch (Exception ex) {
 				context.Logger.WarnException("Failed to load dynamic cipher library.", ex);
+			}
+
+			foreach (string pluginPath in context.Project.PluginPaths) {
+				string realPath = Path.Combine(context.BaseDirectory, pluginPath);
+				try {
+					Assembly plugin = Assembly.LoadFile(realPath);
+					AddPlugins(context, protections, packers, components, plugin);
+				}
+				catch (Exception ex) {
+					context.Logger.WarnException("Failed to load plugin '" + pluginPath + "'.", ex);
+				}
 			}
 		}
 	}

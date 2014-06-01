@@ -67,11 +67,11 @@ namespace Confuser.Core {
 			var asmResolver = new AssemblyResolver();
 			asmResolver.EnableTypeDefCache = true;
 			asmResolver.DefaultModuleContext = new ModuleContext(asmResolver);
-			foreach (string probePath in parameters.Project.ProbePaths)
-				asmResolver.PostSearchPaths.Add(probePath);
 			context.Resolver = asmResolver;
 			context.BaseDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.BaseDirectory + "\\");
 			context.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.OutputDirectory + "\\");
+			foreach (string probePath in parameters.Project.ProbePaths)
+				asmResolver.PostSearchPaths.Add(Path.Combine(context.BaseDirectory, probePath));
 
 			PrintInfo(context);
 

@@ -63,6 +63,7 @@
         <xs:element name="packer" type="objSettings" minOccurs="0" maxOccurs="1" />
         <xs:element name="module" type="module" minOccurs="1" maxOccurs="unbounded" />
         <xs:element name="probePath" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="plugin" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
       <xs:attribute name="outputDir" type="xs:string" use="required" />
       <xs:attribute name="baseDir" type="xs:string" use="required" />
