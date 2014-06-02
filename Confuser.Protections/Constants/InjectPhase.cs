@@ -46,6 +46,8 @@ namespace Confuser.Protections.Constants {
 						break;
 					case Mode.x86:
 						moduleCtx.ModeHandler = new x86Mode();
+                        			if ((context.CurrentModule.Cor20HeaderFlags & dnlib.DotNet.MD.ComImageFlags.ILOnly) != 0)
+                            				context.CurrentModuleWriterOptions.Cor20HeaderOptions.Flags &= ~dnlib.DotNet.MD.ComImageFlags.ILOnly;
 						break;
 					default:
 						throw new UnreachableException();
