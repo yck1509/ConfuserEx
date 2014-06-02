@@ -193,7 +193,7 @@ namespace Confuser.Runtime {
 			    info->scope == moduleHnd &&
 			    info->ILCode[0] == 0x14) {
 				ICorClassInfo* clsInfo = ICorStaticInfo.ICorClassInfo(ICorDynamicInfo.ICorStaticInfo(ICorJitInfo.ICorDynamicInfo(comp)));
-				int gmdSlot = 12 + (ver ? 2 : IntPtr.Size / 4);
+				int gmdSlot = 12 + (ver ? 2 : 1);
 				var getMethodDef = (getMethodDefFromMethod)Marshal.GetDelegateForFunctionPointer(clsInfo->vfptr[gmdSlot], typeof (getMethodDefFromMethod));
 				uint token = getMethodDef((IntPtr)clsInfo, info->ftn);
 
