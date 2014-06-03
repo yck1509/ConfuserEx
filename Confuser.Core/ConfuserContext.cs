@@ -87,6 +87,12 @@ namespace Confuser.Core {
 		public IList<byte[]> OutputModules { get; internal set; }
 
 		/// <summary>
+		///     Gets the <c>byte[]</c> of module debug symbols after protected, or null if module is not protected yet.
+		/// </summary>
+		/// <value>The list of <c>byte[]</c> of module debug symbols.</value>
+		public IList<byte[]> OutputSymbols { get; internal set; }
+
+		/// <summary>
 		///     Gets the relative output paths of module, or null if module is not protected yet.
 		/// </summary>
 		/// <value>The relative output paths of protected modules.</value>
@@ -123,6 +129,12 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <value>The output <c>byte[]</c>.</value>
 		public byte[] CurrentModuleOutput { get; internal set; }
+
+		/// <summary>
+		///     Gets output <c>byte[]</c> debug symbol of the current module
+		/// </summary>
+		/// <value>The output <c>byte[]</c> debug symbol.</value>
+		public byte[] CurrentModuleSymbol { get; internal set; }
 
 		/// <summary>
 		///     Throws a System.OperationCanceledException if protection process has been canceled.

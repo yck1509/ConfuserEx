@@ -112,6 +112,7 @@ namespace Confuser.Core {
 				MarkerResult markings = marker.MarkProject(parameters.Project, context);
 				context.Modules = markings.Modules.ToList().AsReadOnly();
 				context.OutputModules = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
+				context.OutputSymbols = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
 				context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToArray();
 				foreach (ModuleDefMD module in context.Modules)
 					asmResolver.AddToCache(module);
@@ -206,9 +207,11 @@ namespace Confuser.Core {
 				pipeline.ExecuteStage(PipelineStage.WriteModule, WriteModule, () => getModuleDefs(context.CurrentModule), context);
 
 				context.OutputModules[i] = context.CurrentModuleOutput;
+				context.OutputSymbols[i] = context.CurrentModuleSymbol;
 				context.CurrentModuleWriterOptions = null;
 				context.CurrentModuleWriterListener = null;
 				context.CurrentModuleOutput = null;
+				context.CurrentModuleSymbol = null;
 			}
 
 			context.CurrentModuleIndex = -1;
@@ -297,10 +300,16 @@ namespace Confuser.Core {
 			var snKey = context.Annotations.Get<StrongNameKey>(context.CurrentModule, Marker.SNKey);
 			context.CurrentModuleWriterOptions.InitializeStrongNameSigning(context.CurrentModule, snKey);
 
+			if (context.Project.Debug)
+				context.CurrentModule.LoadPdb();
+
 			foreach (TypeDef type in context.CurrentModule.GetTypes())
 				foreach (MethodDef method in type.Methods) {
-					if (method.Body != null)
+					if (method.Body != null) {
 						method.Body.Instructions.SimplifyMacros(method.Body.Variables, method.Parameters);
+						if (context.Project.Debug)
+							context.CurrentModule.PdbState.Initialize(method.Body, method.Rid);
+					}
 				}
 		}
 
@@ -324,17 +333,35 @@ namespace Confuser.Core {
 		private static void WriteModule(ConfuserContext context) {
 			context.Logger.InfoFormat("Writing module '{0}'...", context.CurrentModule.Name);
 
-			var ms = new MemoryStream();
+			MemoryStream pdb = null, output = new MemoryStream();
+			if (context.Project.Debug) {
+				context.CurrentModuleWriterOptions.WritePdb = true;
+				context.CurrentModuleWriterOptions.PdbFileName = Path.ChangeExtension(Path.GetFileName(context.OutputPaths[context.CurrentModuleIndex]), "pdb");
+				pdb = new MemoryStream();
+				context.CurrentModuleWriterOptions.PdbStream = pdb;
+			}
+
 			if (context.CurrentModuleWriterOptions is ModuleWriterOptions)
-				context.CurrentModule.Write(ms, (ModuleWriterOptions)context.CurrentModuleWriterOptions);
+				context.CurrentModule.Write(output, (ModuleWriterOptions)context.CurrentModuleWriterOptions);
 			else
-				context.CurrentModule.NativeWrite(ms, (NativeModuleWriterOptions)context.CurrentModuleWriterOptions);
-			context.CurrentModuleOutput = ms.ToArray();
+				context.CurrentModule.NativeWrite(output, (NativeModuleWriterOptions)context.CurrentModuleWriterOptions);
+
+			context.CurrentModuleOutput = output.ToArray();
+			if (context.Project.Debug)
+				context.CurrentModuleSymbol = pdb.ToArray();
 		}
 
 		private static void Debug(ConfuserContext context) {
 			context.Logger.Info("Finalizing...");
-			// TODO: Write debug symbols
+			if (context.Project.Debug) {
+				for (int i = 0; i < context.OutputModules.Count; i++) {
+					string path = Path.GetFullPath(Path.Combine(context.OutputDirectory, context.OutputPaths[i]));
+					string dir = Path.GetDirectoryName(path);
+					if (!Directory.Exists(dir))
+						Directory.CreateDirectory(dir);
+					File.WriteAllBytes(Path.ChangeExtension(path, "pdb"), context.OutputSymbols[i]);
+				}
+			}
 		}
 
 		private static void Pack(ConfuserContext context) {
