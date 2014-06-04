@@ -92,11 +92,15 @@ namespace Confuser.Core {
 		protected internal virtual MarkerResult MarkProject(ConfuserProject proj, ConfuserContext context) {
 			Packer packer = null;
 			Dictionary<string, string> packerParams = null;
+
 			if (proj.Packer != null) {
 				if (!packers.ContainsKey(proj.Packer.Id)) {
 					context.Logger.ErrorFormat("Cannot find packer with ID '{0}'.", proj.Packer.Id);
 					throw new ConfuserException(null);
 				}
+				if (proj.Debug)
+					context.Logger.Warn("Generated Debug symbols might not be usable with packers!");
+
 				packer = packers[proj.Packer.Id];
 				packerParams = new Dictionary<string, string>(proj.Packer, StringComparer.OrdinalIgnoreCase);
 			}
@@ -104,7 +108,11 @@ namespace Confuser.Core {
 			var modules = new List<ModuleDefMD>();
 			foreach (ProjectModule module in proj) {
 				context.Logger.InfoFormat("Loading '{0}'...", module.Path);
+
 				ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
+				if (proj.Debug)
+					modDef.LoadPdb();
+
 				Rules rules = ParseRules(proj, module, context);
 
 				context.Annotations.Set(modDef, SNKey, LoadSNKey(context, module.SNKeyPath == null ? null : Path.Combine(proj.BaseDirectory, module.SNKeyPath), module.SNKeyPassword));

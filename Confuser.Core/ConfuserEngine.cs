@@ -300,15 +300,10 @@ namespace Confuser.Core {
 			var snKey = context.Annotations.Get<StrongNameKey>(context.CurrentModule, Marker.SNKey);
 			context.CurrentModuleWriterOptions.InitializeStrongNameSigning(context.CurrentModule, snKey);
 
-			if (context.Project.Debug)
-				context.CurrentModule.LoadPdb();
-
 			foreach (TypeDef type in context.CurrentModule.GetTypes())
 				foreach (MethodDef method in type.Methods) {
 					if (method.Body != null) {
 						method.Body.Instructions.SimplifyMacros(method.Body.Variables, method.Parameters);
-						if (context.Project.Debug)
-							context.CurrentModule.PdbState.Initialize(method.Body, method.Rid);
 					}
 				}
 		}
@@ -334,10 +329,11 @@ namespace Confuser.Core {
 			context.Logger.InfoFormat("Writing module '{0}'...", context.CurrentModule.Name);
 
 			MemoryStream pdb = null, output = new MemoryStream();
-			if (context.Project.Debug) {
+
+			if (context.CurrentModule.PdbState != null) {
+				pdb = new MemoryStream();
 				context.CurrentModuleWriterOptions.WritePdb = true;
 				context.CurrentModuleWriterOptions.PdbFileName = Path.ChangeExtension(Path.GetFileName(context.OutputPaths[context.CurrentModuleIndex]), "pdb");
-				pdb = new MemoryStream();
 				context.CurrentModuleWriterOptions.PdbStream = pdb;
 			}
 
@@ -347,20 +343,20 @@ namespace Confuser.Core {
 				context.CurrentModule.NativeWrite(output, (NativeModuleWriterOptions)context.CurrentModuleWriterOptions);
 
 			context.CurrentModuleOutput = output.ToArray();
-			if (context.Project.Debug)
+			if (context.CurrentModule.PdbState != null)
 				context.CurrentModuleSymbol = pdb.ToArray();
 		}
 
 		private static void Debug(ConfuserContext context) {
 			context.Logger.Info("Finalizing...");
-			if (context.Project.Debug) {
-				for (int i = 0; i < context.OutputModules.Count; i++) {
-					string path = Path.GetFullPath(Path.Combine(context.OutputDirectory, context.OutputPaths[i]));
-					string dir = Path.GetDirectoryName(path);
-					if (!Directory.Exists(dir))
-						Directory.CreateDirectory(dir);
-					File.WriteAllBytes(Path.ChangeExtension(path, "pdb"), context.OutputSymbols[i]);
-				}
+			for (int i = 0; i < context.OutputModules.Count; i++) {
+				if (context.OutputSymbols[i] == null)
+					continue;
+				string path = Path.GetFullPath(Path.Combine(context.OutputDirectory, context.OutputPaths[i]));
+				string dir = Path.GetDirectoryName(path);
+				if (!Directory.Exists(dir))
+					Directory.CreateDirectory(dir);
+				File.WriteAllBytes(Path.ChangeExtension(path, "pdb"), context.OutputSymbols[i]);
 			}
 		}
 
