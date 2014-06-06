@@ -1,0 +1,17 @@
+﻿<Application x:Class="ConfuserEx.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Skin.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <BitmapImage x:Key="New" UriSource="Resources/New.png" />
+            <BitmapImage x:Key="Open" UriSource="Resources/Open.png" />
+            <BitmapImage x:Key="Save" UriSource="Resources/Save.png" />
+            <BitmapImage x:Key="Tools" UriSource="Resources/Tools.png" />
+            <BitmapImage x:Key="Decode" UriSource="Resources/Decode.png" />
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
