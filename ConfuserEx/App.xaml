@@ -6,12 +6,14 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Skin.xaml" />
+                <ResourceDictionary Source="Views.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <BitmapImage x:Key="New" UriSource="Resources/New.png" />
             <BitmapImage x:Key="Open" UriSource="Resources/Open.png" />
             <BitmapImage x:Key="Save" UriSource="Resources/Save.png" />
             <BitmapImage x:Key="Tools" UriSource="Resources/Tools.png" />
             <BitmapImage x:Key="Decode" UriSource="Resources/Decode.png" />
+            <FontFamily x:Key="FontAwesome">Resources/#FontAwesome</FontFamily>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
