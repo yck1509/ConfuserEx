@@ -44,21 +44,21 @@ namespace Confuser.Renamer {
 			context.Logger.Debug("Analyzing...");
 			IList<IRenamer> renamers = service.Renamers;
 			foreach (IDnlibDef def in parameters.Targets) {
-				Analyze(service, context, def, true);
+				Analyze(service, context, parameters, def, true);
 			}
 		}
 
-		internal void Analyze(NameService service, ConfuserContext context, IDnlibDef def, bool runAnalyzer) {
+		internal void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, IDnlibDef def, bool runAnalyzer) {
 			if (def is TypeDef)
-				Analyze(service, context, (TypeDef)def);
+				Analyze(service, context, parameters, (TypeDef)def);
 			else if (def is MethodDef)
-				Analyze(service, context, (MethodDef)def);
+				Analyze(service, context, parameters, (MethodDef)def);
 			else if (def is FieldDef)
-				Analyze(service, context, (FieldDef)def);
+				Analyze(service, context, parameters, (FieldDef)def);
 			else if (def is PropertyDef)
-				Analyze(service, context, (PropertyDef)def);
+				Analyze(service, context, parameters, (PropertyDef)def);
 			else if (def is EventDef)
-				Analyze(service, context, (EventDef)def);
+				Analyze(service, context, parameters, (EventDef)def);
 			else if (def is ModuleDef)
 				service.SetCanRename(def, false);
 
@@ -69,8 +69,8 @@ namespace Confuser.Renamer {
 				renamer.Analyze(context, service, def);
 		}
 
-		private void Analyze(NameService service, ConfuserContext context, TypeDef type) {
-			if (type.IsVisibleOutside()) {
+		private void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, TypeDef type) {
+			if (type.IsVisibleOutside() && !parameters.GetParameter<bool>(context, type, "renPublic", false)) {
 				service.SetCanRename(type, false);
 			}
 			else if (type.IsRuntimeSpecialName || type.IsSpecialName) {
@@ -86,9 +86,10 @@ namespace Confuser.Renamer {
 			}
 		}
 
-		private void Analyze(NameService service, ConfuserContext context, MethodDef method) {
+		private void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, MethodDef method) {
 			if (method.DeclaringType.IsVisibleOutside() &&
-			    (method.IsFamily || method.IsFamilyOrAssembly || method.IsPublic))
+				(method.IsFamily || method.IsFamilyOrAssembly || method.IsPublic) &&
+				!parameters.GetParameter<bool>(context, method, "renPublic", false))
 				service.SetCanRename(method, false);
 
 			else if (method.IsRuntimeSpecialName || method.IsSpecialName)
@@ -101,17 +102,19 @@ namespace Confuser.Renamer {
 				service.SetCanRename(method, false);
 		}
 
-		private void Analyze(NameService service, ConfuserContext context, FieldDef field) {
+		private void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, FieldDef field) {
 			if (field.DeclaringType.IsVisibleOutside() &&
-			    (field.IsFamily || field.IsFamilyOrAssembly || field.IsPublic))
+				(field.IsFamily || field.IsFamilyOrAssembly || field.IsPublic) &&
+				!parameters.GetParameter<bool>(context, field, "renPublic", false))
 				service.SetCanRename(field, false);
 
 			else if (field.IsRuntimeSpecialName || field.IsSpecialName)
 				service.SetCanRename(field, false);
 		}
 
-		private void Analyze(NameService service, ConfuserContext context, PropertyDef property) {
-			if (property.DeclaringType.IsVisibleOutside())
+		private void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, PropertyDef property) {
+			if (property.DeclaringType.IsVisibleOutside() &&
+				!parameters.GetParameter<bool>(context, property, "renPublic", false))
 				service.SetCanRename(property, false);
 
 			else if (property.IsRuntimeSpecialName || property.IsSpecialName)
@@ -124,8 +127,9 @@ namespace Confuser.Renamer {
 				service.SetCanRename(property, false);
 		}
 
-		private void Analyze(NameService service, ConfuserContext context, EventDef evt) {
-			if (evt.DeclaringType.IsVisibleOutside())
+		private void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, EventDef evt) {
+			if (evt.DeclaringType.IsVisibleOutside() &&
+				!parameters.GetParameter<bool>(context, evt, "renPublic", false))
 				service.SetCanRename(evt, false);
 
 			else if (evt.IsRuntimeSpecialName || evt.IsSpecialName)

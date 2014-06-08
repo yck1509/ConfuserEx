@@ -112,7 +112,7 @@ namespace Confuser.Renamer {
 				GetVTables().GetVTable((TypeDef)def);
 				SetOriginalNamespace(def, ((TypeDef)def).Namespace);
 			}
-			analyze.Analyze(this, context, def, true);
+			analyze.Analyze(this, context, ProtectionParameters.Empty, def, true);
 		}
 
 		public string ObfuscateName(string name, RenameMode mode) {

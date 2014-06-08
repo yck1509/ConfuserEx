@@ -13,6 +13,11 @@ namespace Confuser.Core {
 		private readonly ConfuserComponent comp;
 
 		/// <summary>
+		/// A empty instance of <see cref="ProtectionParameters" />.
+		/// </summary>
+		public static readonly ProtectionParameters Empty = new ProtectionParameters(null, new IDnlibDef[0]);
+
+		/// <summary>
 		///     Initializes a new instance of the <see cref="ProtectionParameters" /> class.
 		/// </summary>
 		/// <param name="component">The component that this parameters applied to.</param>

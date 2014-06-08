@@ -18,9 +18,13 @@ using TypeAttributes = dnlib.DotNet.TypeAttributes;
 
 namespace Confuser.Core {
 	/// <summary>
-	///     The processing engine of Confuser.
+	///     The processing engine of ConfuserEx.
 	/// </summary>
 	public static class ConfuserEngine {
+
+		/// <summary>
+		/// The version of ConfuserEx.
+		/// </summary>
 		public static readonly string Version;
 		private static readonly string Copyright;
 
