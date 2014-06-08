@@ -75,10 +75,11 @@ namespace Confuser.Renamer {
 
 				var prot = (NameProtection)analyze.Parent;
 				ProtectionSettings parameters = ProtectionParameters.GetParameters(context, (IDnlibDef)obj);
-				if (!parameters.ContainsKey(prot))
+				if (parameters == null || !parameters.ContainsKey(prot))
 					return false;
+				return context.Annotations.Get(obj, CanRenameKey, true);
 			}
-			return context.Annotations.Get(obj, CanRenameKey, true);
+			return false;
 		}
 
 		public void SetCanRename(object obj, bool val) {
