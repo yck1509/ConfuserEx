@@ -7,35 +7,39 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer {
 	public class VTableSignature {
-		internal VTableSignature(MethodSig sig, string name) {
+		internal VTableSignature(TypeSig iface, MethodSig sig, string name) {
+			if (iface.ScopeType.ResolveTypeDefThrow().IsInterface)
+				InterfaceType = iface;
+			else
+				InterfaceType = null;
 			MethodSig = sig;
 			Name = name;
 		}
 
+		public TypeSig InterfaceType { get; private set; }
 		public MethodSig MethodSig { get; private set; }
 		public string Name { get; private set; }
 
 		public static VTableSignature FromMethod(IMethod method) {
 			MethodSig sig = method.MethodSig;
-			if (method.DeclaringType is TypeSpec) {
-				var typeSpec = (TypeSpec)method.DeclaringType;
-				if (typeSpec.TypeSig is GenericInstSig) {
-					sig = GenericArgumentResolver.Resolve(sig, ((GenericInstSig)typeSpec.TypeSig).GenericArguments);
-				}
+			TypeSig iface = method.DeclaringType.ToTypeSig();
+			if (iface is GenericInstSig) {
+				sig = GenericArgumentResolver.Resolve(sig, ((GenericInstSig)iface).GenericArguments);
 			}
-			return new VTableSignature(sig, method.Name);
+			return new VTableSignature(iface, sig, method.Name);
 		}
 
 		public override bool Equals(object obj) {
 			var other = obj as VTableSignature;
 			if (other == null)
 				return false;
-			return new SigComparer().Equals(MethodSig, other.MethodSig) && Name.Equals(other.Name, StringComparison.Ordinal);
+			return new SigComparer().Equals(InterfaceType, other.InterfaceType) && new SigComparer().Equals(MethodSig, other.MethodSig) && Name.Equals(other.Name, StringComparison.Ordinal);
 		}
 
 		public override int GetHashCode() {
-			int mh = new SigComparer().GetHashCode(MethodSig);
-			return ((mh << 5) + mh) + Name.GetHashCode();
+			int hash = new SigComparer().GetHashCode(InterfaceType);
+			hash = hash * 7 + new SigComparer().GetHashCode(MethodSig);
+			return hash * 7 + Name.GetHashCode();
 		}
 
 		public static bool operator ==(VTableSignature a, VTableSignature b) {
@@ -52,7 +56,7 @@ namespace Confuser.Renamer {
 		}
 
 		public override string ToString() {
-			return FullNameCreator.MethodFullName("", Name, MethodSig);
+			return FullNameCreator.MethodFullName(InterfaceType == null ? "" : FullNameCreator.FullName(InterfaceType, false), Name, MethodSig);
 		}
 	}
 
@@ -278,7 +282,7 @@ namespace Confuser.Renamer {
 					newDecl = new GenericInstSig((ClassOrValueTypeSig)openType.ToTypeSig(), genInst.GenericArguments.ToArray());
 				else
 					newDecl = GenericArgumentResolver.Resolve(newDecl, genInst.GenericArguments);
-				ret.Slots.Add(new VTableSlot(ret, slot.MethodDef, newDecl, new VTableSignature(newSig, slot.Signature.Name)).Override(slot));
+				ret.Slots.Add(new VTableSlot(ret, slot.MethodDef, newDecl, new VTableSignature(genInst, newSig, slot.Signature.Name)).Override(slot));
 			}
 			return ret;
 		}
