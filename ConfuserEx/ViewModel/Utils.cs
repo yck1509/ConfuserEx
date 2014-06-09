@@ -41,21 +41,21 @@ namespace ConfuserEx.ViewModel {
 			return ret;
 		}
 
-		public static ObservableCollection<IViewModel<T>> Wrap<T>(IList<T> list, Func<T, IViewModel<T>> transform) {
-			var ret = new ObservableCollection<IViewModel<T>>(list.Select(item => transform(item)));
+		public static ObservableCollection<TViewModel> Wrap<TModel, TViewModel>(IList<TModel> list, Func<TModel, TViewModel> transform) where TViewModel : IViewModel<TModel> {
+			var ret = new ObservableCollection<TViewModel>(list.Select(item => transform(item)));
 
 			ret.CollectionChanged += (sender, e) => {
-				var collection = (ObservableCollection<IViewModel<T>>)sender;
+				var collection = (ObservableCollection<TViewModel>)sender;
 				switch (e.Action) {
 					case NotifyCollectionChangedAction.Reset:
 						list.Clear();
-						foreach (var item in collection)
+						foreach (TViewModel item in collection)
 							list.Add(item.Model);
 						break;
 
 					case NotifyCollectionChangedAction.Add:
 						for (int i = 0; i < e.NewItems.Count; i++)
-							list.Insert(e.NewStartingIndex + i, ((IViewModel<T>)e.NewItems[i]).Model);
+							list.Insert(e.NewStartingIndex + i, ((TViewModel)e.NewItems[i]).Model);
 						break;
 
 					case NotifyCollectionChangedAction.Remove:
@@ -65,11 +65,11 @@ namespace ConfuserEx.ViewModel {
 
 					case NotifyCollectionChangedAction.Move:
 						list.RemoveAt(e.OldStartingIndex);
-						list.Insert(e.NewStartingIndex, ((IViewModel<T>)e.NewItems[0]).Model);
+						list.Insert(e.NewStartingIndex, ((TViewModel)e.NewItems[0]).Model);
 						break;
 
 					case NotifyCollectionChangedAction.Replace:
-						list[e.NewStartingIndex] = ((IViewModel<T>)e.NewItems[0]).Model;
+						list[e.NewStartingIndex] = ((TViewModel)e.NewItems[0]).Model;
 						break;
 				}
 			};

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Confuser.Core.Project;
 
 namespace ConfuserEx.ViewModel {
@@ -8,6 +10,9 @@ namespace ConfuserEx.ViewModel {
 
 		public ProjectVM(ConfuserProject proj) {
 			this.proj = proj;
+			ObservableCollection<ProjectModuleVM> modules = Utils.Wrap(proj, module => new ProjectModuleVM(this, module));
+			modules.CollectionChanged += (sender, e) => IsModified = true;
+			Modules = modules;
 		}
 
 		public ConfuserProject Project {
@@ -38,6 +43,8 @@ namespace ConfuserEx.ViewModel {
 			get { return proj.OutputDirectory; }
 			set { SetProperty(proj.OutputDirectory != value, val => proj.OutputDirectory = val, value, "OutputDirectory"); }
 		}
+
+		public IList<ProjectModuleVM> Modules { get; private set; }
 
 		ConfuserProject IViewModel<ConfuserProject>.Model {
 			get { return proj; }

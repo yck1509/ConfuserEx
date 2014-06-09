@@ -1,8 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:vm="clr-namespace:ConfuserEx.ViewModel">
+                    xmlns:local="clr-namespace:ConfuserEx"
+                    xmlns:vm="clr-namespace:ConfuserEx.ViewModel"
+                    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+                    xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4">
     <DataTemplate DataType="{x:Type vm:ProjectTabVM}">
-        <Grid>
+        <Grid AllowDrop="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="36px" />
                 <RowDefinition Height="36px" />
@@ -15,18 +18,31 @@
                 <ColumnDefinition Width="35px" />
             </Grid.ColumnDefinitions>
 
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="PreviewDragOver">
+                    <cmd:EventToCommand PassEventArgsToCommand="True" Command="{Binding DragOver}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="PreviewDrop">
+                    <cmd:EventToCommand PassEventArgsToCommand="True" Command="{Binding Drop}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+
             <Label Content="Base Directory : " Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Right"
                    VerticalContentAlignment="Center" />
-            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" />
-            <Button Grid.Row="0" Grid.Column="2" Margin="5" VerticalAlignment="Center" Height="26">
+            <TextBox Grid.Row="0" Grid.Column="1" Margin="5" VerticalContentAlignment="Center"
+                     Text="{Binding App.Project.BaseDirectory, Mode=TwoWay}" />
+            <Button Grid.Row="0" Grid.Column="2" Margin="5" VerticalAlignment="Center" Height="26"
+                    Command="{Binding ChooseBaseDir}">
                 <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf141;" Height="10px"
                            TextOptions.TextRenderingMode="GrayScale" />
             </Button>
 
             <Label Content="Output Directory : " Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Right"
                    VerticalContentAlignment="Center" />
-            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center" />
-            <Button Grid.Row="1" Grid.Column="2" Margin="5" VerticalAlignment="Center" Height="26">
+            <TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center"
+                     Text="{Binding App.Project.OutputDirectory, Mode=TwoWay}" />
+            <Button Grid.Row="1" Grid.Column="2" Margin="5" VerticalAlignment="Center" Height="26"
+                    Command="{Binding ChooseOutputDir}">
                 <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf141;" Height="10px"
                            TextOptions.TextRenderingMode="GrayScale" />
             </Button>
@@ -39,25 +55,51 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Seed : " Grid.Column="0" HorizontalContentAlignment="Right"
                        VerticalContentAlignment="Center" />
-                <TextBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center" />
-                <CheckBox Grid.Column="2" Content="Generate Debug Symbols" VerticalAlignment="Center" Margin="5" />
+                <TextBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center"
+                         Text="{Binding App.Project.Seed, Mode=TwoWay}"
+                         local:Skin.EmptyPrompt="Leave blank for random seed" />
+                <CheckBox Grid.Column="2" Content="Generate Debug Symbols" VerticalAlignment="Center" Margin="5"
+                          IsChecked="{Binding App.Project.Debug, Mode=TwoWay}" />
             </Grid>
 
-            <ListBox Grid.Row="3" Grid.ColumnSpan="2" Margin="5" />
-            <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Vertical">
-                <Button Grid.Row="1" Grid.Column="2" Height="26" Margin="5">
+            <ListBox Grid.Row="3" Grid.ColumnSpan="2" Margin="5" local:Skin.EmptyPrompt="Drag input modules here"
+                     ItemsSource="{Binding App.Project.Modules}" HorizontalContentAlignment="Stretch"
+                     SelectedIndex="{Binding SelectedIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     Grid.IsSharedSizeScope="True">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:ProjectModuleVM}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding AssemblyName}"
+                                       TextAlignment="Left" Margin="0,0,5,0" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Grid.Column="1" Text="{Binding Path}"
+                                       TextAlignment="Right" Margin="5,0,0,0" TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <DockPanel Grid.Row="3" Grid.Column="2">
+                <Button Height="26" Margin="5" DockPanel.Dock="Top" Command="{Binding Add}">
                     <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf067;" Height="12px"
                                TextOptions.TextRenderingMode="GrayScale" />
                 </Button>
-                <Button Grid.Row="1" Grid.Column="2" Height="26" Margin="5">
+                <Button Height="26" Margin="5" DockPanel.Dock="Top" Command="{Binding Remove}">
                     <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf068;" Height="12px"
                                TextOptions.TextRenderingMode="GrayScale" />
                 </Button>
-                <Button Grid.Row="1" Grid.Column="2" Height="26" Margin="5">
-                    <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf014;" Height="12px"
+                <Button Height="26" Margin="5" DockPanel.Dock="Top" Command="{Binding Edit}">
+                    <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf044;" Height="12px"
                                TextOptions.TextRenderingMode="GrayScale" />
                 </Button>
-            </StackPanel>
+                <Button Height="26" Margin="5" DockPanel.Dock="Bottom" Command="{Binding Advanced}">
+                    <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf013;" Height="12px"
+                               TextOptions.TextRenderingMode="GrayScale" />
+                </Button>
+                <Border />
+            </DockPanel>
         </Grid>
     </DataTemplate>
 </ResourceDictionary>

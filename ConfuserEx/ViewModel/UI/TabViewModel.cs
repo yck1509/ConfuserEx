@@ -3,6 +3,7 @@
 namespace ConfuserEx.ViewModel {
 	public abstract class TabViewModel : ViewModelBase {
 		protected TabViewModel(AppVM app, string header) {
+			App = app;
 			Header = header;
 		}
 

@@ -68,7 +68,7 @@ namespace Confuser.Core {
 		}
 
 		/// <summary>
-		///     OBtains the relative path from the specified base path.
+		///     Obtains the relative path from the specified base path.
 		/// </summary>
 		/// <param name="filespec">The file path.</param>
 		/// <param name="folder">The base path.</param>
