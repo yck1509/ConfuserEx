@@ -10,9 +10,18 @@ namespace ConfuserEx.ViewModel {
 
 		public ProjectVM(ConfuserProject proj) {
 			this.proj = proj;
+
 			ObservableCollection<ProjectModuleVM> modules = Utils.Wrap(proj, module => new ProjectModuleVM(this, module));
 			modules.CollectionChanged += (sender, e) => IsModified = true;
 			Modules = modules;
+
+			var plugins = Utils.Wrap(proj.PluginPaths, path => new StringItem(path));
+			plugins.CollectionChanged += (sender, e) => IsModified = true;
+			Plugins = plugins;
+
+			ObservableCollection<StringItem> probePaths = Utils.Wrap(proj.ProbePaths, path => new StringItem(path));
+			probePaths.CollectionChanged += (sender, e) => IsModified = true;
+			ProbePaths = probePaths;
 		}
 
 		public ConfuserProject Project {
@@ -45,6 +54,8 @@ namespace ConfuserEx.ViewModel {
 		}
 
 		public IList<ProjectModuleVM> Modules { get; private set; }
+		public IList<StringItem> Plugins { get; private set; }
+		public IList<StringItem> ProbePaths { get; private set; }
 
 		ConfuserProject IViewModel<ConfuserProject>.Model {
 			get { return proj; }

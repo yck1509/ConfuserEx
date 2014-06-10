@@ -5,7 +5,7 @@
                     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
                     xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4">
     <DataTemplate DataType="{x:Type vm:ProjectTabVM}">
-        <Grid AllowDrop="True">
+        <Grid Background="Transparent">
             <Grid.RowDefinitions>
                 <RowDefinition Height="36px" />
                 <RowDefinition Height="36px" />
@@ -15,22 +15,13 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150px" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="35px" />
+                <ColumnDefinition Width="36px" />
             </Grid.ColumnDefinitions>
-
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="PreviewDragOver">
-                    <cmd:EventToCommand PassEventArgsToCommand="True" Command="{Binding DragOver}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="PreviewDrop">
-                    <cmd:EventToCommand PassEventArgsToCommand="True" Command="{Binding Drop}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-
             <Label Content="Base Directory : " Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Right"
                    VerticalContentAlignment="Center" />
             <TextBox Grid.Row="0" Grid.Column="1" Margin="5" VerticalContentAlignment="Center"
-                     Text="{Binding App.Project.BaseDirectory, Mode=TwoWay}" />
+                     Text="{Binding App.Project.BaseDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     local:FileDragDrop.Command="{x:Static local:FileDragDrop.DirectoryCmd}" />
             <Button Grid.Row="0" Grid.Column="2" Margin="5" VerticalAlignment="Center" Height="26"
                     Command="{Binding ChooseBaseDir}">
                 <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf141;" Height="10px"
@@ -40,7 +31,8 @@
             <Label Content="Output Directory : " Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Right"
                    VerticalContentAlignment="Center" />
             <TextBox Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center"
-                     Text="{Binding App.Project.OutputDirectory, Mode=TwoWay}" />
+                     Text="{Binding App.Project.OutputDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     local:FileDragDrop.Command="{x:Static local:FileDragDrop.DirectoryCmd}" />
             <Button Grid.Row="1" Grid.Column="2" Margin="5" VerticalAlignment="Center" Height="26"
                     Command="{Binding ChooseOutputDir}">
                 <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf141;" Height="10px"
@@ -56,7 +48,7 @@
                 <Label Content="Seed : " Grid.Column="0" HorizontalContentAlignment="Right"
                        VerticalContentAlignment="Center" />
                 <TextBox Grid.Column="1" Margin="5" VerticalContentAlignment="Center"
-                         Text="{Binding App.Project.Seed, Mode=TwoWay}"
+                         Text="{Binding App.Project.Seed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          local:Skin.EmptyPrompt="Leave blank for random seed" />
                 <CheckBox Grid.Column="2" Content="Generate Debug Symbols" VerticalAlignment="Center" Margin="5"
                           IsChecked="{Binding App.Project.Debug, Mode=TwoWay}" />
@@ -65,7 +57,8 @@
             <ListBox Grid.Row="3" Grid.ColumnSpan="2" Margin="5" local:Skin.EmptyPrompt="Drag input modules here"
                      ItemsSource="{Binding App.Project.Modules}" HorizontalContentAlignment="Stretch"
                      SelectedIndex="{Binding SelectedIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     Grid.IsSharedSizeScope="True">
+                     Grid.IsSharedSizeScope="True" local:FileDragDrop.Command="{Binding DragDrop}"
+                     ScrollViewer.CanContentScroll="False">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:ProjectModuleVM}">
                         <Grid>

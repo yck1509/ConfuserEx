@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Confuser.Core.Project;
@@ -15,21 +16,17 @@ namespace ConfuserEx.ViewModel {
 		public ProjectTabVM(AppVM app)
 			: base(app, "Project") { }
 
-		public ICommand DragOver {
+		public ICommand DragDrop {
 			get {
-				return new RelayCommand<DragEventArgs>(e => {
-					e.Effects = DragDropEffects.None;
-					if (e.Data.GetDataPresent(DataFormats.FileDrop))
-						e.Effects = DragDropEffects.Link;
-				});
-			}
-		}
-
-		public ICommand Drop {
-			get {
-				return new RelayCommand<DragEventArgs>(e => {
-					foreach (string file in (string[])e.Data.GetData(DataFormats.FileDrop))
+				return new RelayCommand<IDataObject>(data => {
+					foreach (string file in (string[])data.GetData(DataFormats.FileDrop))
 						AddModule(file);
+				}, data => {
+					if (!data.GetDataPresent(DataFormats.FileDrop))
+						return false;
+					var files = (string[])data.GetData(DataFormats.FileDrop);
+					bool ret = files.All(file => File.Exists(file));
+					return ret;
 				});
 			}
 		}
@@ -79,11 +76,14 @@ namespace ConfuserEx.ViewModel {
 		public ICommand Remove {
 			get {
 				return new RelayCommand(() => {
-					Debug.Assert(SelectedIndex != -1);
-					ProjectModuleVM module = App.Project.Modules[SelectedIndex];
+					int selIndex = SelectedIndex;
+					Debug.Assert(selIndex != -1);
+					ProjectModuleVM module = App.Project.Modules[selIndex];
 					string msg = string.Format("Are you sure to remove module '{0}'?\r\nAll settings specific to it would be lost!", module.Path);
-					if (MessageBox.Show(msg, "ConfuserEx", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-						App.Project.Modules.RemoveAt(SelectedIndex);
+					if (MessageBox.Show(msg, "ConfuserEx", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+						App.Project.Modules.RemoveAt(selIndex);
+						SelectedIndex = selIndex >= App.Project.Modules.Count ? App.Project.Modules.Count - 1 : selIndex;
+					}
 				}, () => SelectedIndex != -1);
 			}
 		}
@@ -100,7 +100,13 @@ namespace ConfuserEx.ViewModel {
 		}
 
 		public ICommand Advanced {
-			get { return new RelayCommand(() => { }); }
+			get {
+				return new RelayCommand(() => {
+					var dialog = new ProjectTabAdvancedView(App.Project);
+					dialog.Owner = Application.Current.MainWindow;
+					dialog.ShowDialog();
+				});
+			}
 		}
 
 		private void AddModule(string file) {
@@ -114,7 +120,12 @@ namespace ConfuserEx.ViewModel {
 				App.Project.OutputDirectory = Path.Combine(directory, "Confused");
 			}
 			var module = new ProjectModuleVM(App.Project, new ProjectModule());
-			module.Path = Confuser.Core.Utils.GetRelativePath(file, App.Project.BaseDirectory);
+			try {
+				module.Path = Confuser.Core.Utils.GetRelativePath(file, App.Project.BaseDirectory);
+			}
+			catch {
+				module.Path = file;
+			}
 			App.Project.Modules.Add(module);
 		}
 	}
