@@ -22,9 +22,14 @@ namespace Confuser.Core.Project.Patterns {
 			if (!(definition is TypeDef) && !(definition is IMemberDef))
 				return false;
 			object ns = Arguments[0].Evaluate(definition);
+
 			var type = definition as TypeDef;
 			if (type == null)
 				type = ((IMemberDef)definition).DeclaringType;
+
+			while (type.IsNested) 
+				type = type.DeclaringType;
+
 			return type != null && type.Namespace == ns.ToString();
 		}
 	}
