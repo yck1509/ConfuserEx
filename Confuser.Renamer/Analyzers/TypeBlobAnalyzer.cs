@@ -68,11 +68,17 @@ namespace Confuser.Renamer.Analyzers {
 
 				foreach (CANamedArgument fieldArg in attr.Fields) {
 					FieldDef field = attrType.FindField(fieldArg.Name, new FieldSig(fieldArg.Type));
-					service.AddReference(field, new CAMemberReference(fieldArg, field));
+					if (field == null)
+						context.Logger.WarnFormat("Failed to resolve CA field '{0}::{1} : {2}'.", attrType, fieldArg.Name, fieldArg.Type);
+					else
+						service.AddReference(field, new CAMemberReference(fieldArg, field));
 				}
 				foreach (CANamedArgument propertyArg in attr.Properties) {
 					PropertyDef property = attrType.FindProperty(propertyArg.Name, new PropertySig(true, propertyArg.Type));
-					service.AddReference(property, new CAMemberReference(propertyArg, property));
+					if (property == null)
+						context.Logger.WarnFormat("Failed to resolve CA property '{0}::{1} : {2}'.", attrType, propertyArg.Name, propertyArg.Type);
+					else
+						service.AddReference(property, new CAMemberReference(propertyArg, property));
 				}
 			}
 		}
