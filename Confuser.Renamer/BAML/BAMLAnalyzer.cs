@@ -334,7 +334,7 @@ namespace Confuser.Renamer.BAML {
 					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(((ContentPropertyRecord)rec).AttributeId);
 					type = attrInfo.Item2;
 					attr = attrInfo.Item1;
-					if (elem.Attribute != null)
+					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
 					foreach (BamlElement child in elem.Children) {
 						child.Type = type;
@@ -346,7 +346,7 @@ namespace Confuser.Renamer.BAML {
 					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(customRec.AttributeId);
 					type = attrInfo.Item2;
 					attr = attrInfo.Item1;
-					if (elem.Attribute != null)
+					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
 
 					if ((customRec.SerializerTypeId & 0x4000) != 0 && (customRec.SerializerTypeId & 0x4000) == 0x89) {
@@ -359,7 +359,7 @@ namespace Confuser.Renamer.BAML {
 					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(extRec.AttributeId);
 					type = attrInfo.Item2;
 					attr = attrInfo.Item1;
-					if (elem.Attribute != null)
+					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
 
 					// Umm... Nothing to do here too, since the value only contains either typeId/memberId, which already have references attached.
