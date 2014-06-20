@@ -62,7 +62,7 @@ namespace Confuser.Renamer {
 			else if (def is ModuleDef)
 				service.SetCanRename(def, false);
 
-			if (!runAnalyzer)
+			if (!runAnalyzer || parameters.GetParameter<bool>(context, def, "forceRen", false))
 				return;
 
 			foreach (IRenamer renamer in service.Renamers)
@@ -81,6 +81,9 @@ namespace Confuser.Renamer {
 				service.SetCanRename(type, false);
 			}
 
+			if (parameters.GetParameter<bool>(context, type, "forceRen", false))
+				return;
+
 			if (type.InheritsFromCorlib("System.Attribute")) {
 				service.ReduceRenameMode(type, RenameMode.ASCII);
 			}
@@ -94,6 +97,9 @@ namespace Confuser.Renamer {
 
 			else if (method.IsRuntimeSpecialName || method.IsSpecialName)
 				service.SetCanRename(method, false);
+
+			else if (parameters.GetParameter<bool>(context, method, "forceRen", false))
+				return;
 
 			else if (method.DeclaringType.IsComImport() && !method.HasAttribute("System.Runtime.InteropServices.DispIdAttribute"))
 				service.SetCanRename(method, false);
@@ -119,6 +125,9 @@ namespace Confuser.Renamer {
 
 			else if (property.IsRuntimeSpecialName || property.IsSpecialName)
 				service.SetCanRename(property, false);
+
+			else if (parameters.GetParameter<bool>(context, property, "forceRen", false))
+				return;
 
 			else if (property.DeclaringType.Implements("System.ComponentModel.INotifyPropertyChanged"))
 				service.SetCanRename(property, false);
