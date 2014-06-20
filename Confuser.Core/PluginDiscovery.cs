@@ -32,7 +32,7 @@ namespace Confuser.Core {
 			GetPluginsInternal(context, protections, packers, components);
 		}
 
-		private static bool HasAccessibleDefConstructor(Type type) {
+		public static bool HasAccessibleDefConstructor(Type type) {
 			ConstructorInfo ctor = type.GetConstructor(Type.EmptyTypes);
 			if (ctor == null) return false;
 			return ctor.IsPublic;

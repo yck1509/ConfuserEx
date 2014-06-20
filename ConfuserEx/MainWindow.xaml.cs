@@ -15,6 +15,7 @@ namespace ConfuserEx {
 			app.FileName = "Unnamed.crproj";
 
 			app.Tabs.Add(new ProjectTabVM(app));
+			app.Tabs.Add(new SettingsTabVM(app));
 
 			DataContext = app;
 		}

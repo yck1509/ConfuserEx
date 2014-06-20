@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reflection;
+using Confuser.Core;
 using Confuser.Core.Project;
 
 namespace ConfuserEx.ViewModel {
@@ -22,6 +24,11 @@ namespace ConfuserEx.ViewModel {
 			ObservableCollection<StringItem> probePaths = Utils.Wrap(proj.ProbePaths, path => new StringItem(path));
 			probePaths.CollectionChanged += (sender, e) => IsModified = true;
 			ProbePaths = probePaths;
+
+			Protections = new ObservableCollection<ConfuserComponent>();
+			Packers = new ObservableCollection<ConfuserComponent>();
+			ComponentDiscovery.LoadComponents(Protections, Packers, Assembly.Load("Confuser.Protections").Location);
+			ComponentDiscovery.LoadComponents(Protections, Packers, Assembly.Load("Confuser.Renamer").Location);
 		}
 
 		public ConfuserProject Project {
@@ -56,6 +63,9 @@ namespace ConfuserEx.ViewModel {
 		public IList<ProjectModuleVM> Modules { get; private set; }
 		public IList<StringItem> Plugins { get; private set; }
 		public IList<StringItem> ProbePaths { get; private set; }
+
+		public ObservableCollection<ConfuserComponent> Protections { get; private set; }
+		public ObservableCollection<ConfuserComponent> Packers { get; private set; }
 
 		ConfuserProject IViewModel<ConfuserProject>.Model {
 			get { return proj; }

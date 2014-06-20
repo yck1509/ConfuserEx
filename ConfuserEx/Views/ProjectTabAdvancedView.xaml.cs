@@ -23,15 +23,26 @@ namespace ConfuserEx.Views {
 				ofd.Filter = ".NET assemblies (*.exe, *.dll)|*.exe;*.dll|All Files (*.*)|*.*";
 				ofd.Multiselect = true;
 				if (ofd.ShowDialog() ?? false) {
-					foreach (string plugin in ofd.FileNames)
-						project.Plugins.Add(new StringItem(plugin));
+					foreach (string plugin in ofd.FileNames) {
+						try {
+							ComponentDiscovery.LoadComponents(project.Protections, project.Packers, plugin);
+							project.Plugins.Add(new StringItem(plugin));
+						}
+						catch {
+							MessageBox.Show("Failed to load plugin '" + plugin + "'.");
+						}
+					}
 				}
 			});
 
 			RemovePlugin.Command = new RelayCommand(() => {
 				int selIndex = PluginPaths.SelectedIndex;
 				Debug.Assert(selIndex != -1);
+
+				string plugin = project.Plugins[selIndex].Item;
+				ComponentDiscovery.RemoveComponents(project.Protections, project.Packers, plugin);
 				project.Plugins.RemoveAt(selIndex);
+
 				PluginPaths.SelectedIndex = selIndex >= project.Plugins.Count ? project.Plugins.Count - 1 : selIndex;
 			}, () => PluginPaths.SelectedIndex != -1);
 
