@@ -49,9 +49,20 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox Grid.Row="2" Grid.Column="1" Margin="5" FontFamily="Consolas" DisplayMemberPath="Pattern"
+            <ListBox Grid.Row="2" Grid.Column="1" Margin="5" FontFamily="Consolas"
                      ItemsSource="{Binding SelectedList.Rules}"
-                     SelectedIndex="{Binding SelectedRuleIndex, Mode=TwoWay}" />
+                     SelectedIndex="{Binding SelectedRuleIndex, Mode=TwoWay}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock x:Name="txt" Text="{Binding Pattern}" />
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Expression}" Value="{x:Null}">
+                                <Setter TargetName="txt" Property="Foreground" Value="Red" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
             <DockPanel Grid.Row="2" Grid.Column="2" LastChildFill="False">
                 <Button Height="26" Margin="5" DockPanel.Dock="Top" Command="{Binding Add}">

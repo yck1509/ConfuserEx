@@ -75,8 +75,7 @@ namespace ConfuserEx.ViewModel {
 					string path = System.IO.Path.Combine(parent.BaseDirectory, Path);
 					AssemblyName name = System.Reflection.AssemblyName.GetAssemblyName(path);
 					AssemblyName = name.FullName;
-				}
-				catch {
+				} catch {
 					AssemblyName = "Unknown";
 				}
 			});

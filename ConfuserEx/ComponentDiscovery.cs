@@ -15,8 +15,7 @@ namespace ConfuserEx {
 				if (typeof (Protection).IsAssignableFrom(i)) {
 					var prot = (Protection)Activator.CreateInstance(i);
 					ctx.AddProtection(Info.FromComponent(prot, ctx.PluginPath));
-				}
-				else if (typeof (Packer).IsAssignableFrom(i)) {
+				} else if (typeof (Packer).IsAssignableFrom(i)) {
 					var packer = (Packer)Activator.CreateInstance(i);
 					ctx.AddPacker(Info.FromComponent(packer, ctx.PluginPath));
 				}

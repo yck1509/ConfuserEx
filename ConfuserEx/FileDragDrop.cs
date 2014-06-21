@@ -21,15 +21,13 @@ namespace ConfuserEx {
 					string file = ((string[])data.Item2.GetData(DataFormats.FileDrop))[0];
 					Debug.Assert(File.Exists(file));
 					((TextBox)data.Item1).Text = file;
-				}
-				else if (data.Item1 is ListBox) {
+				} else if (data.Item1 is ListBox) {
 					var files = (string[])data.Item2.GetData(DataFormats.FileDrop);
 					Debug.Assert(files.All(file => File.Exists(file)));
 					var list = (IList<StringItem>)((ListBox)data.Item1).ItemsSource;
 					foreach (string file in files)
 						list.Add(new StringItem(file));
-				}
-				else
+				} else
 					throw new NotSupportedException();
 			}, data => {
 				if (!data.Item2.GetDataPresent(DataFormats.FileDrop))
@@ -45,15 +43,13 @@ namespace ConfuserEx {
 					string dir = ((string[])data.Item2.GetData(DataFormats.FileDrop))[0];
 					Debug.Assert(Directory.Exists(dir));
 					((TextBox)data.Item1).Text = dir;
-				}
-				else if (data.Item1 is ListBox) {
+				} else if (data.Item1 is ListBox) {
 					var dirs = (string[])data.Item2.GetData(DataFormats.FileDrop);
 					Debug.Assert(dirs.All(dir => Directory.Exists(dir)));
 					var list = (IList<StringItem>)((ListBox)data.Item1).ItemsSource;
 					foreach (string dir in dirs)
 						list.Add(new StringItem(dir));
-				}
-				else
+				} else
 					throw new NotSupportedException();
 			}, data => {
 				if (!data.Item2.GetDataPresent(DataFormats.FileDrop))
@@ -75,8 +71,7 @@ namespace ConfuserEx {
 				elem.AllowDrop = true;
 				elem.PreviewDragOver += OnDragOver;
 				elem.PreviewDrop += OnDrop;
-			}
-			else {
+			} else {
 				elem.AllowDrop = false;
 				elem.PreviewDragOver -= OnDragOver;
 				elem.PreviewDrop -= OnDrop;
@@ -89,8 +84,7 @@ namespace ConfuserEx {
 			if (cmd is DragDropCommand) {
 				if (cmd.CanExecute(Tuple.Create((UIElement)sender, e.Data)))
 					e.Effects = DragDropEffects.Link;
-			}
-			else {
+			} else {
 				if (cmd.CanExecute(e.Data))
 					e.Effects = DragDropEffects.Link;
 			}
@@ -102,8 +96,7 @@ namespace ConfuserEx {
 			if (cmd is DragDropCommand) {
 				if (cmd.CanExecute(Tuple.Create((UIElement)sender, e.Data)))
 					cmd.Execute(Tuple.Create((UIElement)sender, e.Data));
-			}
-			else {
+			} else {
 				if (cmd.CanExecute(e.Data))
 					cmd.Execute(e.Data);
 			}

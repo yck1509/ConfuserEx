@@ -54,10 +54,17 @@ namespace ConfuserEx.Views {
 		}
 
 		private void CheckValidity() {
-			if (rule.Expression == null)
+			if (rule.Expression == null) {
 				pattern.BorderBrush = Brushes.Red;
-			else
+				errorImg.Visibility = Visibility.Visible;
+			} else {
 				pattern.ClearValue(BorderBrushProperty);
+				errorImg.Visibility = Visibility.Hidden;
+			}
+		}
+
+		private void Done(object sender, RoutedEventArgs e) {
+			DialogResult = true;
 		}
 	}
 }

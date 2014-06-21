@@ -25,7 +25,9 @@ namespace ConfuserEx.ViewModel {
 			Protections = protections;
 		}
 
-		public ProjectVM Project { get { return parent; } }
+		public ProjectVM Project {
+			get { return parent; }
+		}
 
 		public string Pattern {
 			get { return rule.Pattern; }
@@ -74,8 +76,7 @@ namespace ConfuserEx.ViewModel {
 			try {
 				expression = new PatternParser().Parse(Pattern);
 				ExpressionError = null;
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				ExpressionError = e.Message;
 				expression = null;
 			}
