@@ -30,14 +30,10 @@
                                 </Grid>
                             </Border>
                             <ControlTemplate.Triggers>
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsMouseOver" Value="True" />
-                                        <Condition Property="IsSelected" Value="False" />
-                                    </MultiTrigger.Conditions>
+                                <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Background" Value="{StaticResource HighlightBackground}" />
                                     <Setter Property="Foreground" Value="{StaticResource SelectedForeground}" />
-                                </MultiTrigger>
+                                </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>

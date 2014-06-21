@@ -6,9 +6,10 @@ using Confuser.Core;
 using Confuser.Core.Project;
 
 namespace ConfuserEx.ViewModel {
-	public class ProjectVM : ViewModelBase, IViewModel<ConfuserProject> {
+	public class ProjectVM : ViewModelBase, IViewModel<ConfuserProject>, IRuleContainer {
 		private readonly ConfuserProject proj;
 		private bool modified;
+		private ProjectSettingVM<Packer> packer;
 
 		public ProjectVM(ConfuserProject proj) {
 			this.proj = proj;
@@ -24,6 +25,10 @@ namespace ConfuserEx.ViewModel {
 			ObservableCollection<StringItem> probePaths = Utils.Wrap(proj.ProbePaths, path => new StringItem(path));
 			probePaths.CollectionChanged += (sender, e) => IsModified = true;
 			ProbePaths = probePaths;
+
+			ObservableCollection<ProjectRuleVM> rules = Utils.Wrap(proj.Rules, rule => new ProjectRuleVM(this, rule));
+			rules.CollectionChanged += (sender, e) => IsModified = true;
+			Rules = rules;
 
 			Protections = new ObservableCollection<ConfuserComponent>();
 			Packers = new ObservableCollection<ConfuserComponent>();
@@ -60,12 +65,28 @@ namespace ConfuserEx.ViewModel {
 			set { SetProperty(proj.OutputDirectory != value, val => proj.OutputDirectory = val, value, "OutputDirectory"); }
 		}
 
+		public ProjectSettingVM<Packer> Packer {
+			get {
+				if (proj.Packer == null)
+					packer = null;
+				else
+					packer = new ProjectSettingVM<Packer>(this, proj.Packer);
+				return packer;
+			}
+			set {
+				var vm = (IViewModel<SettingItem<Packer>>)value;
+				bool changed = (vm == null && proj.Packer != null) || (vm != null && proj.Packer != vm.Model);
+				SetProperty(changed, val => proj.Packer = val == null ? null : val.Model, vm, "Packer");
+			}
+		}
+
 		public IList<ProjectModuleVM> Modules { get; private set; }
 		public IList<StringItem> Plugins { get; private set; }
 		public IList<StringItem> ProbePaths { get; private set; }
 
 		public ObservableCollection<ConfuserComponent> Protections { get; private set; }
 		public ObservableCollection<ConfuserComponent> Packers { get; private set; }
+		public IList<ProjectRuleVM> Rules { get; private set; }
 
 		ConfuserProject IViewModel<ConfuserProject>.Model {
 			get { return proj; }

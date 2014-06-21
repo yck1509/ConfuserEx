@@ -79,10 +79,14 @@
     <Compile Include="CompComboBox.xaml.cs">
       <DependentUpon>CompComboBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ComponentConverter.cs" />
     <Compile Include="ComponentDiscovery.cs" />
+    <Compile Include="EnumValuesExtension.cs" />
     <Compile Include="FileDragDrop.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Skin.cs" />
+    <Compile Include="ViewModel\Project\ProjectRuleVM.cs" />
+    <Compile Include="ViewModel\Project\ProjectSettingVM.cs" />
     <Compile Include="ViewModel\StringItem.cs" />
     <Compile Include="ViewModel\UI\AppVM.cs" />
     <Compile Include="ViewModel\IViewModel.cs" />
@@ -95,6 +99,9 @@
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="Views\ProjectModuleView.xaml.cs">
       <DependentUpon>ProjectModuleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProjectRuleView.xaml.cs">
+      <DependentUpon>ProjectRuleView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ProjectTabAdvancedView.xaml.cs">
       <DependentUpon>ProjectTabAdvancedView.xaml</DependentUpon>
@@ -122,6 +129,10 @@
     <Page Include="Views.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProjectRuleView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\SettingsTabView.xaml">
       <Generator>MSBuild:Compile</Generator>

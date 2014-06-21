@@ -1108,6 +1108,18 @@
                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                     </DockPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Background" TargetName="Border"
+                                    Value="{StaticResource HighlightBackground}" />
+                        </Trigger>
+                        <DataTrigger
+                            Binding="{Binding IsDropDownOpen, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ComboBox}}}"
+                            Value="true">
+                            <Setter Property="Background" TargetName="Border"
+                                    Value="{StaticResource HighlightBackground}" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -1266,10 +1278,6 @@
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsSelectionBoxHighlighted" Value="false">
-                            <Setter Property="Background" TargetName="Border"
-                                    Value="{StaticResource HighlightBackground}" />
-                        </Trigger>
                         <Trigger Property="HasItems" Value="false">
                             <Setter Property="MinHeight" TargetName="DropDownBorder" Value="95" />
                         </Trigger>
