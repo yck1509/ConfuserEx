@@ -3,9 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:ConfuserEx"
         xmlns:core="clr-namespace:Confuser.Core;assembly=Confuser.Core"
-        Title="Edit rule..." Height="400" Width="600"
+        xmlns:proj="clr-namespace:Confuser.Core.Project;assembly=Confuser.Core"
+        Title="Edit rule..." Height="600" Width="800" x:Name="View"
         Style="{StaticResource DarkWindow}" ShowInTaskbar="False" ResizeMode="NoResize">
     <Grid Margin="5">
+        <Grid.Resources>
+            <local:ComponentConverter x:Key="ProtConverter"
+                                      xmlns:PresentationOptions="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options"
+                                      PresentationOptions:Freeze="True"
+                                      Components="{Binding Project.Protections}" />
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*" />
             <ColumnDefinition Width="10px" />
@@ -36,14 +43,32 @@
                       IsChecked="{Binding Inherit}" Margin="5" VerticalAlignment="Center" />
         </DockPanel>
 
-        <ListBox Grid.Row="1" Grid.Column="2" Grid.RowSpan="5" Margin="5" />
+        <ListBox x:Name="prots" Grid.Row="1" Grid.Column="2" Grid.RowSpan="5" Margin="5"
+                 ItemsSource="{Binding Protections}" Grid.IsSharedSizeScope="True">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition SharedSizeGroup="Action" />
+                            <ColumnDefinition Width="10px" />
+                            <ColumnDefinition SharedSizeGroup="Protection" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox Grid.Column="0" Width="80" SelectedItem="{Binding Action}" IsEnabled="True"
+                                  ItemsSource="{local:EnumValues {x:Type proj:SettingItemAction}}" />
+                        <local:CompComboBox Grid.Column="2" Width="150"
+                                            Components="{Binding Project.Protections, ElementName=View}"
+                                            SelectedComponent="{Binding Id, Converter={StaticResource ProtConverter}, Mode=TwoWay}" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <DockPanel Grid.Row="1" Grid.Column="3" Grid.RowSpan="5" LastChildFill="False">
-            <Button Height="26" Margin="5" DockPanel.Dock="Top" Command="{Binding Add}">
+            <Button Height="26" Margin="5" DockPanel.Dock="Top" x:Name="AddBtn">
                 <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf067;" Height="12px"
                            TextOptions.TextRenderingMode="GrayScale" />
             </Button>
-            <Button Height="26" Margin="5" DockPanel.Dock="Top" Command="{Binding Remove}">
+            <Button Height="26" Margin="5" DockPanel.Dock="Top" x:Name="RemoveBtn">
                 <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf068;" Height="12px"
                            TextOptions.TextRenderingMode="GrayScale" />
             </Button>

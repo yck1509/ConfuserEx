@@ -834,7 +834,8 @@
                                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                         </Border>
-                        <Border x:Name="Overlay" Background="{StaticResource HighlightOverlay}" Opacity="0" />
+                        <Border x:Name="Overlay" Background="{StaticResource HighlightOverlay}" Opacity="0"
+                                IsHitTestVisible="False" />
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="true">

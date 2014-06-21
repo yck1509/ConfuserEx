@@ -1,21 +1,47 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
+using Confuser.Core;
+using Confuser.Core.Project;
 using ConfuserEx.ViewModel;
+using GalaSoft.MvvmLight.Command;
 
 namespace ConfuserEx.Views {
 	public partial class ProjectRuleView : Window {
+		private readonly ProjectVM proj;
 		private readonly ProjectRuleVM rule;
 
-		public ProjectRuleView(ProjectRuleVM rule) {
+		public ProjectRuleView(ProjectVM proj, ProjectRuleVM rule) {
 			InitializeComponent();
 			this.rule = rule;
+			this.proj = proj;
 			DataContext = rule;
 
 			rule.PropertyChanged += OnPropertyChanged;
 			CheckValidity();
+		}
+
+		public ProjectVM Project {
+			get { return proj; }
+		}
+
+		public override void OnApplyTemplate() {
+			base.OnApplyTemplate();
+
+			AddBtn.Command = new RelayCommand(() => {
+				var prot = new ProjectSettingVM<Protection>(proj, new SettingItem<Protection>());
+				prot.Id = proj.Protections[0].Id;
+				rule.Protections.Add(prot);
+			});
+			RemoveBtn.Command = new RelayCommand(() => {
+				int selIndex = prots.SelectedIndex;
+				Debug.Assert(selIndex != -1);
+
+				rule.Protections.RemoveAt(prots.SelectedIndex);
+				prots.SelectedIndex = selIndex >= rule.Protections.Count ? rule.Protections.Count - 1 : selIndex;
+			}, () => prots.SelectedIndex != -1);
 		}
 
 		public void Cleanup() {

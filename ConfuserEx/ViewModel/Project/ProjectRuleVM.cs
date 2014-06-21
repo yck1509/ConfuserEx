@@ -25,6 +25,8 @@ namespace ConfuserEx.ViewModel {
 			Protections = protections;
 		}
 
+		public ProjectVM Project { get { return parent; } }
+
 		public string Pattern {
 			get { return rule.Pattern; }
 			set {

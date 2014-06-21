@@ -27,8 +27,7 @@ namespace ConfuserEx.Views {
 						try {
 							ComponentDiscovery.LoadComponents(project.Protections, project.Packers, plugin);
 							project.Plugins.Add(new StringItem(plugin));
-						}
-						catch {
+						} catch {
 							MessageBox.Show("Failed to load plugin '" + plugin + "'.");
 						}
 					}

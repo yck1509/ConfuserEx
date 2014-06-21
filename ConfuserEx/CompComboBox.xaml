@@ -21,8 +21,7 @@
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <Label Grid.Row="0" Content="{Binding Name}" HorizontalAlignment="Left" />
-                                    <Label Grid.Row="0" Content="{Binding Id}" FontFamily="Consolas"
-                                           HorizontalAlignment="Right" />
+                                    <Label Grid.Row="0" Content="{Binding Id}" HorizontalAlignment="Right" />
                                     <Label Grid.Row="1">
                                         <TextBlock Text="{Binding Description}" TextTrimming="WordEllipsis"
                                                    FontSize="10" Foreground="Gray" />

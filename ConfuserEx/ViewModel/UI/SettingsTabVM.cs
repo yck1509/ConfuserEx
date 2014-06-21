@@ -75,9 +75,10 @@ namespace ConfuserEx.ViewModel {
 			get {
 				return new RelayCommand(() => {
 					Debug.Assert(SelectedRuleIndex != -1);
-					var dialog = new ProjectRuleView(SelectedList.Rules[SelectedRuleIndex]);
+					var dialog = new ProjectRuleView(App.Project, SelectedList.Rules[SelectedRuleIndex]);
 					dialog.Owner = Application.Current.MainWindow;
 					dialog.ShowDialog();
+					dialog.Cleanup();
 				}, () => SelectedRuleIndex != -1 && SelectedList != null);
 			}
 		}

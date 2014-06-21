@@ -72,7 +72,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <DockPanel Grid.Row="3" Grid.Column="2" LastChildFill="False" >
+            <DockPanel Grid.Row="3" Grid.Column="2" LastChildFill="False">
                 <Button Height="26" Margin="5" DockPanel.Dock="Top" Command="{Binding Add}">
                     <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf067;" Height="12px"
                                TextOptions.TextRenderingMode="GrayScale" />
