@@ -10,12 +10,13 @@ namespace Confuser.Core {
 	/// </summary>
 	public class ProtectionParameters {
 		private static readonly object ParametersKey = new object();
-		private readonly ConfuserComponent comp;
 
 		/// <summary>
-		/// A empty instance of <see cref="ProtectionParameters" />.
+		///     A empty instance of <see cref="ProtectionParameters" />.
 		/// </summary>
 		public static readonly ProtectionParameters Empty = new ProtectionParameters(null, new IDnlibDef[0]);
+
+		private readonly ConfuserComponent comp;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProtectionParameters" /> class.
@@ -47,11 +48,13 @@ namespace Confuser.Core {
 		public T GetParameter<T>(ConfuserContext context, IDnlibDef target, string name, T defValue = default(T)) {
 			Dictionary<string, string> parameters;
 
+			if (comp == null)
+				return defValue;
+
 			// For packers
 			if (comp is Packer) {
 				parameters = new Dictionary<string, string>(context.Project.Packer, StringComparer.OrdinalIgnoreCase);
-			}
-			else {
+			} else {
 				// For protections
 				var objParams = context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
 				if (objParams == null)
