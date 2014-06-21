@@ -9,19 +9,19 @@
         </Grid.RowDefinitions>
         <ToolBar Grid.Row="0" Grid.ColumnSpan="2" ToolBarTray.IsLocked="True" ToolBar.OverflowMode="Never"
                  KeyboardNavigation.TabNavigation="Continue">
-            <Button>
+            <Button Command="{Binding NewProject}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{StaticResource New}" Margin="0,0,4,0" />
                     <TextBlock Text="New project" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
-            <Button>
+            <Button Command="{Binding OpenProject}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{StaticResource Open}" Margin="0,0,4,0" />
                     <TextBlock Text="Open project" VerticalAlignment="Center" />
                 </StackPanel>
             </Button>
-            <Button>
+            <Button Command="{Binding SaveProject}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{StaticResource Save}" Margin="0,0,4,0" />
                     <TextBlock Text="Save project" VerticalAlignment="Center" />
@@ -35,8 +35,9 @@
                           VerticalAlignment="Center" />
                 </StackPanel>
                 <Button.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Stack Trace Decoder">
+                    <ContextMenu
+                        DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+                        <MenuItem Header="Stack Trace Decoder" Command="{Binding Decode}">
                             <MenuItem.Icon>
                                 <Image Source="{StaticResource Decode}" />
                             </MenuItem.Icon>

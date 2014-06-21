@@ -18,7 +18,7 @@ namespace ConfuserEx.ViewModel {
 			modules.CollectionChanged += (sender, e) => IsModified = true;
 			Modules = modules;
 
-			var plugins = Utils.Wrap(proj.PluginPaths, path => new StringItem(path));
+			ObservableCollection<StringItem> plugins = Utils.Wrap(proj.PluginPaths, path => new StringItem(path));
 			plugins.CollectionChanged += (sender, e) => IsModified = true;
 			Plugins = plugins;
 

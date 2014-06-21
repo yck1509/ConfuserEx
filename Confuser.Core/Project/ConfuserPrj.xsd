@@ -61,7 +61,7 @@
       <xs:sequence>
         <xs:element name="rule" type="rule" minOccurs="0" maxOccurs="unbounded" />
         <xs:element name="packer" type="objSettings" minOccurs="0" maxOccurs="1" />
-        <xs:element name="module" type="module" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element name="module" type="module" minOccurs="0" maxOccurs="unbounded" />
         <xs:element name="probePath" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
         <xs:element name="plugin" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
