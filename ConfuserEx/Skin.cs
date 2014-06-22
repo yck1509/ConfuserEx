@@ -32,8 +32,12 @@ namespace ConfuserEx {
 
 		public static void OnRTBDocumentChanged(DependencyObject d, DependencyPropertyChangedEventArgs dpe) {
 			var rtb = (RichTextBox)d;
-			rtb.Document = (FlowDocument)dpe.NewValue;
-			rtb.TextChanged += (sender, e) => rtb.ScrollToEnd();
+			if (dpe.NewValue != null) {
+				rtb.Document = (FlowDocument)dpe.NewValue;
+				rtb.TextChanged += (sender, e) => rtb.ScrollToEnd();
+			}
+			else
+				rtb.Document = new FlowDocument();
 		}
 
 		public static FlowDocument GetRTBDocument(DependencyObject obj) {

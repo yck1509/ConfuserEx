@@ -18,6 +18,10 @@ namespace Confuser.Protections.Constants {
 			get { return ProtectionTargets.Methods; }
 		}
 
+		public override string Name {
+			get { return "Constant encryption helpers injection"; }
+		}
+
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			if (parameters.Targets.Any()) {
 				var compression = context.Registry.GetService<ICompressionService>();

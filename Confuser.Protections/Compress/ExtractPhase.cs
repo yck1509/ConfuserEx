@@ -14,6 +14,10 @@ namespace Confuser.Protections.Compress {
 			get { return ProtectionTargets.Modules; }
 		}
 
+		public override string Name {
+			get { return "Packer info extraction"; }
+		}
+
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			if (context.Packer == null)
 				return;

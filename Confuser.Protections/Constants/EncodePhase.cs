@@ -20,6 +20,10 @@ namespace Confuser.Protections.Constants {
 			get { return ProtectionTargets.Methods; }
 		}
 
+		public override string Name {
+			get { return "Constants encoding"; }
+		}
+
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			var moduleCtx = context.Annotations.Get<CEContext>(context.CurrentModule, ConstantProtection.ContextKey);
 			if (!parameters.Targets.Any() || moduleCtx == null)

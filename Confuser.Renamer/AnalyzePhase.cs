@@ -15,6 +15,10 @@ namespace Confuser.Renamer {
 			get { return ProtectionTargets.AllDefinitions; }
 		}
 
+		public override string Name {
+			get { return "Name analysis"; }
+		}
+
 		private void ParseParameters(IDnlibDef def, ConfuserContext context, NameService service, ProtectionParameters parameters) {
 			var mode = parameters.GetParameter<RenameMode?>(context, def, "mode", null);
 			if (mode != null)

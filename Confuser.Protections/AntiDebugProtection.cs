@@ -49,6 +49,10 @@ namespace Confuser.Protections {
 				get { return ProtectionTargets.Modules; }
 			}
 
+			public override string Name {
+				get { return "Anti-debug injection"; }
+			}
+
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 				var rt = context.Registry.GetService<IRuntimeService>();
 				var marker = context.Registry.GetService<IMarkerService>();

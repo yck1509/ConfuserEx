@@ -19,6 +19,10 @@ namespace Confuser.Protections.Resources {
 			get { return ProtectionTargets.Methods; }
 		}
 
+		public override string Name {
+			get { return "Resource encryption helpers injection"; }
+		}
+
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			if (parameters.Targets.Any()) {
 				var compression = context.Registry.GetService<ICompressionService>();

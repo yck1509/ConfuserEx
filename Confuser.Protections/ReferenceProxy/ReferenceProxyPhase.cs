@@ -16,6 +16,10 @@ namespace Confuser.Protections.ReferenceProxy {
 			get { return ProtectionTargets.Methods; }
 		}
 
+		public override string Name {
+			get { return "Encoding reference proxies"; }
+		}
+
 		private static RPContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RPStore store) {
 			var ret = new RPContext();
 			ret.Mode = parameters.GetParameter(context, method, "mode", Mode.Mild);

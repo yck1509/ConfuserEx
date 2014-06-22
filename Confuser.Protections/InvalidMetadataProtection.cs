@@ -49,6 +49,10 @@ namespace Confuser.Protections {
 				get { return ProtectionTargets.Modules; }
 			}
 
+			public override string Name {
+				get { return "Invalid metadata addition"; }
+			}
+
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 				if (parameters.Targets.Contains(context.CurrentModule)) {
 					random = context.Registry.GetService<IRandomService>().GetRandomGenerator(_FullId);

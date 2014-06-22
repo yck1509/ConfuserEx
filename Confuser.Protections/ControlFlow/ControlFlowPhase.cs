@@ -20,6 +20,10 @@ namespace Confuser.Protections.ControlFlow {
 			get { return ProtectionTargets.Methods; }
 		}
 
+		public override string Name {
+			get { return "Control flow mangling"; }
+		}
+
 		private static CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random, bool disableOpti) {
 			var ret = new CFContext();
 			ret.Type = parameters.GetParameter(context, method, "type", CFType.Switch);

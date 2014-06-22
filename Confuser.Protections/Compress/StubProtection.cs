@@ -49,6 +49,10 @@ namespace Confuser.Protections.Compress {
 				get { return ProtectionTargets.Modules; }
 			}
 
+			public override string Name {
+				get { return "Packer info encoding"; }
+			}
+
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 				context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => {
 					                                                     if (e.WriterEvent == ModuleWriterEvent.MDBeginCreateTables) {
