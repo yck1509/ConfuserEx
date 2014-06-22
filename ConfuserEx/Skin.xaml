@@ -358,7 +358,8 @@
                             <RowDefinition x:Name="RowDefinition1" Height="*" />
                         </Grid.RowDefinitions>
                         <TabPanel x:Name="HeaderPanel" Background="Transparent" Grid.Column="0" IsItemsHost="true"
-                                  Margin="0,2,2,-1" Grid.Row="0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1" />
+                                  Margin="0,2,2,-1" Grid.Row="0" KeyboardNavigation.TabIndex="1" Panel.ZIndex="1"
+                                  IsEnabled="{Binding Path=(local:Skin.TabsDisabled), RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static local:InvertBoolConverter.Instance}}" />
                         <Grid x:Name="ContentPanel" Grid.Column="0"
                               KeyboardNavigation.DirectionalNavigation="Contained" Grid.Row="1"
                               KeyboardNavigation.TabIndex="2" KeyboardNavigation.TabNavigation="Local">
@@ -695,6 +696,58 @@
                         </Trigger>
                         <Trigger Property="Text" Value="{x:Null}">
                             <Setter Property="Opacity" TargetName="Prompt" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type RichTextBox}">
+        <Setter Property="BorderBrush" Value="{StaticResource Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{StaticResource Foreground}" />
+        <Setter Property="Background" Value="{StaticResource ControlBackground}" />
+        <Setter Property="Padding" Value="1" />
+        <Setter Property="KeyboardNavigation.TabNavigation" Value="None" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="AllowDrop" Value="true" />
+        <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst" />
+        <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+        <Setter Property="SelectionBrush" Value="{StaticResource Foreground}" />
+        <Setter Property="SelectionOpacity" Value="0.2" />
+        <Setter Property="CaretBrush" Value="{StaticResource Border}" />
+        <Setter Property="ContextMenu">
+            <Setter.Value>
+                <ContextMenu>
+                    <MenuItem Header="Undo" Command="ApplicationCommands.Undo" />
+                    <MenuItem Header="Redo" Command="ApplicationCommands.Redo" />
+                    <Separator />
+                    <MenuItem Header="Cut" Command="ApplicationCommands.Cut" />
+                    <MenuItem Header="Copy" Command="ApplicationCommands.Copy" />
+                    <MenuItem Header="Paste" Command="ApplicationCommands.Paste" />
+                </ContextMenu>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RichTextBox}">
+                    <Border x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}">
+                        <Grid>
+                            <Border x:Name="Overlay" Background="{StaticResource HighlightOverlay}" Opacity="0" />
+                            <ScrollViewer x:Name="PART_ContentHost" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Background" TargetName="Bd" Value="{StaticResource DisabledBackground}" />
+                            <Setter Property="Foreground" Value="{StaticResource DisabledForeground}" />
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="true">
+                            <Setter Property="Opacity" TargetName="Overlay" Value="0.5" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -1358,5 +1411,91 @@
                 <Setter Property="Foreground" Value="{StaticResource DisabledForeground}" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type ProgressBar}">
+        <Setter Property="Background" Value="{StaticResource ControlBackground}" />
+        <Setter Property="Foreground" Value="{StaticResource Foreground}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                    <Grid MinHeight="14" MinWidth="200" Background="{TemplateBinding Background}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Determinate" />
+                                <VisualState x:Name="Indeterminate">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Duration="0"
+                                                                       Storyboard.TargetName="PART_Indicator"
+                                                                       Storyboard.TargetProperty="Background">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <SolidColorBrush Color="Transparent" />
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+
+                                        <ObjectAnimationUsingKeyFrames Duration="0"
+                                                                       Storyboard.TargetName="Animation"
+                                                                       Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="animTranslate"
+                                            Storyboard.TargetProperty="X"
+                                            From="0" To="50" Duration="0:0:1" RepeatBehavior="Forever" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Border x:Name="PART_Track"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}" />
+                        <Border x:Name="PART_Indicator"
+                                HorizontalAlignment="Left"
+                                Background="{TemplateBinding Foreground}"
+                                Margin="3">
+                            <Border x:Name="Animation" Visibility="Hidden">
+                                <Border.Background>
+                                    <DrawingBrush TileMode="Tile" Viewport="0,0,25,25" ViewportUnits="Absolute">
+                                        <DrawingBrush.Transform>
+                                            <TranslateTransform x:Name="animTranslate" />
+                                        </DrawingBrush.Transform>
+                                        <DrawingBrush.Drawing>
+                                            <GeometryDrawing>
+                                                <GeometryDrawing.Brush>
+                                                    <LinearGradientBrush SpreadMethod="Repeat" StartPoint="0,0"
+                                                                         EndPoint="1,1">
+                                                        <LinearGradientBrush.RelativeTransform>
+                                                            <ScaleTransform ScaleX="0.5" ScaleY="0.5" />
+                                                        </LinearGradientBrush.RelativeTransform>
+                                                        <GradientStop Offset="0" Color="Transparent" />
+                                                        <GradientStop Offset="0.5" Color="Transparent" />
+                                                        <GradientStop Offset="0.5"
+                                                                      Color="{Binding Foreground, Converter={x:Static local:BrushToColorConverter.Instance}, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                        <GradientStop Offset="1"
+                                                                      Color="{Binding Foreground, Converter={x:Static local:BrushToColorConverter.Instance}, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                    </LinearGradientBrush>
+                                                </GeometryDrawing.Brush>
+                                                <GeometryDrawing.Geometry>
+                                                    <RectangleGeometry Rect="0,0,10,10" />
+                                                </GeometryDrawing.Geometry>
+                                            </GeometryDrawing>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </Border.Background>
+                            </Border>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

@@ -17,6 +17,7 @@ namespace ConfuserEx {
 
 			app.Tabs.Add(new ProjectTabVM(app));
 			app.Tabs.Add(new SettingsTabVM(app));
+			app.Tabs.Add(new ProtectTabVM(app));
 
 			DataContext = app;
 		}

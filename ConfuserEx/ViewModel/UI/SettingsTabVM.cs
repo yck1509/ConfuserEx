@@ -88,6 +88,8 @@ namespace ConfuserEx.ViewModel {
 				App.Project,
 				new CollectionContainer { Collection = App.Project.Modules }
 			};
+			OnPropertyChanged("ModulesView");
+			HasPacker = App.Project.Packer != null;
 		}
 
 		protected override void OnPropertyChanged(string property) {

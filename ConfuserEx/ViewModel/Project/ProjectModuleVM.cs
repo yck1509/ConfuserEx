@@ -19,6 +19,9 @@ namespace ConfuserEx.ViewModel {
 			ObservableCollection<ProjectRuleVM> rules = Utils.Wrap(module.Rules, rule => new ProjectRuleVM(parent, rule));
 			rules.CollectionChanged += (sender, e) => parent.IsModified = true;
 			Rules = rules;
+
+			SimpleName = System.IO.Path.GetFileName(module.Path);
+			LoadAssemblyName();
 		}
 
 		public ProjectModule Module {

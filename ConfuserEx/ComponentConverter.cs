@@ -17,15 +17,19 @@ namespace ConfuserEx {
 		}
 
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-			Debug.Assert(value is string);
+			Debug.Assert(value is string || value == null);
 			Debug.Assert(targetType == typeof (ConfuserComponent));
 			Debug.Assert(Components != null);
+
+			if (value == null) return null;
 			return Components.Single(comp => comp.Id == (string)value);
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-			Debug.Assert(value is ConfuserComponent);
+			Debug.Assert(value is ConfuserComponent || value == null);
 			Debug.Assert(targetType == typeof (string));
+
+			if (value == null) return null;
 			return ((ConfuserComponent)value).Id;
 		}
 

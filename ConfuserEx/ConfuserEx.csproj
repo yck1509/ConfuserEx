@@ -57,6 +57,10 @@
       <HintPath>..\deps\Ookii.Dialogs.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Threading, Version=1.0.2856.102, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.4.3.31.1\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -76,6 +80,7 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BrushToColorConverter.cs" />
     <Compile Include="CompComboBox.xaml.cs">
       <DependentUpon>CompComboBox.xaml</DependentUpon>
     </Compile>
@@ -83,6 +88,7 @@
     <Compile Include="ComponentDiscovery.cs" />
     <Compile Include="EnumValuesExtension.cs" />
     <Compile Include="FileDragDrop.cs" />
+    <Compile Include="InvertBoolConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Skin.cs" />
     <Compile Include="ViewModel\Project\ProjectRuleVM.cs" />
@@ -93,6 +99,7 @@
     <Compile Include="ViewModel\Project\ProjectModuleVM.cs" />
     <Compile Include="ViewModel\UI\ProjectTabVM.cs" />
     <Compile Include="ViewModel\Project\ProjectVM.cs" />
+    <Compile Include="ViewModel\UI\ProtectTabVM.cs" />
     <Compile Include="ViewModel\UI\SettingsTabVM.cs" />
     <Compile Include="ViewModel\UI\TabViewModel.cs" />
     <Compile Include="ViewModel\Utils.cs" />
@@ -127,6 +134,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\ProtectTabView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

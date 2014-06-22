@@ -23,6 +23,8 @@ namespace ConfuserEx.ViewModel {
 			ObservableCollection<ProjectSettingVM<Protection>> protections = Utils.Wrap(rule, setting => new ProjectSettingVM<Protection>(parent, setting));
 			protections.CollectionChanged += (sender, e) => parent.IsModified = true;
 			Protections = protections;
+
+			ParseExpression();
 		}
 
 		public ProjectVM Project {
