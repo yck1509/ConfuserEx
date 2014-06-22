@@ -32,6 +32,11 @@ namespace Confuser.Core {
 			GetPluginsInternal(context, protections, packers, components);
 		}
 
+		/// <summary>
+		/// Determines whether the specified type has an accessible default constructor.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns><c>true</c> if the specified type has an accessible default constructor; otherwise, <c>false</c>.</returns>
 		public static bool HasAccessibleDefConstructor(Type type) {
 			ConstructorInfo ctor = type.GetConstructor(Type.EmptyTypes);
 			if (ctor == null) return false;

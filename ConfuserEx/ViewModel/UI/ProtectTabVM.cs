@@ -44,6 +44,7 @@ namespace ConfuserEx.ViewModel {
 			documentContent.Inlines.Clear();
 			App.NavigationDisabled = true;
 			Result = null;
+			Progress = null;
 			begin = DateTime.Now;
 
 			ConfuserEngine.Run(parameters)
@@ -66,44 +67,44 @@ namespace ConfuserEx.ViewModel {
 
 		private DateTime begin;
 
-		public void Debug(string msg) {
+		void ILogger.Debug(string msg) {
 			AppendLine("[DEBUG] {0}", Brushes.Gray, msg);
 		}
 
-		public void DebugFormat(string format, params object[] args) {
+		void ILogger.DebugFormat(string format, params object[] args) {
 			AppendLine("[DEBUG] {0}", Brushes.Gray, string.Format(format, args));
 		}
 
-		public void Info(string msg) {
+		void ILogger.Info(string msg) {
 			AppendLine(" [INFO] {0}", Brushes.White, msg);
 		}
 
-		public void InfoFormat(string format, params object[] args) {
+		void ILogger.InfoFormat(string format, params object[] args) {
 			AppendLine(" [INFO] {0}", Brushes.White, string.Format(format, args));
 		}
 
-		public void Warn(string msg) {
+		void ILogger.Warn(string msg) {
 			AppendLine(" [WARN] {0}", Brushes.Yellow, msg);
 		}
 
-		public void WarnFormat(string format, params object[] args) {
+		void ILogger.WarnFormat(string format, params object[] args) {
 			AppendLine(" [WARN] {0}", Brushes.Yellow, string.Format(format, args));
 		}
 
-		public void WarnException(string msg, Exception ex) {
+		void ILogger.WarnException(string msg, Exception ex) {
 			AppendLine(" [WARN] {0}", Brushes.Yellow, msg);
 			AppendLine("Exception: {0}", Brushes.Yellow, ex);
 		}
 
-		public void Error(string msg) {
+		void ILogger.Error(string msg) {
 			AppendLine("[ERROR] {0}", Brushes.Red, msg);
 		}
 
-		public void ErrorFormat(string format, params object[] args) {
+		void ILogger.ErrorFormat(string format, params object[] args) {
 			AppendLine("[ERROR] {0}", Brushes.Red, string.Format(format, args));
 		}
 
-		public void ErrorException(string msg, Exception ex) {
+		void ILogger.ErrorException(string msg, Exception ex) {
 			AppendLine("[ERROR] {0}", Brushes.Red, msg);
 			AppendLine("Exception: {0}", Brushes.Red, ex);
 		}
@@ -112,7 +113,11 @@ namespace ConfuserEx.ViewModel {
 			Progress = (double)progress / overall;
 		}
 
-		public void Finish(bool successful) {
+		void ILogger.EndProgress() {
+			Progress = null;
+		}
+
+		void ILogger.Finish(bool successful) {
 			DateTime now = DateTime.Now;
 			string timeString = string.Format(
 				"at {0}, {1}:{2:d2} elapsed.",

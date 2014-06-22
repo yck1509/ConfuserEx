@@ -21,6 +21,9 @@ namespace Confuser.Core {
 	///     The processing engine of Confuser.
 	/// </summary>
 	public static class ConfuserEngine {
+		/// <summary>
+		///     The version of Confuser.
+		/// </summary>
 		public static readonly string Version;
 		private static readonly string Copyright;
 

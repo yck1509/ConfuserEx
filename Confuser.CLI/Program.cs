@@ -128,9 +128,9 @@ namespace Confuser.CLI {
 				WriteLineWithColor(ConsoleColor.Red, "Exception: " + ex);
 			}
 
-			public void Progress(int overall, int progress) {
-				WriteLineWithColor(ConsoleColor.Gray, string.Format("{0}/{1}", progress, overall));
-			}
+			public void Progress(int overall, int progress) { }
+
+			public void EndProgress() { }
 
 			public void Finish(bool successful) {
 				DateTime now = DateTime.Now;

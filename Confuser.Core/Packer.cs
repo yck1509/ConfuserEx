@@ -128,6 +128,10 @@ namespace Confuser.Core {
 			baseLogger.Progress(overall, progress);
 		}
 
+		public void EndProgress() {
+			baseLogger.EndProgress();
+		}
+
 		public void Finish(bool successful) {
 			if (!successful)
 				throw new ConfuserException(null);
