@@ -100,6 +100,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>().WithProgress(context.Logger))
 				if (method.HasBody && method.Body.Instructions.Count > 0) {
 					ProcessMethod(ParseParameters(method, context, parameters, store));
+					context.CheckCancellation();
 				}
 
 			RPContext ctx = ParseParameters(context.CurrentModule, context, parameters, store);

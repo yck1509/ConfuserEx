@@ -26,6 +26,7 @@ namespace Confuser.Protections.Resources {
 		private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginAddResources) {
+				ctx.Context.CheckCancellation();
 				ctx.Context.Logger.Debug("Encrypting resources...");
 
 				List<EmbeddedResource> resources = ctx.Module.Resources.OfType<EmbeddedResource>().ToList();
@@ -57,6 +58,7 @@ namespace Confuser.Protections.Resources {
 					moduleBuff,
 					progress => ctx.Context.Logger.Progress((int)(progress * 10000), 10000));
 				ctx.Context.Logger.EndProgress();
+				ctx.Context.CheckCancellation();
 
 				uint compressedLen = (uint)(moduleBuff.Length + 3) / 4;
 				compressedLen = (compressedLen + 0xfu) & ~0xfu;

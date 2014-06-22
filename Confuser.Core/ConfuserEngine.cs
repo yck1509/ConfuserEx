@@ -66,7 +66,6 @@ namespace Confuser.Core {
 			context.PackerInitiated = parameters.PackerInitiated;
 			context.token = token;
 
-
 			PrintInfo(context);
 
 			bool ok = false;
@@ -80,6 +79,8 @@ namespace Confuser.Core {
 				foreach (string probePath in parameters.Project.ProbePaths)
 					asmResolver.PostSearchPaths.Add(Path.Combine(context.BaseDirectory, probePath));
 
+				context.CheckCancellation();
+
 				Marker marker = parameters.GetMarker();
 
 				// 2. Discover plugins
@@ -91,6 +92,8 @@ namespace Confuser.Core {
 				parameters.GetPluginDiscovery().GetPlugins(context, out prots, out packers, out components);
 
 				context.Logger.InfoFormat("Discovered {0} protections, {1} packers.", prots.Count, packers.Count);
+
+				context.CheckCancellation();
 
 				// 3. Resolve dependency
 				context.Logger.Debug("Resolving component dependency...");
@@ -108,6 +111,8 @@ namespace Confuser.Core {
 				foreach (Packer packer in packers)
 					components.Add(packer);
 
+				context.CheckCancellation();
+
 				// 4. Load modules
 				context.Logger.Info("Loading input modules...");
 				marker.Initalize(prots, packers);
@@ -118,6 +123,8 @@ namespace Confuser.Core {
 				foreach (ModuleDefMD module in context.Modules)
 					asmResolver.AddToCache(module);
 				context.Packer = markings.Packer;
+
+				context.CheckCancellation();
 
 				// 5. Initialize components
 				context.Logger.Info("Initializing...");
@@ -131,6 +138,8 @@ namespace Confuser.Core {
 					context.CheckCancellation();
 				}
 
+				context.CheckCancellation();
+
 				// 6. Build pipeline
 				context.Logger.Debug("Building pipeline...");
 				var pipeline = new ProtectionPipeline();
@@ -138,6 +147,7 @@ namespace Confuser.Core {
 				foreach (ConfuserComponent comp in components) {
 					comp.PopulatePipeline(pipeline);
 				}
+
 				context.CheckCancellation();
 
 				//7. Run pipeline
@@ -285,6 +295,7 @@ namespace Confuser.Core {
 			context.Logger.InfoFormat("Processing module '{0}'...", context.CurrentModule.Name);
 
 			context.CurrentModuleWriterListener = new ModuleWriterListener();
+			context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => context.CheckCancellation();
 			context.CurrentModuleWriterOptions = new ModuleWriterOptions(context.CurrentModule, context.CurrentModuleWriterListener);
 			var snKey = context.Annotations.Get<StrongNameKey>(context.CurrentModule, Marker.SNKey);
 			context.CurrentModuleWriterOptions.InitializeStrongNameSigning(context.CurrentModule, snKey);

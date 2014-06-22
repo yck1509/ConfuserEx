@@ -120,10 +120,11 @@ namespace Confuser.Core {
 		/// <param name="context">The working context.</param>
 		internal void ExecuteStage(PipelineStage stage, Action<ConfuserContext> func, Func<IList<IDnlibDef>> targets, ConfuserContext context) {
 			foreach (ProtectionPhase pre in preStage[stage]) {
+				context.CheckCancellation();
 				context.Logger.DebugFormat("Executing '{0}' phase...", pre.Name);
 				pre.Execute(context, new ProtectionParameters(pre.Parent, Filter(context, targets(), pre)));
-				context.CheckCancellation();
 			}
+			context.CheckCancellation();
 			func(context);
 			context.CheckCancellation();
 			foreach (ProtectionPhase post in postStage[stage]) {

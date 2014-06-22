@@ -23,6 +23,7 @@ namespace Confuser.Renamer {
 			foreach (IRenamer renamer in service.Renamers) {
 				foreach (IDnlibDef def in parameters.Targets)
 					renamer.PreRename(context, service, def);
+				context.CheckCancellation();
 			}
 
 			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
@@ -66,6 +67,7 @@ namespace Confuser.Renamer {
 						throw new ConfuserException(null);
 					}
 				}
+				context.CheckCancellation();
 			}
 		}
 	}

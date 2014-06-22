@@ -11,12 +11,14 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="100px" />
+                <ColumnDefinition Width="100px" />
             </Grid.ColumnDefinitions>
 
             <ProgressBar x:Name="progress" Grid.Row="0" Grid.Column="0" Margin="5"
                          Value="{Binding Progress}" Minimum="0" Maximum="1" />
             <Button Grid.Row="0" Grid.Column="1" Margin="5" Content="Protect!" Command="{Binding ProtectCmd}" />
-            <RichTextBox x:Name="log" Grid.Row="1" Grid.ColumnSpan="2" Margin="5" FontFamily="Consolas"
+            <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="Cancel" Command="{Binding CancelCmd}" />
+            <RichTextBox x:Name="log" Grid.Row="1" Grid.ColumnSpan="3" Margin="5" FontFamily="Consolas"
                          IsReadOnly="True" IsReadOnlyCaretVisible="True" local:Skin.RTBDocument="{Binding LogDocument}"
                          VerticalScrollBarVisibility="Visible" />
         </Grid>

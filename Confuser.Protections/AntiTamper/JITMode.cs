@@ -218,6 +218,7 @@ namespace Confuser.Protections.AntiTamper {
 
 				method.Body = NopBody;
 				writer.MetaData.TablesHeap.MethodTable[token.Rid].ImplFlags |= (ushort)MethodImplAttributes.NoInlining;
+				context.CheckCancellation();
 			}
 			bodyIndex.PopulateSection(newSection);
 

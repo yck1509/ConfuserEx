@@ -228,4 +228,20 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+
+  <Target Name="solveAliasProblem" >
+    <ConvertToAbsolutePath Paths="..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll">
+      <Output TaskParameter="AbsolutePaths" PropertyName="FullPathOriginal" />
+    </ConvertToAbsolutePath>
+    <ItemGroup>
+      <ReferencePath Remove="$(FullPathOriginal)"/>
+      <ReferencePath Include="$(FullPathOriginal)">
+        <Aliases>PTL</Aliases>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
+  <PropertyGroup>
+    <CoreCompileDependsOn>solveAliasProblem;$(PrepareResourcesDependsOn)</CoreCompileDependsOn>
+  </PropertyGroup>
+
 </Project>

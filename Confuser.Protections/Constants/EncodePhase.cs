@@ -40,6 +40,7 @@ namespace Confuser.Protections.Constants {
 			foreach (var entry in ldInit.WithProgress(context.Logger)) // Ensure the array length haven't been encoded yet
 			{
 				EncodeInitializer(moduleCtx, entry.Key, entry.Value);
+				context.CheckCancellation();
 			}
 			foreach (var entry in ldc.WithProgress(context.Logger)) {
 				if (entry.Key is string) {
@@ -63,6 +64,7 @@ namespace Confuser.Protections.Constants {
 				}
 				else
 					throw new UnreachableException();
+				context.CheckCancellation();
 			}
 
 			// compress
@@ -76,6 +78,7 @@ namespace Confuser.Protections.Constants {
 			}
 			Debug.Assert(buffIndex == encodedBuff.Length);
 			encodedBuff = context.Registry.GetService<ICompressionService>().Compress(encodedBuff);
+			context.CheckCancellation();
 
 			uint compressedLen = (uint)(encodedBuff.Length + 3) / 4;
 			compressedLen = (compressedLen + 0xfu) & ~0xfu;
@@ -323,6 +326,8 @@ namespace Confuser.Protections.Constants {
 					if (eligible)
 						ldc.AddListEntry(instr.Operand, Tuple.Create(method, instr));
 				}
+
+				context.CheckCancellation();
 			}
 		}
 

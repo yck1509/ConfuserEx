@@ -1,4 +1,6 @@
-﻿using System;
+﻿extern alias PTL;
+
+using System;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -6,6 +8,9 @@ using System.Windows.Media;
 using Confuser.Core;
 using Confuser.Core.Project;
 using GalaSoft.MvvmLight.Command;
+using PTL::System.Threading;
+
+// http://connect.microsoft.com/VisualStudio/feedback/details/615953/
 
 namespace ConfuserEx.ViewModel {
 	internal class ProtectTabVM : TabViewModel, ILogger {
@@ -24,6 +29,10 @@ namespace ConfuserEx.ViewModel {
 			get { return new RelayCommand(DoProtect, () => !App.NavigationDisabled); }
 		}
 
+		public ICommand CancelCmd {
+			get { return new RelayCommand(DoCancel, () => App.NavigationDisabled); }
+		}
+
 		public double? Progress {
 			get { return progress; }
 			set { SetProperty(ref progress, value, "Progress"); }
@@ -36,24 +45,30 @@ namespace ConfuserEx.ViewModel {
 			set { SetProperty(ref result, value, "Result"); }
 		}
 
+		CancellationTokenSource cancelSrc;
 		private void DoProtect() {
 			var parameters = new ConfuserParameters();
 			parameters.Project = ((IViewModel<ConfuserProject>)App.Project).Model;
 			parameters.Logger = this;
 
 			documentContent.Inlines.Clear();
-			App.NavigationDisabled = true;
+			cancelSrc = new CancellationTokenSource();
 			Result = null;
 			Progress = null;
 			begin = DateTime.Now;
+			App.NavigationDisabled = true;
 
-			ConfuserEngine.Run(parameters)
+			ConfuserEngine.Run(parameters, cancelSrc.Token)
 			              .ContinueWith(_ =>
 			                            Application.Current.Dispatcher.BeginInvoke(new Action(() => {
 				                            Progress = 0;
 				                            App.NavigationDisabled = false;
 				                            CommandManager.InvalidateRequerySuggested();
 			                            })));
+		}
+
+		private void DoCancel() {
+			cancelSrc.Cancel();
 		}
 
 		private void AppendLine(string format, Brush foreground, params object[] args) {

@@ -43,12 +43,14 @@ namespace Confuser.Renamer {
 					service.GetVTables().GetVTable((TypeDef)def);
 					service.SetOriginalNamespace(def, ((TypeDef)def).Namespace);
 				}
+				context.CheckCancellation();
 			}
 
 			context.Logger.Debug("Analyzing...");
 			IList<IRenamer> renamers = service.Renamers;
 			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
 				Analyze(service, context, def, true);
+				context.CheckCancellation();
 			}
 		}
 

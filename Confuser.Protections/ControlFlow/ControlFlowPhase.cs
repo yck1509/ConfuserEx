@@ -74,6 +74,7 @@ namespace Confuser.Protections.ControlFlow {
 			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>().WithProgress(context.Logger))
 				if (method.HasBody && method.Body.Instructions.Count > 0) {
 					ProcessMethod(method.Body, ParseParameters(method, context, parameters, random, disabledOpti));
+					context.CheckCancellation();
 				}
 		}
 

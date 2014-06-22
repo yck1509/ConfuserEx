@@ -77,6 +77,7 @@ namespace Confuser.Protections {
 				stubModule.Write(ms, new ModuleWriterOptions(stubModule, new KeyInjector(ctx)) {
 					StrongNameKey = snKey
 				});
+				context.CheckCancellation();
 				base.ProtectStub(context, context.OutputPaths[ctx.ModuleIndex], ms.ToArray(), snKey, new StubProtection(ctx));
 			}
 		}
@@ -118,6 +119,7 @@ namespace Confuser.Protections {
 					progress = (progress + moduleIndex) / modules.Count;
 					context.Logger.Progress((int)(progress * 10000), 10000);
 				});
+				context.CheckCancellation();
 
 				var resource = new EmbeddedResource(Convert.ToBase64String(name), encrypted, ManifestResourceAttributes.Private);
 				stubModule.Resources.Add(resource);
@@ -183,6 +185,7 @@ namespace Confuser.Protections {
 			byte[] encryptedModule = compCtx.Encrypt(comp, compCtx.OriginModule, seed,
 			                                         progress => context.Logger.Progress((int)(progress * 10000), 10000));
 			context.Logger.EndProgress();
+			context.CheckCancellation();
 
 			compCtx.EncryptedModule = encryptedModule;
 
