@@ -87,7 +87,7 @@ namespace Confuser.Core {
 		/// </example>
 		/// <param name="overall">The total work amount .</param>
 		/// <param name="progress">The amount of work done.</param>
-		void Progress(int overall, int progress);
+		void Progress(int progress, int overall);
 
 		/// <summary>
 		///     End the progress of protection.

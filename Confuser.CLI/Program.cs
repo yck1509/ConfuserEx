@@ -128,7 +128,7 @@ namespace Confuser.CLI {
 				WriteLineWithColor(ConsoleColor.Red, "Exception: " + ex);
 			}
 
-			public void Progress(int overall, int progress) { }
+			public void Progress(int progress, int overall) { }
 
 			public void EndProgress() { }
 

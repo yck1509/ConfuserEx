@@ -109,7 +109,7 @@ namespace ConfuserEx.ViewModel {
 			AppendLine("Exception: {0}", Brushes.Red, ex);
 		}
 
-		void ILogger.Progress(int overall, int progress) {
+		void ILogger.Progress(int progress, int overall) {
 			Progress = (double)progress / overall;
 		}
 
