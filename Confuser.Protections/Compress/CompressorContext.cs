@@ -19,7 +19,7 @@ namespace Confuser.Protections.Compress {
 		public string ModuleName;
 		public byte[] OriginModule;
 
-		public byte[] Encrypt(ICompressionService compress, byte[] data, uint seed) {
+		public byte[] Encrypt(ICompressionService compress, byte[] data, uint seed, Action<double> progressFunc) {
 			data = (byte[])data.Clone();
 			var dst = new uint[0x10];
 			var src = new uint[0x10];
@@ -37,7 +37,7 @@ namespace Confuser.Protections.Compress {
 				if ((i & 0xff) == 0)
 					state = (state * state) % 0x8a5cb7;
 			}
-			data = compress.Compress(data);
+			data = compress.Compress(data, progressFunc);
 			Array.Resize(ref data, (data.Length + 3) & ~3);
 
 			var encryptedData = new byte[data.Length];

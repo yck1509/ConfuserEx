@@ -53,7 +53,10 @@ namespace Confuser.Protections.Resources {
 				}
 
 				// compress
-				moduleBuff = ctx.Context.Registry.GetService<ICompressionService>().Compress(moduleBuff);
+				moduleBuff = ctx.Context.Registry.GetService<ICompressionService>().Compress(
+					moduleBuff,
+					progress => ctx.Context.Logger.Progress((int)(progress * 10000), 10000));
+				ctx.Context.Logger.EndProgress();
 
 				uint compressedLen = (uint)(moduleBuff.Length + 3) / 4;
 				compressedLen = (compressedLen + 0xfu) & ~0xfu;
@@ -93,8 +96,7 @@ namespace Confuser.Protections.Resources {
 				MutationHelper.InjectKeys(ctx.InitMethod,
 				                          new[] { 0, 1 },
 				                          new[] { (int)(size / 4), (int)(keySeed) });
-			}
-			else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
+			} else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 				TablesHeap tblHeap = writer.MetaData.TablesHeap;
 				tblHeap.FieldRVATable[writer.MetaData.GetFieldRVARid(ctx.DataField)].RVA = (uint)encryptedResource.RVA;
 			}

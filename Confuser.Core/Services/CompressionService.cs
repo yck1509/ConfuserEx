@@ -24,42 +24,41 @@ namespace Confuser.Core.Services {
 		/// <inheritdoc />
 		public MethodDef GetRuntimeDecompressor(ModuleDef module, Action<IDnlibDef> init) {
 			Tuple<MethodDef, List<IDnlibDef>> decompressor = context.Annotations.GetOrCreate(module, Decompressor, m => {
-				                                                                                                       var rt = context.Registry.GetService<IRuntimeService>();
+				var rt = context.Registry.GetService<IRuntimeService>();
 
-				                                                                                                       List<IDnlibDef> members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Lzma"), module.GlobalType, module).ToList();
-				                                                                                                       MethodDef decomp = null;
-				                                                                                                       foreach (IDnlibDef member in members) {
-					                                                                                                       if (member is MethodDef) {
-						                                                                                                       var method = (MethodDef)member;
-						                                                                                                       if (method.Access == MethodAttributes.Public)
-							                                                                                                       method.Access = MethodAttributes.Assembly;
-						                                                                                                       if (!method.IsConstructor)
-							                                                                                                       method.IsSpecialName = false;
+				List<IDnlibDef> members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Lzma"), module.GlobalType, module).ToList();
+				MethodDef decomp = null;
+				foreach (IDnlibDef member in members) {
+					if (member is MethodDef) {
+						var method = (MethodDef)member;
+						if (method.Access == MethodAttributes.Public)
+							method.Access = MethodAttributes.Assembly;
+						if (!method.IsConstructor)
+							method.IsSpecialName = false;
 
-						                                                                                                       if (method.Name == "Decompress")
-							                                                                                                       decomp = method;
-					                                                                                                       }
-					                                                                                                       else if (member is FieldDef) {
-						                                                                                                       var field = (FieldDef)member;
-						                                                                                                       if (field.Access == FieldAttributes.Public)
-							                                                                                                       field.Access = FieldAttributes.Assembly;
-						                                                                                                       if (field.IsLiteral) {
-							                                                                                                       field.DeclaringType.Fields.Remove(field);
-						                                                                                                       }
-					                                                                                                       }
-				                                                                                                       }
-				                                                                                                       members.RemoveWhere(def => def is FieldDef && ((FieldDef)def).IsLiteral);
+						if (method.Name == "Decompress")
+							decomp = method;
+					} else if (member is FieldDef) {
+						var field = (FieldDef)member;
+						if (field.Access == FieldAttributes.Public)
+							field.Access = FieldAttributes.Assembly;
+						if (field.IsLiteral) {
+							field.DeclaringType.Fields.Remove(field);
+						}
+					}
+				}
+				members.RemoveWhere(def => def is FieldDef && ((FieldDef)def).IsLiteral);
 
-				                                                                                                       Debug.Assert(decomp != null);
-				                                                                                                       return Tuple.Create(decomp, members);
-			                                                                                                       });
+				Debug.Assert(decomp != null);
+				return Tuple.Create(decomp, members);
+			});
 			foreach (IDnlibDef member in decompressor.Item2)
 				init(member);
 			return decompressor.Item1;
 		}
 
 		/// <inheritdoc />
-		public byte[] Compress(byte[] data) {
+		public byte[] Compress(byte[] data, Action<double> progressFunc = null) {
 			CoderPropID[] propIDs = {
 				CoderPropID.DictionarySize,
 				CoderPropID.PosStateBits,
@@ -89,8 +88,28 @@ namespace Confuser.Core.Services {
 			fileSize = data.Length;
 			for (int i = 0; i < 8; i++)
 				x.WriteByte((Byte)(fileSize >> (8 * i)));
-			encoder.Code(new MemoryStream(data), x, -1, -1, null);
+
+			ICodeProgress progress = null;
+			if (progressFunc != null)
+				progress = new CompressionLogger(progressFunc, data.Length);
+			encoder.Code(new MemoryStream(data), x, -1, -1, progress);
+
 			return x.ToArray();
+		}
+
+		private class CompressionLogger : ICodeProgress {
+			private readonly Action<double> progressFunc;
+			private readonly int size;
+
+			public CompressionLogger(Action<double> progressFunc, int size) {
+				this.progressFunc = progressFunc;
+				this.size = size;
+			}
+
+			public void SetProgress(long inSize, long outSize) {
+				double precentage = (double)inSize / size;
+				progressFunc(precentage);
+			}
 		}
 	}
 
@@ -110,7 +129,8 @@ namespace Confuser.Core.Services {
 		///     Compresses the specified data.
 		/// </summary>
 		/// <param name="data">The buffer storing the data.</param>
+		/// <param name="progressFunc">The function that receive the progress of compression.</param>
 		/// <returns>The compressed data.</returns>
-		byte[] Compress(byte[] data);
+		byte[] Compress(byte[] data, Action<double> progressFunc = null);
 	}
 }
