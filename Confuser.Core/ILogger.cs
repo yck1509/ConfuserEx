@@ -74,9 +74,26 @@ namespace Confuser.Core {
 		/// <summary>
 		///     Logs the progress of protection.
 		/// </summary>
+		/// <remarks>
+		///     This method is intended to be used with <see cref="EndProgress" />.
+		/// </remarks>
+		/// <example>
+		///     <code> 
+		///         for (int i = 0; i &lt; defs.Length; i++) {
+		///             logger.Progress(i + 1, defs.Length);
+		///         }
+		///         logger.EndProgress();
+		///     </code>
+		/// </example>
 		/// <param name="overall">The total work amount .</param>
 		/// <param name="progress">The amount of work done.</param>
-		void Progress(int overall, int progress);
+		void Progress(int progress, int overall);
+
+		/// <summary>
+		///     End the progress of protection.
+		/// </summary>
+		/// <seealso cref="Progress" />
+		void EndProgress();
 
 		/// <summary>
 		///     Logs the finish of protection.

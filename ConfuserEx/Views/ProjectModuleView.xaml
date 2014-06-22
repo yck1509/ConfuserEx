@@ -1,0 +1,46 @@
+﻿<Window x:Class="ConfuserEx.Views.ProjectModuleView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ConfuserEx"
+        Title="{Binding Path, StringFormat=Edit module \'{0}\'...}" Style="{StaticResource DarkWindow}"
+        SizeToContent="WidthAndHeight" ShowInTaskbar="False" ResizeMode="NoResize">
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36px" />
+            <RowDefinition Height="36px" />
+            <RowDefinition Height="36px" />
+            <RowDefinition Height="36px" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150px" />
+            <ColumnDefinition Width="250px" />
+            <ColumnDefinition Width="35px" />
+        </Grid.ColumnDefinitions>
+
+        <Label Content="Assembly Path : " Grid.Row="0" Grid.Column="0" HorizontalContentAlignment="Right"
+               VerticalContentAlignment="Center" />
+        <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" VerticalContentAlignment="Center"
+                 Text="{Binding Path, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 local:FileDragDrop.Command="{x:Static local:FileDragDrop.FileCmd}" />
+
+        <Label Content="SN Key Path : " Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Right"
+               VerticalContentAlignment="Center" />
+        <TextBox x:Name="PathBox" Grid.Row="1" Grid.Column="1" Margin="5" VerticalContentAlignment="Center"
+                 TextChanged="PathBox_TextChanged"
+                 Text="{Binding SNKeyPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 local:FileDragDrop.Command="{x:Static local:FileDragDrop.FileCmd}" />
+        <Button Grid.Row="1" Grid.Column="2" Margin="5" VerticalAlignment="Center" Height="26" Click="ChooseSNKey">
+            <TextBlock FontSize="14px" FontFamily="{DynamicResource FontAwesome}" Text="&#xf141;" Height="10px"
+                       TextOptions.TextRenderingMode="GrayScale" />
+        </Button>
+
+        <Label Content="SN Key Password : " Grid.Row="2" Grid.Column="0" HorizontalContentAlignment="Right"
+               VerticalContentAlignment="Center" />
+        <TextBox x:Name="PwdBox" Grid.Row="2" Grid.Column="1" Margin="5" Grid.ColumnSpan="2"
+                 VerticalContentAlignment="Center"
+                 Text="{Binding SNKeyPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Button Grid.Row="3" Grid.ColumnSpan="3" HorizontalAlignment="Right" Content="Done"
+                Width="70" Margin="5" Click="Done" />
+    </Grid>
+</Window>

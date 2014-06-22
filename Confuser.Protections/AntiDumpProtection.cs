@@ -49,6 +49,10 @@ namespace Confuser.Protections {
 				get { return ProtectionTargets.Modules; }
 			}
 
+			public override string Name {
+				get { return "Anti-dump injection"; }
+			}
+
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 				TypeDef rtType = context.Registry.GetService<IRuntimeService>().GetRuntimeType("Confuser.Runtime.AntiDump");
 

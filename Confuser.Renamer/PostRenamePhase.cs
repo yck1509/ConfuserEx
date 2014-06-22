@@ -14,12 +14,17 @@ namespace Confuser.Renamer {
 			get { return ProtectionTargets.AllDefinitions; }
 		}
 
+		public override string Name {
+			get { return "Post-renaming"; }
+		}
+
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			var service = (NameService)context.Registry.GetService<INameService>();
 
 			foreach (IRenamer renamer in service.Renamers) {
 				foreach (IDnlibDef def in parameters.Targets)
 					renamer.PostRename(context, service, def);
+				context.CheckCancellation();
 			}
 		}
 	}

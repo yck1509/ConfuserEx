@@ -12,6 +12,10 @@ namespace Confuser.Renamer {
 			get { return ProtectionTargets.AllDefinitions; }
 		}
 
+		public override string Name {
+			get { return "Renaming"; }
+		}
+
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			var service = (NameService)context.Registry.GetService<INameService>();
 
@@ -19,9 +23,10 @@ namespace Confuser.Renamer {
 			foreach (IRenamer renamer in service.Renamers) {
 				foreach (IDnlibDef def in parameters.Targets)
 					renamer.PreRename(context, service, def);
+				context.CheckCancellation();
 			}
 
-			foreach (IDnlibDef def in parameters.Targets) {
+			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
 				if (def is MethodDef)
 					if (parameters.GetParameter(context, def, "renameArgs", true)) {
 						foreach (ParamDef param in ((MethodDef)def).ParamDefs)
@@ -62,6 +67,7 @@ namespace Confuser.Renamer {
 						throw new ConfuserException(null);
 					}
 				}
+				context.CheckCancellation();
 			}
 		}
 	}

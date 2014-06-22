@@ -110,6 +110,8 @@ namespace Confuser.Core {
 				context.Logger.InfoFormat("Loading '{0}'...", module.Path);
 
 				ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
+				context.CheckCancellation();
+
 				if (proj.Debug)
 					modDef.LoadPdb();
 
@@ -118,8 +120,10 @@ namespace Confuser.Core {
 				context.Annotations.Set(modDef, SNKey, LoadSNKey(context, module.SNKeyPath == null ? null : Path.Combine(proj.BaseDirectory, module.SNKeyPath), module.SNKeyPassword));
 				context.Annotations.Set(modDef, RulesKey, rules);
 
-				foreach (IDnlibDef def in modDef.FindDefinitions())
+				foreach (IDnlibDef def in modDef.FindDefinitions()) {
 					ApplyRules(context, def, rules);
+					context.CheckCancellation();
+				}
 
 				// Packer parameters are stored in modules
 				if (packerParams != null)

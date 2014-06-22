@@ -15,6 +15,10 @@ namespace Confuser.Renamer {
 			get { return ProtectionTargets.AllDefinitions; }
 		}
 
+		public override string Name {
+			get { return "Name analysis"; }
+		}
+
 		private void ParseParameters(IDnlibDef def, ConfuserContext context, NameService service, ProtectionParameters parameters) {
 			var mode = parameters.GetParameter<RenameMode?>(context, def, "mode", null);
 			if (mode != null)
@@ -24,7 +28,7 @@ namespace Confuser.Renamer {
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			var service = (NameService)context.Registry.GetService<INameService>();
 			context.Logger.Debug("Building VTables & identifier list...");
-			foreach (IDnlibDef def in parameters.Targets) {
+			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
 				ParseParameters(def, context, service, parameters);
 
 				if (def is ModuleDef) {
@@ -39,12 +43,14 @@ namespace Confuser.Renamer {
 					service.GetVTables().GetVTable((TypeDef)def);
 					service.SetOriginalNamespace(def, ((TypeDef)def).Namespace);
 				}
+				context.CheckCancellation();
 			}
 
 			context.Logger.Debug("Analyzing...");
 			IList<IRenamer> renamers = service.Renamers;
-			foreach (IDnlibDef def in parameters.Targets) {
+			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
 				Analyze(service, context, parameters, def, true);
+				context.CheckCancellation();
 			}
 		}
 

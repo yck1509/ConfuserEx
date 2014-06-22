@@ -50,6 +50,9 @@ namespace Confuser.Core {
 		public void Progress(int overall, int progress) { }
 
 		/// <inheritdoc />
+		public void EndProgress() { }
+
+		/// <inheritdoc />
 		public void Finish(bool successful) { }
 
 		/// <inheritdoc />

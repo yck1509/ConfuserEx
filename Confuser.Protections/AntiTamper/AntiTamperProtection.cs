@@ -53,6 +53,10 @@ namespace Confuser.Protections {
 				get { return ProtectionTargets.Methods; }
 			}
 
+			public override string Name {
+				get { return "Anti-tamper helpers injection"; }
+			}
+
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 				if (!parameters.Targets.Any())
 					return;
@@ -80,6 +84,10 @@ namespace Confuser.Protections {
 
 			public override ProtectionTargets Targets {
 				get { return ProtectionTargets.Methods; }
+			}
+
+			public override string Name {
+				get { return "Anti-tamper metadata preparation"; }
 			}
 
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {

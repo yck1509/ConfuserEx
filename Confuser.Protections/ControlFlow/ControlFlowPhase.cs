@@ -20,6 +20,10 @@ namespace Confuser.Protections.ControlFlow {
 			get { return ProtectionTargets.Methods; }
 		}
 
+		public override string Name {
+			get { return "Control flow mangling"; }
+		}
+
 		private static CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random, bool disableOpti) {
 			var ret = new CFContext();
 			ret.Type = parameters.GetParameter(context, method, "type", CFType.Switch);
@@ -67,9 +71,10 @@ namespace Confuser.Protections.ControlFlow {
 			bool disabledOpti = DisabledOptimization(context.CurrentModule);
 			RandomGenerator random = context.Registry.GetService<IRandomService>().GetRandomGenerator(ControlFlowProtection._FullId);
 
-			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>())
+			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>().WithProgress(context.Logger))
 				if (method.HasBody && method.Body.Instructions.Count > 0) {
 					ProcessMethod(method.Body, ParseParameters(method, context, parameters, random, disabledOpti));
+					context.CheckCancellation();
 				}
 		}
 

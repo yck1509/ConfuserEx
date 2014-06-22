@@ -67,20 +67,21 @@ namespace Confuser.Core {
 			context.PackerInitiated = parameters.PackerInitiated;
 			context.token = token;
 
-
-			var asmResolver = new AssemblyResolver();
-			asmResolver.EnableTypeDefCache = true;
-			asmResolver.DefaultModuleContext = new ModuleContext(asmResolver);
-			context.Resolver = asmResolver;
-			context.BaseDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.BaseDirectory + "\\");
-			context.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.OutputDirectory + "\\");
-			foreach (string probePath in parameters.Project.ProbePaths)
-				asmResolver.PostSearchPaths.Add(Path.Combine(context.BaseDirectory, probePath));
-
 			PrintInfo(context);
 
 			bool ok = false;
 			try {
+				var asmResolver = new AssemblyResolver();
+				asmResolver.EnableTypeDefCache = true;
+				asmResolver.DefaultModuleContext = new ModuleContext(asmResolver);
+				context.Resolver = asmResolver;
+				context.BaseDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.BaseDirectory + "\\");
+				context.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.OutputDirectory + "\\");
+				foreach (string probePath in parameters.Project.ProbePaths)
+					asmResolver.PostSearchPaths.Add(Path.Combine(context.BaseDirectory, probePath));
+
+				context.CheckCancellation();
+
 				Marker marker = parameters.GetMarker();
 
 				// 2. Discover plugins
@@ -93,13 +94,14 @@ namespace Confuser.Core {
 
 				context.Logger.InfoFormat("Discovered {0} protections, {1} packers.", prots.Count, packers.Count);
 
+				context.CheckCancellation();
+
 				// 3. Resolve dependency
 				context.Logger.Debug("Resolving component dependency...");
 				try {
 					var resolver = new DependencyResolver(prots);
 					prots = resolver.SortDependency();
-				}
-				catch (CircularDependencyException ex) {
+				} catch (CircularDependencyException ex) {
 					context.Logger.ErrorException("", ex);
 					throw new ConfuserException(ex);
 				}
@@ -109,6 +111,8 @@ namespace Confuser.Core {
 					components.Add(prot);
 				foreach (Packer packer in packers)
 					components.Add(packer);
+
+				context.CheckCancellation();
 
 				// 4. Load modules
 				context.Logger.Info("Loading input modules...");
@@ -122,18 +126,21 @@ namespace Confuser.Core {
 					asmResolver.AddToCache(module);
 				context.Packer = markings.Packer;
 
+				context.CheckCancellation();
+
 				// 5. Initialize components
 				context.Logger.Info("Initializing...");
 				foreach (ConfuserComponent comp in components) {
 					try {
 						comp.Initialize(context);
-					}
-					catch (Exception ex) {
+					} catch (Exception ex) {
 						context.Logger.ErrorException("Error occured during initialization of '" + comp.Name + "'.", ex);
 						throw new ConfuserException(ex);
 					}
 					context.CheckCancellation();
 				}
+
+				context.CheckCancellation();
 
 				// 6. Build pipeline
 				context.Logger.Debug("Building pipeline...");
@@ -142,35 +149,28 @@ namespace Confuser.Core {
 				foreach (ConfuserComponent comp in components) {
 					comp.PopulatePipeline(pipeline);
 				}
+
 				context.CheckCancellation();
 
 				//7. Run pipeline
 				RunPipeline(pipeline, context);
 
 				ok = true;
-			}
-			catch (AssemblyResolveException ex) {
+			} catch (AssemblyResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a assembly, check if all dependencies are of correct version.", ex);
-			}
-			catch (TypeResolveException ex) {
+			} catch (TypeResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a type, check if all dependencies are of correct version.", ex);
-			}
-			catch (MemberRefResolveException ex) {
+			} catch (MemberRefResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a member, check if all dependencies are of correct version.", ex);
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				context.Logger.ErrorException("An IO error occured, check if all input/output locations are read/writable.", ex);
-			}
-			catch (OperationCanceledException) {
+			} catch (OperationCanceledException) {
 				context.Logger.Error("Operation is canceled.");
-			}
-			catch (ConfuserException) {
+			} catch (ConfuserException) {
 				// Exception is already handled/logged, so just ignore and report failure
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				context.Logger.ErrorException("Unknown error occured.", ex);
-			}
-			finally {
+			} finally {
 				context.Logger.Finish(ok);
 			}
 		}
@@ -234,8 +234,7 @@ namespace Confuser.Core {
 			                                  .SelectMany(module => module.GetAssemblyRefs().Select(asmRef => Tuple.Create(asmRef, module)))) {
 				try {
 					AssemblyDef assembly = context.Resolver.ResolveThrow(dependency.Item1, dependency.Item2);
-				}
-				catch (AssemblyResolveException ex) {
+				} catch (AssemblyResolveException ex) {
 					context.Logger.ErrorException("Failed to resolve dependency of '" + dependency.Item2.Name + "'.", ex);
 					throw new ConfuserException(ex);
 				}
@@ -300,6 +299,7 @@ namespace Confuser.Core {
 			context.Logger.InfoFormat("Processing module '{0}'...", context.CurrentModule.Name);
 
 			context.CurrentModuleWriterListener = new ModuleWriterListener();
+			context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => context.CheckCancellation();
 			context.CurrentModuleWriterOptions = new ModuleWriterOptions(context.CurrentModule, context.CurrentModuleWriterListener);
 			var snKey = context.Annotations.Get<StrongNameKey>(context.CurrentModule, Marker.SNKey);
 			context.CurrentModuleWriterOptions.InitializeStrongNameSigning(context.CurrentModule, snKey);
@@ -388,8 +388,7 @@ namespace Confuser.Core {
 		private static void PrintInfo(ConfuserContext context) {
 			if (context.PackerInitiated) {
 				context.Logger.Info("Protecting packer stub...");
-			}
-			else {
+			} else {
 				context.Logger.InfoFormat("{0} {1}", Version, Copyright);
 
 				Type mono = Type.GetType("Mono.Runtime");

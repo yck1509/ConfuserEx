@@ -24,7 +24,7 @@ Usage
 `Confuser.CLI <path to project file>`
 
 The project file is a ConfuserEx Project (*.crproj).
-The format of project file can be found in ProjectFormat.md
+The format of project file can be found in docs\ProjectFormat.md
 
 Bug Report
 ----------

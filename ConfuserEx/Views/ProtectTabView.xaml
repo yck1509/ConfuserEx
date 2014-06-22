@@ -1,0 +1,37 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ConfuserEx"
+                    xmlns:vm="clr-namespace:ConfuserEx.ViewModel">
+    <DataTemplate DataType="{x:Type vm:ProtectTabVM}">
+        <Grid Background="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40px" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="100px" />
+                <ColumnDefinition Width="100px" />
+            </Grid.ColumnDefinitions>
+
+            <ProgressBar x:Name="progress" Grid.Row="0" Grid.Column="0" Margin="5"
+                         Value="{Binding Progress}" Minimum="0" Maximum="1" />
+            <Button Grid.Row="0" Grid.Column="1" Margin="5" Content="Protect!" Command="{Binding ProtectCmd}" />
+            <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="Cancel" Command="{Binding CancelCmd}" />
+            <RichTextBox x:Name="log" Grid.Row="1" Grid.ColumnSpan="3" Margin="5" FontFamily="Consolas"
+                         IsReadOnly="True" IsReadOnlyCaretVisible="True" local:Skin.RTBDocument="{Binding LogDocument}"
+                         VerticalScrollBarVisibility="Visible" />
+        </Grid>
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding Progress}" Value="{x:Null}">
+                <Setter TargetName="progress" Property="IsIndeterminate" Value="True" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Result}" Value="True">
+                <Setter TargetName="log" Property="BorderBrush" Value="#40ff40" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Result}" Value="False">
+                <Setter TargetName="log" Property="BorderBrush" Value="#ff4040" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+</ResourceDictionary>

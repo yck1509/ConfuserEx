@@ -43,6 +43,10 @@ namespace Confuser.Protections {
 				get { return ProtectionTargets.Modules; }
 			}
 
+			public override string Name {
+				get { return "Anti-ILDasm marking"; }
+			}
+
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 				foreach (ModuleDef module in parameters.Targets.OfType<ModuleDef>()) {
 					TypeRef attrRef = module.CorLibTypes.GetTypeRef("System.Runtime.CompilerServices", "SuppressIldasmAttribute");

@@ -26,6 +26,9 @@ namespace Confuser.Protections.Resources {
 		private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginAddResources) {
+				ctx.Context.CheckCancellation();
+				ctx.Context.Logger.Debug("Encrypting resources...");
+
 				List<EmbeddedResource> resources = ctx.Module.Resources.OfType<EmbeddedResource>().ToList();
 				ctx.Module.Resources.RemoveWhere(res => res is EmbeddedResource);
 
@@ -51,7 +54,11 @@ namespace Confuser.Protections.Resources {
 				}
 
 				// compress
-				moduleBuff = ctx.Context.Registry.GetService<ICompressionService>().Compress(moduleBuff);
+				moduleBuff = ctx.Context.Registry.GetService<ICompressionService>().Compress(
+					moduleBuff,
+					progress => ctx.Context.Logger.Progress((int)(progress * 10000), 10000));
+				ctx.Context.Logger.EndProgress();
+				ctx.Context.CheckCancellation();
 
 				uint compressedLen = (uint)(moduleBuff.Length + 3) / 4;
 				compressedLen = (compressedLen + 0xfu) & ~0xfu;
@@ -91,8 +98,7 @@ namespace Confuser.Protections.Resources {
 				MutationHelper.InjectKeys(ctx.InitMethod,
 				                          new[] { 0, 1 },
 				                          new[] { (int)(size / 4), (int)(keySeed) });
-			}
-			else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
+			} else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 				TablesHeap tblHeap = writer.MetaData.TablesHeap;
 				tblHeap.FieldRVATable[writer.MetaData.GetFieldRVARid(ctx.DataField)].RVA = (uint)encryptedResource.RVA;
 			}

@@ -124,8 +124,12 @@ namespace Confuser.Core {
 			baseLogger.ErrorException(msg, ex);
 		}
 
-		public void Progress(int overall, int progress) {
-			baseLogger.Progress(overall, progress);
+		public void Progress(int progress, int overall) {
+			baseLogger.Progress(progress, overall);
+		}
+
+		public void EndProgress() {
+			baseLogger.EndProgress();
 		}
 
 		public void Finish(bool successful) {

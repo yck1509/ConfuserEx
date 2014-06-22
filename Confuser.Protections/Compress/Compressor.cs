@@ -50,7 +50,7 @@ namespace Confuser.Protections {
 		protected override void Pack(ConfuserContext context, ProtectionParameters parameters) {
 			var ctx = context.Annotations.Get<CompressorContext>(context, ContextKey);
 			if (ctx == null) {
-				context.Logger.Error("No main module specified!");
+				context.Logger.Error("No executable module!");
 				throw new ConfuserException(null);
 			}
 
@@ -77,6 +77,7 @@ namespace Confuser.Protections {
 				stubModule.Write(ms, new ModuleWriterOptions(stubModule, new KeyInjector(ctx)) {
 					StrongNameKey = snKey
 				});
+				context.CheckCancellation();
 				base.ProtectStub(context, context.OutputPaths[ctx.ModuleIndex], ms.ToArray(), snKey, new StubProtection(ctx));
 			}
 		}
@@ -105,6 +106,7 @@ namespace Confuser.Protections {
 				key[i] |= 1;
 			compCtx.KeySig = key;
 
+			int moduleIndex = 0;
 			foreach (var entry in modules) {
 				byte[] name = Encoding.UTF8.GetBytes(entry.Key);
 				for (int i = 0; i < name.Length; i++)
@@ -113,11 +115,17 @@ namespace Confuser.Protections {
 				uint state = 0x6fff61;
 				foreach (byte chr in name)
 					state = state * 0x5e3f1f + chr;
-				byte[] encrypted = compCtx.Encrypt(comp, entry.Value, state);
+				byte[] encrypted = compCtx.Encrypt(comp, entry.Value, state, progress => {
+					progress = (progress + moduleIndex) / modules.Count;
+					context.Logger.Progress((int)(progress * 10000), 10000);
+				});
+				context.CheckCancellation();
 
 				var resource = new EmbeddedResource(Convert.ToBase64String(name), encrypted, ManifestResourceAttributes.Private);
 				stubModule.Resources.Add(resource);
+				moduleIndex++;
 			}
+			context.Logger.EndProgress();
 		}
 
 		private void InjectData(ModuleDef stubModule, MethodDef method, byte[] data) {
@@ -137,14 +145,14 @@ namespace Confuser.Protections {
 			stubModule.GlobalType.Fields.Add(dataField);
 
 			MutationHelper.ReplacePlaceholder(method, arg => {
-				                                          var repl = new List<Instruction>();
-				                                          repl.AddRange(arg);
-				                                          repl.Add(Instruction.Create(OpCodes.Dup));
-				                                          repl.Add(Instruction.Create(OpCodes.Ldtoken, dataField));
-				                                          repl.Add(Instruction.Create(OpCodes.Call, stubModule.Import(
-					                                          typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
-				                                          return repl.ToArray();
-			                                          });
+				var repl = new List<Instruction>();
+				repl.AddRange(arg);
+				repl.Add(Instruction.Create(OpCodes.Dup));
+				repl.Add(Instruction.Create(OpCodes.Ldtoken, dataField));
+				repl.Add(Instruction.Create(OpCodes.Call, stubModule.Import(
+					typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
+				return repl.ToArray();
+			});
 		}
 
 		private void InjectStub(ConfuserContext context, CompressorContext compCtx, ProtectionParameters parameters, ModuleDef stubModule) {
@@ -165,13 +173,20 @@ namespace Confuser.Protections {
 			}
 			compCtx.Deriver.Init(context, random);
 
+			context.Logger.Debug("Encrypting modules...");
+
 			// Main
 			MethodDef entryPoint = defs.OfType<MethodDef>().Single(method => method.Name == "Main");
 			stubModule.EntryPoint = entryPoint;
 
 			uint seed = random.NextUInt32();
 			compCtx.OriginModule = context.OutputModules[compCtx.ModuleIndex];
-			byte[] encryptedModule = compCtx.Encrypt(comp, compCtx.OriginModule, seed);
+
+			byte[] encryptedModule = compCtx.Encrypt(comp, compCtx.OriginModule, seed,
+			                                         progress => context.Logger.Progress((int)(progress * 10000), 10000));
+			context.Logger.EndProgress();
+			context.CheckCancellation();
+
 			compCtx.EncryptedModule = encryptedModule;
 
 			MutationHelper.InjectKeys(entryPoint,
@@ -196,9 +211,8 @@ namespace Confuser.Protections {
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
 						instrs.InsertRange(i - 2, compCtx.Deriver.EmitDerivation(decrypter, context, (Local)ldDst.Operand, (Local)ldSrc.Operand));
-					}
-					else if (method.DeclaringType.Name == "Lzma" &&
-					         method.Name == "Decompress") {
+					} else if (method.DeclaringType.Name == "Lzma" &&
+					           method.Name == "Decompress") {
 						MethodDef decomp = comp.GetRuntimeDecompressor(stubModule, member => { });
 						instr.Operand = decomp;
 					}
@@ -228,8 +242,7 @@ namespace Confuser.Protections {
 					uint sigToken = 0x11000000 | sigRid;
 					ctx.KeyToken = sigToken;
 					MutationHelper.InjectKey(writer.Module.EntryPoint, 2, (int)sigToken);
-				}
-				else if (evt == ModuleWriterEvent.MDBeginAddResources) {
+				} else if (evt == ModuleWriterEvent.MDBeginAddResources) {
 					// Compute hash
 					byte[] hash = SHA1.Create().ComputeHash(ctx.OriginModule);
 					uint hashBlob = writer.MetaData.BlobHeap.Add(hash);
