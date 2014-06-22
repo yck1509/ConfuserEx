@@ -37,11 +37,11 @@ namespace Confuser.Protections.Constants {
 
 			// encode
 			moduleCtx.EncodedBuffer = new List<uint>();
-			foreach (var entry in ldInit) // Ensure the array length haven't been encoded yet
+			foreach (var entry in ldInit.WithProgress(context.Logger)) // Ensure the array length haven't been encoded yet
 			{
 				EncodeInitializer(moduleCtx, entry.Key, entry.Value);
 			}
-			foreach (var entry in ldc) {
+			foreach (var entry in ldc.WithProgress(context.Logger)) {
 				if (entry.Key is string) {
 					EncodeString(moduleCtx, (string)entry.Key, entry.Value);
 				}
@@ -218,7 +218,7 @@ namespace Confuser.Protections.Constants {
 			ConfuserContext context, ProtectionParameters parameters, CEContext moduleCtx,
 			Dictionary<object, List<Tuple<MethodDef, Instruction>>> ldc,
 			Dictionary<byte[], List<Tuple<MethodDef, Instruction>>> ldInit) {
-			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>()) {
+			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>().WithProgress(context.Logger)) {
 				if (!method.HasBody)
 					continue;
 

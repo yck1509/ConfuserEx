@@ -71,7 +71,7 @@ namespace Confuser.Protections.ControlFlow {
 			bool disabledOpti = DisabledOptimization(context.CurrentModule);
 			RandomGenerator random = context.Registry.GetService<IRandomService>().GetRandomGenerator(ControlFlowProtection._FullId);
 
-			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>())
+			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>().WithProgress(context.Logger))
 				if (method.HasBody && method.Body.Instructions.Count > 0) {
 					ProcessMethod(method.Body, ParseParameters(method, context, parameters, random, disabledOpti));
 				}

@@ -97,7 +97,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 			var store = new RPStore { random = random };
 
-			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>())
+			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>().WithProgress(context.Logger))
 				if (method.HasBody && method.Body.Instructions.Count > 0) {
 					ProcessMethod(ParseParameters(method, context, parameters, store));
 				}

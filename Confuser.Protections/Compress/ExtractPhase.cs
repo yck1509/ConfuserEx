@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Confuser.Core;
@@ -22,11 +23,18 @@ namespace Confuser.Protections.Compress {
 			if (context.Packer == null)
 				return;
 
-			if (context.Annotations.Get<CompressorContext>(context, Compressor.ContextKey) != null)
-				return;
+			bool isExe = context.CurrentModule.Kind == ModuleKind.Windows ||
+			             context.CurrentModule.Kind == ModuleKind.Console;
 
-			var mainModule = parameters.GetParameter<string>(context, null, "main");
-			if (context.CurrentModule.Name == mainModule) {
+			if (context.Annotations.Get<CompressorContext>(context, Compressor.ContextKey) != null) {
+				if (isExe) {
+					context.Logger.Error("Too many executable modules!");
+					throw new ConfuserException(null);
+				}
+				return;
+			}
+
+			if (isExe) {
 				var ctx = new CompressorContext {
 					ModuleIndex = context.CurrentModuleIndex,
 					Assembly = context.CurrentModule.Assembly

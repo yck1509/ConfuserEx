@@ -50,7 +50,7 @@ namespace Confuser.Protections {
 		protected override void Pack(ConfuserContext context, ProtectionParameters parameters) {
 			var ctx = context.Annotations.Get<CompressorContext>(context, ContextKey);
 			if (ctx == null) {
-				context.Logger.Error("No main module specified!");
+				context.Logger.Error("No executable module!");
 				throw new ConfuserException(null);
 			}
 
@@ -105,7 +105,7 @@ namespace Confuser.Protections {
 				key[i] |= 1;
 			compCtx.KeySig = key;
 
-			foreach (var entry in modules) {
+			foreach (var entry in modules.WithProgress(context.Logger)) {
 				byte[] name = Encoding.UTF8.GetBytes(entry.Key);
 				for (int i = 0; i < name.Length; i++)
 					name[i] *= key[i + 4];
@@ -164,6 +164,8 @@ namespace Confuser.Protections {
 					throw new UnreachableException();
 			}
 			compCtx.Deriver.Init(context, random);
+
+			context.Logger.Debug("Encrypting modules...");
 
 			// Main
 			MethodDef entryPoint = defs.OfType<MethodDef>().Single(method => method.Name == "Main");

@@ -28,7 +28,7 @@ namespace Confuser.Renamer {
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			var service = (NameService)context.Registry.GetService<INameService>();
 			context.Logger.Debug("Building VTables & identifier list...");
-			foreach (IDnlibDef def in parameters.Targets) {
+			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
 				ParseParameters(def, context, service, parameters);
 
 				if (def is ModuleDef) {
@@ -47,7 +47,7 @@ namespace Confuser.Renamer {
 
 			context.Logger.Debug("Analyzing...");
 			IList<IRenamer> renamers = service.Renamers;
-			foreach (IDnlibDef def in parameters.Targets) {
+			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
 				Analyze(service, context, def, true);
 			}
 		}
