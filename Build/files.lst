@@ -6,4 +6,12 @@
 ..\Release\bin\Confuser.Renamer.*
 ..\Release\bin\Confuser.Runtime.*
 ..\Release\bin\dnlib.*
+..\Release\bin\ConfuserEx.exe
+..\Release\bin\ConfuserEx.exe.config
+..\Release\bin\ConfuserEx.pdb
 ..\Release\bin\System.Threading.dll
+..\Release\bin\GalaSoft.MvvmLight.Extras.WPF4.dll
+..\Release\bin\GalaSoft.MvvmLight.WPF4.dll
+..\Release\bin\Microsoft.Practices.ServiceLocation.dll
+..\Release\bin\Ookii.Dialogs.Wpf.dll
+..\Release\bin\System.Windows.Interactivity.dll
