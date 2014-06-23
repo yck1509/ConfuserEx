@@ -1,4 +1,6 @@
-﻿namespace Confuser.DynCipher.AST {
+﻿using System;
+
+namespace Confuser.DynCipher.AST {
 	public abstract class Expression {
 		public object Tag { get; set; }
 		public abstract override string ToString();

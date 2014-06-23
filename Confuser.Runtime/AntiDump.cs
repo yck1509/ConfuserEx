@@ -104,8 +104,7 @@ namespace Confuser.Runtime {
 						mdHdr++;
 					}
 				}
-			}
-			else //Flat
+			} else //Flat
 			{
 				//VirtualProtect(ptr - 16, 8, 0x40, out old);
 				//*(uint*)(ptr - 12) = 0;

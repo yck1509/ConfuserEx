@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Confuser.Core;
 using Confuser.Core.Services;
@@ -6,6 +7,7 @@ using Confuser.DynCipher;
 using Confuser.Renamer;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using dnlib.DotNet.MD;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class ReferenceProxyPhase : ProtectionPhase {
@@ -67,10 +69,10 @@ namespace Confuser.Protections.ReferenceProxy {
 					break;
 				case EncodingType.x86:
 					ret.EncodingHandler = store.x86 ?? (store.x86 = new x86Encoding());
-                    
-                        		if ((context.CurrentModule.Cor20HeaderFlags & dnlib.DotNet.MD.ComImageFlags.ILOnly) != 0)
-                        			context.CurrentModuleWriterOptions.Cor20HeaderOptions.Flags &= ~dnlib.DotNet.MD.ComImageFlags.ILOnly;
-                        		break;
+
+					if ((context.CurrentModule.Cor20HeaderFlags & ComImageFlags.ILOnly) != 0)
+						context.CurrentModuleWriterOptions.Cor20HeaderOptions.Flags &= ~ComImageFlags.ILOnly;
+					break;
 				default:
 					throw new UnreachableException();
 			}

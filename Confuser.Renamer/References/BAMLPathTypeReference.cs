@@ -1,4 +1,5 @@
-﻿using Confuser.Core;
+﻿using System;
+using Confuser.Core;
 using Confuser.Renamer.BAML;
 using dnlib.DotNet;
 
@@ -30,8 +31,7 @@ namespace Confuser.Renamer.References {
 				name = prefix + ":" + name;
 			if (indexer != null) {
 				indexer.Type = name;
-			}
-			else {
+			} else {
 				string oldType, property;
 				attachedDP.ExtractAttachedDP(out oldType, out property);
 				attachedDP.Name = string.Format("({0}.{1})", name, property);

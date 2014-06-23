@@ -1,5 +1,4 @@
 ﻿extern alias PTL;
-
 using System;
 using System.Windows;
 using System.Windows.Documents;
@@ -15,6 +14,7 @@ using PTL::System.Threading;
 namespace ConfuserEx.ViewModel {
 	internal class ProtectTabVM : TabViewModel, ILogger {
 		private readonly Paragraph documentContent;
+		private CancellationTokenSource cancelSrc;
 		private double? progress = 0;
 		private bool? result;
 
@@ -45,7 +45,6 @@ namespace ConfuserEx.ViewModel {
 			set { SetProperty(ref result, value, "Result"); }
 		}
 
-		CancellationTokenSource cancelSrc;
 		private void DoProtect() {
 			var parameters = new ConfuserParameters();
 			parameters.Project = ((IViewModel<ConfuserProject>)App.Project).Model;

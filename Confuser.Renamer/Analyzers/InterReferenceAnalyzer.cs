@@ -1,4 +1,5 @@
-﻿using Confuser.Core;
+﻿using System;
+using Confuser.Core;
 using Confuser.Renamer.References;
 using dnlib.DotNet;
 using dnlib.DotNet.MD;

@@ -40,8 +40,7 @@ namespace SevenZip.Compression.RangeCoder {
 			if (symbol == 0) {
 				encoder.Range = newBound;
 				Prob += (kBitModelTotal - Prob) >> kNumMoveBits;
-			}
-			else {
+			} else {
 				encoder.Low += newBound;
 				encoder.Range -= newBound;
 				Prob -= (Prob) >> kNumMoveBits;

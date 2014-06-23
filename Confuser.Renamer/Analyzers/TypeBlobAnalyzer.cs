@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Confuser.Core;
@@ -102,8 +103,7 @@ namespace Confuser.Renamer.Analyzers {
 						service.ReduceRenameMode(typeDef, RenameMode.ASCII);
 					}
 				}
-			}
-			else if (arg.Value is CAArgument[]) {
+			} else if (arg.Value is CAArgument[]) {
 				foreach (CAArgument elem in (CAArgument[])arg.Value)
 					AnalyzeCAArgument(context, service, elem);
 			}

@@ -1,4 +1,5 @@
-﻿using Confuser.Core;
+﻿using System;
+using Confuser.Core;
 
 namespace Confuser.Renamer {
 	public interface INameReference {

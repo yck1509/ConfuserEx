@@ -78,8 +78,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 			if (fallBack) {
 				ProcessBridge(ctx, instrIndex);
-			}
-			else {
+			} else {
 				ProcessInvoke(ctx, instrIndex, begin.Value);
 			}
 		}
@@ -102,8 +101,7 @@ namespace Confuser.Protections.ReferenceProxy {
 					instr.Operand = proxy.Item2;
 					return;
 				}
-			}
-			else
+			} else
 				proxy = new Tuple<FieldDef, MethodDef>(null, null);
 
 			MethodSig sig = CreateProxySignature(ctx, target, instr.OpCode.Code == Code.Newobj);
@@ -145,8 +143,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				                             new Instruction(OpCodes.Call, delegateType.FindMethod("Invoke")));
 				instr.OpCode = OpCodes.Ldsfld;
 				instr.Operand = proxy.Item1;
-			}
-			else {
+			} else {
 				Instruction argBegin = ctx.Body.Instructions[argBeginIndex];
 				ctx.Body.Instructions.Insert(argBeginIndex + 1,
 				                             new Instruction(argBegin.OpCode, argBegin.Operand));
@@ -223,10 +220,10 @@ namespace Confuser.Protections.ReferenceProxy {
 
 				MethodDef ctor = injectedAttr.FindMethod(".ctor");
 				MutationHelper.ReplacePlaceholder(ctor, arg => {
-					                                        var invCompiled = new List<Instruction>();
-					                                        new CodeGen(arg, ctor, invCompiled).GenerateCIL(inverse);
-					                                        return invCompiled.ToArray();
-				                                        });
+					var invCompiled = new List<Instruction>();
+					new CodeGen(arg, ctor, invCompiled).GenerateCIL(inverse);
+					return invCompiled.ToArray();
+				});
 				keyAttrs[index] = Tuple.Create(injectedAttr, expCompiled);
 
 				ctx.Module.AddAsNonNestedType(injectedAttr);
@@ -235,8 +232,7 @@ namespace Confuser.Protections.ReferenceProxy {
 					if (def.Name == "GetHashCode") {
 						ctx.Name.MarkHelper(def, ctx.Marker);
 						((MethodDef)def).Access = MethodAttributes.Public;
-					}
-					else
+					} else
 						ctx.Name.MarkHelper(def, ctx.Marker);
 				}
 			}
@@ -385,8 +381,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				if (var.Name == "{RESULT}") {
 					foreach (Instruction instr in arg)
 						base.Emit(instr);
-				}
-				else
+				} else
 					base.LoadVar(var);
 			}
 		}

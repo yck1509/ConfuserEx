@@ -1,5 +1,7 @@
 // Common/CRC.cs
 
+using System;
+
 namespace SevenZip {
 	internal class CRC {
 		public static readonly uint[] Table;

@@ -1,4 +1,6 @@
-﻿namespace Confuser.DynCipher.AST {
+﻿using System;
+
+namespace Confuser.DynCipher.AST {
 	public class AssignmentStatement : Statement {
 		public Expression Target { get; set; }
 		public Expression Value { get; set; }

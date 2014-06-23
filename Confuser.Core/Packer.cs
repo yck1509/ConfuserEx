@@ -66,8 +66,7 @@ namespace Confuser.Core {
 					Project = proj,
 					PackerInitiated = true
 				}, context.token).Wait();
-			}
-			catch (AggregateException ex) {
+			} catch (AggregateException ex) {
 				context.Logger.Error("Failed to protect packer stub.");
 				throw new ConfuserException(ex);
 			}

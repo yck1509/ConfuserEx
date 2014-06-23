@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -138,8 +139,7 @@ namespace Confuser.Protections.AntiTamper {
 			if (body.Variables.Count > 0) {
 				var local = new LocalSig(body.Variables.Select(var => var.Type).ToList());
 				jitBody.LocalVars = SignatureWriter.Write(metadata, local);
-			}
-			else
+			} else
 				jitBody.LocalVars = new byte[0];
 
 			using (var ms = new MemoryStream()) {
@@ -171,8 +171,7 @@ namespace Confuser.Protections.AntiTamper {
 							jitBody.Options |= 0x80;
 
 						jitBody.EHs[i].ClassTokenOrFilterOffset = token;
-					}
-					else if (eh.HandlerType == ExceptionHandlerType.Filter) {
+					} else if (eh.HandlerType == ExceptionHandlerType.Filter) {
 						jitBody.EHs[i].ClassTokenOrFilterOffset = GetOffset(eh.FilterStart);
 					}
 				}

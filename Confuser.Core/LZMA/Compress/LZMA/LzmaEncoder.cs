@@ -117,8 +117,7 @@ namespace SevenZip.Compression.LZMA {
 						progress.SetProgress(processedInSize, processedOutSize);
 					}
 				}
-			}
-			finally {
+			} finally {
 				ReleaseStreams();
 			}
 		}
@@ -333,8 +332,7 @@ namespace SevenZip.Compression.LZMA {
 			if (repIndex == 0) {
 				price = _isRepG0[state.Index].GetPrice0();
 				price += _isRep0Long[(state.Index << Base.kNumPosStatesBitsMax) + posState].GetPrice1();
-			}
-			else {
+			} else {
 				price = _isRepG0[state.Index].GetPrice1();
 				if (repIndex == 1)
 					price += _isRepG1[state.Index].GetPrice0();
@@ -404,8 +402,7 @@ namespace SevenZip.Compression.LZMA {
 			UInt32 lenMain, numDistancePairs;
 			if (!_longestMatchWasFound) {
 				ReadMatchDistances(out lenMain, out numDistancePairs);
-			}
-			else {
+			} else {
 				lenMain = _longestMatchLength;
 				numDistancePairs = _numDistancePairs;
 				_longestMatchWasFound = false;
@@ -552,27 +549,23 @@ namespace SevenZip.Compression.LZMA {
 							state.UpdateRep();
 						else
 							state.UpdateMatch();
-					}
-					else
+					} else
 						state = _optimum[posPrev].State;
 					state.UpdateChar();
-				}
-				else
+				} else
 					state = _optimum[posPrev].State;
 				if (posPrev == cur - 1) {
 					if (_optimum[cur].IsShortRep())
 						state.UpdateShortRep();
 					else
 						state.UpdateChar();
-				}
-				else {
+				} else {
 					UInt32 pos;
 					if (_optimum[cur].Prev1IsChar && _optimum[cur].Prev2) {
 						posPrev = _optimum[cur].PosPrev2;
 						pos = _optimum[cur].BackPrev2;
 						state.UpdateRep();
-					}
-					else {
+					} else {
 						pos = _optimum[cur].BackPrev;
 						if (pos < Base.kNumRepDistances)
 							state.UpdateRep();
@@ -586,27 +579,23 @@ namespace SevenZip.Compression.LZMA {
 							reps[1] = opt.Backs1;
 							reps[2] = opt.Backs2;
 							reps[3] = opt.Backs3;
-						}
-						else if (pos == 1) {
+						} else if (pos == 1) {
 							reps[0] = opt.Backs1;
 							reps[1] = opt.Backs0;
 							reps[2] = opt.Backs2;
 							reps[3] = opt.Backs3;
-						}
-						else if (pos == 2) {
+						} else if (pos == 2) {
 							reps[0] = opt.Backs2;
 							reps[1] = opt.Backs0;
 							reps[2] = opt.Backs1;
 							reps[3] = opt.Backs3;
-						}
-						else {
+						} else {
 							reps[0] = opt.Backs3;
 							reps[1] = opt.Backs0;
 							reps[2] = opt.Backs1;
 							reps[3] = opt.Backs2;
 						}
-					}
-					else {
+					} else {
 						reps[0] = (pos - Base.kNumRepDistances);
 						reps[1] = opt.Backs0;
 						reps[2] = opt.Backs1;
@@ -910,13 +899,11 @@ namespace SevenZip.Compression.LZMA {
 					if (!_state.IsCharState()) {
 						Byte matchByte = _matchFinder.GetIndexByte((Int32)(0 - _repDistances[0] - 1 - _additionalOffset));
 						subCoder.EncodeMatched(_rangeEncoder, matchByte, curByte);
-					}
-					else
+					} else
 						subCoder.Encode(_rangeEncoder, curByte);
 					_previousByte = curByte;
 					_state.UpdateChar();
-				}
-				else {
+				} else {
 					_isMatch[complexState].Encode(_rangeEncoder, 1);
 					if (pos < Base.kNumRepDistances) {
 						_isRep[_state.Index].Encode(_rangeEncoder, 1);
@@ -926,8 +913,7 @@ namespace SevenZip.Compression.LZMA {
 								_isRep0Long[complexState].Encode(_rangeEncoder, 0);
 							else
 								_isRep0Long[complexState].Encode(_rangeEncoder, 1);
-						}
-						else {
+						} else {
 							_isRepG0[_state.Index].Encode(_rangeEncoder, 1);
 							if (pos == 1)
 								_isRepG1[_state.Index].Encode(_rangeEncoder, 0);
@@ -948,8 +934,7 @@ namespace SevenZip.Compression.LZMA {
 								_repDistances[i] = _repDistances[i - 1];
 							_repDistances[0] = distance;
 						}
-					}
-					else {
+					} else {
 						_isRep[_state.Index].Encode(_rangeEncoder, 0);
 						_state.UpdateMatch();
 						_lenEncoder.Encode(_rangeEncoder, len - Base.kMatchMinLen, posState);
@@ -1127,15 +1112,13 @@ namespace SevenZip.Compression.LZMA {
 				if (symbol < Base.kNumLowLenSymbols) {
 					_choice.Encode(rangeEncoder, 0);
 					_lowCoder[posState].Encode(rangeEncoder, symbol);
-				}
-				else {
+				} else {
 					symbol -= Base.kNumLowLenSymbols;
 					_choice.Encode(rangeEncoder, 1);
 					if (symbol < Base.kNumMidLenSymbols) {
 						_choice2.Encode(rangeEncoder, 0);
 						_midCoder[posState].Encode(rangeEncoder, symbol);
-					}
-					else {
+					} else {
 						_choice2.Encode(rangeEncoder, 1);
 						_highCoder.Encode(rangeEncoder, symbol - Base.kNumMidLenSymbols);
 					}

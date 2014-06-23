@@ -1,4 +1,6 @@
-﻿namespace Confuser.Renamer {
+﻿using System;
+
+namespace Confuser.Renamer {
 	public enum RenameMode {
 		Empty,
 		Unicode,

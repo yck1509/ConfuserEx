@@ -1,4 +1,6 @@
-﻿namespace Confuser.Core {
+﻿using System;
+
+namespace Confuser.Core {
 	/// <summary>
 	///     Various presets of protections.
 	/// </summary>

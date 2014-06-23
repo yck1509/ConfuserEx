@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Confuser.Runtime {
@@ -21,8 +22,7 @@ namespace Confuser.Runtime {
 				if (g == (uint)Mutation.KeyI0) {
 					e = (uint*)(b + (f ? *(r + 3) : *(r + 1)));
 					l = (f ? *(r + 2) : *(r + 0)) >> 2;
-				}
-				else if (g != 0) {
+				} else if (g != 0) {
 					var q = (uint*)(b + (f ? *(r + 3) : *(r + 1)));
 					uint j = *(r + 2) >> 2;
 					for (uint k = 0; k < j; k++) {

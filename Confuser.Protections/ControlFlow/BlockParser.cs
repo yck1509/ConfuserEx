@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Confuser.Core;
@@ -23,8 +24,7 @@ namespace Confuser.Protections.ControlFlow {
 				if (eh.FilterStart != null) {
 					var filterBlock = new ScopeBlock(BlockType.Filter, eh);
 					ehScopes[eh] = Tuple.Create(tryBlock, handlerBlock, filterBlock);
-				}
-				else
+				} else
 					ehScopes[eh] = Tuple.Create(tryBlock, handlerBlock, (ScopeBlock)null);
 			}
 

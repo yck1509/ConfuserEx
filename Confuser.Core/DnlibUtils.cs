@@ -224,8 +224,7 @@ namespace Confuser.Core {
 				ret.Add(genInst.GenericType.TypeDefOrRef);
 				foreach (TypeSig genArg in genInst.GenericArguments)
 					FindTypeRefsInternal(genArg, ret);
-			}
-			else if (typeSig is TypeDefOrRefSig)
+			} else if (typeSig is TypeDefOrRefSig)
 				ret.Add(((TypeDefOrRefSig)typeSig).TypeDefOrRef);
 		}
 

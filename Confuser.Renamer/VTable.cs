@@ -117,8 +117,7 @@ namespace Confuser.Renamer {
 			if (!slot.MethodDef.IsFinal) {
 				slotList.Add(slot);
 				Slots.Add(slot);
-			}
-			else
+			} else
 				Finals.Add(slot);
 		}
 
@@ -133,8 +132,7 @@ namespace Confuser.Renamer {
 			if (!slot.MethodDef.IsFinal) {
 				slotDict.AddListEntry(slot.Signature, slot);
 				Slots.Add(slot);
-			}
-			else
+			} else
 				Finals.Add(slot);
 		}
 
@@ -151,16 +149,13 @@ namespace Confuser.Renamer {
 								slotList.Add(slot);
 								Slots.Add(slot);
 							}
-						}
-						else
+						} else
 							throw new UnreachableException();
-					}
-					else {
+					} else {
 						slotList.Add(slot);
 						Slots.Add(slot);
 					}
-				}
-				else {
+				} else {
 					slotDict.AddListEntry(slot.Signature, slot);
 					Slots.Add(slot);
 				}
@@ -256,18 +251,15 @@ namespace Confuser.Renamer {
 				if (sig is TypeDefOrRefSig) {
 					TypeDef typeDef = ((TypeDefOrRefSig)sig).TypeDefOrRef.ResolveTypeDefThrow();
 					return GetOrConstruct(typeDef);
-				}
-				else if (sig is GenericInstSig) {
+				} else if (sig is GenericInstSig) {
 					var genInst = (GenericInstSig)sig;
 					TypeDef openType = genInst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
 					VTable vTable = GetOrConstruct(openType);
 
 					return ResolveGenericArgument(openType, genInst, vTable);
-				}
-				else
+				} else
 					throw new NotSupportedException("Unexpected type: " + type.ToString());
-			}
-			else
+			} else
 				throw new UnreachableException();
 		}
 

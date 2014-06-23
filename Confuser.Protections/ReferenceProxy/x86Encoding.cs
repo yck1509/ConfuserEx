@@ -73,8 +73,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 				foreach (var native in nativeCodes)
 					native.Item3 = writer.MethodBodies.Add(new MethodBody(native.Item2));
-			}
-			else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
+			} else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 				foreach (var native in nativeCodes) {
 					uint rid = writer.MetaData.GetRid(native.Item1);
 					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)native.Item3.RVA;
@@ -105,8 +104,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				if (var.Name == "{RESULT}") {
 					foreach (Instruction instr in arg)
 						base.Emit(instr);
-				}
-				else
+				} else
 					base.LoadVar(var);
 			}
 		}

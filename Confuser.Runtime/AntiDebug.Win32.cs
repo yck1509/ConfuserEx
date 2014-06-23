@@ -55,8 +55,7 @@ namespace Confuser.Runtime {
 				// CloseHandle
 				try {
 					CloseHandle(IntPtr.Zero);
-				}
-				catch {
+				} catch {
 					Environment.FailFast("");
 				}
 

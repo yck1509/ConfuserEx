@@ -182,8 +182,7 @@ namespace SevenZip.Compression.RangeCoder {
 			if (Code < newBound) {
 				symbol = 0;
 				Range = newBound;
-			}
-			else {
+			} else {
 				symbol = 1;
 				Code -= newBound;
 				Range -= newBound;

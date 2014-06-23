@@ -43,14 +43,14 @@ namespace Confuser.Protections.Constants {
 			uint k1 = ctx.Random.NextUInt32() | 1;
 			uint k2 = ctx.Random.NextUInt32();
 			MutationHelper.ReplacePlaceholder(decoder, arg => {
-				                                           var repl = new List<Instruction>();
-				                                           repl.AddRange(arg);
-				                                           repl.Add(Instruction.Create(OpCodes.Ldc_I4, (int)MathsUtils.modInv(k1)));
-				                                           repl.Add(Instruction.Create(OpCodes.Mul));
-				                                           repl.Add(Instruction.Create(OpCodes.Ldc_I4, (int)k2));
-				                                           repl.Add(Instruction.Create(OpCodes.Xor));
-				                                           return repl.ToArray();
-			                                           });
+				var repl = new List<Instruction>();
+				repl.AddRange(arg);
+				repl.Add(Instruction.Create(OpCodes.Ldc_I4, (int)MathsUtils.modInv(k1)));
+				repl.Add(Instruction.Create(OpCodes.Mul));
+				repl.Add(Instruction.Create(OpCodes.Ldc_I4, (int)k2));
+				repl.Add(Instruction.Create(OpCodes.Xor));
+				return repl.ToArray();
+			});
 			return Tuple.Create(k1, k2);
 		}
 

@@ -1,4 +1,6 @@
-﻿namespace Confuser.Core {
+﻿using System;
+
+namespace Confuser.Core {
 	/// <summary>
 	///     Represent a component in Confuser
 	/// </summary>

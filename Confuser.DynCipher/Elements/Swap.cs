@@ -1,4 +1,5 @@
-﻿using Confuser.Core.Services;
+﻿using System;
+using Confuser.Core.Services;
 using Confuser.DynCipher.AST;
 using Confuser.DynCipher.Generation;
 
@@ -40,8 +41,7 @@ namespace Confuser.DynCipher.Elements {
 						Target = b
 					});
 				}
-			}
-			else {
+			} else {
 				var mask = (LiteralExpression)Mask;
 				var notMask = (LiteralExpression)~Mask;
 				/*  t = (a & mask) * k;

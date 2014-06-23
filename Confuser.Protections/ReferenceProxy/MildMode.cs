@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Confuser.Core;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
@@ -60,8 +61,7 @@ namespace Confuser.Protections.ReferenceProxy {
 					proxy.Name,
 					proxy.MethodSig,
 					new GenericInstSig((ClassOrValueTypeSig)ctx.Method.DeclaringType.ToTypeSig(), genArgs).ToTypeDefOrRef());
-			}
-			else
+			} else
 				invoke.Operand = proxy;
 		}
 

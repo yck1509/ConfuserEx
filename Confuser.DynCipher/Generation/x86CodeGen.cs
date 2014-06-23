@@ -27,8 +27,7 @@ namespace Confuser.DynCipher.Generation {
 
 			try {
 				return ((x86RegisterOperand)Emit(expression, loadArg)).Register;
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				if (ex.Message == "Register overflowed.")
 					return null;
 				throw;

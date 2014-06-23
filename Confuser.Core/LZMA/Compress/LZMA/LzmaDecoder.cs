@@ -71,8 +71,7 @@ namespace SevenZip.Compression.LZMA {
 						m_OutWindow.PutByte(b);
 						state.UpdateChar();
 						nowPos64++;
-					}
-					else {
+					} else {
 						uint len;
 						if (m_IsRepDecoders[state.Index].Decode(m_RangeDecoder) == 1) {
 							if (m_IsRepG0Decoders[state.Index].Decode(m_RangeDecoder) == 0) {
@@ -82,13 +81,11 @@ namespace SevenZip.Compression.LZMA {
 									nowPos64++;
 									continue;
 								}
-							}
-							else {
+							} else {
 								UInt32 distance;
 								if (m_IsRepG1Decoders[state.Index].Decode(m_RangeDecoder) == 0) {
 									distance = rep1;
-								}
-								else {
+								} else {
 									if (m_IsRepG2Decoders[state.Index].Decode(m_RangeDecoder) == 0)
 										distance = rep2;
 									else {
@@ -102,8 +99,7 @@ namespace SevenZip.Compression.LZMA {
 							}
 							len = m_RepLenDecoder.Decode(m_RangeDecoder, posState) + Base.kMatchMinLen;
 							state.UpdateRep();
-						}
-						else {
+						} else {
 							rep3 = rep2;
 							rep2 = rep1;
 							rep1 = rep0;
@@ -121,8 +117,7 @@ namespace SevenZip.Compression.LZMA {
 										numDirectBits - Base.kNumAlignBits) << Base.kNumAlignBits);
 									rep0 += m_PosAlignDecoder.ReverseDecode(m_RangeDecoder);
 								}
-							}
-							else
+							} else
 								rep0 = posSlot;
 						}
 						if (rep0 >= m_OutWindow.TrainSize + nowPos64 || rep0 >= m_DictionarySizeCheck) {

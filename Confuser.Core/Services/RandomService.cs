@@ -84,8 +84,7 @@ namespace Confuser.Core.Services {
 					offset += stateFilled;
 					length -= stateFilled;
 					stateFilled = 0;
-				}
-				else {
+				} else {
 					Buffer.BlockCopy(state, 32 - stateFilled, buffer, offset, length);
 					stateFilled -= length;
 					length = 0;

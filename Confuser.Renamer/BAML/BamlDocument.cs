@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Confuser.Renamer.BAML {
 	internal class BamlDocument : List<BamlRecord> {

@@ -1,4 +1,5 @@
-﻿using Confuser.Core.Project;
+﻿using System;
+using Confuser.Core.Project;
 
 namespace Confuser.Core {
 	/// <summary>

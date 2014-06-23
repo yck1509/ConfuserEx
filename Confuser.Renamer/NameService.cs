@@ -170,15 +170,13 @@ namespace Confuser.Renamer {
 				method.Access = MethodAttributes.Assembly;
 				if (!method.IsSpecialName && !method.IsRuntimeSpecialName && !method.DeclaringType.IsDelegate())
 					method.Name = RandomName();
-			}
-			else if (def is FieldDef) {
+			} else if (def is FieldDef) {
 				var field = (FieldDef)def;
 				field.Access = FieldAttributes.Assembly;
 				field.Name = RandomName();
 				if (!field.IsSpecialName && !field.IsRuntimeSpecialName)
 					field.Name = RandomName();
-			}
-			else if (def is TypeDef) {
+			} else if (def is TypeDef) {
 				var type = (TypeDef)def;
 				type.Visibility = type.DeclaringType == null ? TypeAttributes.NotPublic : TypeAttributes.NestedAssembly;
 				type.Namespace = "";

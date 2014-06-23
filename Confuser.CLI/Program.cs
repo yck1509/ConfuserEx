@@ -25,8 +25,7 @@ namespace Confuser.CLI {
 					xmlDoc.Load(args[0]);
 					proj.Load(xmlDoc);
 					proj.BaseDirectory = Path.Combine(Path.GetDirectoryName(args[0]), proj.BaseDirectory);
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					WriteLineWithColor(ConsoleColor.Red, "Failed to load project:");
 					WriteLineWithColor(ConsoleColor.Red, ex.ToString());
 					return -1;
@@ -46,8 +45,7 @@ namespace Confuser.CLI {
 				}
 
 				return logger.ReturnValue;
-			}
-			finally {
+			} finally {
 				Console.ForegroundColor = original;
 				Console.Title = originalTitle;
 			}
@@ -143,8 +141,7 @@ namespace Confuser.CLI {
 					Console.Title = "ConfuserEx - Success";
 					WriteLineWithColor(ConsoleColor.Green, "Finished " + timeString);
 					ReturnValue = 0;
-				}
-				else {
+				} else {
 					Console.Title = "ConfuserEx - Fail";
 					WriteLineWithColor(ConsoleColor.Red, "Failed " + timeString);
 					ReturnValue = 1;

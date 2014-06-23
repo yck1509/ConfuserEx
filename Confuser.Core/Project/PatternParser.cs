@@ -46,8 +46,7 @@ namespace Confuser.Core.Project {
 				if (PeekToken() != null)
 					throw new InvalidPatternException("Extra tokens beyond the end of pattern.");
 				return ret;
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				if (ex is InvalidPatternException)
 					throw;
 				throw new InvalidPatternException("Invalid pattern.", ex);
@@ -124,8 +123,7 @@ namespace Confuser.Core.Project {
 							throw UnexpectedToken(token);
 						op.OperandA = ParseExpression();
 						ret = op;
-					}
-					else if (IsFunction(token)) {
+					} else if (IsFunction(token)) {
 						// function
 						PatternFunction fn = fns[token.Value]();
 
@@ -154,8 +152,7 @@ namespace Confuser.Core.Project {
 							throw MismatchParens(parens.Position.Value);
 
 						ret = fn;
-					}
-					else {
+					} else {
 						bool boolValue;
 						if (bool.TryParse(token.Value, out boolValue))
 							ret = new LiteralExpression(boolValue);

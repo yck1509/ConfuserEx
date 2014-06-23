@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns {

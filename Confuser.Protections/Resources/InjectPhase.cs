@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -54,10 +55,10 @@ namespace Confuser.Protections.Resources {
 
 				// Inject helpers
 				MethodDef decomp = compression.GetRuntimeDecompressor(context.CurrentModule, member => {
-					                                                                             name.MarkHelper(member, marker);
-					                                                                             if (member is MethodDef)
-						                                                                             ProtectionParameters.GetParameters(context, member).Remove(Parent);
-				                                                                             });
+					name.MarkHelper(member, marker);
+					if (member is MethodDef)
+						ProtectionParameters.GetParameters(context, member).Remove(Parent);
+				});
 				InjectHelpers(context, compression, rt, moduleCtx);
 
 				// Mutate codes
@@ -113,9 +114,8 @@ namespace Confuser.Protections.Resources {
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
 						instrs.InsertRange(i - 2, moduleCtx.ModeHandler.EmitDecrypt(moduleCtx.InitMethod, moduleCtx, (Local)ldBlock.Operand, (Local)ldKey.Operand));
-					}
-					else if (method.DeclaringType.Name == "Lzma" &&
-					         method.Name == "Decompress") {
+					} else if (method.DeclaringType.Name == "Lzma" &&
+					           method.Name == "Decompress") {
 						instr.Operand = decomp;
 					}
 				}
@@ -125,14 +125,14 @@ namespace Confuser.Protections.Resources {
 				moduleCtx.InitMethod.Body.Instructions.Add(instr);
 
 			MutationHelper.ReplacePlaceholder(moduleCtx.InitMethod, arg => {
-				                                                        var repl = new List<Instruction>();
-				                                                        repl.AddRange(arg);
-				                                                        repl.Add(Instruction.Create(OpCodes.Dup));
-				                                                        repl.Add(Instruction.Create(OpCodes.Ldtoken, moduleCtx.DataField));
-				                                                        repl.Add(Instruction.Create(OpCodes.Call, moduleCtx.Module.Import(
-					                                                        typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
-				                                                        return repl.ToArray();
-			                                                        });
+				var repl = new List<Instruction>();
+				repl.AddRange(arg);
+				repl.Add(Instruction.Create(OpCodes.Dup));
+				repl.Add(Instruction.Create(OpCodes.Ldtoken, moduleCtx.DataField));
+				repl.Add(Instruction.Create(OpCodes.Call, moduleCtx.Module.Import(
+					typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
+				return repl.ToArray();
+			});
 			moduleCtx.Context.Registry.GetService<IConstantService>().ExcludeMethod(moduleCtx.Context, moduleCtx.InitMethod);
 		}
 	}

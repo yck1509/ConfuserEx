@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Confuser.Core;
@@ -24,10 +25,10 @@ namespace Confuser.Protections.ReferenceProxy {
 				Debug.Assert(method.MethodSig.HasThis);
 				Debug.Assert(method.Name == ".ctor");
 				TypeSig[] paramTypes = method.MethodSig.Params.Select(type => {
-					                                                      if (ctx.TypeErasure && type.IsClassSig && method.MethodSig.HasThis)
-						                                                      return module.CorLibTypes.Object;
-					                                                      return type;
-				                                                      }).ToArray();
+					if (ctx.TypeErasure && type.IsClassSig && method.MethodSig.HasThis)
+						return module.CorLibTypes.Object;
+					return type;
+				}).ToArray();
 
 				TypeSig retType;
 				if (ctx.TypeErasure) // newobj will not be used with value types
@@ -37,13 +38,12 @@ namespace Confuser.Protections.ReferenceProxy {
 					retType = Import(ctx, declType).ToTypeSig();
 				}
 				return MethodSig.CreateStatic(retType, paramTypes);
-			}
-			else {
+			} else {
 				IEnumerable<TypeSig> paramTypes = method.MethodSig.Params.Select(type => {
-					                                                                 if (ctx.TypeErasure && type.IsClassSig && method.MethodSig.HasThis)
-						                                                                 return module.CorLibTypes.Object;
-					                                                                 return type;
-				                                                                 });
+					if (ctx.TypeErasure && type.IsClassSig && method.MethodSig.HasThis)
+						return module.CorLibTypes.Object;
+					return type;
+				});
 				if (method.MethodSig.HasThis && !method.MethodSig.ExplicitThis) {
 					TypeDef declType = method.DeclaringType.ResolveTypeDefThrow();
 					if (ctx.TypeErasure && !declType.IsValueType)

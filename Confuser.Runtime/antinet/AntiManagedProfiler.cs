@@ -62,8 +62,7 @@ namespace Confuser.Runtime {
 					if (profilerDetector == null)
 						return false;
 					return profilerDetector.IsProfilerAttached();
-				}
-				catch { }
+				} catch { }
 				return false;
 			}
 		}
@@ -78,8 +77,7 @@ namespace Confuser.Runtime {
 					if (profilerDetector == null)
 						return false;
 					return profilerDetector.WasProfilerAttached();
-				}
-				catch { }
+				} catch { }
 				return false;
 			}
 		}
@@ -189,8 +187,7 @@ namespace Confuser.Runtime {
 								addr = new IntPtr((void*)*(uint*)(p + 2));
 							else
 								addr = new IntPtr(p + 7 + *(int*)(p + 2));
-						}
-						else
+						} else
 							continue;
 
 						if (!PEInfo.IsAligned(addr, 4))
@@ -200,8 +197,7 @@ namespace Confuser.Runtime {
 
 						try {
 							*(uint*)addr = *(uint*)addr;
-						}
-						catch {
+						} catch {
 							continue;
 						}
 
@@ -212,8 +208,7 @@ namespace Confuser.Runtime {
 						if (count >= MAX_COUNTS)
 							break;
 					}
-				}
-				catch { }
+				} catch { }
 				IntPtr foundAddr = GetMax(addrCounts, 5);
 				if (foundAddr == IntPtr.Zero)
 					return false;
@@ -352,8 +347,7 @@ namespace Confuser.Runtime {
 					}
 
 					return CreateNamedPipeWait();
-				}
-				catch { }
+				} catch { }
 				return false;
 			}
 
@@ -379,8 +373,7 @@ namespace Confuser.Runtime {
 				try {
 					// Set default timeout to 0 to make sure it fails immediately
 					*(uint*)((byte*)timeOutOptionAddr + ConfigDWORDInfo_defValue) = 0;
-				}
-				finally {
+				} finally {
 					VirtualProtect(timeOutOptionAddr, (int)ConfigDWORDInfo_defValue + 4, oldProtect, out oldProtect);
 				}
 
@@ -392,8 +385,7 @@ namespace Confuser.Runtime {
 					var rand = new Random();
 					for (int i = 0; i < ProfAPIMaxWaitForTriggerMs_name.Length; i++)
 						name[i] = (char)rand.Next(1, ushort.MaxValue);
-				}
-				finally {
+				} finally {
 					VirtualProtect(nameAddr, IntPtr.Size, oldProtect, out oldProtect);
 				}
 			}
@@ -499,15 +491,13 @@ namespace Confuser.Runtime {
 								if ((uint)(p[1] - 0xE8) > 7)
 									continue;
 								p += 3;
-							}
-							else if (*p == 0x85) {
+							} else if (*p == 0x85) {
 								int reg = (p[1] >> 3) & 7;
 								int rm = p[1] & 7;
 								if (reg != rm)
 									continue;
 								p += 2;
-							}
-							else
+							} else
 								continue;
 
 							//	74 / 0F 84 XX			je there
@@ -527,11 +517,9 @@ namespace Confuser.Runtime {
 								continue;
 
 							return addr;
-						}
-						catch { }
+						} catch { }
 					}
-				}
-				catch { }
+				} catch { }
 				return IntPtr.Zero;
 			}
 
@@ -566,11 +554,9 @@ namespace Confuser.Runtime {
 								continue;
 
 							return new IntPtr(p);
-						}
-						catch { }
+						} catch { }
 					}
-				}
-				catch { }
+				} catch { }
 				return IntPtr.Zero;
 			}
 
@@ -636,16 +622,14 @@ namespace Confuser.Runtime {
 						p[2] = 0xC2;
 						p[3] = 0x04;
 						p[4] = 0x00;
-					}
-					else {
+					} else {
 						// xor eax,eax
 						p[0] = 0x33;
 						p[1] = 0xC0;
 						// retn
 						p[2] = 0xC3;
 					}
-				}
-				finally {
+				} finally {
 					VirtualProtect(new IntPtr(p), 5, oldProtect, out oldProtect);
 				}
 				return true;
@@ -694,8 +678,7 @@ namespace Confuser.Runtime {
 
 							return threadProc;
 						}
-					}
-					else {
+					} else {
 						for (; p < end; p++) {
 							// Find this code:
 							//	45 33 C9				xor r9d,r9d
@@ -722,8 +705,7 @@ namespace Confuser.Runtime {
 							return threadProc;
 						}
 					}
-				}
-				catch { }
+				} catch { }
 
 				return IntPtr.Zero;
 			}
@@ -749,8 +731,7 @@ namespace Confuser.Runtime {
 						if (*(uint*)(p + i) == 0x4000)
 							return true;
 					}
-				}
-				catch { }
+				} catch { }
 				return false;
 			}
 
@@ -801,8 +782,7 @@ namespace Confuser.Runtime {
 								addr = new IntPtr((void*)*(uint*)(p + 2));
 							else
 								addr = new IntPtr(p + 7 + *(int*)(p + 2));
-						}
-						else
+						} else
 							continue;
 
 						if (!PEInfo.IsAligned(addr, 4))
@@ -815,8 +795,7 @@ namespace Confuser.Runtime {
 							if (*(uint*)addr > 4)
 								continue;
 							*(uint*)addr = *(uint*)addr;
-						}
-						catch {
+						} catch {
 							continue;
 						}
 
@@ -827,8 +806,7 @@ namespace Confuser.Runtime {
 						if (count >= MAX_COUNTS)
 							break;
 					}
-				}
-				catch { }
+				} catch { }
 				IntPtr foundAddr = GetMax(addrCounts, 5);
 				if (foundAddr == IntPtr.Zero)
 					return false;

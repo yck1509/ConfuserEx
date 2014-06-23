@@ -458,9 +458,9 @@ namespace Confuser.Core.Project {
 			doc.Schemas.Add(Schema);
 			var exceptions = new List<XmlSchemaException>();
 			doc.Validate((sender, e) => {
-				             if (e.Severity != XmlSeverityType.Error) return;
-				             exceptions.Add(e.Exception);
-			             });
+				if (e.Severity != XmlSeverityType.Error) return;
+				exceptions.Add(e.Exception);
+			});
 			if (exceptions.Count > 0) {
 				throw new ProjectValidationException(exceptions);
 			}
@@ -490,18 +490,14 @@ namespace Confuser.Core.Project {
 					var rule = new Rule();
 					rule.Load(i);
 					Rules.Add(rule);
-				}
-				else if (i.Name == "packer") {
+				} else if (i.Name == "packer") {
 					Packer = new SettingItem<Packer>();
 					Packer.Load(i);
-				}
-				else if (i.Name == "probePath") {
+				} else if (i.Name == "probePath") {
 					ProbePaths.Add(i.InnerText);
-				}
-				else if (i.Name == "plugin") {
+				} else if (i.Name == "plugin") {
 					PluginPaths.Add(i.InnerText);
-				}
-				else {
+				} else {
 					var asm = new ProjectModule();
 					asm.Load(i);
 					Add(asm);

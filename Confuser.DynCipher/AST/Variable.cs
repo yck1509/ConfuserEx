@@ -1,4 +1,6 @@
-﻿namespace Confuser.DynCipher.AST {
+﻿using System;
+
+namespace Confuser.DynCipher.AST {
 	public class Variable {
 		public Variable(string name) {
 			Name = name;

@@ -32,8 +32,7 @@ namespace Confuser.Runtime {
 				if (g == (uint)Mutation.KeyI0) {
 					e = (uint*)(b + (f ? *(r + 3) : *(r + 1)));
 					l = (f ? *(r + 2) : *(r + 0)) >> 2;
-				}
-				else if (g != 0) {
+				} else if (g != 0) {
 					var q = (uint*)(b + (f ? *(r + 3) : *(r + 1)));
 					uint j = *(r + 2) >> 2;
 					for (uint k = 0; k < j; k++) {
@@ -75,8 +74,7 @@ namespace Confuser.Runtime {
 				ulong* str = stackalloc ulong[1];
 				str[0] = 0x0061746144705f6d; //m_pData.
 				moduleHnd = (IntPtr)m.GetType().GetField(new string((sbyte*)str), BindingFlags.NonPublic | BindingFlags.Instance).GetValue(m);
-			}
-			else
+			} else
 				moduleHnd = *(IntPtr*)(&hnd);
 
 			Hook();
@@ -96,8 +94,7 @@ namespace Confuser.Runtime {
 			if (ver) {
 				ptr[0] = 0x642e74696a726c63; //clrjit.d
 				ptr[1] = 0x0000000000006c6c; //ll......
-			}
-			else {
+			} else {
 				ptr[0] = 0x74696a726f63736d; //mscorjit
 				ptr[1] = 0x000000006c6c642e; //.dll....
 			}
@@ -117,8 +114,7 @@ namespace Confuser.Runtime {
 
 				VirtualProtect(trampoline, 12, 0x40, out oldPl);
 				Marshal.WriteIntPtr(trampoline, 2, original);
-			}
-			else {
+			} else {
 				trampoline = Marshal.AllocHGlobal(8);
 				var tptr = (ulong*)trampoline;
 				tptr[0] = 0x90e0ffffffffffb8;
@@ -145,8 +141,7 @@ namespace Confuser.Runtime {
 					sigInfo = (CORINFO_SIG_INFO_x64*)((uint*)(info + 1) + 5) + 1;
 				else
 					sigInfo = (CORINFO_SIG_INFO_x86*)((uint*)(info + 1) + 4) + 1;
-			}
-			else {
+			} else {
 				if (IntPtr.Size == 8)
 					sigInfo = (CORINFO_SIG_INFO_x64*)((uint*)(info + 1) + 3) + 1;
 				else
@@ -164,8 +159,7 @@ namespace Confuser.Runtime {
 			if ((b & 0x80) == 0) {
 				numArgs = b;
 				args = (IntPtr)(localVar + 1);
-			}
-			else {
+			} else {
 				numArgs = (ushort)(((uint)(b & ~0x80) << 8) | *(localVar + 1));
 				args = (IntPtr)(localVar + 2);
 			}
@@ -177,8 +171,7 @@ namespace Confuser.Runtime {
 				sigInfox64->flags = 1;
 				sigInfox64->numArgs = numArgs;
 				sigInfox64->args = args;
-			}
-			else {
+			} else {
 				var sigInfox86 = (CORINFO_SIG_INFO_x86*)sigInfo;
 				sigInfox86->callConv = 0;
 				sigInfox86->retType = 1;
@@ -234,8 +227,7 @@ namespace Confuser.Runtime {
 						*((uint*)(info + 1) + 0) = data->MaxStack;
 						*((uint*)(info + 1) + 1) = data->EHCount;
 						*((uint*)(info + 1) + 2) = data->Options;
-					}
-					else {
+					} else {
 						*((ushort*)(info + 1) + 0) = (ushort)data->MaxStack;
 						*((ushort*)(info + 1) + 1) = (ushort)data->EHCount;
 						*((uint*)(info + 1) + 1) = data->Options;
@@ -258,8 +250,7 @@ namespace Confuser.Runtime {
 					hook1.Dispose();
 
 					return ret;
-				}
-				finally {
+				} finally {
 					Marshal.FreeHGlobal((IntPtr)newPtr);
 				}
 			}
@@ -275,8 +266,8 @@ namespace Confuser.Runtime {
 
 		[StructLayout(LayoutKind.Sequential, Pack = 1)]
 		private struct CORINFO_METHOD_INFO {
-			public readonly IntPtr ftn;
-			public readonly IntPtr scope;
+			public IntPtr ftn;
+			public IntPtr scope;
 			public byte* ILCode;
 			public uint ILCodeSize;
 		}
@@ -284,34 +275,34 @@ namespace Confuser.Runtime {
 		[StructLayout(LayoutKind.Sequential)]
 		private struct CORINFO_SIG_INFO_x64 {
 			public uint callConv;
-			private readonly uint pad1;
-			public readonly IntPtr retTypeClass;
-			public readonly IntPtr retTypeSigClass;
+			private uint pad1;
+			public IntPtr retTypeClass;
+			public IntPtr retTypeSigClass;
 			public byte retType;
 			public byte flags;
 			public ushort numArgs;
-			private readonly uint pad2;
-			public readonly CORINFO_SIG_INST_x64 sigInst;
+			private uint pad2;
+			public CORINFO_SIG_INST_x64 sigInst;
 			public IntPtr args;
 			public IntPtr sig;
-			public readonly IntPtr scope;
-			public readonly uint token;
-			private readonly uint pad3;
+			public IntPtr scope;
+			public uint token;
+			private uint pad3;
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct CORINFO_SIG_INFO_x86 {
 			public uint callConv;
-			public readonly IntPtr retTypeClass;
-			public readonly IntPtr retTypeSigClass;
+			public IntPtr retTypeClass;
+			public IntPtr retTypeSigClass;
 			public byte retType;
 			public byte flags;
 			public ushort numArgs;
-			public readonly CORINFO_SIG_INST_x86 sigInst;
+			public CORINFO_SIG_INST_x86 sigInst;
 			public IntPtr args;
 			public IntPtr sig;
-			public readonly IntPtr scope;
-			public readonly uint token;
+			public IntPtr scope;
+			public uint token;
 		}
 
 		[StructLayout(LayoutKind.Sequential, Size = 32)]
@@ -390,8 +381,7 @@ namespace Confuser.Runtime {
 			private void hookEHInfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause) {
 				if (ftn == this.ftn) {
 					*clause = clauses[EHnumber];
-				}
-				else {
+				} else {
 					o_getEHinfo(self, ftn, EHnumber, clause);
 				}
 			}

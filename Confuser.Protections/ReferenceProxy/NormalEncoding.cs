@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Confuser.Core;
 using Confuser.Core.Services;
 using Confuser.DynCipher;
@@ -15,8 +16,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			if (ctx.Random.NextBoolean()) {
 				ret.Add(Instruction.Create(OpCodes.Ldc_I4, key.Item1));
 				ret.AddRange(arg);
-			}
-			else {
+			} else {
 				ret.AddRange(arg);
 				ret.Add(Instruction.Create(OpCodes.Ldc_I4, key.Item1));
 			}

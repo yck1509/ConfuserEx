@@ -45,24 +45,19 @@ namespace Confuser.Protections.Constants {
 			foreach (var entry in ldc.WithProgress(context.Logger)) {
 				if (entry.Key is string) {
 					EncodeString(moduleCtx, (string)entry.Key, entry.Value);
-				}
-				else if (entry.Key is int) {
+				} else if (entry.Key is int) {
 					EncodeConstant32(moduleCtx, (uint)(int)entry.Key, context.CurrentModule.CorLibTypes.Int32, entry.Value);
-				}
-				else if (entry.Key is long) {
+				} else if (entry.Key is long) {
 					EncodeConstant64(moduleCtx, (uint)((long)entry.Key >> 32), (uint)(long)entry.Key, context.CurrentModule.CorLibTypes.Int64, entry.Value);
-				}
-				else if (entry.Key is float) {
+				} else if (entry.Key is float) {
 					var t = new RTransform();
 					t.R4 = (float)entry.Key;
 					EncodeConstant32(moduleCtx, t.Hi, context.CurrentModule.CorLibTypes.Single, entry.Value);
-				}
-				else if (entry.Key is double) {
+				} else if (entry.Key is double) {
 					var t = new RTransform();
 					t.R8 = (double)entry.Key;
 					EncodeConstant64(moduleCtx, t.Hi, t.Lo, context.CurrentModule.CorLibTypes.Double, entry.Value);
-				}
-				else
+				} else
 					throw new UnreachableException();
 				context.CheckCancellation();
 			}
@@ -115,14 +110,14 @@ namespace Confuser.Protections.Constants {
 			                          new[] { 0, 1 },
 			                          new[] { encryptedBuffer.Length / 4, (int)keySeed });
 			MutationHelper.ReplacePlaceholder(moduleCtx.InitMethod, arg => {
-				                                                        var repl = new List<Instruction>();
-				                                                        repl.AddRange(arg);
-				                                                        repl.Add(Instruction.Create(OpCodes.Dup));
-				                                                        repl.Add(Instruction.Create(OpCodes.Ldtoken, moduleCtx.DataField));
-				                                                        repl.Add(Instruction.Create(OpCodes.Call, moduleCtx.Module.Import(
-					                                                        typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
-				                                                        return repl.ToArray();
-			                                                        });
+				var repl = new List<Instruction>();
+				repl.AddRange(arg);
+				repl.Add(Instruction.Create(OpCodes.Dup));
+				repl.Add(Instruction.Create(OpCodes.Ldtoken, moduleCtx.DataField));
+				repl.Add(Instruction.Create(OpCodes.Call, moduleCtx.Module.Import(
+					typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
+				return repl.ToArray();
+			});
 		}
 
 		private void EncodeString(CEContext moduleCtx, string value, List<Tuple<MethodDef, Instruction>> references) {
@@ -257,8 +252,7 @@ namespace Confuser.Protections.Constants {
 						if (string.IsNullOrEmpty(operand) && (moduleCtx.Elements & EncodeElements.Primitive) == 0)
 							continue;
 						eligible = true;
-					}
-					else if (instr.OpCode == OpCodes.Call && (moduleCtx.Elements & EncodeElements.Initializers) != 0) {
+					} else if (instr.OpCode == OpCodes.Call && (moduleCtx.Elements & EncodeElements.Initializers) != 0) {
 						var operand = (IMethod)instr.Operand;
 						if (operand.DeclaringType.DefinitionAssembly.IsCorLib() &&
 						    operand.DeclaringType.Namespace == "System.Runtime.CompilerServices" &&
@@ -295,27 +289,23 @@ namespace Confuser.Protections.Constants {
 							Buffer.BlockCopy(dataField.InitialValue, 0, value, 4, dataField.InitialValue.Length);
 							ldInit.AddListEntry(value, Tuple.Create(method, instr));
 						}
-					}
-					else if ((moduleCtx.Elements & EncodeElements.Numbers) != 0) {
+					} else if ((moduleCtx.Elements & EncodeElements.Numbers) != 0) {
 						if (instr.OpCode == OpCodes.Ldc_I4) {
 							var operand = (int)instr.Operand;
 							if ((operand >= -1 && operand <= 8) && (moduleCtx.Elements & EncodeElements.Primitive) == 0)
 								continue;
 							eligible = true;
-						}
-						else if (instr.OpCode == OpCodes.Ldc_I8) {
+						} else if (instr.OpCode == OpCodes.Ldc_I8) {
 							var operand = (long)instr.Operand;
 							if ((operand >= -1 && operand <= 1) && (moduleCtx.Elements & EncodeElements.Primitive) == 0)
 								continue;
 							eligible = true;
-						}
-						else if (instr.OpCode == OpCodes.Ldc_R4) {
+						} else if (instr.OpCode == OpCodes.Ldc_R4) {
 							var operand = (float)instr.Operand;
 							if ((operand == -1 || operand == 0 || operand == 1) && (moduleCtx.Elements & EncodeElements.Primitive) == 0)
 								continue;
 							eligible = true;
-						}
-						else if (instr.OpCode == OpCodes.Ldc_R8) {
+						} else if (instr.OpCode == OpCodes.Ldc_R8) {
 							var operand = (double)instr.Operand;
 							if ((operand == -1 || operand == 0 || operand == 1) && (moduleCtx.Elements & EncodeElements.Primitive) == 0)
 								continue;

@@ -1,4 +1,5 @@
-﻿using dnlib.DotNet;
+﻿using System;
+using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ReferenceProxy {

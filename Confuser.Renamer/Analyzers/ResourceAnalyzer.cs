@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Confuser.Core;
 using Confuser.Renamer.References;
@@ -37,8 +38,7 @@ namespace Confuser.Renamer.Analyzers {
 					}
 					service.AddReference(type, new ResourceReference(res, type, format));
 				}
-			}
-			else {
+			} else {
 				string format = "{0}.resources";
 				foreach (Resource res in module.Resources) {
 					Match match = ResourceNamePattern.Match(res.Name);

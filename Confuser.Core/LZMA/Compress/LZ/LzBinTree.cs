@@ -116,8 +116,7 @@ namespace SevenZip.Compression.LZ {
 				temp ^= ((UInt32)(_bufferBase[cur + 2]) << 8);
 				hash3Value = temp & (kHash3Size - 1);
 				hashValue = (temp ^ (CRC.Table[_bufferBase[cur + 3]] << 5)) & _hashMask;
-			}
-			else
+			} else
 				hashValue = _bufferBase[cur] ^ ((UInt32)(_bufferBase[cur + 1]) << 8);
 
 			UInt32 curMatch = _hash[kFixHashSize + hashValue];
@@ -196,8 +195,7 @@ namespace SevenZip.Compression.LZ {
 					ptr1 = cyclicPos + 1;
 					curMatch = _son[ptr1];
 					len1 = len;
-				}
-				else {
+				} else {
 					_son[ptr0] = curMatch;
 					ptr0 = cyclicPos;
 					curMatch = _son[ptr0];
@@ -234,8 +232,7 @@ namespace SevenZip.Compression.LZ {
 					UInt32 hash3Value = temp & (kHash3Size - 1);
 					_hash[kHash3Offset + hash3Value] = _pos;
 					hashValue = (temp ^ (CRC.Table[_bufferBase[cur + 3]] << 5)) & _hashMask;
-				}
-				else
+				} else
 					hashValue = _bufferBase[cur] ^ ((UInt32)(_bufferBase[cur + 1]) << 8);
 
 				UInt32 curMatch = _hash[kFixHashSize + hashValue];
@@ -276,8 +273,7 @@ namespace SevenZip.Compression.LZ {
 						ptr1 = cyclicPos + 1;
 						curMatch = _son[ptr1];
 						len1 = len;
-					}
-					else {
+					} else {
 						_son[ptr0] = curMatch;
 						ptr0 = cyclicPos;
 						curMatch = _son[ptr0];
@@ -294,8 +290,7 @@ namespace SevenZip.Compression.LZ {
 				kNumHashDirectBytes = 0;
 				kMinMatchCheck = 4;
 				kFixHashSize = kHash2Size + kHash3Size;
-			}
-			else {
+			} else {
 				kNumHashDirectBytes = 2;
 				kMinMatchCheck = 2 + 1;
 				kFixHashSize = 0;

@@ -1,5 +1,7 @@
 // LzmaBase.cs
 
+using System;
+
 namespace SevenZip.Compression.LZMA {
 	internal abstract class Base {
 		public const uint kNumRepDistances = 4;

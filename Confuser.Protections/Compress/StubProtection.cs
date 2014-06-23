@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using Confuser.Core;
 using dnlib.DotNet;
@@ -55,25 +56,25 @@ namespace Confuser.Protections.Compress {
 
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 				context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => {
-					                                                     if (e.WriterEvent == ModuleWriterEvent.MDBeginCreateTables) {
-						                                                     // Add key signature
-						                                                     var writer = (ModuleWriter)sender;
-						                                                     var prot = (StubProtection)Parent;
-						                                                     uint blob = writer.MetaData.BlobHeap.Add(prot.ctx.KeySig);
-						                                                     uint rid = writer.MetaData.TablesHeap.StandAloneSigTable.Add(new RawStandAloneSigRow(blob));
-						                                                     Debug.Assert((0x11000000 | rid) == prot.ctx.KeyToken);
+					if (e.WriterEvent == ModuleWriterEvent.MDBeginCreateTables) {
+						// Add key signature
+						var writer = (ModuleWriter)sender;
+						var prot = (StubProtection)Parent;
+						uint blob = writer.MetaData.BlobHeap.Add(prot.ctx.KeySig);
+						uint rid = writer.MetaData.TablesHeap.StandAloneSigTable.Add(new RawStandAloneSigRow(blob));
+						Debug.Assert((0x11000000 | rid) == prot.ctx.KeyToken);
 
-						                                                     // Add File reference
-						                                                     byte[] hash = SHA1.Create().ComputeHash(prot.ctx.OriginModule);
-						                                                     uint hashBlob = writer.MetaData.BlobHeap.Add(hash);
+						// Add File reference
+						byte[] hash = SHA1.Create().ComputeHash(prot.ctx.OriginModule);
+						uint hashBlob = writer.MetaData.BlobHeap.Add(hash);
 
-						                                                     MDTable<RawFileRow> fileTbl = writer.MetaData.TablesHeap.FileTable;
-						                                                     uint fileRid = fileTbl.Add(new RawFileRow(
-							                                                                                (uint)FileAttributes.ContainsMetaData,
-							                                                                                writer.MetaData.StringsHeap.Add("koi"),
-							                                                                                hashBlob));
-					                                                     }
-				                                                     };
+						MDTable<RawFileRow> fileTbl = writer.MetaData.TablesHeap.FileTable;
+						uint fileRid = fileTbl.Add(new RawFileRow(
+							                           (uint)FileAttributes.ContainsMetaData,
+							                           writer.MetaData.StringsHeap.Add("koi"),
+							                           hashBlob));
+					}
+				};
 			}
 		}
 	}

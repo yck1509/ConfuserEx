@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Confuser.DynCipher.AST;
 
@@ -38,16 +39,13 @@ namespace Confuser.DynCipher.Transforms {
 							x += i;
 						return x;
 					}
-				}
-				else {
+				} else {
 					binOp.Left = ProcessExpression(binOp.Left);
 					binOp.Right = ProcessExpression(binOp.Right);
 				}
-			}
-			else if (exp is ArrayIndexExpression) {
+			} else if (exp is ArrayIndexExpression) {
 				((ArrayIndexExpression)exp).Array = ProcessExpression(((ArrayIndexExpression)exp).Array);
-			}
-			else if (exp is UnaryOpExpression) {
+			} else if (exp is UnaryOpExpression) {
 				((UnaryOpExpression)exp).Value = ProcessExpression(((UnaryOpExpression)exp).Value);
 			}
 			return exp;

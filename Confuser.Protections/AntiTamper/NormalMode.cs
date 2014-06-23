@@ -57,8 +57,7 @@ namespace Confuser.Protections.AntiTamper {
 				Instruction instr = instrs[i];
 				if (instr.OpCode == OpCodes.Ldtoken) {
 					instr.Operand = context.CurrentModule.GlobalType;
-				}
-				else if (instr.OpCode == OpCodes.Call) {
+				} else if (instr.OpCode == OpCodes.Call) {
 					var method = (IMethod)instr.Operand;
 					if (method.DeclaringType.Name == "Mutation" &&
 					    method.Name == "Crypt") {
@@ -100,8 +99,7 @@ namespace Confuser.Protections.AntiTamper {
 			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDEndCreateTables) {
 				CreateSections(writer);
-			}
-			else if (e.WriterEvent == ModuleWriterEvent.BeginStrongNameSign) {
+			} else if (e.WriterEvent == ModuleWriterEvent.BeginStrongNameSign) {
 				EncryptSection(writer);
 			}
 		}
@@ -185,8 +183,7 @@ namespace Confuser.Protections.AntiTamper {
 				if (nameHash == name1 * name2) {
 					encSize = reader.ReadUInt32();
 					encLoc = reader.ReadUInt32();
-				}
-				else if (nameHash != 0) {
+				} else if (nameHash != 0) {
 					uint sectSize = reader.ReadUInt32();
 					uint sectLoc = reader.ReadUInt32();
 					Hash(stream, reader, sectLoc, sectSize);

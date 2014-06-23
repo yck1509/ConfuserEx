@@ -123,11 +123,9 @@ namespace Confuser.Runtime {
 							continue;
 
 						return pDebuggerRCThread;
-					}
-					catch { }
+					} catch { }
 				}
-			}
-			catch { }
+			} catch { }
 
 			return IntPtr.Zero;
 		}

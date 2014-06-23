@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
@@ -62,8 +63,7 @@ namespace Confuser.Core.Helpers {
 			if (!ctx.Map.TryGetValue(typeDef, out existing)) {
 				ret = Clone(typeDef);
 				ctx.Map[typeDef] = ret;
-			}
-			else
+			} else
 				ret = (TypeDef)existing;
 
 			foreach (TypeDef nestedType in typeDef.NestedTypes)

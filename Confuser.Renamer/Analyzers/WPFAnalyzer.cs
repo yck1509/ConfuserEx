@@ -91,10 +91,8 @@ namespace Confuser.Renamer.Analyzers {
 					if (regMethod.DeclaringType.FullName == "System.Windows.DependencyProperty" &&
 					    regMethod.Name.String.StartsWith("Register")) {
 						dpRegInstrs.Add(Tuple.Create(regMethod.Name.String.StartsWith("RegisterAttached"), instr));
-					}
-
-					else if (regMethod.DeclaringType.FullName == "System.Windows.EventManager" &&
-					         regMethod.Name.String == "RegisterRoutedEvent") {
+					} else if (regMethod.DeclaringType.FullName == "System.Windows.EventManager" &&
+					           regMethod.Name.String == "RegisterRoutedEvent") {
 						routedEvtRegInstrs.Add(instr);
 					}
 				}

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Confuser.Core;
 using Confuser.Renamer.References;
@@ -18,8 +19,7 @@ namespace Confuser.Renamer.Analyzers {
 
 			if (method.IsAbstract) {
 				service.SetCanRename(method, false);
-			}
-			else {
+			} else {
 				foreach (VTableSlot baseSlot in slot.Overrides) {
 					// Better on safe side, add references to both methods.
 					service.AddReference(method, new OverrideDirectiveReference(slot, baseSlot));

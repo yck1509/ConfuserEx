@@ -1,4 +1,5 @@
-﻿using dnlib.DotNet;
+﻿using System;
+using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns {
 	/// <summary>

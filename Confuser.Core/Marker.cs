@@ -76,8 +76,7 @@ namespace Confuser.Core {
 					return new StrongNameKey(rsa.ExportCspBlob(true));
 				}
 				return new StrongNameKey(path);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				context.Logger.ErrorException("Cannot load the Strong Name Key located at: " + path, ex);
 				throw new ConfuserException(ex);
 			}
@@ -161,8 +160,7 @@ namespace Confuser.Core {
 			foreach (Rule rule in proj.Rules.Concat(module.Rules)) {
 				try {
 					ret.Add(rule, parser.Parse(rule.Pattern));
-				}
-				catch (InvalidPatternException ex) {
+				} catch (InvalidPatternException ex) {
 					context.Logger.ErrorFormat("Invalid rule pattern: " + rule.Pattern + ".", ex);
 					throw new ConfuserException(ex);
 				}

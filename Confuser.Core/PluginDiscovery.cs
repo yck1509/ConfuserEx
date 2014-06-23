@@ -33,7 +33,7 @@ namespace Confuser.Core {
 		}
 
 		/// <summary>
-		/// Determines whether the specified type has an accessible default constructor.
+		///     Determines whether the specified type has an accessible default constructor.
 		/// </summary>
 		/// <param name="type">The type.</param>
 		/// <returns><c>true</c> if the specified type has an accessible default constructor; otherwise, <c>false</c>.</returns>
@@ -61,24 +61,19 @@ namespace Confuser.Core {
 				if (typeof (Protection).IsAssignableFrom(i)) {
 					try {
 						protections.Add((Protection)Activator.CreateInstance(i));
-					}
-					catch (Exception ex) {
+					} catch (Exception ex) {
 						context.Logger.ErrorException("Failed to instantiate protection '" + i.Name + "'.", ex);
 					}
-				}
-				else if (typeof (Packer).IsAssignableFrom(i)) {
+				} else if (typeof (Packer).IsAssignableFrom(i)) {
 					try {
 						packers.Add((Packer)Activator.CreateInstance(i));
-					}
-					catch (Exception ex) {
+					} catch (Exception ex) {
 						context.Logger.ErrorException("Failed to instantiate packer '" + i.Name + "'.", ex);
 					}
-				}
-				else if (typeof (ConfuserComponent).IsAssignableFrom(i)) {
+				} else if (typeof (ConfuserComponent).IsAssignableFrom(i)) {
 					try {
 						components.Add((ConfuserComponent)Activator.CreateInstance(i));
-					}
-					catch (Exception ex) {
+					} catch (Exception ex) {
 						context.Logger.ErrorException("Failed to instantiate component '" + i.Name + "'.", ex);
 					}
 				}
@@ -99,24 +94,21 @@ namespace Confuser.Core {
 			try {
 				Assembly protAsm = Assembly.Load("Confuser.Protections");
 				AddPlugins(context, protections, packers, components, protAsm);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				context.Logger.WarnException("Failed to load built-in protections.", ex);
 			}
 
 			try {
 				Assembly renameAsm = Assembly.Load("Confuser.Renamer");
 				AddPlugins(context, protections, packers, components, renameAsm);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				context.Logger.WarnException("Failed to load renamer.", ex);
 			}
 
 			try {
 				Assembly renameAsm = Assembly.Load("Confuser.DynCipher");
 				AddPlugins(context, protections, packers, components, renameAsm);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				context.Logger.WarnException("Failed to load dynamic cipher library.", ex);
 			}
 
@@ -125,8 +117,7 @@ namespace Confuser.Core {
 				try {
 					Assembly plugin = Assembly.LoadFile(realPath);
 					AddPlugins(context, protections, packers, components, plugin);
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					context.Logger.WarnException("Failed to load plugin '" + pluginPath + "'.", ex);
 				}
 			}

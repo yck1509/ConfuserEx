@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Confuser.Core;
 using dnlib.DotNet;
@@ -52,13 +53,11 @@ namespace Confuser.Renamer {
 					if (parameters.GetParameter(context, def, "flatten", true)) {
 						typeDef.Name = service.ObfuscateName(typeDef.FullName, mode);
 						typeDef.Namespace = "";
-					}
-					else {
+					} else {
 						typeDef.Namespace = service.ObfuscateName(typeDef.Namespace, mode);
 						typeDef.Name = service.ObfuscateName(typeDef.Name, mode);
 					}
-				}
-				else
+				} else
 					def.Name = service.ObfuscateName(def.Name, mode);
 
 				foreach (INameReference refer in references.ToList()) {

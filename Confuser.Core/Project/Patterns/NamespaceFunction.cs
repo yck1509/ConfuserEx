@@ -1,4 +1,5 @@
-﻿using dnlib.DotNet;
+﻿using System;
+using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns {
 	/// <summary>
@@ -27,7 +28,7 @@ namespace Confuser.Core.Project.Patterns {
 			if (type == null)
 				type = ((IMemberDef)definition).DeclaringType;
 
-			while (type.IsNested) 
+			while (type.IsNested)
 				type = type.DeclaringType;
 
 			return type != null && type.Namespace == ns.ToString();

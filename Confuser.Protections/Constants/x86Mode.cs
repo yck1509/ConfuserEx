@@ -44,11 +44,11 @@ namespace Confuser.Protections.Constants {
 			var encoding = new x86Encoding();
 			encoding.Compile(ctx);
 			MutationHelper.ReplacePlaceholder(decoder, arg => {
-				                                           var repl = new List<Instruction>();
-				                                           repl.AddRange(arg);
-				                                           repl.Add(Instruction.Create(OpCodes.Call, encoding.native));
-				                                           return repl.ToArray();
-			                                           });
+				var repl = new List<Instruction>();
+				repl.AddRange(arg);
+				repl.Add(Instruction.Create(OpCodes.Call, encoding.native));
+				return repl.ToArray();
+			});
 			return encoding;
 		}
 
@@ -125,8 +125,7 @@ namespace Confuser.Protections.Constants {
 				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 					codeChunk = writer.MethodBodies.Add(new MethodBody(code));
-				}
-				else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
+				} else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 					uint rid = writer.MetaData.GetRid(native);
 					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)codeChunk.RVA;
 				}

@@ -1,4 +1,5 @@
-﻿using Confuser.Core.Services;
+﻿using System;
+using Confuser.Core.Services;
 
 namespace Confuser.Core {
 	/// <summary>

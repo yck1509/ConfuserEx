@@ -162,8 +162,7 @@ namespace Confuser.Core.Services {
 									beforeDepths[targetIndex] = currentStack;
 								fromInstrs.AddListEntry(offset2index[target.Offset], instr);
 							}
-						}
-						else {
+						} else {
 							int targetIndex = offset2index[((Instruction)instr.Operand).Offset];
 							if (beforeDepths[targetIndex] == int.MinValue)
 								beforeDepths[targetIndex] = currentStack;
@@ -264,8 +263,7 @@ namespace Confuser.Core.Services {
 					if (stackUsage < 0) {
 						Debug.Assert(stackUsage == -1); // i.e. push
 						evalStack.Push(index);
-					}
-					else {
+					} else {
 						if (evalStack.Count < stackUsage)
 							return null;
 
@@ -282,14 +280,11 @@ namespace Confuser.Core.Services {
 							working2.Enqueue(Tuple.Create(targetIndex, new Stack<int>(evalStack)));
 							index++;
 						}
-					}
-
-					else if (currentInstr.Operand is Instruction[]) {
+					} else if (currentInstr.Operand is Instruction[]) {
 						foreach (Instruction targetInstr in (Instruction[])currentInstr.Operand)
 							working2.Enqueue(Tuple.Create(offset2index[targetInstr.Offset], new Stack<int>(evalStack)));
 						index++;
-					}
-					else
+					} else
 						index++;
 				}
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Confuser.Core;
 using Confuser.Core.Helpers;
@@ -109,8 +110,7 @@ namespace Confuser.Protections {
 							CustomAttribute ca = method.CustomAttributes.Find(attrName);
 							if (ca != null)
 								ca.Constructor = attr.FindMethod(".ctor");
-						}
-						else if (member is FieldDef) {
+						} else if (member is FieldDef) {
 							var field = (FieldDef)member;
 							if (field.Access == FieldAttributes.Public)
 								field.Access = FieldAttributes.Assembly;

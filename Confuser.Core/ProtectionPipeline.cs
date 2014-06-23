@@ -161,14 +161,14 @@ namespace Confuser.Core {
 			if (phase.ProcessAll)
 				return filter.ToList();
 			return filter.Where(def => {
-				                    ProtectionSettings parameters = ProtectionParameters.GetParameters(context, def);
-				                    Debug.Assert(parameters != null);
-				                    if (parameters == null) {
-					                    context.Logger.ErrorFormat("'{0}' not marked for obfuscation, possibly a bug.");
-					                    throw new ConfuserException(null);
-				                    }
-				                    return parameters.ContainsKey(phase.Parent);
-			                    }).ToList();
+				ProtectionSettings parameters = ProtectionParameters.GetParameters(context, def);
+				Debug.Assert(parameters != null);
+				if (parameters == null) {
+					context.Logger.ErrorFormat("'{0}' not marked for obfuscation, possibly a bug.");
+					throw new ConfuserException(null);
+				}
+				return parameters.ContainsKey(phase.Parent);
+			}).ToList();
 		}
 	}
 }

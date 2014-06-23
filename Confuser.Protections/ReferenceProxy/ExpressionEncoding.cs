@@ -62,8 +62,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				if (var.Name == "{RESULT}") {
 					foreach (Instruction instr in arg)
 						base.Emit(instr);
-				}
-				else
+				} else
 					base.LoadVar(var);
 			}
 		}

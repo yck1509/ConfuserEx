@@ -56,8 +56,7 @@ namespace Confuser.Runtime {
 				var v = new T[1];
 				Buffer.BlockCopy(b, (int)id, v, 0, Mutation.Value<int>());
 				ret = v[0];
-			}
-			else if (t == Mutation.KeyI2) {
+			} else if (t == Mutation.KeyI2) {
 				int s = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
 				int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
 				Array v = Array.CreateInstance(typeof (T).GetElementType(), l);

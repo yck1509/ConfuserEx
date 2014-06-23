@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Confuser.Core;
@@ -8,6 +9,7 @@ using Confuser.DynCipher;
 using Confuser.Renamer;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using dnlib.DotNet.MD;
 
 namespace Confuser.Protections.Constants {
 	internal class InjectPhase : ProtectionPhase {
@@ -50,8 +52,8 @@ namespace Confuser.Protections.Constants {
 						break;
 					case Mode.x86:
 						moduleCtx.ModeHandler = new x86Mode();
-                        			if ((context.CurrentModule.Cor20HeaderFlags & dnlib.DotNet.MD.ComImageFlags.ILOnly) != 0)
-                            				context.CurrentModuleWriterOptions.Cor20HeaderOptions.Flags &= ~dnlib.DotNet.MD.ComImageFlags.ILOnly;
+						if ((context.CurrentModule.Cor20HeaderFlags & ComImageFlags.ILOnly) != 0)
+							context.CurrentModuleWriterOptions.Cor20HeaderOptions.Flags &= ~ComImageFlags.ILOnly;
 						break;
 					default:
 						throw new UnreachableException();
@@ -59,10 +61,10 @@ namespace Confuser.Protections.Constants {
 
 				// Inject helpers
 				MethodDef decomp = compression.GetRuntimeDecompressor(context.CurrentModule, member => {
-					                                                                             name.MarkHelper(member, marker);
-					                                                                             if (member is MethodDef)
-						                                                                             ProtectionParameters.GetParameters(context, member).Remove(Parent);
-				                                                                             });
+					name.MarkHelper(member, marker);
+					if (member is MethodDef)
+						ProtectionParameters.GetParameters(context, member).Remove(Parent);
+				});
 				InjectHelpers(context, compression, rt, moduleCtx);
 
 				// Mutate codes
@@ -117,9 +119,8 @@ namespace Confuser.Protections.Constants {
 					    method.DeclaringType.Name == "Mutation" &&
 					    method.Name == "Value") {
 						decoderInst.Body.Instructions[j] = Instruction.Create(OpCodes.Sizeof, new GenericMVar(0).ToTypeDefOrRef());
-					}
-					else if (instr.OpCode == OpCodes.Ldsfld &&
-					         method.DeclaringType.Name == "Constant") {
+					} else if (instr.OpCode == OpCodes.Ldsfld &&
+					           method.DeclaringType.Name == "Constant") {
 						if (field.Name == "b") instr.Operand = moduleCtx.BufferField;
 						else throw new UnreachableException();
 					}
@@ -160,9 +161,8 @@ namespace Confuser.Protections.Constants {
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
 						instrs.InsertRange(i - 2, moduleCtx.ModeHandler.EmitDecrypt(moduleCtx.InitMethod, moduleCtx, (Local)ldBlock.Operand, (Local)ldKey.Operand));
-					}
-					else if (method.DeclaringType.Name == "Lzma" &&
-					         method.Name == "Decompress") {
+					} else if (method.DeclaringType.Name == "Lzma" &&
+					           method.Name == "Decompress") {
 						instr.Operand = decomp;
 					}
 				}

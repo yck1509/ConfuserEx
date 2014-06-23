@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using dnlib.DotNet.Emit;
@@ -71,11 +72,9 @@ namespace Confuser.Protections.ControlFlow {
 				if (Type == BlockType.Try) {
 					Handler.TryStart = GetFirstInstr();
 					Handler.TryEnd = GetLastInstr();
-				}
-				else if (Type == BlockType.Filter) {
+				} else if (Type == BlockType.Filter) {
 					Handler.FilterStart = GetFirstInstr();
-				}
-				else {
+				} else {
 					Handler.HandlerStart = GetFirstInstr();
 					Handler.HandlerEnd = GetLastInstr();
 				}

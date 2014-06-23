@@ -584,7 +584,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style TargetType="{x:Type Separator}">
         <Setter Property="Background" Value="{StaticResource Border}" />
         <Setter Property="Margin" Value="2" />
@@ -1520,7 +1520,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style TargetType="{x:Type Hyperlink}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
