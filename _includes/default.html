@@ -61,7 +61,7 @@
           </div>
           <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav navbar-left">
-              {% for node in site.pages %}
+              {% for node in site.pages | sort:"title" %}
                 {% if node.title != null %}
                   {% if node.group == 'navigation' %}
                     {% unless node.url contains '/news/page/' %}
