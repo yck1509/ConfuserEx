@@ -8,16 +8,14 @@ It is the successor of [Confuser](http://confuser.codeplex.com) project.
 
 ---
 <div class="row">
-  <div class="col-md-12">
-    <img class="img-responsive" alt="Screenshot of Command-line interface" src="{{ ASSET_PATH }}/screenshot1.png">
+  <div class="col-md-6">
+    <img class="img-responsive" alt="Screenshot of Command-line interface" src="{{ ASSET_PATH }}/screenshot1.png" style="height: 300px">
     <small>Command-line interface</small>
   </div>
-  <!--  Umm... not really. WIP.
   <div class="col-md-6">
-    <img class="img-responsive" alt="Screenshot of Graphical interface" src="{{ ASSET_PATH }}/screenshot2.png">
+    <img class="img-responsive" alt="Screenshot of Graphical interface" src="{{ ASSET_PATH }}/screenshot2.png" style="height: 300px">
     <small>Graphical interface</small>
   </div>
-  -->
 </div>
 ---
 

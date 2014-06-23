@@ -83,8 +83,7 @@ If you have any doubt about protection strength, feel free to contact me!
 Is there any GUI for ConfuserEX?
 ---
 
-Sorry there is no GUI at the moment. It is planned to be implemented in near 
-future!
+A GUI is available since version 0.2.0. Go check it out!
 
 <div class="a-right"><a class="back-to-top" href="#top"><i class="glyphicon glyphicon-chevron-up"></i></a></div>
 ---
