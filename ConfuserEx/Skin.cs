@@ -10,6 +10,9 @@ namespace ConfuserEx {
 
 		public static readonly DependencyProperty TabsDisabledProperty =
 			DependencyProperty.RegisterAttached("TabsDisabled", typeof (bool), typeof (Skin), new UIPropertyMetadata(false));
+		
+		public static readonly DependencyProperty FocusOverlayProperty =
+			DependencyProperty.RegisterAttached("FocusOverlay", typeof(bool), typeof(Skin), new UIPropertyMetadata(true));
 
 		public static readonly DependencyProperty RTBDocumentProperty =
 			DependencyProperty.RegisterAttached("RTBDocument", typeof (FlowDocument), typeof (Skin), new FrameworkPropertyMetadata(null, OnRTBDocumentChanged));
@@ -20,6 +23,14 @@ namespace ConfuserEx {
 
 		public static void SetEmptyPrompt(DependencyObject obj, string value) {
 			obj.SetValue(EmptyPromptProperty, value);
+		}
+		
+		public static bool GetFocusOverlay(DependencyObject obj) {
+			return (bool)obj.GetValue(FocusOverlayProperty);
+		}
+
+		public static void SetFocusOverlay(DependencyObject obj, bool value) {
+			obj.SetValue(FocusOverlayProperty, value);
 		}
 
 		public static bool GetTabsDisabled(DependencyObject obj) {

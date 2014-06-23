@@ -4,5 +4,6 @@
         <ResourceDictionary Source="Views\ProjectTabView.xaml" />
         <ResourceDictionary Source="Views\SettingsTabView.xaml" />
         <ResourceDictionary Source="Views\ProtectTabView.xaml" />
+        <ResourceDictionary Source="Views\AboutTabView.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

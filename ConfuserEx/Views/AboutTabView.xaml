@@ -1,0 +1,92 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ConfuserEx"
+                    xmlns:vm="clr-namespace:ConfuserEx.ViewModel"
+                    xmlns:core="clr-namespace:Confuser.Core;assembly=Confuser.Core">
+    <DataTemplate DataType="{x:Type vm:AboutTabVM}">
+        <Grid Background="Transparent" Margin="10" x:Name="Root">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="400px" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70px" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="100px" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70px" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Source="{Binding Icon}" Width="64" Height="64" />
+                <Label Grid.Row="0" Grid.Column="1" FontSize="20" Content="ConfuserEx" Foreground="#ffffff" />
+                <TextBox Grid.Row="1" Grid.Column="1" FontSize="14" Text="{x:Static core:ConfuserEngine.Version}"
+                         Foreground="#a0a0a0" BorderThickness="0" VerticalAlignment="Center" Background="Transparent"
+                         IsReadOnly="True" IsReadOnlyCaretVisible="True" local:Skin.FocusOverlay="False" />
+            </Grid>
+
+            <DockPanel Grid.Row="1" Grid.Column="0" Margin="10" LastChildFill="True"
+                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+
+                <Separator DockPanel.Dock="Top" />
+                <Separator DockPanel.Dock="Bottom" />
+
+                <StackPanel TextBlock.FontSize="13" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                    <Label FontWeight="Bold">ConfuserEx, a .NET protector</Label>
+                    <Label>Developed by Ki, open sourced under MIT license.</Label>
+                    <Label>
+                        <TextBlock>
+                            <Hyperlink NavigateUri="http://yck1509.github.io/ConfuserEx/"
+                                       Command="{Binding LaunchBrowser}"
+                                       CommandParameter="http://yck1509.github.io/ConfuserEx/">
+                                Visit the project page for details.
+                            </Hyperlink>
+                        </TextBlock>
+                    </Label>
+                    <Label Height="20px" />
+
+                    <Label>If you like it or find it useful,</Label>
+                    <Label>
+                        <TextBlock>
+                            <Hyperlink NavigateUri="http://yck1509.github.io/ConfuserEx/#donation"
+                                       Command="{Binding LaunchBrowser}"
+                                       CommandParameter="http://yck1509.github.io/ConfuserEx/#donation">
+                                feel free to support the project by making a donation!
+                            </Hyperlink>
+                        </TextBlock>
+                    </Label>
+                </StackPanel>
+            </DockPanel>
+
+            <Button Grid.Row="2" Grid.Column="0" Command="{Binding LaunchBrowser}"
+                    CommandParameter="http://board.b-at-s.info/" Focusable="False" Cursor="Hand">
+                <Button.Template>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Button.Template>
+                <Image Source="{DynamicResource TeamLogo}" Width="400" Height="100" />
+            </Button>
+
+            <StackPanel Grid.Column="1" Grid.RowSpan="3" TextBlock.FontSize="13" Margin="10"
+                        VerticalAlignment="Stretch" HorizontalAlignment="Center">
+                <Label HorizontalContentAlignment="Center">Special Thanks to:</Label>
+                <Label HorizontalContentAlignment="Center">0xd4d</Label>
+                <Label HorizontalContentAlignment="Center">CodeCracker</Label>
+                <Label HorizontalContentAlignment="Center">JeRRy</Label>
+                <Label HorizontalContentAlignment="Center">kao</Label>
+                <Label HorizontalContentAlignment="Center">Kurapica</Label>
+                <Label HorizontalContentAlignment="Center">UbbeLoL</Label>
+                <Label HorizontalContentAlignment="Center">whoknows</Label>
+                <Label HorizontalContentAlignment="Center">Members of Black Storm Forum</Label>
+                <Label HorizontalContentAlignment="Center">and You!</Label>
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

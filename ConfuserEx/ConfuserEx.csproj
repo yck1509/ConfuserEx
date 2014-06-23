@@ -94,6 +94,7 @@
     <Compile Include="ViewModel\Project\ProjectRuleVM.cs" />
     <Compile Include="ViewModel\Project\ProjectSettingVM.cs" />
     <Compile Include="ViewModel\StringItem.cs" />
+    <Compile Include="ViewModel\UI\AboutTabVM.cs" />
     <Compile Include="ViewModel\UI\AppVM.cs" />
     <Compile Include="ViewModel\IViewModel.cs" />
     <Compile Include="ViewModel\Project\ProjectModuleVM.cs" />
@@ -134,6 +135,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\AboutTabView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -213,6 +218,9 @@
   <ItemGroup>
     <Resource Include="Resources\Error.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\TeamLogo.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -228,13 +236,12 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-
-  <Target Name="solveAliasProblem" >
+  <Target Name="solveAliasProblem">
     <ConvertToAbsolutePath Paths="..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll">
       <Output TaskParameter="AbsolutePaths" PropertyName="FullPathOriginal" />
     </ConvertToAbsolutePath>
     <ItemGroup>
-      <ReferencePath Remove="$(FullPathOriginal)"/>
+      <ReferencePath Remove="$(FullPathOriginal)" />
       <ReferencePath Include="$(FullPathOriginal)">
         <Aliases>PTL</Aliases>
       </ReferencePath>
@@ -243,5 +250,4 @@
   <PropertyGroup>
     <CoreCompileDependsOn>solveAliasProblem;$(PrepareResourcesDependsOn)</CoreCompileDependsOn>
   </PropertyGroup>
-
 </Project>

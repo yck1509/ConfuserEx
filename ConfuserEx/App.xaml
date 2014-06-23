@@ -12,6 +12,7 @@
             <BitmapImage x:Key="Tools" UriSource="Resources/Tools.png" />
             <BitmapImage x:Key="Decode" UriSource="Resources/Decode.png" />
             <BitmapImage x:Key="Error" UriSource="Resources/Error.png" />
+            <BitmapImage x:Key="TeamLogo" UriSource="Resources/TeamLogo.png" />
             <FontFamily x:Key="FontAwesome">Resources/#FontAwesome</FontFamily>
         </ResourceDictionary>
     </Application.Resources>
