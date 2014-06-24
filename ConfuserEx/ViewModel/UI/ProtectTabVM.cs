@@ -1,4 +1,6 @@
-﻿extern alias PTL;
+﻿#if !NET45
+extern alias PTL;
+#endif
 using System;
 using System.Windows;
 using System.Windows.Documents;
@@ -7,7 +9,11 @@ using System.Windows.Media;
 using Confuser.Core;
 using Confuser.Core.Project;
 using GalaSoft.MvvmLight.Command;
+#if !NET45
 using PTL::System.Threading;
+#else
+using System.Threading;
+#endif
 
 // http://connect.microsoft.com/VisualStudio/feedback/details/615953/
 

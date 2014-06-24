@@ -109,12 +109,17 @@ namespace Confuser.Protections.ReferenceProxy {
 
 			// Create proxy field
 			if (proxy.Item1 == null)
-				proxy.Item1 = CreateField(ctx, delegateType);
+				proxy = new Tuple<FieldDef,MethodDef>(
+					CreateField(ctx, delegateType),
+					proxy.Item2);
 
 			// Create proxy bridge
 			Debug.Assert(proxy.Item2 == null);
 
-			proxy.Item2 = CreateBridge(ctx, delegateType, proxy.Item1, sig);
+			proxy = new Tuple<FieldDef,MethodDef>(
+				proxy.Item1,
+				CreateBridge(ctx, delegateType, proxy.Item1, sig));
+
 			fields[key] = proxy;
 
 			// Replace instruction
