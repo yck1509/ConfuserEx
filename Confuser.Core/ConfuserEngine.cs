@@ -75,8 +75,8 @@ namespace Confuser.Core {
 				asmResolver.EnableTypeDefCache = true;
 				asmResolver.DefaultModuleContext = new ModuleContext(asmResolver);
 				context.Resolver = asmResolver;
-				context.BaseDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.BaseDirectory + "\\");
-				context.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.OutputDirectory + "\\");
+				context.BaseDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
+				context.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.OutputDirectory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
 				foreach (string probePath in parameters.Project.ProbePaths)
 					asmResolver.PostSearchPaths.Add(Path.Combine(context.BaseDirectory, probePath));
 
@@ -322,16 +322,19 @@ namespace Confuser.Core {
 
 		private static void EndModule(ConfuserContext context) {
 			string output = context.Modules[context.CurrentModuleIndex].Location;
-			if (output != null)
+			if (output != null) {
+				if (!Path.IsPathRooted(output))
+					output = Path.Combine(Environment.CurrentDirectory, output);
 				output = Utils.GetRelativePath(output, context.BaseDirectory);
-			else
+			} else {
 				output = context.CurrentModule.Name;
+			}
 			context.OutputPaths[context.CurrentModuleIndex] = output;
 		}
 
 		private static void WriteModule(ConfuserContext context) {
 			context.Logger.InfoFormat("Writing module '{0}'...", context.CurrentModule.Name);
-
+			
 			MemoryStream pdb = null, output = new MemoryStream();
 
 			if (context.CurrentModule.PdbState != null) {
