@@ -17,9 +17,7 @@ namespace Confuser.Renamer.Analyzers {
 			VTableSlot slot = vTbl.FindSlot(method);
 			Debug.Assert(slot != null);
 
-			if (method.IsAbstract) {
-				service.SetCanRename(method, false);
-			} else {
+			if (!method.IsAbstract) {
 				foreach (VTableSlot baseSlot in slot.Overrides) {
 					// Better on safe side, add references to both methods.
 					service.AddReference(method, new OverrideDirectiveReference(slot, baseSlot));
