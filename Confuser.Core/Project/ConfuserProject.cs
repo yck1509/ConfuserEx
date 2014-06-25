@@ -425,6 +425,9 @@ namespace Confuser.Core.Project {
 				elem.Attributes.Append(debugAttr);
 			}
 
+			foreach (Rule i in Rules)
+				elem.AppendChild(i.Save(xmlDoc));
+
 			if (Packer != null)
 				elem.AppendChild(Packer.Save(xmlDoc));
 

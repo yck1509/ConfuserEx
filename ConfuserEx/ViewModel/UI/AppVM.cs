@@ -16,6 +16,7 @@ namespace ConfuserEx.ViewModel {
 		private readonly IList<TabViewModel> tabs = new ObservableCollection<TabViewModel>();
 		private string fileName;
 		private bool navDisabled;
+		private bool firstSaved = false;
 
 		private ProjectVM proj;
 
@@ -79,7 +80,7 @@ namespace ConfuserEx.ViewModel {
 		}
 
 		private bool SaveProj() {
-			if (File.Exists(FileName)) {
+			if (!firstSaved || !File.Exists(FileName)) {
 				var sfd = new VistaSaveFileDialog();
 				sfd.FileName = FileName;
 				sfd.Filter = "ConfuserEx Projects (*.crproj)|*.crproj|All Files (*.*)|*.*";
@@ -90,6 +91,7 @@ namespace ConfuserEx.ViewModel {
 			ConfuserProject proj = ((IViewModel<ConfuserProject>)Project).Model;
 			proj.Save().Save(FileName);
 			Project.IsModified = false;
+			firstSaved = true;
 			return true;
 		}
 
@@ -137,7 +139,7 @@ namespace ConfuserEx.ViewModel {
 		}
 
 		private void OnProjectPropertyChanged(object sender, PropertyChangedEventArgs e) {
-			if (e.PropertyName == "IsModified" && proj.IsModified)
+			if (e.PropertyName == "IsModified")
 				OnPropertyChanged("Title");
 		}
 	}

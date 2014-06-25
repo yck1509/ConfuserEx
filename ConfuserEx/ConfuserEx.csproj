@@ -178,7 +178,9 @@
     <None Include="..\ConfuserEx.snk">
       <Link>Properties\ConfuserEx.snk</Link>
     </None>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Resources\CREDITS" />
     <Resource Include="Resources\FontAwesome.otf" />
