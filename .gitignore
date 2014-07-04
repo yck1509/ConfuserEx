@@ -36,3 +36,4 @@ gh-pages/
 ConfuserEx.snk
 GlobalAssemblyInfo.cs
 /Build/*.zip
+!Build/7z.exe

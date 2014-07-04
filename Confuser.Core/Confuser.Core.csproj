@@ -152,6 +152,6 @@
   </Target>
   <Target Name="BeforeBuild">
     <MSBuild Projects="$(SolutionDir)\Build\UpdateVersion.csproj" Targets="Build" Properties="Configuration=Release" />
-    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="UpdateVersion.exe $(SolutionDir)" Timeout="5000" />
+    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="UpdateVersion.exe $(SolutionDir)" Timeout="60000" />
   </Target>
 </Project>
