@@ -211,6 +211,19 @@ namespace Confuser.Renamer {
 
 			// Remaining methods
 			foreach (MethodDef method in typeDef.Methods.Where(method => method.IsVirtual).Except(methodsProcessed)) {
+				foreach (var remainingSlot in slotDict.Keys.Where(key => key.InterfaceType != null)) {
+					// If there is a remaining slot for an interface method which has the same name and signature as an unprocessed method,
+					// allow the method to override the slot.
+					// This is necessary because public methods which implement interface methods do not have an InterfaceType in their signature,
+					// but the keys of "slotDict" which were added for interface methods *do* have InterfaceType in their signature.  Therefore,
+					// these slots are not filled by the "Normal override" loop above.
+					if (new SigComparer().Equals(remainingSlot.MethodSig, method.MethodSig) && remainingSlot.Name.Equals(method.Name, StringComparison.Ordinal)) {
+						var methodSlot = new VTableSlot(ret, method, method.DeclaringType.ToTypeSig(), remainingSlot);
+						ret.Override(slotDict, remainingSlot, methodSlot);
+						methodsProcessed.Add(method);
+						goto next;
+					}
+				}
 				var slot = new VTableSlot(ret, method, method.DeclaringType.ToTypeSig(), VTableSignature.FromMethod(method));
 				if (method.IsFinal)
 					ret.Finals.Add(slot);
@@ -218,6 +231,7 @@ namespace Confuser.Renamer {
 					Debug.Assert(!ret.Slots.Any(s => s.MethodDef == method));
 					ret.Slots.Add(slot);
 				}
+				next: continue;
 			}
 
 			return ret;

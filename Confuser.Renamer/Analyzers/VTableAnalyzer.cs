@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Confuser.Core;
 using Confuser.Renamer.References;
 using dnlib.DotNet;
@@ -26,9 +27,20 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-
 		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
-			//
+			var method = def as MethodDef;
+			if (method == null || !method.IsVirtual)
+				return;
+
+			VTable vTbl = service.GetVTables()[method.DeclaringType];
+			VTableSignature sig = VTableSignature.FromMethod(method);
+			VTableSlot slot = vTbl.FindSlot(method);
+			Debug.Assert(slot != null);
+			
+			// Can't rename virtual methods which implement an interface method or override a method declared in a base type,
+			// when the interface or base type is declared in an assembly that is not currently being processed
+			if (slot.Overrides.Any(slotOverride => !context.Modules.Any(module => module.Assembly.FullName == slotOverride.MethodDef.DeclaringType.DefinitionAssembly.FullName)))
+				service.SetCanRename(method, false);
 		}
 
 		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {

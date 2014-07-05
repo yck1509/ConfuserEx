@@ -70,12 +70,16 @@ namespace Confuser.Runtime {
 
 			ver = RuntimeEnvironment.GetSystemVersion()[1] == '4';
 			ModuleHandle hnd = m.ModuleHandle;
+			#if !NET45
 			if (ver) {
+			#endif
 				ulong* str = stackalloc ulong[1];
 				str[0] = 0x0061746144705f6d; //m_pData.
 				moduleHnd = (IntPtr)m.GetType().GetField(new string((sbyte*)str), BindingFlags.NonPublic | BindingFlags.Instance).GetValue(m);
+			#if !NET45
 			} else
 				moduleHnd = *(IntPtr*)(&hnd);
+			#endif
 
 			Hook();
 		}
