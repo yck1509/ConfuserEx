@@ -435,14 +435,14 @@ namespace Confuser.Core.Project {
 				elem.AppendChild(i.Save(xmlDoc));
 
 			foreach (string i in ProbePaths) {
-				XmlElement path = xmlDoc.CreateElement("probePath");
-				path.Value = i;
+				XmlElement path = xmlDoc.CreateElement("probePath", ConfuserProject.Namespace);
+				path.InnerText = i;
 				elem.AppendChild(path);
 			}
 
 			foreach (string i in PluginPaths) {
-				XmlElement path = xmlDoc.CreateElement("plugin");
-				path.Value = i;
+				XmlElement path = xmlDoc.CreateElement("plugin", ConfuserProject.Namespace);
+				path.InnerText = i;
 				elem.AppendChild(path);
 			}
 
