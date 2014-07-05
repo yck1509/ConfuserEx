@@ -47,9 +47,9 @@ namespace Confuser.Protections.AntiTamper {
 			deriver.Init(context, random);
 
 			var rt = context.Registry.GetService<IRuntimeService>();
-			MethodDef initMethod = rt.GetRuntimeType("Confuser.Runtime.AntiTamperNormal").FindMethod("Initialize");
-			initMethod = InjectHelper.Inject(initMethod, context.CurrentModule);
-			context.CurrentModule.GlobalType.Methods.Add(initMethod);
+			TypeDef initType = rt.GetRuntimeType("Confuser.Runtime.AntiTamperNormal");
+			IEnumerable<IDnlibDef> members = InjectHelper.Inject(initType, context.CurrentModule.GlobalType, context.CurrentModule);
+			var initMethod = (MethodDef)members.Single(m => m.Name == "Initialize");
 
 			initMethod.Body.SimplifyMacros(initMethod.Parameters);
 			List<Instruction> instrs = initMethod.Body.Instructions.ToList();
@@ -81,13 +81,16 @@ namespace Confuser.Protections.AntiTamper {
 
 			var name = context.Registry.GetService<INameService>();
 			var marker = context.Registry.GetService<IMarkerService>();
-			name.MarkHelper(initMethod, marker);
+			foreach (IDnlibDef def in members) {
+				name.MarkHelper(def, marker);
+				if (def is MethodDef)
+					parent.ExcludeMethod(context, (MethodDef)def);
+			}
 
 			MethodDef cctor = context.CurrentModule.GlobalType.FindStaticConstructor();
 			cctor.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, initMethod));
 
 			parent.ExcludeMethod(context, cctor);
-			parent.ExcludeMethod(context, initMethod);
 		}
 
 		public void HandleMD(AntiTamperProtection parent, ConfuserContext context, ProtectionParameters parameters) {
