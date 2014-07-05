@@ -28,7 +28,7 @@ public static class Program {
 					if (infos.Length >= 3)
 						ver = ver + "." + infos[infos.Length - 2];
 					else
-						ver = ver + ".0";
+						ver = infos[0].Substring(1);
 					ps.WaitForExit();
 					if (ps.ExitCode != 0) {
 						Console.WriteLine("error when executing git describe: " + ps.ExitCode);
