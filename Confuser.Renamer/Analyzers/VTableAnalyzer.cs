@@ -33,6 +33,8 @@ namespace Confuser.Renamer.Analyzers {
 				return;
 
 			VTable vTbl = service.GetVTables()[method.DeclaringType];
+			if (vTbl == null) // This case occurs at late injected types, like delegates
+				return;
 			VTableSignature sig = VTableSignature.FromMethod(method);
 			VTableSlot slot = vTbl.FindSlot(method);
 			Debug.Assert(slot != null);
