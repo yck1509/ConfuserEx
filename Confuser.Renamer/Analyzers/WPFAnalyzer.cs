@@ -187,6 +187,7 @@ namespace Confuser.Renamer.Analyzers {
 				if ((eventDef = declType.FindEvent(name)) == null) {
 					context.Logger.WarnFormat("Failed to find the CLR event of routed event '{0}' in type '{1}'.",
 					                          name, declType.FullName);
+					continue;
 				}
 				if (eventDef.AddMethod != null)
 					service.SetCanRename(eventDef.AddMethod, false);

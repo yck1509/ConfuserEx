@@ -404,7 +404,7 @@ namespace Confuser.Renamer.BAML {
 			} else if (converter.FullName == "System.Windows.PropertyPathConverter") {
 				AnalyzePropertyPath(rec.Value);
 			} else if (converter.FullName == "System.Windows.Markup.RoutedEventConverter") {
-				throw new NotImplementedException();
+				;
 			} else if (converter.FullName == "System.Windows.Markup.TypeTypeConverter") {
 				string prefix;
 				TypeSig sig = ResolveType(rec.Value.Trim(), out prefix);
