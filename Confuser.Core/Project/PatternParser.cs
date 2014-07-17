@@ -39,6 +39,9 @@ namespace Confuser.Core.Project {
 		///     The pattern is invalid.
 		/// </exception>
 		public PatternExpression Parse(string pattern) {
+			if (pattern == null)
+				throw new ArgumentNullException("pattern");
+
 			try {
 				tokenizer.Initialize(pattern);
 				lookAhead = tokenizer.NextToken();

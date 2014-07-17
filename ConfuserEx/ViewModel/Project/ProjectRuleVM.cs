@@ -74,6 +74,8 @@ namespace ConfuserEx.ViewModel {
 		}
 
 		private void ParseExpression() {
+			if (Pattern == null)
+				return;
 			PatternExpression expression;
 			try {
 				expression = new PatternParser().Parse(Pattern);

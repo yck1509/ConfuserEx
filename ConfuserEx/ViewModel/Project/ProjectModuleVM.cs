@@ -20,8 +20,11 @@ namespace ConfuserEx.ViewModel {
 			rules.CollectionChanged += (sender, e) => parent.IsModified = true;
 			Rules = rules;
 
-			SimpleName = System.IO.Path.GetFileName(module.Path);
-			LoadAssemblyName();
+			if (module.Path != null)
+			{
+				SimpleName = System.IO.Path.GetFileName(module.Path);
+				LoadAssemblyName();
+			}
 		}
 
 		public ProjectModule Module {
