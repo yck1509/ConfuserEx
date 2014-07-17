@@ -195,8 +195,11 @@ namespace Confuser.Renamer {
 					Debug.Assert(slotDict.ContainsKey(sig));
 
 					var methodSlot = new VTableSlot(ret, method, method.DeclaringType.ToTypeSig(), VTableSignature.FromMethod(method));
-					ret.Override(slotDict, sig, methodSlot, targetMethod);
-					methodsProcessed.Add(method);
+					if (slotDict.ContainsKey(sig) && slotDict[sig].Count > 0) {
+					        ret.Override(slotDict, sig, methodSlot, targetMethod);
+	                        		methodsProcessed.Add(method);
+				        }
+					
 				}
 
 			// Normal override
