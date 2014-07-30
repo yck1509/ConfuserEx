@@ -175,6 +175,8 @@ namespace Confuser.Core {
 			} catch (Exception ex) {
 				context.Logger.ErrorException("Unknown error occurred.", ex);
 			} finally {
+				if (context.Resolver != null)
+					context.Resolver.Clear();
 				context.Logger.Finish(ok);
 			}
 		}
