@@ -9,6 +9,7 @@ using Confuser.Core.Services;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using dnlib.DotNet.Writer;
+using Microsoft.Win32;
 using InformationalAttribute = System.Reflection.AssemblyInformationalVersionAttribute;
 using ProductAttribute = System.Reflection.AssemblyProductAttribute;
 using CopyrightAttribute = System.Reflection.AssemblyCopyrightAttribute;
@@ -29,10 +30,10 @@ namespace Confuser.Core {
 		private static readonly string Copyright;
 
 		static ConfuserEngine() {
-			Assembly assembly = typeof (ConfuserEngine).Assembly;
-			var nameAttr = (ProductAttribute)assembly.GetCustomAttributes(typeof (ProductAttribute), false)[0];
-			var verAttr = (InformationalAttribute)assembly.GetCustomAttributes(typeof (InformationalAttribute), false)[0];
-			var cpAttr = (CopyrightAttribute)assembly.GetCustomAttributes(typeof (CopyrightAttribute), false)[0];
+			Assembly assembly = typeof(ConfuserEngine).Assembly;
+			var nameAttr = (ProductAttribute)assembly.GetCustomAttributes(typeof(ProductAttribute), false)[0];
+			var verAttr = (InformationalAttribute)assembly.GetCustomAttributes(typeof(InformationalAttribute), false)[0];
+			var cpAttr = (CopyrightAttribute)assembly.GetCustomAttributes(typeof(CopyrightAttribute), false)[0];
 			Version = string.Format("{0} {1}", nameAttr.Product, verAttr.InformationalVersion);
 			Copyright = cpAttr.Copyright;
 		}
@@ -158,18 +159,21 @@ namespace Confuser.Core {
 				ok = true;
 			} catch (AssemblyResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a assembly, check if all dependencies are of correct version.", ex);
+				PrintEnvironmentInfo(context);
 			} catch (TypeResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a type, check if all dependencies are of correct version.", ex);
+				PrintEnvironmentInfo(context);
 			} catch (MemberRefResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a member, check if all dependencies are of correct version.", ex);
+				PrintEnvironmentInfo(context);
 			} catch (IOException ex) {
-				context.Logger.ErrorException("An IO error occured, check if all input/output locations are read/writable.", ex);
+				context.Logger.ErrorException("An IO error occurred, check if all input/output locations are read/writable.", ex);
 			} catch (OperationCanceledException) {
 				context.Logger.Error("Operation is canceled.");
 			} catch (ConfuserException) {
 				// Exception is already handled/logged, so just ignore and report failure
 			} catch (Exception ex) {
-				context.Logger.ErrorException("Unknown error occured.", ex);
+				context.Logger.ErrorException("Unknown error occurred.", ex);
 			} finally {
 				context.Logger.Finish(ok);
 			}
@@ -334,7 +338,7 @@ namespace Confuser.Core {
 
 		private static void WriteModule(ConfuserContext context) {
 			context.Logger.InfoFormat("Writing module '{0}'...", context.CurrentModule.Name);
-			
+
 			MemoryStream pdb = null, output = new MemoryStream();
 
 			if (context.CurrentModule.PdbState != null) {
@@ -380,6 +384,7 @@ namespace Confuser.Core {
 				string dir = Path.GetDirectoryName(path);
 				if (!Directory.Exists(dir))
 					Directory.CreateDirectory(dir);
+				context.Logger.DebugFormat("Saving to '{0}'...", path);
 				File.WriteAllBytes(path, context.OutputModules[i]);
 			}
 		}
@@ -402,6 +407,79 @@ namespace Confuser.Core {
 					                          mono.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, null),
 				                          IntPtr.Size * 8);
 			}
+		}
+
+		private static IEnumerable<string> GetFrameworkVersions() {
+			// http://msdn.microsoft.com/en-us/library/hh925568.aspx
+
+			using (RegistryKey ndpKey =
+				RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine, "").
+				            OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\")) {
+				foreach (string versionKeyName in ndpKey.GetSubKeyNames()) {
+					if (!versionKeyName.StartsWith("v"))
+						continue;
+
+					RegistryKey versionKey = ndpKey.OpenSubKey(versionKeyName);
+					var name = (string)versionKey.GetValue("Version", "");
+					string sp = versionKey.GetValue("SP", "").ToString();
+					string install = versionKey.GetValue("Install", "").ToString();
+					if (install == "" || sp != "" && install == "1")
+						yield return versionKeyName + "  " + name;
+
+					if (name != "")
+						continue;
+
+					foreach (string subKeyName in versionKey.GetSubKeyNames()) {
+						RegistryKey subKey = versionKey.OpenSubKey(subKeyName);
+						name = (string)subKey.GetValue("Version", "");
+						if (name != "")
+							sp = subKey.GetValue("SP", "").ToString();
+						install = subKey.GetValue("Install", "").ToString();
+
+						if (install == "")
+							yield return versionKeyName + "  " + name;
+						else if (install == "1")
+							yield return "  " + subKeyName + "  " + name;
+					}
+				}
+			}
+
+			using (RegistryKey ndpKey =
+				RegistryKey.OpenRemoteBaseKey(RegistryHive.LocalMachine, "").
+				            OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\")) {
+				if (ndpKey.GetValue("Release") == null)
+					yield break;
+				var releaseKey = (int)ndpKey.GetValue("Release");
+				yield return "v4.5 " + releaseKey;
+			}
+		}
+
+		/// <summary>
+		///     Prints the environment information when error occurred.
+		/// </summary>
+		/// <param name="context">The working context.</param>
+		private static void PrintEnvironmentInfo(ConfuserContext context) {
+			if (context.PackerInitiated)
+				return;
+
+			context.Logger.Error("---BEGIN DEBUG INFO---");
+
+			context.Logger.Error("Installed Framework Versions:");
+			foreach (string ver in GetFrameworkVersions()) {
+				context.Logger.ErrorFormat("    {0}", ver);
+			}
+
+			if (context.Resolver != null) {
+				context.Logger.Error("Cached assemblies:");
+				foreach (AssemblyDef asm in context.Resolver.GetCachedAssemblies()) {
+					if (string.IsNullOrEmpty(asm.ManifestModule.Location))
+						context.Logger.ErrorFormat("    {0}", asm.FullName);
+					else
+						context.Logger.ErrorFormat("    {0} ({1})", asm.FullName, asm.ManifestModule.Location);
+				}
+			}
+
+			context.Logger.Error("---END DEBUG INFO---");
 		}
 	}
 }
