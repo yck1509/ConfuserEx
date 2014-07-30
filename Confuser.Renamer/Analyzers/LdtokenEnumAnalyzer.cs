@@ -1,5 +1,6 @@
 ﻿using System;
 using Confuser.Core;
+using Confuser.Renamer.References;
 using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 
@@ -41,6 +42,10 @@ namespace Confuser.Renamer.Analyzers {
 				} else if ((instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt) &&
 				           ((IMethod)instr.Operand).Name == "ToString") {
 					HandleEnum(context, service, method, i);
+				} else if (instr.OpCode.Code == Code.Ldstr) {
+					TypeDef typeDef = method.Module.FindReflection((string)instr.Operand);
+					if (typeDef != null)
+						service.AddReference(typeDef, new StringTypeReference(instr, typeDef));
 				}
 			}
 		}

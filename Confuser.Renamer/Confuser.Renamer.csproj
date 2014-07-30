@@ -76,6 +76,7 @@
     <Compile Include="References\BAMLAttributeReference.cs" />
     <Compile Include="References\BAMLConverterTypeReference.cs" />
     <Compile Include="References\BAMLConverterMemberReference.cs" />
+    <Compile Include="References\StringTypeReference.cs" />
     <Compile Include="References\TypeRefReference.cs" />
     <Compile Include="References\OverrideDirectiveReference.cs" />
     <Compile Include="References\MemberRefReference.cs" />
