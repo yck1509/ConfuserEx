@@ -22,6 +22,12 @@ namespace Confuser.Core {
 		BeginModule,
 
 		/// <summary>
+		///     Confuser engine processes a module.
+		///     This stage occurs once per module.
+		/// </summary>
+		ProcessModule,
+
+		/// <summary>
 		///     Confuser engine optimizes opcodes of the method bodys.
 		///     This stage occurs once per module.
 		/// </summary>

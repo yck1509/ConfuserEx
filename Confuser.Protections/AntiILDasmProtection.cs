@@ -33,7 +33,7 @@ namespace Confuser.Protections {
 		}
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
-			pipeline.InsertPostStage(PipelineStage.BeginModule, new AntiILDasmPhase(this));
+			pipeline.InsertPreStage(PipelineStage.ProcessModule, new AntiILDasmPhase(this));
 		}
 
 		private class AntiILDasmPhase : ProtectionPhase {

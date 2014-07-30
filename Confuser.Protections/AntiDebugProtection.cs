@@ -39,7 +39,7 @@ namespace Confuser.Protections {
 		}
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
-			pipeline.InsertPostStage(PipelineStage.BeginModule, new AntiDebugPhase(this));
+			pipeline.InsertPreStage(PipelineStage.ProcessModule, new AntiDebugPhase(this));
 		}
 
 		private class AntiDebugPhase : ProtectionPhase {

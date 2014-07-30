@@ -202,6 +202,7 @@ namespace Confuser.Core {
 				context.CurrentModuleWriterListener = null;
 
 				pipeline.ExecuteStage(PipelineStage.BeginModule, BeginModule, () => getModuleDefs(context.CurrentModule), context);
+				pipeline.ExecuteStage(PipelineStage.ProcessModule, ProcessModule, () => getModuleDefs(context.CurrentModule), context);
 				pipeline.ExecuteStage(PipelineStage.OptimizeMethods, OptimizeMethods, () => getModuleDefs(context.CurrentModule), context);
 				pipeline.ExecuteStage(PipelineStage.EndModule, EndModule, () => getModuleDefs(context.CurrentModule), context);
 
@@ -316,6 +317,9 @@ namespace Confuser.Core {
 						method.Body.Instructions.SimplifyMacros(method.Body.Variables, method.Parameters);
 					}
 				}
+		}
+
+		private static void ProcessModule(ConfuserContext context) {
 		}
 
 		private static void OptimizeMethods(ConfuserContext context) {

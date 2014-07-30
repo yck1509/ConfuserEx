@@ -34,7 +34,7 @@ namespace Confuser.Protections {
 		}
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
-			pipeline.InsertPostStage(PipelineStage.BeginModule, new InjectPhase(this));
+			pipeline.InsertPreStage(PipelineStage.ProcessModule, new InjectPhase(this));
 		}
 	}
 }

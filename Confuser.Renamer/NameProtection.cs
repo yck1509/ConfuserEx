@@ -33,8 +33,8 @@ namespace Confuser.Renamer {
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
 			pipeline.InsertPostStage(PipelineStage.Inspection, new AnalyzePhase(this));
-			pipeline.InsertPreStage(PipelineStage.EndModule, new RenamePhase(this));
-			pipeline.InsertPostStage(PipelineStage.EndModule, new PostRenamePhase(this));
+			pipeline.InsertPostStage(PipelineStage.BeginModule, new RenamePhase(this));
+			pipeline.InsertPreStage(PipelineStage.EndModule, new PostRenamePhase(this));
 		}
 	}
 }
