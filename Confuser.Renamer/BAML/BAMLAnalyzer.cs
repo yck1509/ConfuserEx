@@ -274,13 +274,11 @@ namespace Confuser.Renamer.BAML {
 					break;
 
 				case BamlRecordType.KeyElementStart:
+				case BamlRecordType.StaticResourceStart:
 					// i.e. <x:Key></x:Key>
 					elem.Type = module.CorLibTypes.Object.TypeDefOrRef.ResolveTypeDef();
 					elem.Attribute = null;
 					break;
-
-				case BamlRecordType.StaticResourceStart:
-					throw new NotSupportedException();
 			}
 		}
 
