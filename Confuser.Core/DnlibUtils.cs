@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 using dnlib.IO;
 
 namespace Confuser.Core {
@@ -292,6 +293,35 @@ namespace Confuser.Core {
 				return true;
 
 			return evt.OtherMethods.Any(method => method.IsStatic);
+		}
+
+		/// <summary>
+		///     Replaces the specified instruction reference with another instruction.
+		/// </summary>
+		/// <param name="body">The method body.</param>
+		/// <param name="target">The instruction to replace.</param>
+		/// <param name="newInstr">The new instruction.</param>
+		public static void ReplaceReference(this CilBody body, Instruction target, Instruction newInstr) {
+			foreach (ExceptionHandler eh in body.ExceptionHandlers) {
+				if (eh.TryStart == target)
+					eh.TryStart = newInstr;
+				if (eh.TryEnd == target)
+					eh.TryEnd = newInstr;
+				if (eh.HandlerStart == target)
+					eh.HandlerStart = newInstr;
+				if (eh.HandlerEnd == target)
+					eh.HandlerEnd = newInstr;
+			}
+			foreach (Instruction instr in body.Instructions) {
+				if (instr.Operand == target)
+					instr.Operand = newInstr;
+				else if (instr.Operand is Instruction[]) {
+					var targets = (Instruction[])instr.Operand;
+					for (int i = 0; i < targets.Length; i++)
+						if (targets[i] == target)
+							targets[i] = newInstr;
+				}
+			}
 		}
 	}
 

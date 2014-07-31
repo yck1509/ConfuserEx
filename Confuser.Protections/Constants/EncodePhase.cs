@@ -32,10 +32,11 @@ namespace Confuser.Protections.Constants {
 			var ldc = new Dictionary<object, List<Tuple<MethodDef, Instruction>>>();
 			var ldInit = new Dictionary<byte[], List<Tuple<MethodDef, Instruction>>>(new ByteArrayComparer());
 
-			// extract
+			// Extract constants
 			ExtractConstants(context, parameters, moduleCtx, ldc, ldInit);
 
-			// encode
+			// Encode constants
+			moduleCtx.ReferenceRepl = new Dictionary<MethodDef, List<Tuple<Instruction, uint, IMethod>>>();
 			moduleCtx.EncodedBuffer = new List<uint>();
 			foreach (var entry in ldInit.WithProgress(context.Logger)) // Ensure the array length haven't been encoded yet
 			{
@@ -61,6 +62,7 @@ namespace Confuser.Protections.Constants {
 					throw new UnreachableException();
 				context.CheckCancellation();
 			}
+			ReferenceReplacer.ReplaceReference(moduleCtx, parameters);
 
 			// compress
 			var encodedBuff = new byte[moduleCtx.EncodedBuffer.Count * 4];
@@ -115,7 +117,7 @@ namespace Confuser.Protections.Constants {
 				repl.Add(Instruction.Create(OpCodes.Dup));
 				repl.Add(Instruction.Create(OpCodes.Ldtoken, moduleCtx.DataField));
 				repl.Add(Instruction.Create(OpCodes.Call, moduleCtx.Module.Import(
-					typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
+					typeof(RuntimeHelpers).GetMethod("InitializeArray"))));
 				return repl.ToArray();
 			});
 		}
@@ -204,11 +206,8 @@ namespace Confuser.Protections.Constants {
 				uint id = (uint)buffIndex | (uint)(typeID(decoder.Item2) << 30);
 				id = moduleCtx.ModeHandler.Encode(decoder.Item2.Data, moduleCtx, id);
 
-				int i = instr.Item1.Body.Instructions.IndexOf(instr.Item2);
-				instr.Item2.OpCode = OpCodes.Ldc_I4;
-				instr.Item2.Operand = (int)id;
-				instr.Item1.Body.Instructions.Insert(i + 1, Instruction.Create(OpCodes.Call,
-				                                                               new MethodSpecUser(decoder.Item1, new GenericInstMethodSig(valueType))));
+				var targetDecoder = new MethodSpecUser(decoder.Item1, new GenericInstMethodSig(valueType));
+				moduleCtx.ReferenceRepl.AddListEntry(instr.Item1, Tuple.Create(instr.Item2, id, (IMethod)targetDecoder));
 			}
 		}
 

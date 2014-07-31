@@ -5,27 +5,33 @@ using Confuser.Core.Services;
 using Confuser.DynCipher;
 using Confuser.Renamer;
 using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Constants {
 	internal class CEContext {
-		public FieldDef BufferField;
 		public ConfuserContext Context;
+		public ModuleDef Module;
+
+		public FieldDef BufferField;
 		public FieldDef DataField;
 		public TypeDef DataType;
+		public MethodDef InitMethod;
+
 		public int DecoderCount;
 		public List<Tuple<MethodDef, DecoderDesc>> Decoders;
-		public IDynCipherService DynCipher;
+
 		public EncodeElements Elements;
 		public List<uint> EncodedBuffer;
-		public MethodDef InitMethod;
-		public IMarkerService Marker;
 
 		public Mode Mode;
-
 		public IEncodeMode ModeHandler;
-		public ModuleDef Module;
+
+		public IDynCipherService DynCipher;
+		public IMarkerService Marker;
 		public INameService Name;
 		public RandomGenerator Random;
+
+		public Dictionary<MethodDef, List<Tuple<Instruction, uint, IMethod>>> ReferenceRepl;
 	}
 
 	internal class DecoderDesc {

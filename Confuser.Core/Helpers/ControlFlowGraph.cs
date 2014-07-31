@@ -12,11 +12,16 @@ namespace Confuser.Core.Helpers {
 		private readonly List<ControlFlowBlock> blocks;
 		private readonly CilBody body;
 		private readonly int[] instrBlocks;
+		private readonly Dictionary<Instruction, int> indexMap;
 
 		private ControlFlowGraph(CilBody body) {
 			this.body = body;
 			instrBlocks = new int[body.Instructions.Count];
 			blocks = new List<ControlFlowBlock>();
+
+			indexMap = new Dictionary<Instruction, int>();
+			for (int i = 0; i < body.Instructions.Count; i++)
+				indexMap.Add(body.Instructions[i], i);
 		}
 
 		/// <summary>
@@ -36,6 +41,14 @@ namespace Confuser.Core.Helpers {
 			get { return blocks[id]; }
 		}
 
+		/// <summary>
+		///     Gets the corresponding method body.
+		/// </summary>
+		/// <value>The method body.</value>
+		public CilBody Body {
+			get { return body; }
+		}
+
 		IEnumerator<ControlFlowBlock> IEnumerable<ControlFlowBlock>.GetEnumerator() {
 			return blocks.GetEnumerator();
 		}
@@ -53,7 +66,16 @@ namespace Confuser.Core.Helpers {
 			return blocks[instrBlocks[instrIndex]];
 		}
 
-		private void PopulateBlockHeaders(HashSet<Instruction> blockHeaders, HashSet<Instruction> handlerHeaders) {
+		/// <summary>
+		///     Gets the index of the specified instruction.
+		/// </summary>
+		/// <param name="instrIndex">The instruction.</param>
+		/// <returns>The index of instruction.</returns>
+		public int IndexOf(Instruction instr) {
+			return indexMap[instr];
+		}
+
+		private void PopulateBlockHeaders(HashSet<Instruction> blockHeaders, HashSet<Instruction> entryHeaders) {
 			for (int i = 0; i < body.Instructions.Count; i++) {
 				Instruction instr = body.Instructions[i];
 
@@ -61,6 +83,11 @@ namespace Confuser.Core.Helpers {
 					blockHeaders.Add((Instruction)instr.Operand);
 					if (i + 1 < body.Instructions.Count)
 						blockHeaders.Add(body.Instructions[i + 1]);
+
+					// Exiting protected blocks may have unexpected side effects (i.e. finally)
+					// TODO: Handle finally in a better way.
+					if (instr.OpCode.Code == Code.Leave || instr.OpCode.Code == Code.Leave_S)
+						entryHeaders.Add((Instruction)instr.Operand);
 				} else if (instr.Operand is Instruction[]) {
 					foreach (Instruction target in (Instruction[])instr.Operand)
 						blockHeaders.Add(target);
@@ -76,12 +103,12 @@ namespace Confuser.Core.Helpers {
 				blockHeaders.Add(eh.TryStart);
 				blockHeaders.Add(eh.HandlerStart);
 				blockHeaders.Add(eh.FilterStart);
-				handlerHeaders.Add(eh.HandlerStart);
-				handlerHeaders.Add(eh.FilterStart);
+				entryHeaders.Add(eh.HandlerStart);
+				entryHeaders.Add(eh.FilterStart);
 			}
 		}
 
-		private void SplitBlocks(HashSet<Instruction> blockHeaders, HashSet<Instruction> handlerHeaders) {
+		private void SplitBlocks(HashSet<Instruction> blockHeaders, HashSet<Instruction> entryHeaders) {
 			int nextBlockId = 0;
 			int currentBlockId = -1;
 			Instruction currentBlockHdr = null;
@@ -93,7 +120,7 @@ namespace Confuser.Core.Helpers {
 						Instruction footer = body.Instructions[i - 1];
 
 						var type = ControlFlowBlockType.Normal;
-						if (handlerHeaders.Contains(currentBlockHdr) || currentBlockHdr == body.Instructions[0])
+						if (entryHeaders.Contains(currentBlockHdr) || currentBlockHdr == body.Instructions[0])
 							type |= ControlFlowBlockType.Entry;
 						if (footer.OpCode.FlowControl == FlowControl.Return || footer.OpCode.FlowControl == FlowControl.Throw)
 							type |= ControlFlowBlockType.Exit;
@@ -111,7 +138,7 @@ namespace Confuser.Core.Helpers {
 				Instruction footer = body.Instructions[body.Instructions.Count - 1];
 
 				var type = ControlFlowBlockType.Normal;
-				if (handlerHeaders.Contains(currentBlockHdr) || currentBlockHdr == body.Instructions[0])
+				if (entryHeaders.Contains(currentBlockHdr) || currentBlockHdr == body.Instructions[0])
 					type |= ControlFlowBlockType.Entry;
 				if (footer.OpCode.FlowControl == FlowControl.Return || footer.OpCode.FlowControl == FlowControl.Throw)
 					type |= ControlFlowBlockType.Exit;
@@ -120,7 +147,7 @@ namespace Confuser.Core.Helpers {
 			}
 		}
 
-		private void LinkBlocks(Dictionary<Instruction, int> indexMap) {
+		private void LinkBlocks() {
 			for (int i = 0; i < body.Instructions.Count; i++) {
 				Instruction instr = body.Instructions[i];
 				if (instr.Operand is Instruction) {
@@ -157,20 +184,16 @@ namespace Confuser.Core.Helpers {
 			if (body.Instructions.Count == 0)
 				return graph;
 
-			var indexMap = new Dictionary<Instruction, int>();
-			for (int i = 0; i < body.Instructions.Count; i++)
-				indexMap.Add(body.Instructions[i], i);
-
 			// Populate block headers
 			var blockHeaders = new HashSet<Instruction>();
-			var handlerHeaders = new HashSet<Instruction>();
-			graph.PopulateBlockHeaders(blockHeaders, handlerHeaders);
+			var entryHeaders = new HashSet<Instruction>();
+			graph.PopulateBlockHeaders(blockHeaders, entryHeaders);
 
 			// Split blocks
-			graph.SplitBlocks(blockHeaders, handlerHeaders);
+			graph.SplitBlocks(blockHeaders, entryHeaders);
 
 			// Link blocks
-			graph.LinkBlocks(indexMap);
+			graph.LinkBlocks();
 
 			return graph;
 		}
