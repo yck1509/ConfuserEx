@@ -66,8 +66,10 @@ namespace ConfuserEx.ViewModel {
 				return new RelayCommand(() => {
 					var ofd = new VistaOpenFileDialog();
 					ofd.Filter = ".NET assemblies (*.exe, *.dll)|*.exe;*.dll|All Files (*.*)|*.*";
+					ofd.Multiselect = true;
 					if (ofd.ShowDialog() ?? false) {
-						AddModule(ofd.FileName);
+						foreach(var file in ofd.FileNames)
+							AddModule(file);
 					}
 				});
 			}
