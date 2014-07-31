@@ -110,9 +110,7 @@ namespace Confuser.Renamer.BAML {
 				else
 					assembly = assemblyRefs[(ushort)asmId];
 
-				// WPF uses Assembly.GetType to load it, so if no assembly specified in the TypeSig, it must be in current assembly.
-				AssemblyDef assemblyRef = module.Assembly == assembly ?
-					                          null : context.Resolver.ResolveThrow(module.GetAssemblyRefs().Single(r => r.FullName == assembly.FullName), module);
+				AssemblyDef assemblyRef = module.Assembly == assembly ? null : assembly;
 
 				TypeSig typeSig = TypeNameParser.ParseAsTypeSigReflectionThrow(module, rec.TypeFullName, new DummyAssemblyRefFinder(assemblyRef));
 				typeRefs[rec.TypeId] = typeSig;
