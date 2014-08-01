@@ -39,13 +39,13 @@ namespace Confuser.Renamer {
 		private static readonly object ReferencesKey = new object();
 		private static readonly object OriginalNameKey = new object();
 		private static readonly object OriginalNamespaceKey = new object();
-		private readonly ConfuserContext context;
 
+		private readonly ConfuserContext context;
 		private readonly byte[] nameSeed;
 		private readonly RandomGenerator random;
-
 		private readonly VTableStorage storage = new VTableStorage();
 		private AnalyzePhase analyze;
+		private readonly Dictionary<string, string> nameDict = new Dictionary<string, string>();
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
@@ -136,6 +136,10 @@ namespace Confuser.Renamer {
 					return Utils.EncodeString(hash, letterCharset);
 				case RenameMode.ASCII:
 					return Utils.EncodeString(hash, asciiCharset);
+				case RenameMode.Decodable:
+					var newName = "=" + Utils.EncodeString(hash, alphaNumCharset) + "=";
+					nameDict[newName] = name;
+					return newName;
 			}
 			throw new NotSupportedException("Rename mode '" + mode + "' is not supported.");
 		}
@@ -156,11 +160,9 @@ namespace Confuser.Renamer {
 			context.Annotations.Set(obj, OriginalNamespaceKey, ns);
 		}
 
-
 		public void RegisterRenamer(IRenamer renamer) {
 			Renamers.Add(renamer);
 		}
-
 
 		public void MarkHelper(IDnlibDef def, IMarkerService marker) {
 			if (marker.IsMarked(def))
@@ -170,13 +172,15 @@ namespace Confuser.Renamer {
 				method.Access = MethodAttributes.Assembly;
 				if (!method.IsSpecialName && !method.IsRuntimeSpecialName && !method.DeclaringType.IsDelegate())
 					method.Name = RandomName();
-			} else if (def is FieldDef) {
+			}
+			else if (def is FieldDef) {
 				var field = (FieldDef)def;
 				field.Access = FieldAttributes.Assembly;
 				field.Name = RandomName();
 				if (!field.IsSpecialName && !field.IsRuntimeSpecialName)
 					field.Name = RandomName();
-			} else if (def is TypeDef) {
+			}
+			else if (def is TypeDef) {
 				var type = (TypeDef)def;
 				type.Visibility = type.DeclaringType == null ? TypeAttributes.NotPublic : TypeAttributes.NestedAssembly;
 				type.Namespace = "";
@@ -198,6 +202,11 @@ namespace Confuser.Renamer {
 		private static readonly char[] letterCharset = Enumerable.Range(0, 26)
 		                                                         .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
 		                                                         .ToArray();
+
+		private static readonly char[] alphaNumCharset = Enumerable.Range(0, 26)
+		                                                           .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
+		                                                           .Concat(Enumerable.Range(0, 10).Select(ord => (char)('0' + ord)))
+		                                                           .ToArray();
 
 		// Especially chosen, just to mess with people.
 		// Inspired by: http://xkcd.com/1137/ :D
@@ -224,6 +233,10 @@ namespace Confuser.Renamer {
 
 		public string GetOriginalNamespace(object obj) {
 			return context.Annotations.Get(obj, OriginalNamespaceKey, "");
+		}
+
+		public ICollection<KeyValuePair<string, string>> GetNameMap() {
+			return nameDict;
 		}
 	}
 }

@@ -6,6 +6,7 @@ namespace Confuser.Renamer {
 		Unicode,
 		ASCII,
 		Letters,
+		Decodable,
 		Debug,
 	}
 }
