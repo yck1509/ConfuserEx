@@ -472,8 +472,9 @@ namespace Confuser.Core {
 
 			context.Logger.Error("Installed Framework Versions:");
 			foreach (string ver in GetFrameworkVersions()) {
-				context.Logger.ErrorFormat("    {0}", ver);
+				context.Logger.ErrorFormat("    {0}", ver.Trim());
 			}
+			context.Logger.Error("");
 
 			if (context.Resolver != null) {
 				context.Logger.Error("Cached assemblies:");
@@ -482,6 +483,8 @@ namespace Confuser.Core {
 						context.Logger.ErrorFormat("    {0}", asm.FullName);
 					else
 						context.Logger.ErrorFormat("    {0} ({1})", asm.FullName, asm.ManifestModule.Location);
+					foreach (var reference in asm.Modules.OfType<ModuleDefMD>().SelectMany(m => m.GetAssemblyRefs()))
+						context.Logger.ErrorFormat("        {0}", reference.FullName);
 				}
 			}
 
