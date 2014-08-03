@@ -45,6 +45,7 @@ namespace Confuser.Runtime {
 			return g;
 		}
 
+		[STAThread]
 		private static int Main(string[] args) {
 			var l = (uint)Mutation.KeyI0;
 			uint[] q = Mutation.Placeholder(new uint[Mutation.KeyI0]);
