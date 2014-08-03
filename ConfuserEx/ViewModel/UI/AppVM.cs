@@ -72,7 +72,7 @@ namespace ConfuserEx.ViewModel {
 		}
 
 		public ICommand Decode {
-			get { return new RelayCommand(() => { MessageBox.Show("Not yet implemented!", "ConfuserEx", MessageBoxButton.OK, MessageBoxImage.Information); }, () => !NavigationDisabled); }
+			get { return new RelayCommand(() => new StackTraceDecoder { Owner = Application.Current.MainWindow }.ShowDialog(), () => !NavigationDisabled); }
 		}
 
 		public bool OnWindowClosing() {

@@ -92,6 +92,9 @@
     <Compile Include="InvertBoolConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Skin.cs" />
+    <Compile Include="StackTraceDecoder.xaml.cs">
+      <DependentUpon>StackTraceDecoder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModel\Project\ProjectRuleVM.cs" />
     <Compile Include="ViewModel\Project\ProjectSettingVM.cs" />
     <Compile Include="ViewModel\StringItem.cs" />
@@ -134,6 +137,10 @@
     <Page Include="Skin.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="StackTraceDecoder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views.xaml">
       <Generator>MSBuild:Compile</Generator>
