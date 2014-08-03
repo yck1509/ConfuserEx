@@ -7,6 +7,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer {
 	public class VTableSignature {
+
 		internal VTableSignature(TypeSig iface, MethodSig sig, string name) {
 			if (iface.ScopeType.ResolveTypeDefThrow().IsInterface)
 				InterfaceType = iface;
@@ -58,9 +59,11 @@ namespace Confuser.Renamer {
 		public override string ToString() {
 			return FullNameCreator.MethodFullName(InterfaceType == null ? "" : FullNameCreator.FullName(InterfaceType, false), Name, MethodSig);
 		}
+
 	}
 
 	public class VTableSlot {
+
 		internal VTableSlot(VTable vTable, MethodDef def, TypeSig decl, VTableSignature signature) {
 			VTable = vTable;
 			MethodDef = def;
@@ -85,9 +88,11 @@ namespace Confuser.Renamer {
 		public override string ToString() {
 			return MethodDef.ToString();
 		}
+
 	}
 
 	public class VTable {
+
 		internal VTable(TypeDef typeDef) {
 			Type = typeDef;
 			GenericArguments = null;
@@ -117,7 +122,8 @@ namespace Confuser.Renamer {
 			if (!slot.MethodDef.IsFinal) {
 				slotList.Add(slot);
 				Slots.Add(slot);
-			} else
+			}
+			else
 				Finals.Add(slot);
 		}
 
@@ -132,7 +138,8 @@ namespace Confuser.Renamer {
 			if (!slot.MethodDef.IsFinal) {
 				slotDict.AddListEntry(slot.Signature, slot);
 				Slots.Add(slot);
-			} else
+			}
+			else
 				Finals.Add(slot);
 		}
 
@@ -149,13 +156,16 @@ namespace Confuser.Renamer {
 								slotList.Add(slot);
 								Slots.Add(slot);
 							}
-						} else
+						}
+						else
 							throw new UnreachableException();
-					} else {
+					}
+					else {
 						slotList.Add(slot);
 						Slots.Add(slot);
 					}
-				} else {
+				}
+				else {
 					slotDict.AddListEntry(slot.Signature, slot);
 					Slots.Add(slot);
 				}
@@ -196,10 +206,9 @@ namespace Confuser.Renamer {
 
 					var methodSlot = new VTableSlot(ret, method, method.DeclaringType.ToTypeSig(), VTableSignature.FromMethod(method));
 					if (slotDict.ContainsKey(sig) && slotDict[sig].Count > 0) {
-					        ret.Override(slotDict, sig, methodSlot, targetMethod);
-	                        		methodsProcessed.Add(method);
-				        }
-					
+						ret.Override(slotDict, sig, methodSlot, targetMethod);
+						methodsProcessed.Add(method);
+					}
 				}
 
 			// Normal override
@@ -234,14 +243,17 @@ namespace Confuser.Renamer {
 					Debug.Assert(!ret.Slots.Any(s => s.MethodDef == method));
 					ret.Slots.Add(slot);
 				}
-				next: continue;
+				next:
+				continue;
 			}
 
 			return ret;
 		}
+
 	}
 
 	public class VTableStorage {
+
 		private Dictionary<TypeDef, VTable> storage = new Dictionary<TypeDef, VTable>();
 
 		public VTable this[TypeDef type] {
@@ -268,15 +280,18 @@ namespace Confuser.Renamer {
 				if (sig is TypeDefOrRefSig) {
 					TypeDef typeDef = ((TypeDefOrRefSig)sig).TypeDefOrRef.ResolveTypeDefThrow();
 					return GetOrConstruct(typeDef);
-				} else if (sig is GenericInstSig) {
+				}
+				else if (sig is GenericInstSig) {
 					var genInst = (GenericInstSig)sig;
 					TypeDef openType = genInst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
 					VTable vTable = GetOrConstruct(openType);
 
 					return ResolveGenericArgument(openType, genInst, vTable);
-				} else
+				}
+				else
 					throw new NotSupportedException("Unexpected type: " + type.ToString());
-			} else
+			}
+			else
 				throw new UnreachableException();
 		}
 
@@ -295,5 +310,6 @@ namespace Confuser.Renamer {
 			}
 			return ret;
 		}
+
 	}
 }

@@ -10,6 +10,7 @@ using SevenZip.Compression.LZMA;
 
 namespace Confuser.Core.Services {
 	internal class CompressionService : ICompressionService {
+
 		private static readonly object Decompressor = new object();
 		private readonly ConfuserContext context;
 
@@ -38,7 +39,8 @@ namespace Confuser.Core.Services {
 
 						if (method.Name == "Decompress")
 							decomp = method;
-					} else if (member is FieldDef) {
+					}
+					else if (member is FieldDef) {
 						var field = (FieldDef)member;
 						if (field.Access == FieldAttributes.Public)
 							field.Access = FieldAttributes.Assembly;
@@ -98,6 +100,7 @@ namespace Confuser.Core.Services {
 		}
 
 		private class CompressionLogger : ICodeProgress {
+
 			private readonly Action<double> progressFunc;
 			private readonly int size;
 
@@ -110,13 +113,16 @@ namespace Confuser.Core.Services {
 				double precentage = (double)inSize / size;
 				progressFunc(precentage);
 			}
+
 		}
+
 	}
 
 	/// <summary>
 	///     Provides methods to do compression and inject decompression algorithm.
 	/// </summary>
 	public interface ICompressionService {
+
 		/// <summary>
 		///     Gets the runtime decompression method in the module and inject if it does not exists.
 		/// </summary>
@@ -132,5 +138,6 @@ namespace Confuser.Core.Services {
 		/// <param name="progressFunc">The function that receive the progress of compression.</param>
 		/// <returns>The compressed data.</returns>
 		byte[] Compress(byte[] data, Action<double> progressFunc = null);
+
 	}
 }

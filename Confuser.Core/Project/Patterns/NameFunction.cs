@@ -6,6 +6,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that compare the name of definition.
 	/// </summary>
 	public class NameFunction : PatternFunction {
+
 		internal const string FnName = "name";
 
 		/// <inheritdoc />
@@ -23,5 +24,6 @@ namespace Confuser.Core.Project.Patterns {
 			object name = Arguments[0].Evaluate(definition);
 			return definition.Name == name.ToString();
 		}
+
 	}
 }

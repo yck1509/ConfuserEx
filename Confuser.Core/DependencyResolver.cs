@@ -8,6 +8,7 @@ namespace Confuser.Core {
 	///     Resolves dependency between protections.
 	/// </summary>
 	internal class DependencyResolver {
+
 		private readonly List<Protection> protections;
 
 		/// <summary>
@@ -40,7 +41,7 @@ namespace Confuser.Core {
 				Type protType = prot.GetType();
 
 				BeforeProtectionAttribute before = protType
-					.GetCustomAttributes(typeof (BeforeProtectionAttribute), false)
+					.GetCustomAttributes(typeof(BeforeProtectionAttribute), false)
 					.Cast<BeforeProtectionAttribute>()
 					.SingleOrDefault();
 				if (before != null) {
@@ -53,7 +54,7 @@ namespace Confuser.Core {
 				}
 
 				AfterProtectionAttribute after = protType
-					.GetCustomAttributes(typeof (AfterProtectionAttribute), false)
+					.GetCustomAttributes(typeof(AfterProtectionAttribute), false)
 					.Cast<AfterProtectionAttribute>()
 					.SingleOrDefault();
 				if (after != null) {
@@ -97,6 +98,7 @@ namespace Confuser.Core {
 		///     An edge of dependency graph.
 		/// </summary>
 		private class DependencyGraphEdge {
+
 			/// <summary>
 			///     Initializes a new instance of the <see cref="DependencyGraphEdge" /> class.
 			/// </summary>
@@ -116,13 +118,16 @@ namespace Confuser.Core {
 			///     The destination protection node.
 			/// </summary>
 			public Protection To { get; private set; }
+
 		}
+
 	}
 
 	/// <summary>
 	///     The exception that is thrown when there exists circular dependency between protections.
 	/// </summary>
 	internal class CircularDependencyException : Exception {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="CircularDependencyException" /> class.
 		/// </summary>
@@ -145,5 +150,6 @@ namespace Confuser.Core {
 		///     Second protection that involved in circular dependency.
 		/// </summary>
 		public Protection ProtectionB { get; private set; }
+
 	}
 }

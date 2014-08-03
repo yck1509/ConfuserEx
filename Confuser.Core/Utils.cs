@@ -9,6 +9,7 @@ namespace Confuser.Core {
 	///     Provides a set of utility methods
 	/// </summary>
 	public static class Utils {
+
 		private static readonly char[] hexCharset = "0123456789abcdef".ToCharArray();
 
 		/// <summary>
@@ -199,5 +200,6 @@ namespace Confuser.Core {
 			logger.Progress(i, list.Count);
 			logger.EndProgress();
 		}
+
 	}
 }

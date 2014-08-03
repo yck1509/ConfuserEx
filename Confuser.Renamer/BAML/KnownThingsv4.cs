@@ -5,6 +5,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.BAML {
 	internal class KnownThingsv4 : IKnownThings {
+
 		private readonly Dictionary<int, AssemblyDef> assemblies;
 		private readonly ConfuserContext context;
 		private readonly Dictionary<KnownProperties, Tuple<KnownTypes, PropertyDef, TypeDef>> properties;
@@ -1083,5 +1084,6 @@ namespace Confuser.Renamer.BAML {
 			properties[KnownProperties.WrapPanel_Children] = InitProperty(KnownTypes.WrapPanel, "Children", assemblies[1].Find("System.Windows.UIElement", true));
 			properties[KnownProperties.XmlDataProvider_XmlSerializer] = InitProperty(KnownTypes.XmlDataProvider, "XmlSerializer", assemblies[6].Find("System.Xml.Serialization.IXmlSerializable", true));
 		}
+
 	}
 }

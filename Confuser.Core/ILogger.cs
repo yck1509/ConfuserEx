@@ -5,6 +5,7 @@ namespace Confuser.Core {
 	///     Defines a logger used to log Confuser events
 	/// </summary>
 	public interface ILogger {
+
 		/// <summary>
 		///     Logs a message at DEBUG level.
 		/// </summary>
@@ -100,5 +101,6 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="successful">Indicated whether the protection process is successful.</param>
 		void Finish(bool successful);
+
 	}
 }

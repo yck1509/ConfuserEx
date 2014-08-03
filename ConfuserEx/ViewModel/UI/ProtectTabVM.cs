@@ -10,7 +10,7 @@ using Confuser.Core;
 using Confuser.Core.Project;
 using GalaSoft.MvvmLight.Command;
 #if !NET45
-using PTL::System.Threading;
+
 #else
 using System.Threading;
 #endif
@@ -19,6 +19,7 @@ using System.Threading;
 
 namespace ConfuserEx.ViewModel {
 	internal class ProtectTabVM : TabViewModel, ILogger {
+
 		private readonly Paragraph documentContent;
 		private CancellationTokenSource cancelSrc;
 		private double? progress = 0;

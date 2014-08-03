@@ -8,6 +8,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class ExpressionEncoding : IRPEncoding {
+
 		private readonly Dictionary<MethodDef, Tuple<Expression, Func<int, int>>> keys = new Dictionary<MethodDef, Tuple<Expression, Func<int, int>>>();
 
 		public Instruction[] EmitDecode(MethodDef init, RPContext ctx, Instruction[] arg) {
@@ -34,7 +35,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				new VariableExpression { Variable = var }, new VariableExpression { Variable = result },
 				ctx.Depth, out expression, out inverse);
 
-			expCompiled = new DMCodeGen(typeof (int), new[] { Tuple.Create("{VAR}", typeof (int)) })
+			expCompiled = new DMCodeGen(typeof(int), new[] { Tuple.Create("{VAR}", typeof(int)) })
 				.GenerateCIL(expression)
 				.Compile<Func<int, int>>();
 		}
@@ -51,6 +52,7 @@ namespace Confuser.Protections.ReferenceProxy {
 		}
 
 		private class CodeGen : CILCodeGen {
+
 			private readonly Instruction[] arg;
 
 			public CodeGen(Instruction[] arg, MethodDef method, IList<Instruction> instrs)
@@ -62,9 +64,12 @@ namespace Confuser.Protections.ReferenceProxy {
 				if (var.Name == "{RESULT}") {
 					foreach (Instruction instr in arg)
 						base.Emit(instr);
-				} else
+				}
+				else
 					base.LoadVar(var);
 			}
+
 		}
+
 	}
 }

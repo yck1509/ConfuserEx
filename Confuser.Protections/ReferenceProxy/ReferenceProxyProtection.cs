@@ -5,12 +5,15 @@ using dnlib.DotNet;
 
 namespace Confuser.Protections {
 	public interface IReferenceProxyService {
+
 		void ExcludeMethod(ConfuserContext context, MethodDef method);
+
 	}
 
 	[AfterProtection("Ki.AntiDebug", "Ki.AntiDump")]
 	[BeforeProtection("Ki.ControlFlow")]
 	internal class ReferenceProxyProtection : Protection, IReferenceProxyService {
+
 		public const string _Id = "ref proxy";
 		public const string _FullId = "Ki.RefProxy";
 		public const string _ServiceId = "Ki.RefProxy";
@@ -40,11 +43,12 @@ namespace Confuser.Protections {
 		}
 
 		protected override void Initialize(ConfuserContext context) {
-			context.Registry.RegisterService(_ServiceId, typeof (IReferenceProxyService), this);
+			context.Registry.RegisterService(_ServiceId, typeof(IReferenceProxyService), this);
 		}
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
 			pipeline.InsertPreStage(PipelineStage.ProcessModule, new ReferenceProxyPhase(this));
 		}
+
 	}
 }

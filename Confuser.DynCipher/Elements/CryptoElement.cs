@@ -4,6 +4,7 @@ using Confuser.DynCipher.Generation;
 
 namespace Confuser.DynCipher.Elements {
 	internal abstract class CryptoElement {
+
 		public CryptoElement(int count) {
 			DataCount = count;
 			DataIndexes = new int[count];
@@ -15,5 +16,6 @@ namespace Confuser.DynCipher.Elements {
 		public abstract void Initialize(RandomGenerator random);
 		public abstract void Emit(CipherGenContext context);
 		public abstract void EmitInverse(CipherGenContext context);
+
 	}
 }

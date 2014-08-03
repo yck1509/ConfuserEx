@@ -9,6 +9,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Constants {
 	internal class NormalMode : IEncodeMode {
+
 		public IEnumerable<Instruction> EmitDecrypt(MethodDef init, CEContext ctx, Local block, Local key) {
 			for (int i = 0; i < 0x10; i++) {
 				yield return Instruction.Create(OpCodes.Ldloc, block);
@@ -52,5 +53,6 @@ namespace Confuser.Protections.Constants {
 			Debug.Assert(((ret * MathsUtils.modInv(key.Item1)) ^ key.Item2) == id);
 			return ret;
 		}
+
 	}
 }

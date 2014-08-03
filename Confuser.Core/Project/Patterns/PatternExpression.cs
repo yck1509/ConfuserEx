@@ -7,6 +7,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     A pattern expression.
 	/// </summary>
 	public abstract class PatternExpression {
+
 		/// <summary>
 		///     Evaluates the expression on the specified definition.
 		/// </summary>
@@ -19,5 +20,6 @@ namespace Confuser.Core.Project.Patterns {
 		/// </summary>
 		/// <param name="tokens">The output list of tokens.</param>
 		public abstract void Serialize(IList<PatternToken> tokens);
+
 	}
 }

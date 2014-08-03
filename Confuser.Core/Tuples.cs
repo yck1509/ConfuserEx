@@ -8,6 +8,7 @@ namespace Confuser.Core {
 	/// <typeparam name="T1">The type of the tuple's first component.</typeparam>
 	/// <typeparam name="T2">The type of the tuple's second component.</typeparam>
 	public class Tuple<T1, T2> {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="Tuple{T1, T2}" /> class.
 		/// </summary>
@@ -48,6 +49,7 @@ namespace Confuser.Core {
 		public override string ToString() {
 			return string.Format("({0}, {1})", Item1, Item2);
 		}
+
 	}
 
 	/// <summary>
@@ -57,6 +59,7 @@ namespace Confuser.Core {
 	/// <typeparam name="T2">The type of the tuple's second component.</typeparam>
 	/// <typeparam name="T3">The type of the tuple's third component.</typeparam>
 	public class Tuple<T1, T2, T3> {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="Tuple{T1, T2, T3}" /> class.
 		/// </summary>
@@ -107,12 +110,14 @@ namespace Confuser.Core {
 		public override string ToString() {
 			return string.Format("({0}, {1}, {2})", Item1, Item2, Item3);
 		}
+
 	}
 
 	/// <summary>
 	///     Provides static methods for creating tuple objects.
 	/// </summary>
 	public static class Tuple {
+
 		/// <summary>
 		///     Creates a new 2-tuple, or pair.
 		/// </summary>
@@ -138,5 +143,6 @@ namespace Confuser.Core {
 		public static Tuple<T1, T2, T3> Create<T1, T2, T3>(T1 item1, T2 item2, T3 item3) {
 			return new Tuple<T1, T2, T3>(item1, item2, item3);
 		}
+
 	}
 }

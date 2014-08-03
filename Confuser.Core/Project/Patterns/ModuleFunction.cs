@@ -6,6 +6,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that compare the module of definition.
 	/// </summary>
 	public class ModuleFunction : PatternFunction {
+
 		internal const string FnName = "module";
 
 		/// <inheritdoc />
@@ -25,5 +26,6 @@ namespace Confuser.Core.Project.Patterns {
 			object name = Arguments[0].Evaluate(definition);
 			return ((IOwnerModule)definition).Module.Name == name.ToString();
 		}
+
 	}
 }

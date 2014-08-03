@@ -7,6 +7,7 @@ using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Generation {
 	internal class ExpressionGenerator {
+
 		private static Expression GenerateExpression(RandomGenerator random, Expression current, int currentDepth, int targetDepth) {
 			if (currentDepth == targetDepth || (currentDepth > targetDepth / 3 && random.NextInt32(100) > 85))
 				return current;
@@ -46,7 +47,8 @@ namespace Confuser.DynCipher.Generation {
 				}
 				SwapOperands(random, binExp.Left);
 				SwapOperands(random, binExp.Right);
-			} else if (exp is UnaryOpExpression)
+			}
+			else if (exp is UnaryOpExpression)
 				SwapOperands(random, ((UnaryOpExpression)exp).Value);
 			else if (exp is LiteralExpression || exp is VariableExpression)
 				return;
@@ -64,9 +66,11 @@ namespace Confuser.DynCipher.Generation {
 				else if (exp is BinOpExpression) {
 					var binExp = (BinOpExpression)exp;
 					ret = HasVariable(binExp.Left, hasVar) || HasVariable(binExp.Right, hasVar);
-				} else if (exp is UnaryOpExpression) {
+				}
+				else if (exp is UnaryOpExpression) {
 					ret = HasVariable(((UnaryOpExpression)exp).Value, hasVar);
-				} else
+				}
+				else
 					throw new UnreachableException();
 				hasVar[exp] = ret;
 			}
@@ -84,7 +88,8 @@ namespace Confuser.DynCipher.Generation {
 						Value = result
 					};
 					exp = unaryOp.Value;
-				} else if (exp is BinOpExpression) {
+				}
+				else if (exp is BinOpExpression) {
 					var binOp = (BinOpExpression)exp;
 					bool leftHasVar = hasVar[binOp.Left];
 					Expression varExp = leftHasVar ? binOp.Left : binOp.Right;
@@ -105,7 +110,8 @@ namespace Confuser.DynCipher.Generation {
 								Left = result,
 								Right = constExp
 							};
-						} else {
+						}
+						else {
 							// k - v = r => v = k - r
 							result = new BinOpExpression {
 								Operation = BinOps.Sub,
@@ -113,7 +119,8 @@ namespace Confuser.DynCipher.Generation {
 								Right = result
 							};
 						}
-					} else if (binOp.Operation == BinOps.Mul) {
+					}
+					else if (binOp.Operation == BinOps.Mul) {
 						Debug.Assert(constExp is LiteralExpression);
 						uint val = ((LiteralExpression)constExp).Value;
 						val = MathsUtils.modInv(val);
@@ -122,7 +129,8 @@ namespace Confuser.DynCipher.Generation {
 							Left = result,
 							Right = (LiteralExpression)val
 						};
-					} else if (binOp.Operation == BinOps.Xor)
+					}
+					else if (binOp.Operation == BinOps.Xor)
 						result = new BinOpExpression {
 							Operation = BinOps.Xor,
 							Left = result,
@@ -146,12 +154,15 @@ namespace Confuser.DynCipher.Generation {
 		}
 
 		private enum ExpressionOps {
+
 			Add,
 			Sub,
 			Mul,
 			Xor,
 			Not,
 			Neg,
+
 		}
+
 	}
 }

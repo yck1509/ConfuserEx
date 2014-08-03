@@ -8,6 +8,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class VTableAnalyzer : IRenamer {
+
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
 			var method = def as MethodDef;
 			if (method == null || !method.IsVirtual)
@@ -38,7 +39,7 @@ namespace Confuser.Renamer.Analyzers {
 			VTableSignature sig = VTableSignature.FromMethod(method);
 			VTableSlot slot = vTbl.FindSlot(method);
 			Debug.Assert(slot != null);
-			
+
 			// Can't rename virtual methods which implement an interface method or override a method declared in a base type,
 			// when the interface or base type is declared in an assembly that is not currently being processed
 			if (slot.Overrides.Any(slotOverride => !context.Modules.Any(module => module.Assembly.FullName == slotOverride.MethodDef.DeclaringType.DefinitionAssembly.FullName)))
@@ -56,6 +57,7 @@ namespace Confuser.Renamer.Analyzers {
 		}
 
 		private class MethodDefOrRefComparer : IEqualityComparer<IMethodDefOrRef> {
+
 			public static readonly MethodDefOrRefComparer Instance = new MethodDefOrRefComparer();
 			private MethodDefOrRefComparer() { }
 
@@ -66,6 +68,8 @@ namespace Confuser.Renamer.Analyzers {
 			public int GetHashCode(IMethodDefOrRef obj) {
 				return new SigComparer().GetHashCode(obj) * 5 + new SigComparer().GetHashCode(obj.DeclaringType);
 			}
+
 		}
+
 	}
 }

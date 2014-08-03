@@ -11,6 +11,7 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.ControlFlow {
 	internal class ControlFlowPhase : ProtectionPhase {
+
 		private static readonly JumpMangler Jump = new JumpMangler();
 		private static readonly SwitchMangler Switch = new SwitchMangler();
 
@@ -104,5 +105,6 @@ namespace Confuser.Protections.ControlFlow {
 			}
 			body.KeepOldMaxStack = true;
 		}
+
 	}
 }

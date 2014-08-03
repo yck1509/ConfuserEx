@@ -4,6 +4,7 @@ using System;
 
 namespace SevenZip {
 	internal class CRC {
+
 		public static readonly uint[] Table;
 
 		private uint _value = 0xFFFFFFFF;
@@ -49,5 +50,6 @@ namespace SevenZip {
 		private static bool VerifyDigest(uint digest, byte[] data, uint offset, uint size) {
 			return (CalculateDigest(data, offset, size) == digest);
 		}
+
 	}
 }

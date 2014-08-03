@@ -8,6 +8,7 @@ namespace Confuser.Core.Services {
 	///     A seeded SHA256 PRNG.
 	/// </summary>
 	public class RandomGenerator {
+
 		/// <summary>
 		///     The prime numbers used for generation
 		/// </summary>
@@ -84,7 +85,8 @@ namespace Confuser.Core.Services {
 					offset += stateFilled;
 					length -= stateFilled;
 					stateFilled = 0;
-				} else {
+				}
+				else {
 					Buffer.BlockCopy(state, 32 - stateFilled, buffer, offset, length);
 					stateFilled -= length;
 					length = 0;
@@ -186,12 +188,14 @@ namespace Confuser.Core.Services {
 				list[i] = tmp;
 			}
 		}
+
 	}
 
 	/// <summary>
 	///     Implementation of <see cref="IRandomService" />.
 	/// </summary>
 	internal class RandomService : IRandomService {
+
 		private readonly byte[] seed; //32 bytes
 
 		/// <summary>
@@ -212,12 +216,14 @@ namespace Confuser.Core.Services {
 				newSeed[i] ^= idHash[i];
 			return new RandomGenerator(Utils.SHA256(newSeed));
 		}
+
 	}
 
 	/// <summary>
 	///     Provides methods to obtain a unique stable PRNG for any given ID.
 	/// </summary>
 	public interface IRandomService {
+
 		/// <summary>
 		///     Gets a RNG with the specified identifier.
 		/// </summary>
@@ -225,5 +231,6 @@ namespace Confuser.Core.Services {
 		/// <returns>The requested RNG.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="id" /> is <c>null</c>.</exception>
 		RandomGenerator GetRandomGenerator(string id);
+
 	}
 }

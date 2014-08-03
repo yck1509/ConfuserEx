@@ -5,6 +5,7 @@ using System.IO;
 
 namespace SevenZip.Compression.LZ {
 	internal class OutWindow {
+
 		public uint TrainSize = 0;
 		private byte[] _buffer;
 		private uint _pos;
@@ -94,5 +95,6 @@ namespace SevenZip.Compression.LZ {
 				pos += _windowSize;
 			return _buffer[pos];
 		}
+
 	}
 }

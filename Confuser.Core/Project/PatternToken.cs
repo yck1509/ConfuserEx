@@ -5,6 +5,7 @@ namespace Confuser.Core.Project {
 	///     The type of pattern tokens
 	/// </summary>
 	public enum TokenType {
+
 		/// <summary>
 		///     An identifier, could be functions/operators.
 		/// </summary>
@@ -29,6 +30,7 @@ namespace Confuser.Core.Project {
 		///     A comma.
 		/// </summary>
 		Comma,
+
 	}
 
 
@@ -36,6 +38,7 @@ namespace Confuser.Core.Project {
 	///     Represent a token in pattern
 	/// </summary>
 	public struct PatternToken {
+
 		/// <summary>
 		///     The position of this token in the pattern, or null if position not available.
 		/// </summary>
@@ -106,5 +109,6 @@ namespace Confuser.Core.Project {
 				return string.Format("[{0}] {1}", Type, Value);
 			return string.Format("[{0}]", Type);
 		}
+
 	}
 }

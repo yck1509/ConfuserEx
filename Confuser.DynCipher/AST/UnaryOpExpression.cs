@@ -2,11 +2,14 @@
 
 namespace Confuser.DynCipher.AST {
 	public enum UnaryOps {
+
 		Not,
 		Negate
+
 	}
 
 	public class UnaryOpExpression : Expression {
+
 		public Expression Value { get; set; }
 		public UnaryOps Operation { get; set; }
 
@@ -24,5 +27,6 @@ namespace Confuser.DynCipher.AST {
 			}
 			return op + Value;
 		}
+
 	}
 }

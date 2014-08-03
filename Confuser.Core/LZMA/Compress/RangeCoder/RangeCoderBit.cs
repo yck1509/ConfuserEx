@@ -2,6 +2,7 @@ using System;
 
 namespace SevenZip.Compression.RangeCoder {
 	internal struct BitEncoder {
+
 		public const int kNumBitModelTotalBits = 11;
 		public const uint kBitModelTotal = (1 << kNumBitModelTotalBits);
 		private const int kNumMoveBits = 5;
@@ -40,7 +41,8 @@ namespace SevenZip.Compression.RangeCoder {
 			if (symbol == 0) {
 				encoder.Range = newBound;
 				Prob += (kBitModelTotal - Prob) >> kNumMoveBits;
-			} else {
+			}
+			else {
 				encoder.Low += newBound;
 				encoder.Range -= newBound;
 				Prob -= (Prob) >> kNumMoveBits;
@@ -62,9 +64,11 @@ namespace SevenZip.Compression.RangeCoder {
 		public uint GetPrice1() {
 			return ProbPrices[(kBitModelTotal - Prob) >> kNumMoveReducingBits];
 		}
+
 	}
 
 	internal struct BitDecoder {
+
 		public const int kNumBitModelTotalBits = 11;
 		public const uint kBitModelTotal = (1 << kNumBitModelTotalBits);
 		private const int kNumMoveBits = 5;
@@ -102,5 +106,6 @@ namespace SevenZip.Compression.RangeCoder {
 			}
 			return 1;
 		}
+
 	}
 }

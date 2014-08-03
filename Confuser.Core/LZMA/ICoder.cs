@@ -8,17 +8,22 @@ namespace SevenZip {
 	///     The exception that is thrown when an error in input stream occurs during decoding.
 	/// </summary>
 	internal class DataErrorException : ApplicationException {
+
 		public DataErrorException() : base("Data Error") { }
+
 	}
 
 	/// <summary>
 	///     The exception that is thrown when the value of an argument is outside the allowable range.
 	/// </summary>
 	internal class InvalidParamException : ApplicationException {
+
 		public InvalidParamException() : base("Invalid Parameter") { }
+
 	}
 
 	internal interface ICodeProgress {
+
 		/// <summary>
 		///     Callback progress.
 		/// </summary>
@@ -29,9 +34,11 @@ namespace SevenZip {
 		///     output size. -1 if unknown.
 		/// </param>
 		void SetProgress(Int64 inSize, Int64 outSize);
+
 	};
 
 	internal interface ICoder {
+
 		/// <summary>
 		///     Codes streams.
 		/// </summary>
@@ -55,6 +62,7 @@ namespace SevenZip {
 		/// </exception>
 		void Code(Stream inStream, Stream outStream,
 		          Int64 inSize, Int64 outSize, ICodeProgress progress);
+
 	};
 
 	/*
@@ -72,6 +80,7 @@ namespace SevenZip {
 	///     Provides the fields that represent properties idenitifiers for compressing.
 	/// </summary>
 	internal enum CoderPropID {
+
 		/// <summary>
 		///     Specifies default property.
 		/// </summary>
@@ -146,18 +155,25 @@ namespace SevenZip {
 		///     Specifies mode with end marker.
 		/// </summary>
 		EndMarker
+
 	};
 
 
 	internal interface ISetCoderProperties {
+
 		void SetCoderProperties(CoderPropID[] propIDs, object[] properties);
+
 	};
 
 	internal interface IWriteCoderProperties {
+
 		void WriteCoderProperties(Stream outStream);
+
 	}
 
 	internal interface ISetDecoderProperties {
+
 		void SetDecoderProperties(byte[] properties);
+
 	}
 }

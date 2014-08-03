@@ -7,6 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ControlFlow {
 	internal static class BlockParser {
+
 		public static ScopeBlock ParseBody(CilBody body) {
 			var ehScopes = new Dictionary<ExceptionHandler, Tuple<ScopeBlock, ScopeBlock, ScopeBlock>>();
 			foreach (ExceptionHandler eh in body.ExceptionHandlers) {
@@ -24,7 +25,8 @@ namespace Confuser.Protections.ControlFlow {
 				if (eh.FilterStart != null) {
 					var filterBlock = new ScopeBlock(BlockType.Filter, eh);
 					ehScopes[eh] = Tuple.Create(tryBlock, handlerBlock, filterBlock);
-				} else
+				}
+				else
 					ehScopes[eh] = Tuple.Create(tryBlock, handlerBlock, (ScopeBlock)null);
 			}
 
@@ -80,5 +82,6 @@ namespace Confuser.Protections.ControlFlow {
 			Debug.Assert(scopeStack.Count == 1);
 			return root;
 		}
+
 	}
 }

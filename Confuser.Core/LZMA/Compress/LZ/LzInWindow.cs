@@ -5,6 +5,7 @@ using System.IO;
 
 namespace SevenZip.Compression.LZ {
 	internal class InWindow {
+
 		public UInt32 _blockSize; // Size of Allocated memory block
 		public Byte[] _bufferBase = null; // pointer to buffer with data
 
@@ -126,5 +127,6 @@ namespace SevenZip.Compression.LZ {
 			_pos -= (UInt32)subValue;
 			_streamPos -= (UInt32)subValue;
 		}
+
 	}
 }

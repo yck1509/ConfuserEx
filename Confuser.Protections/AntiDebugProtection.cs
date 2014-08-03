@@ -11,6 +11,7 @@ using dnlib.DotNet.Emit;
 namespace Confuser.Protections {
 	[BeforeProtection("Ki.ControlFlow")]
 	internal class AntiDebugProtection : Protection {
+
 		public const string _Id = "anti debug";
 		public const string _FullId = "Ki.AntiDebug";
 
@@ -43,6 +44,7 @@ namespace Confuser.Protections {
 		}
 
 		private class AntiDebugPhase : ProtectionPhase {
+
 			public AntiDebugPhase(AntiDebugProtection parent)
 				: base(parent) { }
 
@@ -110,7 +112,8 @@ namespace Confuser.Protections {
 							CustomAttribute ca = method.CustomAttributes.Find(attrName);
 							if (ca != null)
 								ca.Constructor = attr.FindMethod(".ctor");
-						} else if (member is FieldDef) {
+						}
+						else if (member is FieldDef) {
 							var field = (FieldDef)member;
 							if (field.Access == FieldAttributes.Public)
 								field.Access = FieldAttributes.Assembly;
@@ -128,10 +131,14 @@ namespace Confuser.Protections {
 			}
 
 			private enum AntiMode {
+
 				Safe,
 				Win32,
 				Antinet
+
 			}
+
 		}
+
 	}
 }

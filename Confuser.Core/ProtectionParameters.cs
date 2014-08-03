@@ -9,6 +9,7 @@ namespace Confuser.Core {
 	///     Parameters of <see cref="ConfuserComponent" />.
 	/// </summary>
 	public class ProtectionParameters {
+
 		private static readonly object ParametersKey = new object();
 
 		/// <summary>
@@ -54,7 +55,8 @@ namespace Confuser.Core {
 			// For packers
 			if (comp is Packer) {
 				parameters = new Dictionary<string, string>(context.Project.Packer, StringComparer.OrdinalIgnoreCase);
-			} else {
+			}
+			else {
 				// For protections
 				var objParams = context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
 				if (objParams == null)
@@ -64,14 +66,14 @@ namespace Confuser.Core {
 			}
 			string ret;
 			if (parameters.TryGetValue(name, out ret)) {
-				Type paramType = typeof (T);
+				Type paramType = typeof(T);
 				Type nullable = Nullable.GetUnderlyingType(paramType);
 				if (nullable != null)
 					paramType = nullable;
 
 				if (paramType.IsEnum)
 					return (T)Enum.Parse(paramType, ret, true);
-				return (T)Convert.ChangeType(ret, typeof (T));
+				return (T)Convert.ChangeType(ret, typeof(T));
 			}
 			return defValue;
 		}
@@ -97,5 +99,6 @@ namespace Confuser.Core {
 			ConfuserContext context, IDnlibDef target) {
 			return context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
 		}
+
 	}
 }

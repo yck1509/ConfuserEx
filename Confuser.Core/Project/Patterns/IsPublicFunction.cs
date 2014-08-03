@@ -6,6 +6,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that indicate the visibility of members.
 	/// </summary>
 	public class IsPublicFunction : PatternFunction {
+
 		internal const string FnName = "is-public";
 
 		/// <inheritdoc />
@@ -20,7 +21,7 @@ namespace Confuser.Core.Project.Patterns {
 
 		/// <inheritdoc />
 		public override object Evaluate(IDnlibDef definition) {
-			IMemberDef member = definition as IMemberDef;
+			var member = definition as IMemberDef;
 			if (member == null)
 				return false;
 
@@ -33,14 +34,14 @@ namespace Confuser.Core.Project.Patterns {
 
 			if (member is MethodDef)
 				return ((MethodDef)member).IsPublic;
-			else if (member is FieldDef)
+			if (member is FieldDef)
 				return ((FieldDef)member).IsPublic;
-			else if (member is PropertyDef)
+			if (member is PropertyDef)
 				return ((PropertyDef)member).IsPublic();
-			else if (member is EventDef)
+			if (member is EventDef)
 				return ((EventDef)member).IsPublic();
-			else
-				throw new NotSupportedException();
+			throw new NotSupportedException();
 		}
+
 	}
 }

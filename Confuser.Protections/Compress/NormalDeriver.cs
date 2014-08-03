@@ -7,6 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Compress {
 	internal class NormalDeriver : IKeyDeriver {
+
 		private uint k1;
 		private uint k2;
 		private uint k3;
@@ -65,5 +66,6 @@ namespace Confuser.Protections.Compress {
 				yield return Instruction.Create(OpCodes.Stelem_I4);
 			}
 		}
+
 	}
 }

@@ -12,6 +12,7 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.Resources {
 	internal class MDPhase {
+
 		private readonly REContext ctx;
 		private ByteArrayChunk encryptedResource;
 
@@ -98,10 +99,12 @@ namespace Confuser.Protections.Resources {
 				MutationHelper.InjectKeys(ctx.InitMethod,
 				                          new[] { 0, 1 },
 				                          new[] { (int)(size / 4), (int)(keySeed) });
-			} else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
+			}
+			else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 				TablesHeap tblHeap = writer.MetaData.TablesHeap;
 				tblHeap.FieldRVATable[writer.MetaData.GetFieldRVARid(ctx.DataField)].RVA = (uint)encryptedResource.RVA;
 			}
 		}
+
 	}
 }

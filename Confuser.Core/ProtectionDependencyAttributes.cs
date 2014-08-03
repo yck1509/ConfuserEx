@@ -6,6 +6,7 @@ namespace Confuser.Core {
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 	public class BeforeProtectionAttribute : Attribute {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="BeforeProtectionAttribute" /> class.
 		/// </summary>
@@ -19,6 +20,7 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <value>The IDs of protections.</value>
 		public string[] Ids { get; private set; }
+
 	}
 
 	/// <summary>
@@ -26,6 +28,7 @@ namespace Confuser.Core {
 	/// </summary>
 	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
 	public class AfterProtectionAttribute : Attribute {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="BeforeProtectionAttribute" /> class.
 		/// </summary>
@@ -39,5 +42,6 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <value>The IDs of protections.</value>
 		public string[] Ids { get; private set; }
+
 	}
 }

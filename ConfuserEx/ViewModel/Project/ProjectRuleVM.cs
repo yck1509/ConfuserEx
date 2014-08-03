@@ -7,10 +7,13 @@ using Confuser.Core.Project.Patterns;
 
 namespace ConfuserEx.ViewModel {
 	internal interface IRuleContainer {
+
 		IList<ProjectRuleVM> Rules { get; }
+
 	}
 
 	public class ProjectRuleVM : ViewModelBase, IViewModel<Rule> {
+
 		private readonly ProjectVM parent;
 		private readonly Rule rule;
 		private string error;
@@ -80,11 +83,13 @@ namespace ConfuserEx.ViewModel {
 			try {
 				expression = new PatternParser().Parse(Pattern);
 				ExpressionError = null;
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				ExpressionError = e.Message;
 				expression = null;
 			}
 			Expression = expression;
 		}
+
 	}
 }

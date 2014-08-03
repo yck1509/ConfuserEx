@@ -7,6 +7,7 @@ using Confuser.Core.Project;
 
 namespace ConfuserEx.ViewModel {
 	public class ProjectVM : ViewModelBase, IViewModel<ConfuserProject>, IRuleContainer {
+
 		private readonly ConfuserProject proj;
 		private bool modified;
 		private ProjectSettingVM<Packer> packer;
@@ -97,5 +98,6 @@ namespace ConfuserEx.ViewModel {
 			if (property != "IsModified")
 				IsModified = true;
 		}
+
 	}
 }

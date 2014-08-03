@@ -3,6 +3,7 @@ using System.Text;
 
 namespace Confuser.Runtime {
 	internal static class Constant {
+
 		private static byte[] b;
 
 		private static void Initialize() {
@@ -56,14 +57,16 @@ namespace Confuser.Runtime {
 				var v = new T[1];
 				Buffer.BlockCopy(b, (int)id, v, 0, Mutation.Value<int>());
 				ret = v[0];
-			} else if (t == Mutation.KeyI2) {
+			}
+			else if (t == Mutation.KeyI2) {
 				int s = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
 				int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
-				Array v = Array.CreateInstance(typeof (T).GetElementType(), l);
+				Array v = Array.CreateInstance(typeof(T).GetElementType(), l);
 				Buffer.BlockCopy(b, (int)id, v, 0, s - 4);
 				ret = (T)(object)v;
 			}
 			return ret;
 		}
+
 	}
 }

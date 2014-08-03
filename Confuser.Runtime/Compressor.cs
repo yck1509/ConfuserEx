@@ -6,6 +6,7 @@ using System.Text;
 
 namespace Confuser.Runtime {
 	internal static class Compressor {
+
 		private static byte[] key;
 
 		private static GCHandle Decrypt(uint[] data, uint seed) {
@@ -102,5 +103,6 @@ namespace Confuser.Runtime {
 			}
 			return null;
 		}
+
 	}
 }

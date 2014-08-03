@@ -14,6 +14,7 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class StrongMode : RPMode {
+
 		// { invoke opCode, invoke target, encoding}, { proxy field, bridge method }
 		private readonly List<FieldDesc> fieldDescs = new List<FieldDesc>();
 		private readonly Dictionary<Tuple<Code, IMethod, IRPEncoding>, Tuple<FieldDef, MethodDef>> fields = new Dictionary<Tuple<Code, IMethod, IRPEncoding>, Tuple<FieldDef, MethodDef>>();
@@ -78,7 +79,8 @@ namespace Confuser.Protections.ReferenceProxy {
 
 			if (fallBack) {
 				ProcessBridge(ctx, instrIndex);
-			} else {
+			}
+			else {
 				ProcessInvoke(ctx, instrIndex, begin.Value);
 			}
 		}
@@ -101,7 +103,8 @@ namespace Confuser.Protections.ReferenceProxy {
 					instr.Operand = proxy.Item2;
 					return;
 				}
-			} else
+			}
+			else
 				proxy = new Tuple<FieldDef, MethodDef>(null, null);
 
 			MethodSig sig = CreateProxySignature(ctx, target, instr.OpCode.Code == Code.Newobj);
@@ -109,14 +112,14 @@ namespace Confuser.Protections.ReferenceProxy {
 
 			// Create proxy field
 			if (proxy.Item1 == null)
-				proxy = new Tuple<FieldDef,MethodDef>(
+				proxy = new Tuple<FieldDef, MethodDef>(
 					CreateField(ctx, delegateType),
 					proxy.Item2);
 
 			// Create proxy bridge
 			Debug.Assert(proxy.Item2 == null);
 
-			proxy = new Tuple<FieldDef,MethodDef>(
+			proxy = new Tuple<FieldDef, MethodDef>(
 				proxy.Item1,
 				CreateBridge(ctx, delegateType, proxy.Item1, sig));
 
@@ -148,7 +151,8 @@ namespace Confuser.Protections.ReferenceProxy {
 				                             new Instruction(OpCodes.Call, delegateType.FindMethod("Invoke")));
 				instr.OpCode = OpCodes.Ldsfld;
 				instr.Operand = proxy.Item1;
-			} else {
+			}
+			else {
 				Instruction argBegin = ctx.Body.Instructions[argBeginIndex];
 				ctx.Body.Instructions.Insert(argBeginIndex + 1,
 				                             new Instruction(argBegin.OpCode, argBegin.Operand));
@@ -219,7 +223,7 @@ namespace Confuser.Protections.ReferenceProxy {
 					new VariableExpression { Variable = var }, new VariableExpression { Variable = result },
 					ctx.Depth, out expression, out inverse);
 
-				var expCompiled = new DMCodeGen(typeof (int), new[] { Tuple.Create("{VAR}", typeof (int)) })
+				var expCompiled = new DMCodeGen(typeof(int), new[] { Tuple.Create("{VAR}", typeof(int)) })
 					.GenerateCIL(expression)
 					.Compile<Func<int, int>>();
 
@@ -237,7 +241,8 @@ namespace Confuser.Protections.ReferenceProxy {
 					if (def.Name == "GetHashCode") {
 						ctx.Name.MarkHelper(def, ctx.Marker);
 						((MethodDef)def).Access = MethodAttributes.Public;
-					} else
+					}
+					else
 						ctx.Name.MarkHelper(def, ctx.Marker);
 				}
 			}
@@ -375,6 +380,7 @@ namespace Confuser.Protections.ReferenceProxy {
 		}
 
 		private class CodeGen : CILCodeGen {
+
 			private readonly Instruction[] arg;
 
 			public CodeGen(Instruction[] arg, MethodDef method, IList<Instruction> instrs)
@@ -386,25 +392,32 @@ namespace Confuser.Protections.ReferenceProxy {
 				if (var.Name == "{RESULT}") {
 					foreach (Instruction instr in arg)
 						base.Emit(instr);
-				} else
+				}
+				else
 					base.LoadVar(var);
 			}
+
 		}
 
 		private class FieldDesc {
+
 			public FieldDef Field;
 			public InitMethodDesc InitDesc;
 			public IMethod Method;
 			public Code OpCode;
 			public byte OpKey;
+
 		}
 
 		private class InitMethodDesc {
+
 			public IRPEncoding Encoding;
 			public MethodDef Method;
 			public int OpCodeIndex;
 			public int[] TokenByteOrder;
 			public int[] TokenNameOrder;
+
 		}
+
 	}
 }

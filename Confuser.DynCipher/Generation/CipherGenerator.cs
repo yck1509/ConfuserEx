@@ -8,6 +8,7 @@ using Confuser.DynCipher.Transforms;
 
 namespace Confuser.DynCipher.Generation {
 	internal class CipherGenerator {
+
 		private const int MAT_RATIO = 4;
 		private const int NUMOP_RATIO = 10;
 		private const int SWAP_RATIO = 6;
@@ -86,5 +87,6 @@ namespace Confuser.DynCipher.Generation {
 			decrypt = decryptContext.Block;
 			PostProcessStatements(decrypt, random);
 		}
+
 	}
 }

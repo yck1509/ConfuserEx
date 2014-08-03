@@ -7,6 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Core.Services {
 	internal class TraceService : ITraceService {
+
 		private readonly Dictionary<MethodDef, MethodTrace> cache = new Dictionary<MethodDef, MethodTrace>();
 		private ConfuserContext context;
 
@@ -25,12 +26,14 @@ namespace Confuser.Core.Services {
 				throw new ArgumentNullException("method");
 			return cache.GetValueOrDefaultLazy(method, m => cache[m] = new MethodTrace(m)).Trace();
 		}
+
 	}
 
 	/// <summary>
 	///     Provides methods to trace stack of method body.
 	/// </summary>
 	public interface ITraceService {
+
 		/// <summary>
 		///     Trace the stack of the specified method.
 		/// </summary>
@@ -38,6 +41,7 @@ namespace Confuser.Core.Services {
 		/// <exception cref="InvalidMethodException"><paramref name="method" /> has invalid body.</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="method" /> is <c>null</c>.</exception>
 		MethodTrace Trace(MethodDef method);
+
 	}
 
 
@@ -45,6 +49,7 @@ namespace Confuser.Core.Services {
 	///     The trace result of a method.
 	/// </summary>
 	public class MethodTrace {
+
 		private readonly MethodDef method;
 		private Dictionary<int, List<Instruction>> fromInstrs;
 		private Dictionary<uint, int> offset2index;
@@ -162,7 +167,8 @@ namespace Confuser.Core.Services {
 									beforeDepths[targetIndex] = currentStack;
 								fromInstrs.AddListEntry(offset2index[target.Offset], instr);
 							}
-						} else {
+						}
+						else {
 							int targetIndex = offset2index[((Instruction)instr.Operand).Offset];
 							if (beforeDepths[targetIndex] == int.MinValue)
 								beforeDepths[targetIndex] = currentStack;
@@ -263,7 +269,8 @@ namespace Confuser.Core.Services {
 					if (stackUsage < 0) {
 						Debug.Assert(stackUsage == -1); // i.e. push
 						evalStack.Push(index);
-					} else {
+					}
+					else {
 						if (evalStack.Count < stackUsage)
 							return null;
 
@@ -280,11 +287,13 @@ namespace Confuser.Core.Services {
 							working2.Enqueue(Tuple.Create(targetIndex, new Stack<int>(evalStack)));
 							index++;
 						}
-					} else if (currentInstr.Operand is Instruction[]) {
+					}
+					else if (currentInstr.Operand is Instruction[]) {
 						foreach (Instruction targetInstr in (Instruction[])currentInstr.Operand)
 							working2.Enqueue(Tuple.Create(offset2index[targetInstr.Offset], new Stack<int>(evalStack)));
 						index++;
-					} else
+					}
+					else
 						index++;
 				}
 
@@ -301,5 +310,6 @@ namespace Confuser.Core.Services {
 			Array.Reverse(ret);
 			return ret;
 		}
+
 	}
 }

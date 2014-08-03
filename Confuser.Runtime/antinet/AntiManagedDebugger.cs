@@ -23,6 +23,7 @@ namespace Confuser.Runtime {
 	// some later time when this process is trying to send a debug message to the debugger.
 	// Clearing the debug flag could possibly solve this if you don't want it to hang.
 	static partial class AntiDebugAntinet {
+
 		[DllImport("kernel32", CharSet = CharSet.Auto)]
 		private static extern uint GetCurrentProcessId();
 
@@ -123,14 +124,17 @@ namespace Confuser.Runtime {
 							continue;
 
 						return pDebuggerRCThread;
-					} catch { }
+					}
+					catch { }
 				}
-			} catch { }
+			}
+			catch { }
 
 			return IntPtr.Zero;
 		}
 
 		private class Info {
+
 			/// <summary>
 			///     Offset in <c>DebuggerRCThread</c> of event to signal to wake it up.
 			///     See <c>Debugger::StopDebugger()</c> or one of the first methods it calls.
@@ -166,9 +170,11 @@ namespace Confuser.Runtime {
 			///     See <c>Debugger::Debugger()</c>.
 			/// </summary>
 			public int Debugger_pid;
+
 		}
 
 		private static class Infos {
+
 			/// <summary>
 			///     CLR 2.0 x86 offsets
 			/// </summary>
@@ -228,6 +234,8 @@ namespace Confuser.Runtime {
 				DebuggerRCThread_shouldKeepLooping = 0x70,
 				DebuggerRCThread_hEvent1 = 0x78,
 			};
+
 		}
+
 	}
 }

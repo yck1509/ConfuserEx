@@ -3,6 +3,7 @@ using System.IO;
 
 namespace SevenZip.Compression.RangeCoder {
 	internal class Encoder {
+
 		public const uint kTopValue = (1 << 24);
 
 		public UInt64 Low;
@@ -96,9 +97,11 @@ namespace SevenZip.Compression.RangeCoder {
 			       Stream.Position - StartPosition + 4;
 			// (long)Stream.GetProcessedSize();
 		}
+
 	}
 
 	internal class Decoder {
+
 		public const uint kTopValue = (1 << 24);
 		public uint Code;
 		public uint Range;
@@ -182,7 +185,8 @@ namespace SevenZip.Compression.RangeCoder {
 			if (Code < newBound) {
 				symbol = 0;
 				Range = newBound;
-			} else {
+			}
+			else {
 				symbol = 1;
 				Code -= newBound;
 				Range -= newBound;

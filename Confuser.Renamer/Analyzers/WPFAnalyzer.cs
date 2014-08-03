@@ -14,6 +14,7 @@ using dnlib.IO;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class WPFAnalyzer : IRenamer {
+
 		private static readonly object BAMLKey = new object();
 
 		private static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
@@ -91,8 +92,9 @@ namespace Confuser.Renamer.Analyzers {
 					if (regMethod.DeclaringType.FullName == "System.Windows.DependencyProperty" &&
 					    regMethod.Name.String.StartsWith("Register")) {
 						dpRegInstrs.Add(Tuple.Create(regMethod.Name.String.StartsWith("RegisterAttached"), instr));
-					} else if (regMethod.DeclaringType.FullName == "System.Windows.EventManager" &&
-					           regMethod.Name.String == "RegisterRoutedEvent") {
+					}
+					else if (regMethod.DeclaringType.FullName == "System.Windows.EventManager" &&
+					         regMethod.Name.String == "RegisterRoutedEvent") {
 						routedEvtRegInstrs.Add(instr);
 					}
 				}
@@ -239,5 +241,6 @@ namespace Confuser.Renamer.Analyzers {
 			if (wpfResInfo.Count > 0)
 				context.Annotations.Set(module, BAMLKey, wpfResInfo);
 		}
+
 	}
 }

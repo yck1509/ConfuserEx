@@ -9,6 +9,7 @@ namespace Confuser.Core.Helpers {
 	///     Provides methods to inject a <see cref="TypeDef" /> into another module.
 	/// </summary>
 	public static class InjectHelper {
+
 		/// <summary>
 		///     Clones the specified origin TypeDef.
 		/// </summary>
@@ -63,7 +64,8 @@ namespace Confuser.Core.Helpers {
 			if (!ctx.Map.TryGetValue(typeDef, out existing)) {
 				ret = Clone(typeDef);
 				ctx.Map[typeDef] = ret;
-			} else
+			}
+			else
 				ret = (TypeDef)existing;
 
 			foreach (TypeDef nestedType in typeDef.NestedTypes)
@@ -234,6 +236,7 @@ namespace Confuser.Core.Helpers {
 		///     Context of the injection process.
 		/// </summary>
 		private class InjectContext : ImportResolver {
+
 			/// <summary>
 			///     The mapping of origin definitions to injected definitions.
 			/// </summary>
@@ -294,6 +297,8 @@ namespace Confuser.Core.Helpers {
 					return (FieldDef)Map[fieldDef];
 				return null;
 			}
+
 		}
+
 	}
 }

@@ -5,6 +5,7 @@ using Confuser.DynCipher.Generation;
 
 namespace Confuser.DynCipher.Elements {
 	internal class RotateBit : CryptoElement {
+
 		public RotateBit()
 			: base(1) { }
 
@@ -61,5 +62,6 @@ namespace Confuser.DynCipher.Elements {
 					});
 			}
 		}
+
 	}
 }

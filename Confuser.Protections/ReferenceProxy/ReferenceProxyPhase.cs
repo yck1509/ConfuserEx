@@ -11,6 +11,7 @@ using dnlib.DotNet.MD;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class ReferenceProxyPhase : ProtectionPhase {
+
 		public ReferenceProxyPhase(ReferenceProxyProtection parent)
 			: base(parent) { }
 
@@ -151,6 +152,7 @@ namespace Confuser.Protections.ReferenceProxy {
 		}
 
 		private class RPStore {
+
 			public readonly Dictionary<MethodSig, TypeDef> delegates = new Dictionary<MethodSig, TypeDef>(new MethodSigComparer());
 			public ExpressionEncoding expression;
 			public MildMode mild;
@@ -161,6 +163,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			public x86Encoding x86;
 
 			private class MethodSigComparer : IEqualityComparer<MethodSig> {
+
 				public bool Equals(MethodSig x, MethodSig y) {
 					return new SigComparer().Equals(x, y);
 				}
@@ -168,7 +171,10 @@ namespace Confuser.Protections.ReferenceProxy {
 				public int GetHashCode(MethodSig obj) {
 					return new SigComparer().GetHashCode(obj);
 				}
+
 			}
+
 		}
+
 	}
 }

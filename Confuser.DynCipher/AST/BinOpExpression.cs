@@ -2,6 +2,7 @@
 
 namespace Confuser.DynCipher.AST {
 	public enum BinOps {
+
 		Add,
 		Sub,
 		Div,
@@ -11,9 +12,11 @@ namespace Confuser.DynCipher.AST {
 		Xor,
 		Lsh,
 		Rsh,
+
 	}
 
 	public class BinOpExpression : Expression {
+
 		public Expression Left { get; set; }
 		public Expression Right { get; set; }
 		public BinOps Operation { get; set; }
@@ -53,5 +56,6 @@ namespace Confuser.DynCipher.AST {
 			}
 			return string.Format("({0} {1} {2})", Left, op, Right);
 		}
+
 	}
 }

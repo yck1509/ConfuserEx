@@ -7,6 +7,7 @@ using Ookii.Dialogs.Wpf;
 
 namespace ConfuserEx.Views {
 	public partial class ProjectTabAdvancedView : Window {
+
 		private readonly ProjectVM project;
 
 		public ProjectTabAdvancedView(ProjectVM project) {
@@ -27,7 +28,8 @@ namespace ConfuserEx.Views {
 						try {
 							ComponentDiscovery.LoadComponents(project.Protections, project.Packers, plugin);
 							project.Plugins.Add(new StringItem(plugin));
-						} catch {
+						}
+						catch {
 							MessageBox.Show("Failed to load plugin '" + plugin + "'.");
 						}
 					}
@@ -59,5 +61,6 @@ namespace ConfuserEx.Views {
 				ProbePaths.SelectedIndex = selIndex >= project.ProbePaths.Count ? project.ProbePaths.Count - 1 : selIndex;
 			}, () => ProbePaths.SelectedIndex != -1);
 		}
+
 	}
 }

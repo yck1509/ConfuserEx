@@ -5,11 +5,14 @@ using System.Text;
 
 namespace Confuser.Renamer.BAML {
 	internal class PropertyPathIndexer {
+
 		public string Type { get; set; }
 		public string Value { get; set; }
+
 	}
 
 	internal class PropertyPathPart {
+
 		public PropertyPathPart(bool isIndexer, bool? isHiera, string name) {
 			IsIndexer = isIndexer;
 			IsHierarchical = isHiera;
@@ -33,15 +36,18 @@ namespace Confuser.Renamer.BAML {
 				// type = null means the property is on the same type
 				type = null;
 				property = name.Trim();
-			} else {
+			}
+			else {
 				int dot = name.LastIndexOf('.');
 				type = name.Substring(0, dot).Trim();
 				property = name.Substring(dot + 1).Trim();
 			}
 		}
+
 	}
 
 	internal class PropertyPath {
+
 		// See: MS.Internal.Data.PathParser
 
 		private static readonly char[] SpecialChars = {
@@ -83,13 +89,16 @@ namespace Confuser.Renamer.BAML {
 						if (c == '(') {
 							index++;
 							state = STATE_TYPE;
-						} else if (c == '^') {
+						}
+						else if (c == '^') {
 							valueString.Append(path[++index]);
 							index++;
 							state = STATE_VALUE;
-						} else if (char.IsWhiteSpace(c)) {
+						}
+						else if (char.IsWhiteSpace(c)) {
 							index++;
-						} else {
+						}
+						else {
 							valueString.Append(path[index++]);
 							state = STATE_VALUE;
 						}
@@ -98,10 +107,12 @@ namespace Confuser.Renamer.BAML {
 						if (c == ')') {
 							index++;
 							state = STATE_VALUE;
-						} else if (c == '^') {
+						}
+						else if (c == '^') {
 							typeString.Append(path[++index]);
 							index++;
-						} else {
+						}
+						else {
 							typeString.Append(path[index++]);
 						}
 						break;
@@ -110,15 +121,18 @@ namespace Confuser.Renamer.BAML {
 							valueString.Append(path[index++]);
 							level++;
 							trim = false;
-						} else if (c == '^') {
+						}
+						else if (c == '^') {
 							valueString.Append(path[++index]);
 							index++;
 							trim = false;
-						} else if (level > 0 && c == ']') {
+						}
+						else if (level > 0 && c == ']') {
 							level--;
 							valueString.Append(path[index++]);
 							trim = false;
-						} else if (c == ']' || c == ',') {
+						}
+						else if (c == ']' || c == ',') {
 							string value = valueString.ToString();
 							// Note: it may be a WPF bug that if the value is "^  " (2 spaces after caret), all spaces will be trimmed.
 							// According to http://msdn.microsoft.com/en-us/library/ms742451.aspx, the result should have one space.
@@ -138,7 +152,8 @@ namespace Confuser.Renamer.BAML {
 								state = STATE_WAIT;
 							else
 								state = STATE_DONE;
-						} else {
+						}
+						else {
 							valueString.Append(path[index++]);
 							if (c == ' ' && level == 0)
 								trim = true;
@@ -247,5 +262,6 @@ namespace Confuser.Renamer.BAML {
 			}
 			return ret.ToString();
 		}
+
 	}
 }

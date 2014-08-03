@@ -7,6 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ControlFlow {
 	internal class SwitchMangler : ManglerBase {
+
 		private LinkedList<Instruction[]> SpiltStatements(InstrBlock block, MethodTrace trace, CFContext ctx) {
 			var statements = new LinkedList<Instruction[]>();
 			var currentStatement = new List<Instruction>();
@@ -109,7 +110,8 @@ namespace Confuser.Protections.ControlFlow {
 					predicate.Init(body);
 					switchHdr.Add(Instruction.CreateLdcI4(predicate.GetSwitchKey(key[1])));
 					predicate.EmitSwitchLoad(switchHdr);
-				} else {
+				}
+				else {
 					switchHdr.Add(Instruction.CreateLdcI4(key[1]));
 				}
 
@@ -142,7 +144,8 @@ namespace Confuser.Protections.ControlFlow {
 								operands[key[i]] = newStatement[0];
 								converted = true;
 							}
-						} else if (newStatement.Last().IsConditionalBranch()) {
+						}
+						else if (newStatement.Last().IsConditionalBranch()) {
 							// Conditional
 
 							var target = (Instruction)newStatement.Last().Operand;
@@ -186,7 +189,8 @@ namespace Confuser.Protections.ControlFlow {
 							ctx.AddJunk(newStatement);
 							operands[key[i]] = newStatement[0];
 						}
-					} else
+					}
+					else
 						operands[key[i]] = switchHdr[0];
 
 					current.Value = newStatement.ToArray();
@@ -212,5 +216,6 @@ namespace Confuser.Protections.ControlFlow {
 				block.Instructions.AddRange(last);
 			}
 		}
+
 	}
 }

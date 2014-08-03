@@ -9,6 +9,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer {
 	public interface INameService {
+
 		VTableStorage GetVTables();
 
 		void Analyze(IDnlibDef def);
@@ -31,9 +32,11 @@ namespace Confuser.Renamer {
 		void SetOriginalNamespace(object obj, string ns);
 
 		void MarkHelper(IDnlibDef def, IMarkerService marker);
+
 	}
 
 	internal class NameService : INameService {
+
 		private static readonly object CanRenameKey = new object();
 		private static readonly object RenameModeKey = new object();
 		private static readonly object ReferencesKey = new object();
@@ -238,5 +241,6 @@ namespace Confuser.Renamer {
 		public ICollection<KeyValuePair<string, string>> GetNameMap() {
 			return nameDict;
 		}
+
 	}
 }

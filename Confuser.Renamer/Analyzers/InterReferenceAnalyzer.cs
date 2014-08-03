@@ -6,6 +6,7 @@ using dnlib.DotNet.MD;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class InterReferenceAnalyzer : IRenamer {
+
 		// i.e. Inter-Assembly References, e.g. InternalVisibleToAttributes
 
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
@@ -48,5 +49,6 @@ namespace Confuser.Renamer.Analyzers {
 		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
 			//
 		}
+
 	}
 }

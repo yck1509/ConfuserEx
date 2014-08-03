@@ -5,24 +5,29 @@ using System.Text;
 
 namespace Confuser.Renamer.BAML {
 	internal class BamlBinaryReader : BinaryReader {
+
 		public BamlBinaryReader(Stream stream)
 			: base(stream) { }
 
 		public int ReadEncodedInt() {
 			return base.Read7BitEncodedInt();
 		}
+
 	}
 
 	internal class BamlBinaryWriter : BinaryWriter {
+
 		public BamlBinaryWriter(Stream stream)
 			: base(stream) { }
 
 		public void WriteEncodedInt(int val) {
 			base.Write7BitEncodedInt(val);
 		}
+
 	}
 
 	internal class BamlReader {
+
 		public static BamlDocument ReadDocument(Stream str) {
 			var ret = new BamlDocument();
 			var reader = new BamlBinaryReader(str);
@@ -219,9 +224,11 @@ namespace Confuser.Renamer.BAML {
 
 			return ret;
 		}
+
 	}
 
 	internal class BamlWriter {
+
 		public static void WriteDocument(BamlDocument doc, Stream str) {
 			var writer = new BamlBinaryWriter(str);
 			{
@@ -249,5 +256,6 @@ namespace Confuser.Renamer.BAML {
 			foreach (int i in defers)
 				(doc[i] as IBamlDeferRecord).WriteDefer(doc, i, writer);
 		}
+
 	}
 }

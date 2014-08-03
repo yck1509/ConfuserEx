@@ -13,6 +13,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Resources {
 	internal class InjectPhase : ProtectionPhase {
+
 		public InjectPhase(ResourceProtection parent)
 			: base(parent) { }
 
@@ -114,8 +115,9 @@ namespace Confuser.Protections.Resources {
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
 						instrs.InsertRange(i - 2, moduleCtx.ModeHandler.EmitDecrypt(moduleCtx.InitMethod, moduleCtx, (Local)ldBlock.Operand, (Local)ldKey.Operand));
-					} else if (method.DeclaringType.Name == "Lzma" &&
-					           method.Name == "Decompress") {
+					}
+					else if (method.DeclaringType.Name == "Lzma" &&
+					         method.Name == "Decompress") {
 						instr.Operand = decomp;
 					}
 				}
@@ -130,10 +132,11 @@ namespace Confuser.Protections.Resources {
 				repl.Add(Instruction.Create(OpCodes.Dup));
 				repl.Add(Instruction.Create(OpCodes.Ldtoken, moduleCtx.DataField));
 				repl.Add(Instruction.Create(OpCodes.Call, moduleCtx.Module.Import(
-					typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
+					typeof(RuntimeHelpers).GetMethod("InitializeArray"))));
 				return repl.ToArray();
 			});
 			moduleCtx.Context.Registry.GetService<IConstantService>().ExcludeMethod(moduleCtx.Context, moduleCtx.InitMethod);
 		}
+
 	}
 }

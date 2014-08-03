@@ -5,6 +5,7 @@ using Confuser.DynCipher.Generation;
 
 namespace Confuser.DynCipher.Elements {
 	internal class Swap : CryptoElement {
+
 		public Swap()
 			: base(2) { }
 
@@ -41,7 +42,8 @@ namespace Confuser.DynCipher.Elements {
 						Target = b
 					});
 				}
-			} else {
+			}
+			else {
 				var mask = (LiteralExpression)Mask;
 				var notMask = (LiteralExpression)~Mask;
 				/*  t = (a & mask) * k;
@@ -70,5 +72,6 @@ namespace Confuser.DynCipher.Elements {
 		public override void EmitInverse(CipherGenContext context) {
 			EmitCore(context);
 		}
+
 	}
 }

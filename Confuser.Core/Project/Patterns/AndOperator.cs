@@ -6,6 +6,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     The AND operator.
 	/// </summary>
 	public class AndOperator : PatternOperator {
+
 		internal const string OpName = "and";
 
 		/// <inheritdoc />
@@ -24,5 +25,6 @@ namespace Confuser.Core.Project.Patterns {
 			if (!a) return false;
 			return (bool)OperandB.Evaluate(definition);
 		}
+
 	}
 }

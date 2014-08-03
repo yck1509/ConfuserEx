@@ -6,6 +6,7 @@ namespace Confuser.Core {
 	///     A registry of different services provided by protections
 	/// </summary>
 	public class ServiceRegistry : IServiceProvider {
+
 		private readonly HashSet<string> serviceIds = new HashSet<string>();
 		private readonly Dictionary<Type, object> services = new Dictionary<Type, object>();
 
@@ -20,7 +21,7 @@ namespace Confuser.Core {
 		/// <typeparam name="T">The type of service.</typeparam>
 		/// <returns>The service instance.</returns>
 		public T GetService<T>() {
-			return (T)services.GetValueOrDefault(typeof (T), null);
+			return (T)services.GetValueOrDefault(typeof(T), null);
 		}
 
 		/// <summary>
@@ -46,5 +47,6 @@ namespace Confuser.Core {
 		public bool Contains(string serviceId) {
 			return serviceIds.Contains(serviceId);
 		}
+
 	}
 }

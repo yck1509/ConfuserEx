@@ -5,6 +5,7 @@ using System.Threading;
 
 namespace Confuser.Runtime {
 	internal static class AntiDebugWin32 {
+
 		private static void Initialize() {
 			string x = "COR";
 			if (Environment.GetEnvironmentVariable(x + "_PROFILER") != null ||
@@ -55,7 +56,8 @@ namespace Confuser.Runtime {
 				// CloseHandle
 				try {
 					CloseHandle(IntPtr.Zero);
-				} catch {
+				}
+				catch {
 					Environment.FailFast("");
 				}
 
@@ -65,5 +67,6 @@ namespace Confuser.Runtime {
 				Thread.Sleep(1000);
 			}
 		}
+
 	}
 }

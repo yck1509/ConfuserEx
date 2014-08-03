@@ -5,6 +5,7 @@ using System.IO;
 
 namespace SevenZip.Buffer {
 	internal class InBuffer {
+
 		private readonly byte[] m_Buffer;
 		private readonly uint m_BufferSize;
 		private uint m_Limit;
@@ -63,5 +64,6 @@ namespace SevenZip.Buffer {
 		public ulong GetProcessedSize() {
 			return m_ProcessedSize + m_Pos;
 		}
+
 	}
 }

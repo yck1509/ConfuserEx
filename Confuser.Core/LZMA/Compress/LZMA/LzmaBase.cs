@@ -4,6 +4,7 @@ using System;
 
 namespace SevenZip.Compression.LZMA {
 	internal abstract class Base {
+
 		public const uint kNumRepDistances = 4;
 		public const uint kNumStates = 12;
 
@@ -59,6 +60,7 @@ namespace SevenZip.Compression.LZMA {
 		}
 
 		public struct State {
+
 			public uint Index;
 
 			public void Init() {
@@ -86,6 +88,8 @@ namespace SevenZip.Compression.LZMA {
 			public bool IsCharState() {
 				return Index < 7;
 			}
+
 		}
+
 	}
 }

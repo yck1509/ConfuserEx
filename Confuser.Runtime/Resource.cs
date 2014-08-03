@@ -3,6 +3,7 @@ using System.Reflection;
 
 namespace Confuser.Runtime {
 	internal static class Resource {
+
 		private static Assembly c;
 
 		// Hmm... Too lazy.
@@ -46,5 +47,6 @@ namespace Confuser.Runtime {
 				return c;
 			return null;
 		}
+
 	}
 }

@@ -8,6 +8,7 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.Compress {
 	internal class StubProtection : Protection {
+
 		private readonly CompressorContext ctx;
 
 		internal StubProtection(CompressorContext ctx) {
@@ -43,6 +44,7 @@ namespace Confuser.Protections.Compress {
 		}
 
 		private class SigPhase : ProtectionPhase {
+
 			public SigPhase(StubProtection parent)
 				: base(parent) { }
 
@@ -76,6 +78,8 @@ namespace Confuser.Protections.Compress {
 					}
 				};
 			}
+
 		}
+
 	}
 }

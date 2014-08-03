@@ -4,6 +4,7 @@ using Confuser.DynCipher.Generation;
 
 namespace Confuser.DynCipher {
 	public static class MathsUtils {
+
 		private const ulong MODULO32 = 0x100000000;
 
 		public static ulong modInv(ulong num, ulong mod) {
@@ -30,9 +31,11 @@ namespace Confuser.DynCipher {
 		public static byte modInv(byte num) {
 			return (byte)modInv(num, 0x100);
 		}
+
 	}
 
 	public static class CodeGenUtils {
+
 		public static byte[] AssembleCode(x86CodeGen codeGen, x86Register reg) {
 			var stream = new MemoryStream();
 			using (var writer = new BinaryWriter(stream)) {
@@ -80,5 +83,6 @@ namespace Confuser.DynCipher {
 			}
 			return stream.ToArray();
 		}
+
 	}
 }

@@ -6,6 +6,7 @@ namespace Confuser.Core {
 	///     An <see cref="ILogger" /> implementation that doesn't actually do any logging.
 	/// </summary>
 	internal class NullLogger : ILogger {
+
 		/// <summary>
 		///     The singleton instance of <see cref="NullLogger" />.
 		/// </summary>
@@ -60,5 +61,6 @@ namespace Confuser.Core {
 
 		/// <inheritdoc />
 		public void EndModule(ModuleDef module) { }
+
 	}
 }

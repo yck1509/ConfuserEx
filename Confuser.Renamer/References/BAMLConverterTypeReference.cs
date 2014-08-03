@@ -5,6 +5,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class BAMLConverterTypeReference : INameReference<TypeDef> {
+
 		private readonly PropertyRecord propRec;
 		private readonly TypeSig sig;
 		private readonly TextRecord textRec;
@@ -37,5 +38,6 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
+
 	}
 }

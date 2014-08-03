@@ -22,6 +22,7 @@ namespace Confuser.Core {
 	///     The processing engine of ConfuserEx.
 	/// </summary>
 	public static class ConfuserEngine {
+
 		/// <summary>
 		///     The version of ConfuserEx.
 		/// </summary>
@@ -102,7 +103,8 @@ namespace Confuser.Core {
 				try {
 					var resolver = new DependencyResolver(prots);
 					prots = resolver.SortDependency();
-				} catch (CircularDependencyException ex) {
+				}
+				catch (CircularDependencyException ex) {
 					context.Logger.ErrorException("", ex);
 					throw new ConfuserException(ex);
 				}
@@ -134,7 +136,8 @@ namespace Confuser.Core {
 				foreach (ConfuserComponent comp in components) {
 					try {
 						comp.Initialize(context);
-					} catch (Exception ex) {
+					}
+					catch (Exception ex) {
 						context.Logger.ErrorException("Error occured during initialization of '" + comp.Name + "'.", ex);
 						throw new ConfuserException(ex);
 					}
@@ -157,24 +160,32 @@ namespace Confuser.Core {
 				RunPipeline(pipeline, context);
 
 				ok = true;
-			} catch (AssemblyResolveException ex) {
+			}
+			catch (AssemblyResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a assembly, check if all dependencies are of correct version.", ex);
 				PrintEnvironmentInfo(context);
-			} catch (TypeResolveException ex) {
+			}
+			catch (TypeResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a type, check if all dependencies are of correct version.", ex);
 				PrintEnvironmentInfo(context);
-			} catch (MemberRefResolveException ex) {
+			}
+			catch (MemberRefResolveException ex) {
 				context.Logger.ErrorException("Failed to resolve a member, check if all dependencies are of correct version.", ex);
 				PrintEnvironmentInfo(context);
-			} catch (IOException ex) {
+			}
+			catch (IOException ex) {
 				context.Logger.ErrorException("An IO error occurred, check if all input/output locations are read/writable.", ex);
-			} catch (OperationCanceledException) {
+			}
+			catch (OperationCanceledException) {
 				context.Logger.Error("Operation is canceled.");
-			} catch (ConfuserException) {
+			}
+			catch (ConfuserException) {
 				// Exception is already handled/logged, so just ignore and report failure
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				context.Logger.ErrorException("Unknown error occurred.", ex);
-			} finally {
+			}
+			finally {
 				if (context.Resolver != null)
 					context.Resolver.Clear();
 				context.Logger.Finish(ok);
@@ -241,7 +252,8 @@ namespace Confuser.Core {
 			                                  .SelectMany(module => module.GetAssemblyRefs().Select(asmRef => Tuple.Create(asmRef, module)))) {
 				try {
 					AssemblyDef assembly = context.Resolver.ResolveThrow(dependency.Item1, dependency.Item2);
-				} catch (AssemblyResolveException ex) {
+				}
+				catch (AssemblyResolveException ex) {
 					context.Logger.ErrorException("Failed to resolve dependency of '" + dependency.Item2.Name + "'.", ex);
 					throw new ConfuserException(ex);
 				}
@@ -319,8 +331,7 @@ namespace Confuser.Core {
 				}
 		}
 
-		private static void ProcessModule(ConfuserContext context) {
-		}
+		private static void ProcessModule(ConfuserContext context) { }
 
 		private static void OptimizeMethods(ConfuserContext context) {
 			foreach (TypeDef type in context.CurrentModule.GetTypes())
@@ -336,7 +347,8 @@ namespace Confuser.Core {
 				if (!Path.IsPathRooted(output))
 					output = Path.Combine(Environment.CurrentDirectory, output);
 				output = Utils.GetRelativePath(output, context.BaseDirectory);
-			} else {
+			}
+			else {
 				output = context.CurrentModule.Name;
 			}
 			context.OutputPaths[context.CurrentModuleIndex] = output;
@@ -402,7 +414,8 @@ namespace Confuser.Core {
 		private static void PrintInfo(ConfuserContext context) {
 			if (context.PackerInitiated) {
 				context.Logger.Info("Protecting packer stub...");
-			} else {
+			}
+			else {
 				context.Logger.InfoFormat("{0} {1}", Version, Copyright);
 
 				Type mono = Type.GetType("Mono.Runtime");
@@ -490,5 +503,6 @@ namespace Confuser.Core {
 
 			context.Logger.Error("---END DEBUG INFO---");
 		}
+
 	}
 }

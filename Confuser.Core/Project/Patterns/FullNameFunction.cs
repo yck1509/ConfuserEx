@@ -6,6 +6,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that compare the full name of definition.
 	/// </summary>
 	public class FullNameFunction : PatternFunction {
+
 		internal const string FnName = "full-name";
 
 		/// <inheritdoc />
@@ -23,5 +24,6 @@ namespace Confuser.Core.Project.Patterns {
 			object name = Arguments[0].Evaluate(definition);
 			return definition.FullName == name.ToString();
 		}
+
 	}
 }

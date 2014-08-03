@@ -5,6 +5,7 @@ using Confuser.DynCipher.Generation;
 
 namespace Confuser.DynCipher.Elements {
 	internal class Matrix : CryptoElement {
+
 		public Matrix()
 			: base(4) { }
 
@@ -132,5 +133,6 @@ namespace Confuser.DynCipher.Elements {
 		public override void EmitInverse(CipherGenContext context) {
 			EmitCore(context, InverseKey);
 		}
+
 	}
 }

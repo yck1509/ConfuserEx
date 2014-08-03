@@ -8,17 +8,22 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ControlFlow {
 	internal enum CFType {
+
 		Switch,
 		Jump,
+
 	}
 
 	internal enum PredicateType {
+
 		Normal,
 		Expression,
 		x86,
+
 	}
 
 	internal class CFContext {
+
 		public ConfuserContext Context;
 		public int Depth;
 		public IDynCipherService DynCipher;
@@ -98,5 +103,6 @@ namespace Confuser.Protections.ControlFlow {
 					break;
 			}
 		}
+
 	}
 }

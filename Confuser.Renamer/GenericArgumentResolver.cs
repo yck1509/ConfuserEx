@@ -7,6 +7,7 @@ namespace Confuser.Renamer {
 	///     Resolves generic arguments
 	/// </summary>
 	public struct GenericArgumentResolver {
+
 		private GenericArguments genericArguments;
 		private RecursionCounter recursionCounter;
 
@@ -155,5 +156,6 @@ namespace Confuser.Renamer {
 
 			return result;
 		}
+
 	}
 }

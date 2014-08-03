@@ -9,6 +9,7 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections {
 	internal class InvalidMetadataProtection : Protection {
+
 		public const string _Id = "invalid metadata";
 		public const string _FullId = "Ki.InvalidMD";
 
@@ -41,6 +42,7 @@ namespace Confuser.Protections {
 		}
 
 		private class InvalidMDPhase : ProtectionPhase {
+
 			private RandomGenerator random;
 
 			public InvalidMDPhase(InvalidMetadataProtection parent)
@@ -119,7 +121,8 @@ namespace Confuser.Protections {
 					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Strings", new byte[1]));
 					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Blob", new byte[1]));
 					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Schema", new byte[1]));
-				} else if (e.WriterEvent == ModuleWriterEvent.MDOnAllTablesSorted) {
+				}
+				else if (e.WriterEvent == ModuleWriterEvent.MDOnAllTablesSorted) {
 					writer.MetaData.TablesHeap.DeclSecurityTable.Add(new RawDeclSecurityRow(
 						                                                 unchecked(0x7fff), 0xffff7fff, 0xffff7fff));
 					/*
@@ -128,9 +131,11 @@ namespace Confuser.Protections {
 					*/
 				}
 			}
+
 		}
 
 		private class RawHeap : HeapBase {
+
 			private readonly byte[] content;
 			private readonly string name;
 
@@ -150,6 +155,8 @@ namespace Confuser.Protections {
 			protected override void WriteToImpl(BinaryWriter writer) {
 				writer.Write(content);
 			}
+
 		}
+
 	}
 }

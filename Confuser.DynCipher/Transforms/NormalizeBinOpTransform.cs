@@ -3,6 +3,7 @@ using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Transforms {
 	internal class NormalizeBinOpTransform {
+
 		private static Expression ProcessExpression(Expression exp) {
 			if (exp is BinOpExpression) {
 				var binOp = (BinOpExpression)exp;
@@ -26,9 +27,11 @@ namespace Confuser.DynCipher.Transforms {
 				if (binOp.Right is LiteralExpression && ((LiteralExpression)binOp.Right).Value == 0 &&
 				    binOp.Operation == BinOps.Add) // x + 0 => x
 					return binOp.Left;
-			} else if (exp is ArrayIndexExpression) {
+			}
+			else if (exp is ArrayIndexExpression) {
 				((ArrayIndexExpression)exp).Array = ProcessExpression(((ArrayIndexExpression)exp).Array);
-			} else if (exp is UnaryOpExpression) {
+			}
+			else if (exp is UnaryOpExpression) {
 				((UnaryOpExpression)exp).Value = ProcessExpression(((UnaryOpExpression)exp).Value);
 			}
 			return exp;
@@ -46,5 +49,6 @@ namespace Confuser.DynCipher.Transforms {
 			foreach (Statement st in block.Statements)
 				ProcessStatement(st);
 		}
+
 	}
 }

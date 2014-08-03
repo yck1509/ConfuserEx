@@ -12,6 +12,7 @@ namespace Confuser.Core {
 	///     A parameterless constructor must exists in derived classes to enable plugin discovery.
 	/// </remarks>
 	public abstract class Packer : ConfuserComponent {
+
 		/// <summary>
 		///     Executes the packer.
 		/// </summary>
@@ -66,7 +67,8 @@ namespace Confuser.Core {
 					Project = proj,
 					PackerInitiated = true
 				}, context.token).Wait();
-			} catch (AggregateException ex) {
+			}
+			catch (AggregateException ex) {
 				context.Logger.Error("Failed to protect packer stub.");
 				throw new ConfuserException(ex);
 			}
@@ -74,9 +76,11 @@ namespace Confuser.Core {
 			context.OutputModules = new[] { File.ReadAllBytes(Path.Combine(outDir, fileName)) };
 			context.OutputPaths = new[] { fileName };
 		}
+
 	}
 
 	internal class PackerLogger : ILogger {
+
 		private readonly ILogger baseLogger;
 
 		public PackerLogger(ILogger baseLogger) {
@@ -136,9 +140,11 @@ namespace Confuser.Core {
 				throw new ConfuserException(null);
 			baseLogger.Info("Finish protecting packer stub.");
 		}
+
 	}
 
 	internal class PackerMarker : Marker {
+
 		private readonly StrongNameKey snKey;
 
 		public PackerMarker(StrongNameKey snKey) {
@@ -151,9 +157,11 @@ namespace Confuser.Core {
 				context.Annotations.Set(module, SNKey, snKey);
 			return result;
 		}
+
 	}
 
 	internal class PackerDiscovery : PluginDiscovery {
+
 		private readonly Protection prot;
 
 		public PackerDiscovery(Protection prot) {
@@ -164,5 +172,6 @@ namespace Confuser.Core {
 			base.GetPluginsInternal(context, protections, packers, components);
 			protections.Add(prot);
 		}
+
 	}
 }

@@ -5,6 +5,7 @@ namespace Confuser.Core {
 	///     Various presets of protections.
 	/// </summary>
 	public enum ProtectionPreset {
+
 		/// <summary> The protection does not belong to any preset. </summary>
 		None = 0,
 
@@ -19,5 +20,6 @@ namespace Confuser.Core {
 
 		/// <summary> The protection provides strongest security with possible incompatibility. </summary>
 		Maximum = 4,
+
 	}
 }

@@ -5,13 +5,16 @@ using Confuser.DynCipher.Generation;
 
 namespace Confuser.DynCipher.Elements {
 	internal enum CryptoNumOps {
+
 		Add,
 		Mul,
 		Xor,
 		Xnor
+
 	}
 
 	internal class NumOp : CryptoElement {
+
 		public NumOp()
 			: base(1) { }
 
@@ -96,5 +99,6 @@ namespace Confuser.DynCipher.Elements {
 					break;
 			}
 		}
+
 	}
 }

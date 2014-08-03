@@ -14,6 +14,7 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.AntiTamper {
 	internal class JITMode : IModeHandler {
+
 		private static readonly CilBody NopBody = new CilBody {
 			Instructions = {
 				Instruction.Create(OpCodes.Ldnull),
@@ -79,7 +80,8 @@ namespace Confuser.Protections.AntiTamper {
 				Instruction instr = instrs[i];
 				if (instr.OpCode == OpCodes.Ldtoken) {
 					instr.Operand = context.CurrentModule.GlobalType;
-				} else if (instr.OpCode == OpCodes.Call) {
+				}
+				else if (instr.OpCode == OpCodes.Call) {
 					var method = (IMethod)instr.Operand;
 					if (method.DeclaringType.Name == "Mutation" &&
 					    method.Name == "Crypt") {
@@ -147,7 +149,8 @@ namespace Confuser.Protections.AntiTamper {
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginWriteMethodBodies) {
 				context.Logger.Debug("Extracting method bodies...");
 				CreateSection(writer);
-			} else if (e.WriterEvent == ModuleWriterEvent.BeginStrongNameSign) {
+			}
+			else if (e.WriterEvent == ModuleWriterEvent.BeginStrongNameSign) {
 				context.Logger.Debug("Encrypting method section...");
 				EncryptSection(writer);
 			}
@@ -245,7 +248,8 @@ namespace Confuser.Protections.AntiTamper {
 				if (nameHash == name1 * name2) {
 					encSize = reader.ReadUInt32();
 					encLoc = reader.ReadUInt32();
-				} else if (nameHash != 0) {
+				}
+				else if (nameHash != 0) {
 					uint sectSize = reader.ReadUInt32();
 					uint sectLoc = reader.ReadUInt32();
 					Hash(stream, reader, sectLoc, sectSize);
@@ -295,5 +299,6 @@ namespace Confuser.Protections.AntiTamper {
 			}
 			return deriver.DeriveKey(dst, src);
 		}
+
 	}
 }

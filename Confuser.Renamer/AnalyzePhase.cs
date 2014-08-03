@@ -5,6 +5,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer {
 	internal class AnalyzePhase : ProtectionPhase {
+
 		public AnalyzePhase(NameProtection parent)
 			: base(parent) { }
 
@@ -36,7 +37,8 @@ namespace Confuser.Renamer {
 					var module = (ModuleDef)def;
 					foreach (Resource res in module.Resources)
 						service.SetOriginalName(res, res.Name);
-				} else
+				}
+				else
 					service.SetOriginalName(def, def.Name);
 
 				if (def is TypeDef) {
@@ -78,9 +80,11 @@ namespace Confuser.Renamer {
 		private void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, TypeDef type) {
 			if (type.IsVisibleOutside() && !parameters.GetParameter(context, type, "renPublic", false)) {
 				service.SetCanRename(type, false);
-			} else if (type.IsRuntimeSpecialName || type.IsSpecialName) {
+			}
+			else if (type.IsRuntimeSpecialName || type.IsSpecialName) {
 				service.SetCanRename(type, false);
-			} else if (type.FullName == "ConfusedByAttribute") {
+			}
+			else if (type.FullName == "ConfusedByAttribute") {
 				// Courtesy
 				service.SetCanRename(type, false);
 			}
@@ -148,5 +152,6 @@ namespace Confuser.Renamer {
 			else if (evt.IsRuntimeSpecialName || evt.IsSpecialName)
 				service.SetCanRename(evt, false);
 		}
+
 	}
 }

@@ -8,6 +8,7 @@ using SevenZip.Compression.RangeCoder;
 namespace SevenZip.Compression.LZMA {
 	internal class Decoder : ICoder, ISetDecoderProperties // ,System.IO.Stream
 	{
+
 		private readonly BitDecoder[] m_IsMatchDecoders = new BitDecoder[Base.kNumStates << Base.kNumPosStatesBitsMax];
 		private readonly BitDecoder[] m_IsRep0LongDecoders = new BitDecoder[Base.kNumStates << Base.kNumPosStatesBitsMax];
 		private readonly BitDecoder[] m_IsRepDecoders = new BitDecoder[Base.kNumStates];
@@ -71,7 +72,8 @@ namespace SevenZip.Compression.LZMA {
 						m_OutWindow.PutByte(b);
 						state.UpdateChar();
 						nowPos64++;
-					} else {
+					}
+					else {
 						uint len;
 						if (m_IsRepDecoders[state.Index].Decode(m_RangeDecoder) == 1) {
 							if (m_IsRepG0Decoders[state.Index].Decode(m_RangeDecoder) == 0) {
@@ -81,11 +83,13 @@ namespace SevenZip.Compression.LZMA {
 									nowPos64++;
 									continue;
 								}
-							} else {
+							}
+							else {
 								UInt32 distance;
 								if (m_IsRepG1Decoders[state.Index].Decode(m_RangeDecoder) == 0) {
 									distance = rep1;
-								} else {
+								}
+								else {
 									if (m_IsRepG2Decoders[state.Index].Decode(m_RangeDecoder) == 0)
 										distance = rep2;
 									else {
@@ -99,7 +103,8 @@ namespace SevenZip.Compression.LZMA {
 							}
 							len = m_RepLenDecoder.Decode(m_RangeDecoder, posState) + Base.kMatchMinLen;
 							state.UpdateRep();
-						} else {
+						}
+						else {
 							rep3 = rep2;
 							rep2 = rep1;
 							rep1 = rep0;
@@ -117,7 +122,8 @@ namespace SevenZip.Compression.LZMA {
 										numDirectBits - Base.kNumAlignBits) << Base.kNumAlignBits);
 									rep0 += m_PosAlignDecoder.ReverseDecode(m_RangeDecoder);
 								}
-							} else
+							}
+							else
 								rep0 = posSlot;
 						}
 						if (rep0 >= m_OutWindow.TrainSize + nowPos64 || rep0 >= m_DictionarySizeCheck) {
@@ -213,6 +219,7 @@ namespace SevenZip.Compression.LZMA {
 		}
 
 		private class LenDecoder {
+
 			private readonly BitTreeDecoder[] m_LowCoder = new BitTreeDecoder[Base.kNumPosStatesMax];
 			private readonly BitTreeDecoder[] m_MidCoder = new BitTreeDecoder[Base.kNumPosStatesMax];
 			private BitDecoder m_Choice = new BitDecoder();
@@ -250,9 +257,11 @@ namespace SevenZip.Compression.LZMA {
 				}
 				return symbol;
 			}
+
 		}
 
 		private class LiteralDecoder {
+
 			private Decoder2[] m_Coders;
 			private int m_NumPosBits;
 			private int m_NumPrevBits;
@@ -290,6 +299,7 @@ namespace SevenZip.Compression.LZMA {
 			}
 
 			private struct Decoder2 {
+
 				private BitDecoder[] m_Decoders;
 
 				public void Create() {
@@ -322,7 +332,9 @@ namespace SevenZip.Compression.LZMA {
 					} while (symbol < 0x100);
 					return (byte)symbol;
 				}
+
 			}
+
 		};
 
 		/*
@@ -349,5 +361,6 @@ namespace SevenZip.Compression.LZMA {
         }
         public override void SetLength(long value) {}
         */
+
 	}
 }

@@ -9,6 +9,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.BAML {
 	internal class BAMLAnalyzer {
+
 		private readonly Dictionary<ushort, AssemblyDef> assemblyRefs = new Dictionary<ushort, AssemblyDef>();
 		private readonly Dictionary<ushort, Tuple<IDnlibDef, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<IDnlibDef, TypeDef>>();
 		private readonly ConfuserContext context;
@@ -52,7 +53,8 @@ namespace Confuser.Renamer.BAML {
 			this.bamlName = bamlName;
 			if (module.IsClr40) {
 				things = thingsv4 ?? (thingsv4 = new KnownThingsv4(context, module));
-			} else {
+			}
+			else {
 				things = thingsv3 ?? (thingsv3 = new KnownThingsv3(context, module));
 			}
 
@@ -124,7 +126,8 @@ namespace Confuser.Renamer.BAML {
 				if (typeRefs.TryGetValue(rec.OwnerTypeId, out declType)) {
 					TypeDef type = declType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
 					attrRefs[rec.AttributeId] = AnalyzeAttributeReference(type, rec);
-				} else {
+				}
+				else {
 					Debug.Assert((short)rec.OwnerTypeId < 0);
 					TypeDef declTypeDef = things.Types((KnownTypes)(-(short)rec.OwnerTypeId));
 					attrRefs[rec.AttributeId] = AnalyzeAttributeReference(declTypeDef, rec);
@@ -173,7 +176,8 @@ namespace Confuser.Renamer.BAML {
 				prefix = "";
 				if (!xmlns.TryGetValue(prefix, out clrNs))
 					return null;
-			} else {
+			}
+			else {
 				prefix = typeName.Substring(0, index);
 				if (!xmlns.TryGetValue(prefix, out clrNs))
 					return null;
@@ -238,7 +242,8 @@ namespace Confuser.Renamer.BAML {
 								AnalyzePropertyPath(cnt.Value);
 							}
 						}
-					} else if (elem.Type.FullName == "System.Windows.Markup.TypeExtension") {
+					}
+					else if (elem.Type.FullName == "System.Windows.Markup.TypeExtension") {
 						foreach (BamlElement child in elem.Children) {
 							if (child.Header.Type == BamlRecordType.ConstructorParametersStart) {
 								var cnt = (TextRecord)child.Body[0];
@@ -314,13 +319,15 @@ namespace Confuser.Renamer.BAML {
 					if (rec is PropertyWithConverterRecord) {
 						ProcessConverter((PropertyWithConverterRecord)rec, type);
 					}
-				} else if (rec is PropertyComplexStartRecord) {
+				}
+				else if (rec is PropertyComplexStartRecord) {
 					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(((PropertyComplexStartRecord)rec).AttributeId);
 					type = attrInfo.Item2;
 					attr = attrInfo.Item1;
 					if (attr != null)
 						type = GetAttributeType(attr);
-				} else if (rec is ContentPropertyRecord) {
+				}
+				else if (rec is ContentPropertyRecord) {
 					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(((ContentPropertyRecord)rec).AttributeId);
 					type = attrInfo.Item2;
 					attr = attrInfo.Item1;
@@ -330,7 +337,8 @@ namespace Confuser.Renamer.BAML {
 						child.Type = type;
 						child.Attribute = attr;
 					}
-				} else if (rec is PropertyCustomRecord) {
+				}
+				else if (rec is PropertyCustomRecord) {
 					var customRec = (PropertyCustomRecord)rec;
 					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(customRec.AttributeId);
 					type = attrInfo.Item2;
@@ -342,7 +350,8 @@ namespace Confuser.Renamer.BAML {
 						// See BamlRecordReader.GetCustomDependencyPropertyValue.
 						// Umm... Well, actually nothing to do, since this record only describe DP, which already won't be renamed.
 					}
-				} else if (rec is PropertyWithExtensionRecord) {
+				}
+				else if (rec is PropertyWithExtensionRecord) {
 					var extRec = (PropertyWithExtensionRecord)rec;
 					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(extRec.AttributeId);
 					type = attrInfo.Item2;
@@ -364,7 +373,8 @@ namespace Confuser.Renamer.BAML {
 					if (enumField != null)
 						service.AddReference(enumField, new BAMLEnumReference(enumField, rec));
 				}
-			} else if (converter.FullName == "System.Windows.Input.CommandConverter") {
+			}
+			else if (converter.FullName == "System.Windows.Input.CommandConverter") {
 				string cmd = rec.Value.Trim();
 				int index = cmd.IndexOf('.');
 				if (index != -1) {
@@ -395,13 +405,17 @@ namespace Confuser.Renamer.BAML {
 						}
 					}
 				}
-			} else if (converter.FullName == "System.Windows.Markup.DependencyPropertyConverter") {
+			}
+			else if (converter.FullName == "System.Windows.Markup.DependencyPropertyConverter") {
 				// Umm... Again nothing to do, DP already won't be renamed.
-			} else if (converter.FullName == "System.Windows.PropertyPathConverter") {
+			}
+			else if (converter.FullName == "System.Windows.PropertyPathConverter") {
 				AnalyzePropertyPath(rec.Value);
-			} else if (converter.FullName == "System.Windows.Markup.RoutedEventConverter") {
+			}
+			else if (converter.FullName == "System.Windows.Markup.RoutedEventConverter") {
 				;
-			} else if (converter.FullName == "System.Windows.Markup.TypeTypeConverter") {
+			}
+			else if (converter.FullName == "System.Windows.Markup.TypeTypeConverter") {
 				string prefix;
 				TypeSig sig = ResolveType(rec.Value.Trim(), out prefix);
 				if (sig != null && context.Modules.Contains((ModuleDefMD)sig.ToBasicTypeDefOrRef().ResolveTypeDefThrow().Module)) {
@@ -454,7 +468,8 @@ namespace Confuser.Renamer.BAML {
 							AddTypeSigReference(sig, reference);
 						}
 					}
-				} else {
+				}
+				else {
 					List<PropertyDef> candidates;
 					if (properties.TryGetValue(part.Name, out candidates))
 						foreach (PropertyDef property in candidates) {
@@ -477,6 +492,7 @@ namespace Confuser.Renamer.BAML {
 		}
 
 		private class DummyAssemblyRefFinder : IAssemblyRefFinder {
+
 			private readonly AssemblyDef assemblyDef;
 
 			public DummyAssemblyRefFinder(AssemblyDef assemblyDef) {
@@ -486,9 +502,11 @@ namespace Confuser.Renamer.BAML {
 			public AssemblyRef FindAssemblyRef(TypeRef nonNestedTypeRef) {
 				return assemblyDef.ToAssemblyRef();
 			}
+
 		}
 
 		internal class XmlNsContext {
+
 			private readonly Dictionary<AssemblyDef, ushort> assemblyRefs;
 			private readonly BamlDocument doc;
 			private readonly Dictionary<Tuple<AssemblyDef, string>, string> xmlNsMap = new Dictionary<Tuple<AssemblyDef, string>, string>();
@@ -533,6 +551,8 @@ namespace Confuser.Renamer.BAML {
 				}
 				return prefix;
 			}
+
 		}
+
 	}
 }

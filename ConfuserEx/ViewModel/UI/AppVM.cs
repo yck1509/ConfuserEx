@@ -13,10 +13,11 @@ using Ookii.Dialogs.Wpf;
 
 namespace ConfuserEx.ViewModel {
 	public class AppVM : ViewModelBase {
+
 		private readonly IList<TabViewModel> tabs = new ObservableCollection<TabViewModel>();
 		private string fileName;
 		private bool navDisabled;
-		private bool firstSaved = false;
+		private bool firstSaved;
 
 		private ProjectVM proj;
 
@@ -132,7 +133,8 @@ namespace ConfuserEx.ViewModel {
 					proj.Load(xmlDoc);
 					Project = new ProjectVM(proj);
 					FileName = fileName;
-				} catch {
+				}
+				catch {
 					MessageBox.Show("Invalid project!", "ConfuserEx", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
@@ -142,5 +144,6 @@ namespace ConfuserEx.ViewModel {
 			if (e.PropertyName == "IsModified")
 				OnPropertyChanged("Title");
 		}
+
 	}
 }

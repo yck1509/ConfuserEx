@@ -5,6 +5,7 @@ namespace Confuser.Core {
 	///     Base class of protection phases.
 	/// </summary>
 	public abstract class ProtectionPhase {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProtectionPhase" /> class.
 		/// </summary>
@@ -45,5 +46,6 @@ namespace Confuser.Core {
 		/// <param name="context">The working context.</param>
 		/// <param name="parameters">The parameters of protection.</param>
 		protected internal abstract void Execute(ConfuserContext context, ProtectionParameters parameters);
+
 	}
 }

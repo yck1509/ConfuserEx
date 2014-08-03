@@ -5,6 +5,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Protections {
 	internal class AntiILDasmProtection : Protection {
+
 		public const string _Id = "anti ildasm";
 		public const string _FullId = "Ki.AntiILDasm";
 
@@ -37,6 +38,7 @@ namespace Confuser.Protections {
 		}
 
 		private class AntiILDasmPhase : ProtectionPhase {
+
 			public AntiILDasmPhase(AntiILDasmProtection parent)
 				: base(parent) { }
 
@@ -57,6 +59,8 @@ namespace Confuser.Protections {
 					module.CustomAttributes.Add(attr);
 				}
 			}
+
 		}
+
 	}
 }

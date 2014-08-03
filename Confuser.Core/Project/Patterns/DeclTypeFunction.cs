@@ -6,6 +6,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that compare the full name of declaring type.
 	/// </summary>
 	public class DeclTypeFunction : PatternFunction {
+
 		internal const string FnName = "decl-type";
 
 		/// <inheritdoc />
@@ -25,5 +26,6 @@ namespace Confuser.Core.Project.Patterns {
 			object fullName = Arguments[0].Evaluate(definition);
 			return ((IMemberDef)definition).DeclaringType.FullName == fullName.ToString();
 		}
+
 	}
 }

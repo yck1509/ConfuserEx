@@ -10,7 +10,9 @@ using System.Text;
 
 namespace Confuser.Runtime {
 	static partial class AntiDebugAntinet {
+
 		private class PEInfo {
+
 			private readonly IntPtr imageBase;
 			private IntPtr imageEnd;
 			private int numSects;
@@ -154,6 +156,8 @@ namespace Confuser.Runtime {
 			public static bool IsAligned(IntPtr addr, uint alignment) {
 				return ((uint)addr.ToInt64() & (alignment - 1)) == 0;
 			}
+
 		}
+
 	}
 }

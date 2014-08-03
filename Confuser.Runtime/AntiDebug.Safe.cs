@@ -4,6 +4,7 @@ using System.Threading;
 
 namespace Confuser.Runtime {
 	internal static class AntiDebugSafe {
+
 		private static void Initialize() {
 			string x = "COR";
 			if (Environment.GetEnvironmentVariable(x + "_PROFILER") != null ||
@@ -33,5 +34,6 @@ namespace Confuser.Runtime {
 				Thread.Sleep(1000);
 			}
 		}
+
 	}
 }

@@ -13,6 +13,7 @@ using MethodBody = dnlib.DotNet.Writer.MethodBody;
 
 namespace Confuser.Protections.ControlFlow {
 	internal class x86Predicate : IPredicate {
+
 		private static readonly object Encoding = new object();
 		private readonly CFContext ctx;
 		private x86Encoding encoding;
@@ -46,6 +47,7 @@ namespace Confuser.Protections.ControlFlow {
 		}
 
 		private class x86Encoding {
+
 			private byte[] code;
 			private MethodBody codeChunk;
 
@@ -83,7 +85,7 @@ namespace Confuser.Protections.ControlFlow {
 
 				code = CodeGenUtils.AssembleCode(codeGen, reg.Value);
 
-				expCompiled = new DMCodeGen(typeof (int), new[] { Tuple.Create("{VAR}", typeof (int)) })
+				expCompiled = new DMCodeGen(typeof(int), new[] { Tuple.Create("{VAR}", typeof(int)) })
 					.GenerateCIL(expression)
 					.Compile<Func<int, int>>();
 
@@ -95,11 +97,14 @@ namespace Confuser.Protections.ControlFlow {
 				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 					codeChunk = writer.MethodBodies.Add(new MethodBody(code));
-				} else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
+				}
+				else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 					uint rid = writer.MetaData.GetRid(native);
 					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)codeChunk.RVA;
 				}
 			}
+
 		}
+
 	}
 }

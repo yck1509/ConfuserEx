@@ -18,6 +18,7 @@ using FileAttributes = dnlib.DotNet.FileAttributes;
 
 namespace Confuser.Protections {
 	internal class Compressor : Packer {
+
 		public const string _Id = "compressor";
 		public const string _FullId = "Ki.Compressor";
 		public const string _ServiceId = "Ki.Compressor";
@@ -39,9 +40,7 @@ namespace Confuser.Protections {
 			get { return _FullId; }
 		}
 
-		protected override void Initialize(ConfuserContext context) {
-			//context.Registry.RegisterService(_ServiceId, typeof(IControlFlowService), this);
-		}
+		protected override void Initialize(ConfuserContext context) { }
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
 			pipeline.InsertPreStage(PipelineStage.WriteModule, new ExtractPhase(this));
@@ -150,7 +149,7 @@ namespace Confuser.Protections {
 				repl.Add(Instruction.Create(OpCodes.Dup));
 				repl.Add(Instruction.Create(OpCodes.Ldtoken, dataField));
 				repl.Add(Instruction.Create(OpCodes.Call, stubModule.Import(
-					typeof (RuntimeHelpers).GetMethod("InitializeArray"))));
+					typeof(RuntimeHelpers).GetMethod("InitializeArray"))));
 				return repl.ToArray();
 			});
 		}
@@ -211,8 +210,9 @@ namespace Confuser.Protections {
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
 						instrs.InsertRange(i - 2, compCtx.Deriver.EmitDerivation(decrypter, context, (Local)ldDst.Operand, (Local)ldSrc.Operand));
-					} else if (method.DeclaringType.Name == "Lzma" &&
-					           method.Name == "Decompress") {
+					}
+					else if (method.DeclaringType.Name == "Lzma" &&
+					         method.Name == "Decompress") {
 						MethodDef decomp = comp.GetRuntimeDecompressor(stubModule, member => { });
 						instr.Operand = decomp;
 					}
@@ -227,6 +227,7 @@ namespace Confuser.Protections {
 		}
 
 		private class KeyInjector : IModuleWriterListener {
+
 			private readonly CompressorContext ctx;
 
 			public KeyInjector(CompressorContext ctx) {
@@ -242,7 +243,8 @@ namespace Confuser.Protections {
 					uint sigToken = 0x11000000 | sigRid;
 					ctx.KeyToken = sigToken;
 					MutationHelper.InjectKey(writer.Module.EntryPoint, 2, (int)sigToken);
-				} else if (evt == ModuleWriterEvent.MDBeginAddResources) {
+				}
+				else if (evt == ModuleWriterEvent.MDBeginAddResources) {
 					// Compute hash
 					byte[] hash = SHA1.Create().ComputeHash(ctx.OriginModule);
 					uint hashBlob = writer.MetaData.BlobHeap.Add(hash);
@@ -260,6 +262,8 @@ namespace Confuser.Protections {
 						resTbl.Add(new RawManifestResourceRow(resource.Item1, resource.Item2, writer.MetaData.StringsHeap.Add(resource.Item3), impl));
 				}
 			}
+
 		}
+
 	}
 }

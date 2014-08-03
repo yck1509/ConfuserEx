@@ -11,6 +11,7 @@ using Ookii.Dialogs.Wpf;
 
 namespace ConfuserEx.ViewModel {
 	public class ProjectTabVM : TabViewModel {
+
 		private int selIndex = -1;
 
 		public ProjectTabVM(AppVM app)
@@ -68,7 +69,7 @@ namespace ConfuserEx.ViewModel {
 					ofd.Filter = ".NET assemblies (*.exe, *.dll)|*.exe;*.dll|All Files (*.*)|*.*";
 					ofd.Multiselect = true;
 					if (ofd.ShowDialog() ?? false) {
-						foreach(var file in ofd.FileNames)
+						foreach (var file in ofd.FileNames)
 							AddModule(file);
 					}
 				});
@@ -124,10 +125,12 @@ namespace ConfuserEx.ViewModel {
 			var module = new ProjectModuleVM(App.Project, new ProjectModule());
 			try {
 				module.Path = Confuser.Core.Utils.GetRelativePath(file, App.Project.BaseDirectory);
-			} catch {
+			}
+			catch {
 				module.Path = file;
 			}
 			App.Project.Modules.Add(module);
 		}
+
 	}
 }

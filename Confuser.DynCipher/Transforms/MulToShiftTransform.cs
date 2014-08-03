@@ -5,6 +5,7 @@ using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Transforms {
 	internal class MulToShiftTransform {
+
 		private static uint NumberOfSetBits(uint i) {
 			i = i - ((i >> 1) & 0x55555555);
 			i = (i & 0x33333333) + ((i >> 2) & 0x33333333);
@@ -39,13 +40,16 @@ namespace Confuser.DynCipher.Transforms {
 							x += i;
 						return x;
 					}
-				} else {
+				}
+				else {
 					binOp.Left = ProcessExpression(binOp.Left);
 					binOp.Right = ProcessExpression(binOp.Right);
 				}
-			} else if (exp is ArrayIndexExpression) {
+			}
+			else if (exp is ArrayIndexExpression) {
 				((ArrayIndexExpression)exp).Array = ProcessExpression(((ArrayIndexExpression)exp).Array);
-			} else if (exp is UnaryOpExpression) {
+			}
+			else if (exp is UnaryOpExpression) {
 				((UnaryOpExpression)exp).Value = ProcessExpression(((UnaryOpExpression)exp).Value);
 			}
 			return exp;
@@ -63,5 +67,6 @@ namespace Confuser.DynCipher.Transforms {
 			foreach (Statement st in block.Statements)
 				ProcessStatement(st);
 		}
+
 	}
 }

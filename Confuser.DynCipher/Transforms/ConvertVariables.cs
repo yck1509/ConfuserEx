@@ -3,6 +3,7 @@ using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Transforms {
 	internal class ConvertVariables {
+
 		private static Expression ReplaceVar(Expression exp, Variable buff) {
 			if (exp is VariableExpression) {
 				if (((VariableExpression)exp).Variable.Name[0] != 'v') return exp;
@@ -13,10 +14,12 @@ namespace Confuser.DynCipher.Transforms {
 			}
 			if (exp is ArrayIndexExpression) {
 				((ArrayIndexExpression)exp).Array = ReplaceVar(((ArrayIndexExpression)exp).Array, buff);
-			} else if (exp is BinOpExpression) {
+			}
+			else if (exp is BinOpExpression) {
 				((BinOpExpression)exp).Left = ReplaceVar(((BinOpExpression)exp).Left, buff);
 				((BinOpExpression)exp).Right = ReplaceVar(((BinOpExpression)exp).Right, buff);
-			} else if (exp is UnaryOpExpression) {
+			}
+			else if (exp is UnaryOpExpression) {
 				((UnaryOpExpression)exp).Value = ReplaceVar(((UnaryOpExpression)exp).Value, buff);
 			}
 			return exp;
@@ -35,5 +38,6 @@ namespace Confuser.DynCipher.Transforms {
 			for (int i = 0; i < block.Statements.Count; i++)
 				block.Statements[i] = ReplaceVar(block.Statements[i], mainBuff);
 		}
+
 	}
 }

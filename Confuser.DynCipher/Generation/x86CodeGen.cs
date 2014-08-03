@@ -7,6 +7,7 @@ using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Generation {
 	public class x86CodeGen {
+
 		private List<x86Instruction> instrs;
 		private bool[] usedRegs;
 
@@ -27,7 +28,8 @@ namespace Confuser.DynCipher.Generation {
 
 			try {
 				return ((x86RegisterOperand)Emit(expression, loadArg)).Register;
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				if (ex.Message == "Register overflowed.")
 					return null;
 				throw;
@@ -196,9 +198,11 @@ namespace Confuser.DynCipher.Generation {
 		public override string ToString() {
 			return string.Join("\r\n", instrs.Select(instr => instr.ToString()).ToArray());
 		}
+
 	}
 
 	public enum x86OpCode {
+
 		MOV,
 		ADD,
 		SUB,
@@ -208,9 +212,11 @@ namespace Confuser.DynCipher.Generation {
 		NOT,
 		XOR,
 		POP
+
 	}
 
 	public enum x86Register {
+
 		EAX,
 		ECX,
 		EDX,
@@ -219,11 +225,15 @@ namespace Confuser.DynCipher.Generation {
 		EBP,
 		ESI,
 		EDI
+
 	}
 
-	public interface Ix86Operand { }
+	public interface Ix86Operand {
+
+	}
 
 	public class x86RegisterOperand : Ix86Operand {
+
 		public x86RegisterOperand(x86Register reg) {
 			Register = reg;
 		}
@@ -233,9 +243,11 @@ namespace Confuser.DynCipher.Generation {
 		public override string ToString() {
 			return Register.ToString();
 		}
+
 	}
 
 	public class x86ImmediateOperand : Ix86Operand {
+
 		public x86ImmediateOperand(int imm) {
 			Immediate = imm;
 		}
@@ -245,9 +257,11 @@ namespace Confuser.DynCipher.Generation {
 		public override string ToString() {
 			return Immediate.ToString("X") + "h";
 		}
+
 	}
 
 	public class x86Instruction {
+
 		public x86OpCode OpCode { get; set; }
 		public Ix86Operand[] Operands { get; set; }
 
@@ -424,5 +438,6 @@ namespace Confuser.DynCipher.Generation {
 			}
 			return ret.ToString();
 		}
+
 	}
 }

@@ -7,6 +7,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Protections.Resources {
 	internal class REContext {
+
 		public ConfuserContext Context;
 
 		public FieldDef DataField;
@@ -21,5 +22,6 @@ namespace Confuser.Protections.Resources {
 		public ModuleDef Module;
 		public INameService Name;
 		public RandomGenerator Random;
+
 	}
 }

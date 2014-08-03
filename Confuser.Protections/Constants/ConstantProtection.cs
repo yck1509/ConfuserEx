@@ -5,11 +5,14 @@ using dnlib.DotNet;
 
 namespace Confuser.Protections {
 	public interface IConstantService {
+
 		void ExcludeMethod(ConfuserContext context, MethodDef method);
+
 	}
 
 	[BeforeProtection("Ki.ControlFlow"), AfterProtection("Ki.RefProxy")]
 	internal class ConstantProtection : Protection, IConstantService {
+
 		public const string _Id = "constants";
 		public const string _FullId = "Ki.Constants";
 		public const string _ServiceId = "Ki.Constants";
@@ -40,12 +43,13 @@ namespace Confuser.Protections {
 		}
 
 		protected override void Initialize(ConfuserContext context) {
-			context.Registry.RegisterService(_ServiceId, typeof (IConstantService), this);
+			context.Registry.RegisterService(_ServiceId, typeof(IConstantService), this);
 		}
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
 			pipeline.InsertPreStage(PipelineStage.ProcessModule, new InjectPhase(this));
 			pipeline.InsertPostStage(PipelineStage.ProcessModule, new EncodePhase(this));
 		}
+
 	}
 }

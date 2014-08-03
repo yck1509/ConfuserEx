@@ -9,7 +9,8 @@ using Confuser.Core;
 
 namespace ConfuserEx {
 	internal class ComponentConverter : Freezable, IValueConverter {
-		public static readonly DependencyProperty ComponentsProperty = DependencyProperty.Register("Components", typeof (IList<ConfuserComponent>), typeof (ComponentConverter), new UIPropertyMetadata(null));
+
+		public static readonly DependencyProperty ComponentsProperty = DependencyProperty.Register("Components", typeof(IList<ConfuserComponent>), typeof(ComponentConverter), new UIPropertyMetadata(null));
 
 		public IList<ConfuserComponent> Components {
 			get { return (IList<ConfuserComponent>)GetValue(ComponentsProperty); }
@@ -18,7 +19,7 @@ namespace ConfuserEx {
 
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
 			Debug.Assert(value is string || value == null);
-			Debug.Assert(targetType == typeof (ConfuserComponent));
+			Debug.Assert(targetType == typeof(ConfuserComponent));
 			Debug.Assert(Components != null);
 
 			if (value == null) return null;
@@ -27,7 +28,7 @@ namespace ConfuserEx {
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
 			Debug.Assert(value is ConfuserComponent || value == null);
-			Debug.Assert(targetType == typeof (string));
+			Debug.Assert(targetType == typeof(string));
 
 			if (value == null) return null;
 			return ((ConfuserComponent)value).Id;
@@ -36,5 +37,6 @@ namespace ConfuserEx {
 		protected override Freezable CreateInstanceCore() {
 			return new ComponentConverter();
 		}
+
 	}
 }

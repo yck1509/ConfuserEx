@@ -6,6 +6,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.DynCipher.Generation {
 	public class CILCodeGen {
+
 		private readonly Dictionary<string, Local> localMap = new Dictionary<string, Local>();
 
 		public CILCodeGen(MethodDef method, IList<Instruction> instrs) {
@@ -60,7 +61,8 @@ namespace Confuser.DynCipher.Generation {
 				EmitLoad(arrIndex.Array);
 				Emit(Instruction.CreateLdcI4(arrIndex.Index));
 				Emit(Instruction.Create(OpCodes.Ldelem_U4));
-			} else if (exp is BinOpExpression) {
+			}
+			else if (exp is BinOpExpression) {
 				var binOp = (BinOpExpression)exp;
 				EmitLoad(binOp.Left);
 				EmitLoad(binOp.Right);
@@ -97,7 +99,8 @@ namespace Confuser.DynCipher.Generation {
 						throw new NotSupportedException();
 				}
 				Emit(Instruction.Create(op));
-			} else if (exp is UnaryOpExpression) {
+			}
+			else if (exp is UnaryOpExpression) {
 				var unaryOp = (UnaryOpExpression)exp;
 				EmitLoad(unaryOp.Value);
 				OpCode op;
@@ -112,13 +115,16 @@ namespace Confuser.DynCipher.Generation {
 						throw new NotSupportedException();
 				}
 				Emit(Instruction.Create(op));
-			} else if (exp is LiteralExpression) {
+			}
+			else if (exp is LiteralExpression) {
 				var literal = (LiteralExpression)exp;
 				Emit(Instruction.CreateLdcI4((int)literal.Value));
-			} else if (exp is VariableExpression) {
+			}
+			else if (exp is VariableExpression) {
 				var var = (VariableExpression)exp;
 				LoadVar(var.Variable);
-			} else
+			}
+			else
 				throw new NotSupportedException();
 		}
 
@@ -129,11 +135,13 @@ namespace Confuser.DynCipher.Generation {
 				Emit(Instruction.CreateLdcI4(arrIndex.Index));
 				EmitLoad(value);
 				Emit(Instruction.Create(OpCodes.Stelem_I4));
-			} else if (exp is VariableExpression) {
+			}
+			else if (exp is VariableExpression) {
 				var var = (VariableExpression)exp;
 				EmitLoad(value);
 				StoreVar(var.Variable);
-			} else
+			}
+			else
 				throw new NotSupportedException();
 		}
 
@@ -141,7 +149,8 @@ namespace Confuser.DynCipher.Generation {
 			if (statement is AssignmentStatement) {
 				var assignment = (AssignmentStatement)statement;
 				EmitStore(assignment.Target, assignment.Value);
-			} else if (statement is LoopStatement) {
+			}
+			else if (statement is LoopStatement) {
 				var loop = (LoopStatement)statement;
 				/*
                  *      ldc.i4  begin
@@ -173,11 +182,14 @@ namespace Confuser.DynCipher.Generation {
 				Emit(Instruction.CreateLdcI4(loop.Limit));
 				Emit(Instruction.Create(OpCodes.Blt, lbl));
 				Emit(Instruction.Create(OpCodes.Pop));
-			} else if (statement is StatementBlock) {
+			}
+			else if (statement is StatementBlock) {
 				foreach (Statement child in ((StatementBlock)statement).Statements)
 					EmitStatement(child);
-			} else
+			}
+			else
 				throw new NotSupportedException();
 		}
+
 	}
 }

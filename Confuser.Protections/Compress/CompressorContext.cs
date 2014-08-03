@@ -6,6 +6,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Protections.Compress {
 	internal class CompressorContext {
+
 		public AssemblyDef Assembly;
 		public IKeyDeriver Deriver;
 		public byte[] EncryptedModule;
@@ -55,5 +56,6 @@ namespace Confuser.Protections.Compress {
 
 			return encryptedData;
 		}
+
 	}
 }

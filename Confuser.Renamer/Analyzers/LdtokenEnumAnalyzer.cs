@@ -6,6 +6,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class LdtokenEnumAnalyzer : IRenamer {
+
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
 			var method = def as MethodDef;
 			if (method == null || !method.HasBody)
@@ -22,27 +23,33 @@ namespace Confuser.Renamer.Analyzers {
 						IMemberForwarded member = ((MemberRef)instr.Operand).ResolveThrow();
 						if (context.Modules.Contains((ModuleDefMD)member.Module))
 							service.SetCanRename(member, false);
-					} else if (instr.Operand is IField) {
+					}
+					else if (instr.Operand is IField) {
 						FieldDef field = ((IField)instr.Operand).ResolveThrow();
 						if (context.Modules.Contains((ModuleDefMD)field.Module))
 							service.SetCanRename(field, false);
-					} else if (instr.Operand is IMethod) {
+					}
+					else if (instr.Operand is IMethod) {
 						MethodDef m = ((IMethod)instr.Operand).ResolveThrow();
 						if (context.Modules.Contains((ModuleDefMD)m.Module))
 							service.SetCanRename(method, false);
-					} else if (instr.Operand is ITypeDefOrRef) {
+					}
+					else if (instr.Operand is ITypeDefOrRef) {
 						if (!(instr.Operand is TypeSpec)) {
 							TypeDef type = ((ITypeDefOrRef)instr.Operand).ResolveTypeDefThrow();
 							if (context.Modules.Contains((ModuleDefMD)type.Module) &&
 							    HandleTypeOf(context, service, method, i))
 								DisableRename(service, type, false);
 						}
-					} else
+					}
+					else
 						throw new UnreachableException();
-				} else if ((instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt) &&
-				           ((IMethod)instr.Operand).Name == "ToString") {
+				}
+				else if ((instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt) &&
+				         ((IMethod)instr.Operand).Name == "ToString") {
 					HandleEnum(context, service, method, i);
-				} else if (instr.OpCode.Code == Code.Ldstr) {
+				}
+				else if (instr.OpCode.Code == Code.Ldstr) {
 					TypeDef typeDef = method.Module.FindReflection((string)instr.Operand);
 					if (typeDef != null)
 						service.AddReference(typeDef, new StringTypeReference(instr, typeDef));
@@ -75,7 +82,8 @@ namespace Confuser.Renamer.Analyzers {
 				if (prevInstr.Operand is MemberRef) {
 					var memberRef = (MemberRef)prevInstr.Operand;
 					targetType = memberRef.IsFieldRef ? memberRef.FieldSig.Type : memberRef.MethodSig.RetType;
-				} else if (prevInstr.Operand is IField)
+				}
+				else if (prevInstr.Operand is IField)
 					targetType = ((IField)prevInstr.Operand).FieldSig.Type;
 
 				else if (prevInstr.Operand is IMethod)
@@ -167,5 +175,6 @@ namespace Confuser.Renamer.Analyzers {
 			foreach (TypeDef nested in typeDef.NestedTypes)
 				DisableRename(service, nested, false);
 		}
+
 	}
 }

@@ -6,6 +6,7 @@ using Ookii.Dialogs.Wpf;
 
 namespace ConfuserEx.Views {
 	public partial class ProjectModuleView : Window {
+
 		private readonly ProjectModuleVM module;
 
 		public ProjectModuleView(ProjectModuleVM module) {
@@ -30,5 +31,6 @@ namespace ConfuserEx.Views {
 				module.SNKeyPath = ofd.FileName;
 			}
 		}
+
 	}
 }

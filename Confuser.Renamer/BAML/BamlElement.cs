@@ -5,6 +5,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.BAML {
 	internal class BamlElement {
+
 		public BamlElement Parent { get; private set; }
 		public BamlRecord Header { get; private set; }
 		public IList<BamlRecord> Body { get; private set; }
@@ -102,7 +103,8 @@ namespace Confuser.Renamer.BAML {
 						current.Parent = prev;
 						stack.Push(prev);
 					}
-				} else if (IsFooter(document[i])) {
+				}
+				else if (IsFooter(document[i])) {
 					if (current == null)
 						throw new Exception("Unexpected footer.");
 
@@ -114,11 +116,13 @@ namespace Confuser.Renamer.BAML {
 					current.Footer = document[i];
 					if (stack.Count > 0)
 						current = stack.Pop();
-				} else
+				}
+				else
 					current.Body.Add(document[i]);
 			}
 			Debug.Assert(stack.Count == 0);
 			return current;
 		}
+
 	}
 }

@@ -10,6 +10,7 @@ using GalaSoft.MvvmLight.Command;
 
 namespace ConfuserEx.Views {
 	public partial class ProjectRuleView : Window {
+
 		private readonly ProjectVM proj;
 		private readonly ProjectRuleVM rule;
 
@@ -57,7 +58,8 @@ namespace ConfuserEx.Views {
 			if (rule.Expression == null) {
 				pattern.BorderBrush = Brushes.Red;
 				errorImg.Visibility = Visibility.Visible;
-			} else {
+			}
+			else {
 				pattern.ClearValue(BorderBrushProperty);
 				errorImg.Visibility = Visibility.Hidden;
 			}
@@ -66,5 +68,6 @@ namespace ConfuserEx.Views {
 		private void Done(object sender, RoutedEventArgs e) {
 			DialogResult = true;
 		}
+
 	}
 }

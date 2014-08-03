@@ -2,6 +2,7 @@ using System;
 
 namespace SevenZip.Compression.RangeCoder {
 	internal struct BitTreeEncoder {
+
 		private readonly BitEncoder[] Models;
 		private readonly int NumBitLevels;
 
@@ -82,9 +83,11 @@ namespace SevenZip.Compression.RangeCoder {
 				symbol >>= 1;
 			}
 		}
+
 	}
 
 	internal struct BitTreeDecoder {
+
 		private readonly BitDecoder[] Models;
 		private readonly int NumBitLevels;
 
@@ -129,5 +132,6 @@ namespace SevenZip.Compression.RangeCoder {
 			}
 			return symbol;
 		}
+
 	}
 }

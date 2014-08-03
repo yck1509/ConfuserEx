@@ -9,6 +9,7 @@ namespace Confuser.Core {
 	///     Various stages in <see cref="ProtectionPipeline" />.
 	/// </summary>
 	public enum PipelineStage {
+
 		/// <summary>
 		///     Confuser engine inspects the loaded modules and makes necessary changes.
 		///     This stage occurs only once per pipeline run.
@@ -62,12 +63,14 @@ namespace Confuser.Core {
 		///     This stage occurs only once per pipeline run.
 		/// </summary>
 		SaveModules
+
 	}
 
 	/// <summary>
 	///     Protection processing pipeline.
 	/// </summary>
 	public class ProtectionPipeline {
+
 		private readonly Dictionary<PipelineStage, List<ProtectionPhase>> postStage;
 		private readonly Dictionary<PipelineStage, List<ProtectionPhase>> preStage;
 
@@ -75,7 +78,7 @@ namespace Confuser.Core {
 		///     Initializes a new instance of the <see cref="ProtectionPipeline" /> class.
 		/// </summary>
 		public ProtectionPipeline() {
-			var stages = (PipelineStage[])Enum.GetValues(typeof (PipelineStage));
+			var stages = (PipelineStage[])Enum.GetValues(typeof(PipelineStage));
 			preStage = stages.ToDictionary(stage => stage, stage => new List<ProtectionPhase>());
 			postStage = stages.ToDictionary(stage => stage, stage => new List<ProtectionPhase>());
 		}
@@ -176,5 +179,6 @@ namespace Confuser.Core {
 				return parameters.ContainsKey(phase.Parent);
 			}).ToList();
 		}
+
 	}
 }

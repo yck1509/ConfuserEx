@@ -6,6 +6,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     The OR operator.
 	/// </summary>
 	public class OrOperator : PatternOperator {
+
 		internal const string OpName = "or";
 
 		/// <inheritdoc />
@@ -24,5 +25,6 @@ namespace Confuser.Core.Project.Patterns {
 			if (a) return true;
 			return (bool)OperandB.Evaluate(definition);
 		}
+
 	}
 }

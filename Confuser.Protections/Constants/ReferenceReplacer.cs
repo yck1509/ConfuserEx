@@ -9,6 +9,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Constants {
 	internal class ReferenceReplacer {
+
 		public static void ReplaceReference(CEContext ctx, ProtectionParameters parameters) {
 			foreach (var entry in ctx.ReferenceRepl) {
 				if (parameters.GetParameter<bool>(ctx.Context, entry.Key, "cfg"))
@@ -28,10 +29,12 @@ namespace Confuser.Protections.Constants {
 		}
 
 		private struct CFGContext {
+
 			public ControlFlowGraph Graph;
 			public BlockKey[] Keys;
 			public RandomGenerator Random;
 			public Local StateVariable;
+
 		}
 
 		private static void InsertEmptyStateUpdate(CFGContext ctx, ControlFlowBlock block) {
@@ -61,7 +64,8 @@ namespace Confuser.Protections.Constants {
 						break;
 				}
 				body.Instructions.Insert(targetIndex + 3, Instruction.Create(OpCodes.Stloc, ctx.StateVariable));
-			} else {
+			}
+			else {
 				body.Instructions.Insert(targetIndex + 0, first = Instruction.Create(OpCodes.Ldc_I4, (int)key.ExitState));
 				body.Instructions.Insert(targetIndex + 1, Instruction.Create(OpCodes.Stloc, ctx.StateVariable));
 			}
@@ -154,5 +158,6 @@ namespace Confuser.Protections.Constants {
 				}
 			}
 		}
+
 	}
 }

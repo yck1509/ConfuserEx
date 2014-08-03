@@ -11,15 +11,18 @@ using dnlib.PE;
 
 namespace Confuser.Protections.AntiTamper {
 	internal struct JITEHClause {
+
 		public uint ClassTokenOrFilterOffset;
 		public uint Flags;
 		public uint HandlerLength;
 		public uint HandlerOffset;
 		public uint TryLength;
 		public uint TryOffset;
+
 	}
 
 	internal class JITMethodBody : IChunk {
+
 		public byte[] Body;
 		public JITEHClause[] EHs;
 		public byte[] ILCode;
@@ -111,9 +114,11 @@ namespace Confuser.Protections.AntiTamper {
 				counter ^= (state >> 5) | (state << 27);
 			}
 		}
+
 	}
 
 	internal class JITMethodBodyWriter : MethodBodyWriterBase {
+
 		private readonly CilBody body;
 		private readonly JITMethodBody jitBody;
 		private readonly bool keepMaxStack;
@@ -139,7 +144,8 @@ namespace Confuser.Protections.AntiTamper {
 			if (body.Variables.Count > 0) {
 				var local = new LocalSig(body.Variables.Select(var => var.Type).ToList());
 				jitBody.LocalVars = SignatureWriter.Write(metadata, local);
-			} else
+			}
+			else
 				jitBody.LocalVars = new byte[0];
 
 			using (var ms = new MemoryStream()) {
@@ -171,7 +177,8 @@ namespace Confuser.Protections.AntiTamper {
 							jitBody.Options |= 0x80;
 
 						jitBody.EHs[i].ClassTokenOrFilterOffset = token;
-					} else if (eh.HandlerType == ExceptionHandlerType.Filter) {
+					}
+					else if (eh.HandlerType == ExceptionHandlerType.Filter) {
 						jitBody.EHs[i].ClassTokenOrFilterOffset = GetOffset(eh.FilterStart);
 					}
 				}
@@ -201,9 +208,11 @@ namespace Confuser.Protections.AntiTamper {
 		protected override void WriteInlineType(BinaryWriter writer, Instruction instr) {
 			writer.Write(metadata.GetToken(instr.Operand).Raw);
 		}
+
 	}
 
 	internal class JITBodyIndex : IChunk {
+
 		private readonly Dictionary<uint, JITMethodBody> bodies;
 
 		private FileOffset offset;
@@ -261,5 +270,6 @@ namespace Confuser.Protections.AntiTamper {
 				offset += entry.Value.GetFileLength();
 			}
 		}
+
 	}
 }

@@ -6,6 +6,7 @@ namespace Confuser.Core.Project.Patterns {
 	///     A pattern operator.
 	/// </summary>
 	public abstract class PatternOperator : PatternExpression {
+
 		/// <summary>
 		///     Gets the name of operator.
 		/// </summary>
@@ -35,11 +36,13 @@ namespace Confuser.Core.Project.Patterns {
 			if (IsUnary) {
 				tokens.Add(new PatternToken(TokenType.Identifier, Name));
 				OperandA.Serialize(tokens);
-			} else {
+			}
+			else {
 				OperandA.Serialize(tokens);
 				tokens.Add(new PatternToken(TokenType.Identifier, Name));
 				OperandB.Serialize(tokens);
 			}
 		}
+
 	}
 }

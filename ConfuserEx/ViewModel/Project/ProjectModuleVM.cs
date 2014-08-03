@@ -7,6 +7,7 @@ using Confuser.Core.Project;
 
 namespace ConfuserEx.ViewModel {
 	public class ProjectModuleVM : ViewModelBase, IViewModel<ProjectModule>, IRuleContainer {
+
 		private readonly ProjectModule module;
 		private readonly ProjectVM parent;
 		private string asmName = "Unknown";
@@ -20,8 +21,7 @@ namespace ConfuserEx.ViewModel {
 			rules.CollectionChanged += (sender, e) => parent.IsModified = true;
 			Rules = rules;
 
-			if (module.Path != null)
-			{
+			if (module.Path != null) {
 				SimpleName = System.IO.Path.GetFileName(module.Path);
 				LoadAssemblyName();
 			}
@@ -81,10 +81,12 @@ namespace ConfuserEx.ViewModel {
 					string path = System.IO.Path.Combine(parent.BaseDirectory, Path);
 					AssemblyName name = System.Reflection.AssemblyName.GetAssemblyName(path);
 					AssemblyName = name.FullName;
-				} catch {
+				}
+				catch {
 					AssemblyName = "Unknown";
 				}
 			});
 		}
+
 	}
 }

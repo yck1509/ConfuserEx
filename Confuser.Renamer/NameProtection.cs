@@ -4,6 +4,7 @@ using Confuser.Core;
 
 namespace Confuser.Renamer {
 	internal class NameProtection : Protection {
+
 		public const string _Id = "rename";
 		public const string _FullId = "Ki.Rename";
 		public const string _ServiceId = "Ki.Rename";
@@ -40,6 +41,7 @@ namespace Confuser.Renamer {
 		}
 
 		private class ExportMapPhase : ProtectionPhase {
+
 			public ExportMapPhase(NameProtection parent)
 				: base(parent) { }
 
@@ -71,6 +73,8 @@ namespace Confuser.Renamer {
 						writer.WriteLine("{0}\t{1}", entry.Key, entry.Value);
 				}
 			}
+
 		}
+
 	}
 }

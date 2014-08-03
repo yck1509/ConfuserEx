@@ -10,6 +10,7 @@ namespace Confuser.Core.Project {
 	///     A module description in a Confuser project.
 	/// </summary>
 	public class ProjectModule {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProjectModule" /> class.
 		/// </summary>
@@ -117,12 +118,14 @@ namespace Confuser.Core.Project {
 		public override string ToString() {
 			return Path;
 		}
+
 	}
 
 	/// <summary>
 	///     Indicates add or remove the protection from the active protections
 	/// </summary>
 	public enum SettingItemAction {
+
 		/// <summary>
 		///     Add the protection to the active protections
 		/// </summary>
@@ -132,6 +135,7 @@ namespace Confuser.Core.Project {
 		///     Remove the protection from the active protections
 		/// </summary>
 		Remove
+
 	}
 
 	/// <summary>
@@ -139,6 +143,7 @@ namespace Confuser.Core.Project {
 	/// </summary>
 	/// <typeparam name="T"><see cref="Protection" /> or <see cref="Packer" /></typeparam>
 	public class SettingItem<T> : Dictionary<string, string> {
+
 		/// <summary>
 		///     The identifier of component
 		/// </summary>
@@ -158,7 +163,7 @@ namespace Confuser.Core.Project {
 		/// <param name="xmlDoc">The root XML document.</param>
 		/// <returns>The setting module description.</returns>
 		internal XmlElement Save(XmlDocument xmlDoc) {
-			XmlElement elem = xmlDoc.CreateElement(typeof (T) == typeof (Packer) ? "packer" : "protection", ConfuserProject.Namespace);
+			XmlElement elem = xmlDoc.CreateElement(typeof(T) == typeof(Packer) ? "packer" : "protection", ConfuserProject.Namespace);
 
 			XmlAttribute idAttr = xmlDoc.CreateAttribute("id");
 			idAttr.Value = Id;
@@ -194,7 +199,7 @@ namespace Confuser.Core.Project {
 			Id = elem.Attributes["id"].Value;
 
 			if (elem.Attributes["action"] != null)
-				Action = (SettingItemAction)Enum.Parse(typeof (SettingItemAction), elem.Attributes["action"].Value, true);
+				Action = (SettingItemAction)Enum.Parse(typeof(SettingItemAction), elem.Attributes["action"].Value, true);
 			else
 				Action = SettingItemAction.Add;
 
@@ -202,6 +207,7 @@ namespace Confuser.Core.Project {
 			foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>())
 				Add(i.Attributes["name"].Value, i.Attributes["value"].Value);
 		}
+
 	}
 
 
@@ -209,6 +215,7 @@ namespace Confuser.Core.Project {
 	///     A rule that control how <see cref="Protection" />s are applied to module
 	/// </summary>
 	public class Rule : List<SettingItem<Protection>> {
+
 		/// <summary>
 		///     Gets or sets the pattern that determine the target components of the rule.
 		/// </summary>
@@ -265,7 +272,7 @@ namespace Confuser.Core.Project {
 			Pattern = elem.Attributes["pattern"].Value;
 
 			if (elem.Attributes["preset"] != null)
-				Preset = (ProtectionPreset)Enum.Parse(typeof (ProtectionPreset), elem.Attributes["preset"].Value, true);
+				Preset = (ProtectionPreset)Enum.Parse(typeof(ProtectionPreset), elem.Attributes["preset"].Value, true);
 			else
 				Preset = ProtectionPreset.None;
 
@@ -302,12 +309,14 @@ namespace Confuser.Core.Project {
 			}
 			return ret;
 		}
+
 	}
 
 	/// <summary>
 	///     The exception that is thrown when there exists schema errors in the project XML.
 	/// </summary>
 	public class ProjectValidationException : Exception {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProjectValidationException" /> class.
 		/// </summary>
@@ -322,12 +331,14 @@ namespace Confuser.Core.Project {
 		/// </summary>
 		/// <value>A list of schema exceptions.</value>
 		public IList<XmlSchemaException> Errors { get; private set; }
+
 	}
 
 	/// <summary>
 	///     Represent a project of Confuser.
 	/// </summary>
 	public class ConfuserProject : List<ProjectModule> {
+
 		/// <summary>
 		///     The namespace of Confuser project schema
 		/// </summary>
@@ -336,7 +347,7 @@ namespace Confuser.Core.Project {
 		/// <summary>
 		///     The schema of project XML.
 		/// </summary>
-		public static readonly XmlSchema Schema = XmlSchema.Read(typeof (ConfuserProject).Assembly.GetManifestResourceStream("Confuser.Core.Project.ConfuserPrj.xsd"), null);
+		public static readonly XmlSchema Schema = XmlSchema.Read(typeof(ConfuserProject).Assembly.GetManifestResourceStream("Confuser.Core.Project.ConfuserPrj.xsd"), null);
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ConfuserProject" /> class.
@@ -435,13 +446,13 @@ namespace Confuser.Core.Project {
 				elem.AppendChild(i.Save(xmlDoc));
 
 			foreach (string i in ProbePaths) {
-				XmlElement path = xmlDoc.CreateElement("probePath", ConfuserProject.Namespace);
+				XmlElement path = xmlDoc.CreateElement("probePath", Namespace);
 				path.InnerText = i;
 				elem.AppendChild(path);
 			}
 
 			foreach (string i in PluginPaths) {
-				XmlElement path = xmlDoc.CreateElement("plugin", ConfuserProject.Namespace);
+				XmlElement path = xmlDoc.CreateElement("plugin", Namespace);
 				path.InnerText = i;
 				elem.AppendChild(path);
 			}
@@ -493,19 +504,24 @@ namespace Confuser.Core.Project {
 					var rule = new Rule();
 					rule.Load(i);
 					Rules.Add(rule);
-				} else if (i.Name == "packer") {
+				}
+				else if (i.Name == "packer") {
 					Packer = new SettingItem<Packer>();
 					Packer.Load(i);
-				} else if (i.Name == "probePath") {
+				}
+				else if (i.Name == "probePath") {
 					ProbePaths.Add(i.InnerText);
-				} else if (i.Name == "plugin") {
+				}
+				else if (i.Name == "plugin") {
 					PluginPaths.Add(i.InnerText);
-				} else {
+				}
+				else {
 					var asm = new ProjectModule();
 					asm.Load(i);
 					Add(asm);
 				}
 			}
 		}
+
 	}
 }

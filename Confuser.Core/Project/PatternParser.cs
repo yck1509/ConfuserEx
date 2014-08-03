@@ -7,6 +7,7 @@ namespace Confuser.Core.Project {
 	///     Parser of pattern expressions.
 	/// </summary>
 	public class PatternParser {
+
 		private static readonly Dictionary<string, Func<PatternFunction>> fns;
 		private static readonly Dictionary<string, Func<PatternOperator>> ops;
 		private readonly PatternTokenizer tokenizer = new PatternTokenizer();
@@ -49,7 +50,8 @@ namespace Confuser.Core.Project {
 				if (PeekToken() != null)
 					throw new InvalidPatternException("Extra tokens beyond the end of pattern.");
 				return ret;
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				if (ex is InvalidPatternException)
 					throw;
 				throw new InvalidPatternException("Invalid pattern.", ex);
@@ -126,7 +128,8 @@ namespace Confuser.Core.Project {
 							throw UnexpectedToken(token);
 						op.OperandA = ParseExpression();
 						ret = op;
-					} else if (IsFunction(token)) {
+					}
+					else if (IsFunction(token)) {
 						// function
 						PatternFunction fn = fns[token.Value]();
 
@@ -155,7 +158,8 @@ namespace Confuser.Core.Project {
 							throw MismatchParens(parens.Position.Value);
 
 						ret = fn;
-					} else {
+					}
+					else {
 						bool boolValue;
 						if (bool.TryParse(token.Value, out boolValue))
 							ret = new LiteralExpression(boolValue);
@@ -192,5 +196,6 @@ namespace Confuser.Core.Project {
 
 			return ret;
 		}
+
 	}
 }

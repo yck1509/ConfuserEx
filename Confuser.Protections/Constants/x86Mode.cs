@@ -12,6 +12,7 @@ using MethodBody = dnlib.DotNet.Writer.MethodBody;
 
 namespace Confuser.Protections.Constants {
 	internal class x86Mode : IEncodeMode {
+
 		private Action<uint[], uint[]> encryptFunc;
 
 		public IEnumerable<Instruction> EmitDecrypt(MethodDef init, CEContext ctx, Local block, Local key) {
@@ -23,9 +24,9 @@ namespace Confuser.Protections.Constants {
 			codeGen.GenerateCIL(decrypt);
 			codeGen.Commit(init.Body);
 
-			var dmCodeGen = new DMCodeGen(typeof (void), new[] {
-				Tuple.Create("{BUFFER}", typeof (uint[])),
-				Tuple.Create("{KEY}", typeof (uint[]))
+			var dmCodeGen = new DMCodeGen(typeof(void), new[] {
+				Tuple.Create("{BUFFER}", typeof(uint[])),
+				Tuple.Create("{KEY}", typeof(uint[]))
 			});
 			dmCodeGen.GenerateCIL(encrypt);
 			encryptFunc = dmCodeGen.Compile<Action<uint[], uint[]>>();
@@ -35,7 +36,7 @@ namespace Confuser.Protections.Constants {
 
 		public uint[] Encrypt(uint[] data, int offset, uint[] key) {
 			var ret = new uint[key.Length];
-			Buffer.BlockCopy(data, offset * sizeof (uint), ret, 0, key.Length * sizeof (uint));
+			Buffer.BlockCopy(data, offset * sizeof(uint), ret, 0, key.Length * sizeof(uint));
 			encryptFunc(ret, key);
 			return ret;
 		}
@@ -58,6 +59,7 @@ namespace Confuser.Protections.Constants {
 		}
 
 		private class CipherCodeGen : CILCodeGen {
+
 			private readonly Local block;
 			private readonly Local key;
 
@@ -74,9 +76,11 @@ namespace Confuser.Protections.Constants {
 					return key;
 				return base.Var(var);
 			}
+
 		}
 
 		private class x86Encoding {
+
 			private byte[] code;
 			private MethodBody codeChunk;
 
@@ -113,7 +117,7 @@ namespace Confuser.Protections.Constants {
 
 				code = CodeGenUtils.AssembleCode(codeGen, reg.Value);
 
-				expCompiled = new DMCodeGen(typeof (int), new[] { Tuple.Create("{VAR}", typeof (int)) })
+				expCompiled = new DMCodeGen(typeof(int), new[] { Tuple.Create("{VAR}", typeof(int)) })
 					.GenerateCIL(expression)
 					.Compile<Func<int, int>>();
 
@@ -125,11 +129,14 @@ namespace Confuser.Protections.Constants {
 				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 					codeChunk = writer.MethodBodies.Add(new MethodBody(code));
-				} else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
+				}
+				else if (e.WriterEvent == ModuleWriterEvent.EndCalculateRvasAndFileOffsets) {
 					uint rid = writer.MetaData.GetRid(native);
 					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)codeChunk.RVA;
 				}
 			}
+
 		}
+
 	}
 }

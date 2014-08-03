@@ -11,6 +11,7 @@ namespace Confuser.Core {
 	///     The annotations are stored using <see cref="WeakReference" />
 	/// </remarks>
 	public class Annotations {
+
 		private readonly Dictionary<object, ListDictionary> annotations = new Dictionary<object, ListDictionary>(WeakReferenceComparer.Instance);
 
 		/// <summary>
@@ -36,9 +37,9 @@ namespace Confuser.Core {
 			if (!objAnno.Contains(key))
 				return defValue;
 
-			Type valueType = typeof (TValue);
+			Type valueType = typeof(TValue);
 			if (valueType.IsValueType)
-				return (TValue)Convert.ChangeType(objAnno[key], typeof (TValue));
+				return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
 			return (TValue)objAnno[key];
 		}
 
@@ -65,9 +66,9 @@ namespace Confuser.Core {
 			if (!objAnno.Contains(key))
 				return defValueFactory(key);
 
-			Type valueType = typeof (TValue);
+			Type valueType = typeof(TValue);
 			if (valueType.IsValueType)
-				return (TValue)Convert.ChangeType(objAnno[key], typeof (TValue));
+				return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
 			return (TValue)objAnno[key];
 		}
 
@@ -93,9 +94,9 @@ namespace Confuser.Core {
 				objAnno = annotations[new WeakReferenceKey(obj)] = new ListDictionary();
 			TValue ret;
 			if (objAnno.Contains(key)) {
-				Type valueType = typeof (TValue);
+				Type valueType = typeof(TValue);
 				if (valueType.IsValueType)
-					return (TValue)Convert.ChangeType(objAnno[key], typeof (TValue));
+					return (TValue)Convert.ChangeType(objAnno[key], typeof(TValue));
 				return (TValue)objAnno[key];
 			}
 			objAnno[key] = ret = factory(key);
@@ -136,6 +137,7 @@ namespace Confuser.Core {
 		///     Equality comparer of weak references.
 		/// </summary>
 		private class WeakReferenceComparer : IEqualityComparer<object> {
+
 			/// <summary>
 			///     The singleton instance of this comparer.
 			/// </summary>
@@ -170,12 +172,14 @@ namespace Confuser.Core {
 					return ((WeakReferenceKey)obj).HashCode;
 				return obj.GetHashCode();
 			}
+
 		}
 
 		/// <summary>
 		///     Represent a key using <see cref="WeakReference" />.
 		/// </summary>
 		private class WeakReferenceKey : WeakReference {
+
 			/// <inheritdoc />
 			public WeakReferenceKey(object target)
 				: base(target) {
@@ -187,6 +191,8 @@ namespace Confuser.Core {
 			/// </summary>
 			/// <value>The hash code.</value>
 			public int HashCode { get; private set; }
+
 		}
+
 	}
 }

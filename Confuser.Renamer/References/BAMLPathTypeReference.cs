@@ -5,6 +5,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class BAMLPathTypeReference : INameReference<TypeDef> {
+
 		private readonly PropertyPathPart attachedDP;
 		private readonly PropertyPathIndexer indexer;
 		private readonly TypeSig sig;
@@ -31,7 +32,8 @@ namespace Confuser.Renamer.References {
 				name = prefix + ":" + name;
 			if (indexer != null) {
 				indexer.Type = name;
-			} else {
+			}
+			else {
 				string oldType, property;
 				attachedDP.ExtractAttachedDP(out oldType, out property);
 				attachedDP.Name = string.Format("({0}.{1})", name, property);
@@ -42,5 +44,6 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
+
 	}
 }

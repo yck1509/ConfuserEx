@@ -9,6 +9,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Constants {
 	internal class CEContext {
+
 		public ConfuserContext Context;
 		public ModuleDef Module;
 
@@ -32,12 +33,15 @@ namespace Confuser.Protections.Constants {
 		public RandomGenerator Random;
 
 		public Dictionary<MethodDef, List<Tuple<Instruction, uint, IMethod>>> ReferenceRepl;
+
 	}
 
 	internal class DecoderDesc {
+
 		public object Data;
 		public byte InitializerID;
 		public byte NumberID;
 		public byte StringID;
+
 	}
 }

@@ -7,6 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ControlFlow {
 	internal class ExpressionPredicate : IPredicate {
+
 		private readonly CFContext ctx;
 		private Func<int, int> expCompiled;
 		private Expression expression;
@@ -49,7 +50,7 @@ namespace Confuser.Protections.ControlFlow {
 				new VariableExpression { Variable = var }, new VariableExpression { Variable = result },
 				ctx.Depth, out expression, out inverse);
 
-			expCompiled = new DMCodeGen(typeof (int), new[] { Tuple.Create("{VAR}", typeof (int)) })
+			expCompiled = new DMCodeGen(typeof(int), new[] { Tuple.Create("{VAR}", typeof(int)) })
 				.GenerateCIL(expression)
 				.Compile<Func<int, int>>();
 
@@ -59,6 +60,7 @@ namespace Confuser.Protections.ControlFlow {
 		}
 
 		private class CodeGen : CILCodeGen {
+
 			private readonly Local state;
 
 			public CodeGen(Local state, CFContext ctx, IList<Instruction> instrs)
@@ -71,6 +73,8 @@ namespace Confuser.Protections.ControlFlow {
 					return state;
 				return base.Var(var);
 			}
+
 		}
+
 	}
 }

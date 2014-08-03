@@ -5,6 +5,7 @@ using Confuser.Core;
 
 namespace ConfuserEx {
 	internal class ComponentDiscovery {
+
 		private static void CrossDomainLoadComponents() {
 			var ctx = (CrossDomainContext)AppDomain.CurrentDomain.GetData("ctx");
 			Assembly assembly = Assembly.LoadFile(ctx.PluginPath);
@@ -12,10 +13,11 @@ namespace ConfuserEx {
 				if (i.IsAbstract || !PluginDiscovery.HasAccessibleDefConstructor(i))
 					continue;
 
-				if (typeof (Protection).IsAssignableFrom(i)) {
+				if (typeof(Protection).IsAssignableFrom(i)) {
 					var prot = (Protection)Activator.CreateInstance(i);
 					ctx.AddProtection(Info.FromComponent(prot, ctx.PluginPath));
-				} else if (typeof (Packer).IsAssignableFrom(i)) {
+				}
+				else if (typeof(Packer).IsAssignableFrom(i)) {
 					var packer = (Packer)Activator.CreateInstance(i);
 					ctx.AddPacker(Info.FromComponent(packer, ctx.PluginPath));
 				}
@@ -36,6 +38,7 @@ namespace ConfuserEx {
 		}
 
 		private class CrossDomainContext : MarshalByRefObject {
+
 			private readonly IList<ConfuserComponent> packers;
 			private readonly string pluginPath;
 			private readonly IList<ConfuserComponent> protections;
@@ -57,10 +60,12 @@ namespace ConfuserEx {
 			public void AddPacker(Info info) {
 				packers.Add(new InfoComponent(info));
 			}
+
 		}
 
 		[Serializable]
 		private class Info {
+
 			public string desc;
 			public string fullId;
 			public string id;
@@ -76,9 +81,11 @@ namespace ConfuserEx {
 				ret.path = pluginPath;
 				return ret;
 			}
+
 		}
 
 		private class InfoComponent : ConfuserComponent {
+
 			public readonly Info info;
 
 			public InfoComponent(Info info) {
@@ -108,6 +115,8 @@ namespace ConfuserEx {
 			protected override void PopulatePipeline(ProtectionPipeline pipeline) {
 				throw new NotSupportedException();
 			}
+
 		}
+
 	}
 }

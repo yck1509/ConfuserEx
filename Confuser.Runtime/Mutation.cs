@@ -1,6 +1,7 @@
 ﻿using System;
 
 internal class Mutation {
+
 	public static readonly int KeyI0 = 0;
 	public static readonly int KeyI1 = 1;
 	public static readonly int KeyI2 = 2;
@@ -31,4 +32,5 @@ internal class Mutation {
 	}
 
 	public static void Crypt(uint[] data, uint[] key) { }
+
 }

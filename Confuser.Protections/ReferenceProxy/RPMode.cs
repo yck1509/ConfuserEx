@@ -9,6 +9,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal abstract class RPMode {
+
 		public abstract void ProcessCall(RPContext ctx, int instrIndex);
 		public abstract void Finalize(RPContext ctx);
 
@@ -38,7 +39,8 @@ namespace Confuser.Protections.ReferenceProxy {
 					retType = Import(ctx, declType).ToTypeSig();
 				}
 				return MethodSig.CreateStatic(retType, paramTypes);
-			} else {
+			}
+			else {
 				IEnumerable<TypeSig> paramTypes = method.MethodSig.Params.Select(type => {
 					if (ctx.TypeErasure && type.IsClassSig && method.MethodSig.HasThis)
 						return module.CorLibTypes.Object;
@@ -87,5 +89,6 @@ namespace Confuser.Protections.ReferenceProxy {
 			ctx.Delegates[sig] = ret;
 			return ret;
 		}
+
 	}
 }

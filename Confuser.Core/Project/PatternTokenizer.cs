@@ -4,6 +4,7 @@ using System.Text;
 
 namespace Confuser.Core.Project {
 	internal class PatternTokenizer {
+
 		private int index;
 		private string rulePattern;
 
@@ -90,5 +91,6 @@ namespace Confuser.Core.Project {
 					return new PatternToken(pos, TokenType.Identifier, ReadIdentifier());
 			}
 		}
+
 	}
 }

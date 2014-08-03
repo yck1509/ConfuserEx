@@ -10,6 +10,7 @@ using dnlib.DotNet.MD;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class TypeBlobAnalyzer : IRenamer {
+
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
 			var module = def as ModuleDefMD;
 			if (module == null) return;
@@ -103,7 +104,8 @@ namespace Confuser.Renamer.Analyzers {
 						service.ReduceRenameMode(typeDef, RenameMode.ASCII);
 					}
 				}
-			} else if (arg.Value is CAArgument[]) {
+			}
+			else if (arg.Value is CAArgument[]) {
 				foreach (CAArgument elem in (CAArgument[])arg.Value)
 					AnalyzeCAArgument(context, service, elem);
 			}
@@ -136,5 +138,6 @@ namespace Confuser.Renamer.Analyzers {
 				service.AddReference(member, new MemberRefReference(memberRef, member));
 			}
 		}
+
 	}
 }

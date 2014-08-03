@@ -4,6 +4,7 @@ using System.ComponentModel;
 
 namespace ConfuserEx.ViewModel {
 	public class ViewModelBase : INotifyPropertyChanged {
+
 		// http://stackoverflow.com/a/1316417/462805
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -30,5 +31,6 @@ namespace ConfuserEx.ViewModel {
 			}
 			return false;
 		}
+
 	}
 }

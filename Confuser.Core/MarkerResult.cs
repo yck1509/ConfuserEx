@@ -7,6 +7,7 @@ namespace Confuser.Core {
 	///     Result of the marker.
 	/// </summary>
 	public class MarkerResult {
+
 		/// <summary>
 		///     Initializes a new instance of the <see cref="MarkerResult" /> class.
 		/// </summary>
@@ -28,5 +29,6 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <value>The packer, or null if no packer exists.</value>
 		public Packer Packer { get; private set; }
+
 	}
 }

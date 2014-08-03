@@ -5,6 +5,7 @@ using System.Windows.Media;
 
 namespace ConfuserEx {
 	public class BrushToColorConverter : IValueConverter {
+
 		public static readonly BrushToColorConverter Instance = new BrushToColorConverter();
 		private BrushToColorConverter() { }
 
@@ -18,5 +19,6 @@ namespace ConfuserEx {
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
 			throw new NotImplementedException();
 		}
+
 	}
 }

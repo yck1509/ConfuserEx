@@ -13,6 +13,7 @@ using dnlib.DotNet.MD;
 
 namespace Confuser.Protections.Constants {
 	internal class InjectPhase : ProtectionPhase {
+
 		public InjectPhase(ConstantProtection parent)
 			: base(parent) { }
 
@@ -119,8 +120,9 @@ namespace Confuser.Protections.Constants {
 					    method.DeclaringType.Name == "Mutation" &&
 					    method.Name == "Value") {
 						decoderInst.Body.Instructions[j] = Instruction.Create(OpCodes.Sizeof, new GenericMVar(0).ToTypeDefOrRef());
-					} else if (instr.OpCode == OpCodes.Ldsfld &&
-					           method.DeclaringType.Name == "Constant") {
+					}
+					else if (instr.OpCode == OpCodes.Ldsfld &&
+					         method.DeclaringType.Name == "Constant") {
 						if (field.Name == "b") instr.Operand = moduleCtx.BufferField;
 						else throw new UnreachableException();
 					}
@@ -161,8 +163,9 @@ namespace Confuser.Protections.Constants {
 						instrs.RemoveAt(i - 1);
 						instrs.RemoveAt(i - 2);
 						instrs.InsertRange(i - 2, moduleCtx.ModeHandler.EmitDecrypt(moduleCtx.InitMethod, moduleCtx, (Local)ldBlock.Operand, (Local)ldKey.Operand));
-					} else if (method.DeclaringType.Name == "Lzma" &&
-					           method.Name == "Decompress") {
+					}
+					else if (method.DeclaringType.Name == "Lzma" &&
+					         method.Name == "Decompress") {
 						instr.Operand = decomp;
 					}
 				}
@@ -171,5 +174,6 @@ namespace Confuser.Protections.Constants {
 			foreach (Instruction instr in instrs)
 				moduleCtx.InitMethod.Body.Instructions.Add(instr);
 		}
+
 	}
 }

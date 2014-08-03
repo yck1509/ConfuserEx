@@ -5,6 +5,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class BAMLEnumReference : INameReference<FieldDef> {
+
 		private readonly FieldDef enumField;
 		private readonly PropertyRecord rec;
 
@@ -21,5 +22,6 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
+
 	}
 }
