@@ -84,10 +84,6 @@ namespace Confuser.Core.Helpers {
 					if (i + 1 < body.Instructions.Count)
 						blockHeaders.Add(body.Instructions[i + 1]);
 
-					// Exiting protected blocks may have unexpected side effects (i.e. finally)
-					// TODO: Handle finally in a better way.
-					if (instr.OpCode.Code == Code.Leave || instr.OpCode.Code == Code.Leave_S)
-						entryHeaders.Add((Instruction)instr.Operand);
 				} else if (instr.Operand is Instruction[]) {
 					foreach (Instruction target in (Instruction[])instr.Operand)
 						blockHeaders.Add(target);
