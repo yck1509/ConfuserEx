@@ -10,7 +10,7 @@ using Confuser.Core;
 using Confuser.Core.Project;
 using GalaSoft.MvvmLight.Command;
 #if !NET45
-
+using PTL::System.Threading;
 #else
 using System.Threading;
 #endif
