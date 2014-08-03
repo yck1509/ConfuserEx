@@ -55,6 +55,8 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Annotations.cs" />
+    <Compile Include="Helpers\ControlFlowGraph.cs" />
+    <Compile Include="Helpers\KeySequence.cs" />
     <Compile Include="LZMA\Common\CRC.cs" />
     <Compile Include="LZMA\Common\InBuffer.cs" />
     <Compile Include="LZMA\Common\OutBuffer.cs" />
