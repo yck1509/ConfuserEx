@@ -66,10 +66,15 @@ namespace Confuser.Protections.ControlFlow {
 
 			body.MaxStack += 2;
 			IPredicate predicate = null;
-			if (ctx.Predicate == PredicateType.Expression)
+			if (ctx.Predicate == PredicateType.Normal) {
+				predicate = new NormalPredicate(ctx);
+			}
+			else if (ctx.Predicate == PredicateType.Expression) {
 				predicate = new ExpressionPredicate(ctx);
-			else if (ctx.Predicate == PredicateType.x86)
+			}
+			else if (ctx.Predicate == PredicateType.x86) {
 				predicate = new x86Predicate(ctx);
+			}
 
 			foreach (InstrBlock block in GetAllBlocks(root)) {
 				LinkedList<Instruction[]> statements = SpiltStatements(block, trace, ctx);

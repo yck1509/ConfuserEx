@@ -90,6 +90,7 @@
     <Compile Include="ControlFlow\ControlFlowProtection.cs" />
     <Compile Include="ControlFlow\BlockParser.cs" />
     <Compile Include="ControlFlow\Blocks.cs" />
+    <Compile Include="ControlFlow\NormalPredicate.cs" />
     <Compile Include="ControlFlow\x86Predicate.cs" />
     <Compile Include="ControlFlow\ExpressionPredicate.cs" />
     <Compile Include="ControlFlow\IPredicate.cs" />
