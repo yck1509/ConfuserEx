@@ -80,7 +80,7 @@ namespace Confuser.Core {
 				context.BaseDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
 				context.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.OutputDirectory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
 				foreach (string probePath in parameters.Project.ProbePaths)
-					asmResolver.PostSearchPaths.Add(Path.Combine(context.BaseDirectory, probePath));
+					asmResolver.PostSearchPaths.Insert(0, Path.Combine(context.BaseDirectory, probePath));
 
 				context.CheckCancellation();
 
