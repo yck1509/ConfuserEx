@@ -5,6 +5,7 @@ using Confuser.Core;
 using dnlib.DotNet;
 using dnlib.DotNet.MD;
 using dnlib.DotNet.Writer;
+using Confuser.Renamer;
 
 namespace Confuser.Protections.Compress {
 	internal class StubProtection : Protection {
@@ -57,6 +58,10 @@ namespace Confuser.Protections.Compress {
 			}
 
 			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
+				var field = context.CurrentModule.Types[0].FindField("DataField");
+				Debug.Assert(field != null);
+				context.Registry.GetService<INameService>().SetCanRename(field, true);
+
 				context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => {
 					if (e.WriterEvent == ModuleWriterEvent.MDBeginCreateTables) {
 						// Add key signature
