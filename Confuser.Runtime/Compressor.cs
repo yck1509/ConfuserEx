@@ -51,10 +51,10 @@ namespace Confuser.Runtime {
 			var l = (uint)Mutation.KeyI0;
 			uint[] q = Mutation.Placeholder(new uint[Mutation.KeyI0]);
 
-			GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
-			var b = (byte[])h.Target;
 			Assembly a = Assembly.GetExecutingAssembly();
 			Module n = a.ManifestModule;
+			GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
+			var b = (byte[])h.Target;
 			Module m = a.LoadModule("koi", b);
 			Array.Clear(b, 0, b.Length);
 			h.Free();

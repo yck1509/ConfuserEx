@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
 using Confuser.Core;
+using Confuser.Renamer;
 using dnlib.DotNet;
 using dnlib.DotNet.MD;
 using dnlib.DotNet.Writer;
-using Confuser.Renamer;
 
 namespace Confuser.Protections.Compress {
 	internal class StubProtection : Protection {
