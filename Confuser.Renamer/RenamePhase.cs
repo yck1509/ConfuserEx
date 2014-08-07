@@ -31,7 +31,7 @@ namespace Confuser.Renamer {
 			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
 				bool canRename = service.CanRename(def);
 				if (def is MethodDef)
-					if (parameters.GetParameter(context, def, "renameArgs", canRename)) {
+					if (canRename && parameters.GetParameter(context, def, "renameArgs", true)) {
 						foreach (ParamDef param in ((MethodDef)def).ParamDefs)
 							param.Name = null;
 					}
