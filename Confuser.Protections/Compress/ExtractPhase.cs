@@ -58,7 +58,6 @@ namespace Confuser.Protections.Compress {
                         			ctx.linkedAttributes.Add(customType);
                 		}		
 
-				context.CurrentModule.Assembly.Modules.Remove(context.CurrentModule);
 
 				context.CurrentModuleWriterListener.OnWriterEvent += new ResourceRecorder(ctx, context.CurrentModule).OnWriterEvent;
 			}
