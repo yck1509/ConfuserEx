@@ -100,8 +100,10 @@ namespace Confuser.Protections.ControlFlow {
 			body.Instructions.Clear();
 			root.ToBody(body);
 			foreach (ExceptionHandler eh in body.ExceptionHandlers) {
-				eh.TryEnd = body.Instructions[body.Instructions.IndexOf(eh.TryEnd) + 1];
-				eh.HandlerEnd = body.Instructions[body.Instructions.IndexOf(eh.HandlerEnd) + 1];
+				var index = body.Instructions.IndexOf(eh.TryEnd) + 1;
+				eh.TryEnd = index < body.Instructions.Count ? body.Instructions[index] : null;
+				index = body.Instructions.IndexOf(eh.HandlerEnd) + 1;
+				eh.HandlerEnd = index < body.Instructions.Count ? body.Instructions[index] : null;
 			}
 			body.KeepOldMaxStack = true;
 		}
