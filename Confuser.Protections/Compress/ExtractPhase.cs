@@ -50,8 +50,14 @@ namespace Confuser.Protections.Compress {
 
 				ctx.Kind = context.CurrentModule.Kind;
 				context.CurrentModule.Kind = ModuleKind.NetModule;
+				
+				foreach (var customAttr in context.CurrentModule.Assembly.CustomAttributes)
+                		{
+                    			TypeDef customType = customAttr.AttributeType.ResolveTypeDef();
+                    			if (customType.Module == context.CurrentModule && customType.Module.Assembly.CustomAttributes.Contains(customAttr))
+                        			ctx.linkedAttributes.Add(customType);
+                		}		
 
-				context.CurrentModule.Assembly.Modules.Remove(context.CurrentModule);
 
 				context.CurrentModuleWriterListener.OnWriterEvent += new ResourceRecorder(ctx, context.CurrentModule).OnWriterEvent;
 			}

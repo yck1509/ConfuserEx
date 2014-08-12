@@ -68,6 +68,12 @@ namespace Confuser.Protections {
 			stubModule.RuntimeVersion = originModule.RuntimeVersion;
 			stubModule.TablesHeaderVersion = originModule.TablesHeaderVersion;
 			stubModule.Win32Resources = originModule.Win32Resources;
+			
+			foreach (TypeDef type in ctx.linkedAttributes)
+            		{
+                		ctx.Assembly.Modules.Single(mod => mod.Name == "koi").Types.Remove(type);
+                		stubModule.Types.Add(type);
+            		}
 
 			InjectStub(context, ctx, parameters, stubModule);
 

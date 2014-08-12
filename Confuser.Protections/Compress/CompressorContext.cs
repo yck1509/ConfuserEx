@@ -19,6 +19,12 @@ namespace Confuser.Protections.Compress {
 		public int ModuleIndex;
 		public string ModuleName;
 		public byte[] OriginModule;
+		public List<TypeDef> linkedAttributes;
+
+        	public CompressorContext()
+        	{
+            		linkedAttributes = new List<TypeDef>();
+        	}
 
 		public byte[] Encrypt(ICompressionService compress, byte[] data, uint seed, Action<double> progressFunc) {
 			data = (byte[])data.Clone();
