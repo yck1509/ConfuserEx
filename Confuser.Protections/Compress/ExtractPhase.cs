@@ -51,8 +51,6 @@ namespace Confuser.Protections.Compress {
 				ctx.Kind = context.CurrentModule.Kind;
 				context.CurrentModule.Kind = ModuleKind.NetModule;
 
-				context.CurrentModule.Assembly.Modules.Remove(context.CurrentModule);
-
 				context.CurrentModuleWriterListener.OnWriterEvent += new ResourceRecorder(ctx, context.CurrentModule).OnWriterEvent;
 			}
 		}

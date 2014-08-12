@@ -11,9 +11,11 @@ namespace Confuser.Protections.Compress {
 	internal class StubProtection : Protection {
 
 		private readonly CompressorContext ctx;
+		private readonly ModuleDef originModule;
 
-		internal StubProtection(CompressorContext ctx) {
+		internal StubProtection(CompressorContext ctx, ModuleDef originModule) {
 			this.ctx = ctx;
+			this.originModule = originModule;
 		}
 
 		public override string Name {
@@ -41,7 +43,34 @@ namespace Confuser.Protections.Compress {
 		}
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
+			pipeline.InsertPreStage(PipelineStage.Inspection, new InjPhase(this));
 			pipeline.InsertPostStage(PipelineStage.BeginModule, new SigPhase(this));
+		}
+
+		private class InjPhase : ProtectionPhase {
+
+			public InjPhase(StubProtection parent)
+				: base(parent) { }
+
+			public override ProtectionTargets Targets {
+				get { return ProtectionTargets.Modules; }
+			}
+
+			public override bool ProcessAll {
+				get { return true; }
+			}
+
+			public override string Name {
+				get { return "Module injection"; }
+			}
+
+			protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
+				// Hack the origin module into the assembly to make sure correct type resolution
+				var originModule = ((StubProtection)Parent).originModule;
+				originModule.Assembly.Modules.Remove(originModule);
+				context.Modules[0].Assembly.Modules.Add(((StubProtection)Parent).originModule);
+			}
+
 		}
 
 		private class SigPhase : ProtectionPhase {

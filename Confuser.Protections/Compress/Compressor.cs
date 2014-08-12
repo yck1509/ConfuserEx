@@ -68,6 +68,7 @@ namespace Confuser.Protections {
 			stubModule.RuntimeVersion = originModule.RuntimeVersion;
 			stubModule.TablesHeaderVersion = originModule.TablesHeaderVersion;
 			stubModule.Win32Resources = originModule.Win32Resources;
+			ImportAssemblyTypeReferences(originModule, stubModule);
 
 			InjectStub(context, ctx, parameters, stubModule);
 
@@ -77,7 +78,7 @@ namespace Confuser.Protections {
 					StrongNameKey = snKey
 				});
 				context.CheckCancellation();
-				base.ProtectStub(context, context.OutputPaths[ctx.ModuleIndex], ms.ToArray(), snKey, new StubProtection(ctx));
+				base.ProtectStub(context, context.OutputPaths[ctx.ModuleIndex], ms.ToArray(), snKey, new StubProtection(ctx, originModule));
 			}
 		}
 
@@ -224,6 +225,18 @@ namespace Confuser.Protections {
 
 			// Pack modules
 			PackModules(context, compCtx, stubModule, comp, random);
+		}
+
+		private void ImportAssemblyTypeReferences(ModuleDef originModule, ModuleDef stubModule) {
+			var assembly = stubModule.Assembly;
+			foreach (var ca in assembly.CustomAttributes) {
+				if (ca.AttributeType.Scope == originModule)
+					ca.Constructor = (ICustomAttributeType)stubModule.Import(ca.Constructor);
+			}
+			foreach (var ca in assembly.DeclSecurities.SelectMany(declSec => declSec.CustomAttributes)) {
+				if (ca.AttributeType.Scope == originModule)
+					ca.Constructor = (ICustomAttributeType)stubModule.Import(ca.Constructor);
+			}
 		}
 
 		private class KeyInjector : IModuleWriterListener {
