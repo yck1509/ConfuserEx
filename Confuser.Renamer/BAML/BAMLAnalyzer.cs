@@ -11,7 +11,7 @@ namespace Confuser.Renamer.BAML {
 	internal class BAMLAnalyzer {
 
 		private readonly Dictionary<ushort, AssemblyDef> assemblyRefs = new Dictionary<ushort, AssemblyDef>();
-		private readonly Dictionary<ushort, Tuple<IDnlibDef, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<IDnlibDef, TypeDef>>();
+		private readonly Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>>();
 		private readonly ConfuserContext context;
 		private readonly Dictionary<string, List<EventDef>> events = new Dictionary<string, List<EventDef>>();
 		private readonly Dictionary<string, List<PropertyDef>> properties = new Dictionary<string, List<PropertyDef>>();
@@ -193,10 +193,10 @@ namespace Confuser.Renamer.BAML {
 			return null;
 		}
 
-		private Tuple<IDnlibDef, TypeDef> ResolveAttribute(ushort attrId) {
+		private Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> ResolveAttribute(ushort attrId) {
 			if ((short)attrId < 0) {
 				Tuple<KnownTypes, PropertyDef, TypeDef> info = things.Properties((KnownProperties)(-(short)attrId));
-				return Tuple.Create<IDnlibDef, TypeDef>(info.Item2, info.Item3);
+				return Tuple.Create<IDnlibDef, AttributeInfoRecord, TypeDef>(info.Item2, null, info.Item3);
 			}
 			return attrRefs[attrId];
 		}
@@ -269,8 +269,8 @@ namespace Confuser.Renamer.BAML {
 				case BamlRecordType.PropertyComplexStart:
 				case BamlRecordType.PropertyDictionaryStart:
 				case BamlRecordType.PropertyListStart:
-					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(((PropertyComplexStartRecord)elem.Header).AttributeId);
-					elem.Type = attrInfo.Item2;
+					var attrInfo = ResolveAttribute(((PropertyComplexStartRecord)elem.Header).AttributeId);
+					elem.Type = attrInfo.Item3;
 					elem.Attribute = attrInfo.Item1;
 					if (elem.Attribute != null)
 						elem.Type = GetAttributeType(elem.Attribute);
@@ -302,8 +302,8 @@ namespace Confuser.Renamer.BAML {
 				IDnlibDef attr = null;
 				if (rec is PropertyRecord) {
 					var propRec = (PropertyRecord)rec;
-					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(propRec.AttributeId);
-					type = attrInfo.Item2;
+					var attrInfo = ResolveAttribute(propRec.AttributeId);
+					type = attrInfo.Item3;
 					attr = attrInfo.Item1;
 					if (attr != null)
 						type = GetAttributeType(attr);
@@ -323,15 +323,15 @@ namespace Confuser.Renamer.BAML {
 					}
 				}
 				else if (rec is PropertyComplexStartRecord) {
-					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(((PropertyComplexStartRecord)rec).AttributeId);
-					type = attrInfo.Item2;
+					var attrInfo = ResolveAttribute(((PropertyComplexStartRecord)rec).AttributeId);
+					type = attrInfo.Item3;
 					attr = attrInfo.Item1;
 					if (attr != null)
 						type = GetAttributeType(attr);
 				}
 				else if (rec is ContentPropertyRecord) {
-					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(((ContentPropertyRecord)rec).AttributeId);
-					type = attrInfo.Item2;
+					var attrInfo = ResolveAttribute(((ContentPropertyRecord)rec).AttributeId);
+					type = attrInfo.Item3;
 					attr = attrInfo.Item1;
 					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
@@ -342,8 +342,8 @@ namespace Confuser.Renamer.BAML {
 				}
 				else if (rec is PropertyCustomRecord) {
 					var customRec = (PropertyCustomRecord)rec;
-					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(customRec.AttributeId);
-					type = attrInfo.Item2;
+					var attrInfo = ResolveAttribute(customRec.AttributeId);
+					type = attrInfo.Item3;
 					attr = attrInfo.Item1;
 					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
@@ -355,13 +355,31 @@ namespace Confuser.Renamer.BAML {
 				}
 				else if (rec is PropertyWithExtensionRecord) {
 					var extRec = (PropertyWithExtensionRecord)rec;
-					Tuple<IDnlibDef, TypeDef> attrInfo = ResolveAttribute(extRec.AttributeId);
-					type = attrInfo.Item2;
+					var attrInfo = ResolveAttribute(extRec.AttributeId);
+					type = attrInfo.Item3;
 					attr = attrInfo.Item1;
 					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
 
-					// Umm... Nothing to do here too, since the value only contains either typeId/memberId, which already have references attached.
+					if (extRec.Flags == 602) { // Static Extension
+						attrInfo = ResolveAttribute(extRec.ValueId);
+
+						var attrTarget = attrInfo.Item1;
+						if (attrTarget == null) {
+							TypeSig declType;
+							TypeDef declTypeDef;
+							if (typeRefs.TryGetValue(attrInfo.Item2.OwnerTypeId, out declType))
+								declTypeDef = declType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+							else {
+								Debug.Assert((short)attrInfo.Item2.OwnerTypeId < 0);
+								declTypeDef = things.Types((KnownTypes)(-(short)attrInfo.Item2.OwnerTypeId));
+							}
+							attrTarget = declTypeDef.FindField(attrInfo.Item2.Name);
+						}
+
+						if (attrTarget != null)
+							service.AddReference(attrTarget, new BAMLAttributeReference(attrTarget, attrInfo.Item2));
+					}
 				}
 			}
 		}
@@ -427,7 +445,7 @@ namespace Confuser.Renamer.BAML {
 			}
 		}
 
-		private Tuple<IDnlibDef, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec) {
+		private Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec) {
 			IDnlibDef retDef = null;
 			ITypeDefOrRef retType = null;
 			while (declType != null) {
@@ -449,20 +467,11 @@ namespace Confuser.Renamer.BAML {
 					break;
 				}
 
-				FieldDef field = declType.FindField(rec.Name);
-				if (field != null) {
-					retDef = field;
-					retType = field.FieldType.ToTypeDefOrRef();
-					if (context.Modules.Contains((ModuleDefMD)declType.Module))
-						service.AddReference(field, new BAMLAttributeReference(field, rec));
-					break;
-				}
-
 				if (declType.BaseType == null)
 					break;
 				declType = declType.BaseType.ResolveTypeDefThrow();
 			}
-			return Tuple.Create(retDef, retType == null ? null : retType.ResolveTypeDefThrow());
+			return Tuple.Create(retDef, rec, retType == null ? null : retType.ResolveTypeDefThrow());
 		}
 
 		private void AnalyzePropertyPath(string path) {
