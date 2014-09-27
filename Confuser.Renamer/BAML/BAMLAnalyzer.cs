@@ -286,10 +286,12 @@ namespace Confuser.Renamer.BAML {
 		}
 
 		private TypeDef GetAttributeType(IDnlibDef attr) {
+			ITypeDefOrRef retType = null;
 			if (attr is PropertyDef)
-				return ((PropertyDef)attr).PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
-			if (attr is EventDef)
-				return ((EventDef)attr).EventType.ResolveTypeDefThrow();
+				retType = ((PropertyDef)attr).PropertySig.RetType.ToBasicTypeDefOrRef();
+			else if (attr is EventDef)
+				retType = ((EventDef)attr).EventType;
+			return (retType == null) ? null : retType.ResolveTypeDefThrow();
 			throw new UnreachableException();
 		}
 
@@ -427,12 +429,12 @@ namespace Confuser.Renamer.BAML {
 
 		private Tuple<IDnlibDef, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec) {
 			IDnlibDef retDef = null;
-			TypeDef retType = null;
+			ITypeDefOrRef retType = null;
 			while (declType != null) {
 				PropertyDef property = declType.FindProperty(rec.Name);
 				if (property != null) {
 					retDef = property;
-					retType = property.PropertySig.RetType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+					retType = property.PropertySig.RetType.ToBasicTypeDefOrRef();
 					if (context.Modules.Contains((ModuleDefMD)declType.Module))
 						service.AddReference(property, new BAMLAttributeReference(property, rec));
 					break;
@@ -441,7 +443,7 @@ namespace Confuser.Renamer.BAML {
 				EventDef evt = declType.FindEvent(rec.Name);
 				if (evt != null) {
 					retDef = evt;
-					retType = evt.EventType.ResolveTypeDefThrow();
+					retType = evt.EventType;
 					if (context.Modules.Contains((ModuleDefMD)declType.Module))
 						service.AddReference(evt, new BAMLAttributeReference(evt, rec));
 					break;
@@ -451,7 +453,7 @@ namespace Confuser.Renamer.BAML {
 					break;
 				declType = declType.BaseType.ResolveTypeDefThrow();
 			}
-			return Tuple.Create(retDef, retType);
+			return Tuple.Create(retDef, retType == null ? null : retType.ResolveTypeDefThrow());
 		}
 
 		private void AnalyzePropertyPath(string path) {
