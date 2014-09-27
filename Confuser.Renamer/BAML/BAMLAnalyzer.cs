@@ -449,6 +449,15 @@ namespace Confuser.Renamer.BAML {
 					break;
 				}
 
+				FieldDef field = declType.FindField(rec.Name);
+				if (field != null) {
+					retDef = field;
+					retType = field.FieldType.ToTypeDefOrRef();
+					if (context.Modules.Contains((ModuleDefMD)declType.Module))
+						service.AddReference(field, new BAMLAttributeReference(field, rec));
+					break;
+				}
+
 				if (declType.BaseType == null)
 					break;
 				declType = declType.BaseType.ResolveTypeDefThrow();
