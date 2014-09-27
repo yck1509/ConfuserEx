@@ -127,6 +127,9 @@ namespace Confuser.Renamer {
 
 			else if (field.DeclaringType.IsSerializable && !field.IsNotSerialized)
 				service.SetCanRename(field, false);
+
+			else if (field.IsLiteral)
+				service.SetCanRename(field, false);
 		}
 
 		private void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, PropertyDef property) {
