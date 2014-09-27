@@ -426,6 +426,26 @@ namespace Confuser.Renamer.BAML {
 
 	}
 
+	internal class TypeSerializerInfoRecord : TypeInfoRecord {
+
+		public override BamlRecordType Type {
+			get { return BamlRecordType.TypeSerializerInfo; }
+		}
+
+		public ushort SerializerTypeId { get; set; }
+
+		protected override void ReadData(BamlBinaryReader reader, int size) {
+			base.ReadData(reader, size);
+			SerializerTypeId = reader.ReadUInt16();
+		}
+
+		protected override void WriteData(BamlBinaryWriter writer) {
+			base.WriteData(writer);
+			writer.Write(SerializerTypeId);
+		}
+
+	}
+
 	internal class AttributeInfoRecord : SizedBamlRecord {
 
 		public override BamlRecordType Type {

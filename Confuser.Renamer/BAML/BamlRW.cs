@@ -196,11 +196,13 @@ namespace Confuser.Renamer.BAML {
 					case BamlRecordType.TypeInfo:
 						rec = new TypeInfoRecord();
 						break;
+					case BamlRecordType.TypeSerializerInfo:
+						rec = new TypeSerializerInfoRecord();
+						break;
 					case BamlRecordType.XmlnsProperty:
 						rec = new XmlnsPropertyRecord();
 						break;
 					case BamlRecordType.XmlAttribute:
-					case BamlRecordType.TypeSerializerInfo:
 					case BamlRecordType.ProcessingInstruction:
 					case BamlRecordType.LastRecordType:
 					case BamlRecordType.EndAttributes:
