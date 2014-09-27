@@ -397,6 +397,7 @@ namespace Confuser.Core {
 		}
 
 		private static void SaveModules(ConfuserContext context) {
+			context.Resolver.Clear();
 			for (int i = 0; i < context.OutputModules.Count; i++) {
 				string path = Path.GetFullPath(Path.Combine(context.OutputDirectory, context.OutputPaths[i]));
 				string dir = Path.GetDirectoryName(path);
