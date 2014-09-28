@@ -70,7 +70,7 @@ namespace Confuser.Core.Helpers {
 		/// <summary>
 		///     Gets the index of the specified instruction.
 		/// </summary>
-		/// <param name="instrIndex">The instruction.</param>
+		/// <param name="instr">The instruction.</param>
 		/// <returns>The index of instruction.</returns>
 		public int IndexOf(Instruction instr) {
 			return indexMap[instr];
