@@ -68,6 +68,7 @@ It supports most of the protections you'll find in commerical protectors, and so
 Downloads
 ---------
 You could obtain the latest source code and releases at [GitHub project page](https://github.com/yck1509/ConfuserEx/releases).
+You may find the bleeding edge builds at [the CI Server](https://ci.appveyor.com/project/yck1509/confuserex).
 ConfuserEx requires only .NET Framework 3.5 to run.
 It might be helpful to read the [FAQ]({{ BASE_PATH }}/faq/)!
 
