@@ -52,6 +52,13 @@
 
       ga('create', 'UA-51743343-1', 'yck1509.github.io');
       ga('send', 'pageview');
+      var trackOutboundLink = function(url) {
+        ga('send', 'event', 'outbound', 'click', url, {'hitCallback':
+          function () {
+            document.location = url;
+          }
+        });
+      }
 
     </script>
     
@@ -86,7 +93,7 @@
                 {% endif %}
               {% endfor %}
             </ul>
-            <a href="{{site.repo}}" class="btn btn-primary navbar-btn navbar-right">View on GitHub</a></li>
+            <a href="{{site.repo}}" class="btn btn-primary navbar-btn navbar-right" onclick=”trackOutboundLink('{{site.repo}}'); return false;">View on GitHub</a></li>
           </div>
         </div>
       </nav>
