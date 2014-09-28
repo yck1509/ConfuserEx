@@ -14,11 +14,11 @@ author:
   name: Ki
   email: confuser.net@gmail.com
 
-production_url : http://yck1509.github.io/ConfuserEx
+production_url : //yck1509.github.io/ConfuserEx
 
 JB :
   version : 0.3.0
-  BASE_PATH : http://yck1509.github.io/ConfuserEx
+  BASE_PATH : //yck1509.github.io/ConfuserEx
 
   ASSET_PATH : false
 
