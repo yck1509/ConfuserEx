@@ -92,8 +92,8 @@ A GUI is available since version 0.2.0. Go check it out!
 What about documentation?
 ---
 
-There are some unfinished documentation in the root directory of project. If you
-got questions, please don't hesitate to contact me or open an issue!
+Documentation is now available at [the project wiki](https://github.com/yck1509/ConfuserEx/wiki)!
+If you still got any problem, please don’t hesitate to contact me or open an issue!
 
 <div class="a-right"><a class="back-to-top" href="#top"><i class="glyphicon glyphicon-chevron-up"></i></a></div>
 ---
@@ -102,7 +102,7 @@ got questions, please don't hesitate to contact me or open an issue!
 How to migrate from Confuser to ConfuserEx?
 ---
 
-ConfuserEx's project format is mostly same as Confuser's. There are few places 
+ConfuserEx's project format is quite similar to Confuser's. There are few places 
 to note:
 
 - `assembly` and `confusion` elements are replaced by `module` and `protection`
