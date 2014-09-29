@@ -326,6 +326,21 @@ namespace Confuser.Core {
 			}
 		}
 
+		/// <summary>
+		///     Determines whether the specified method is array accessors.
+		/// </summary>
+		/// <param name="method">The method.</param>
+		/// <returns><c>true</c> if the specified method is array accessors; otherwise, <c>false</c>.</returns>
+		public static bool IsArrayAccessors(this IMethod method) {
+			var declType = method.DeclaringType.ToTypeSig();
+			if (declType is GenericInstSig)
+				declType = ((GenericInstSig)declType).GenericType;
+
+			if (declType.IsArray) {
+				return method.Name == "Get" || method.Name == "Set" || method.Name == "Address";
+			}
+			return false;
+		}
 	}
 
 

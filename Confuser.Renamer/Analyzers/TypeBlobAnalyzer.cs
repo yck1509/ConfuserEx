@@ -127,7 +127,8 @@ namespace Confuser.Renamer.Analyzers {
 				var inst = (GenericInstSig)sig;
 				Debug.Assert(!(inst.GenericType.TypeDefOrRef is TypeSpec));
 				TypeDef openType = inst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
-				if (!context.Modules.Contains((ModuleDefMD)openType.Module))
+				if (!context.Modules.Contains((ModuleDefMD)openType.Module) ||
+					memberRef.IsArrayAccessors())
 					return;
 
 				IDnlibDef member;

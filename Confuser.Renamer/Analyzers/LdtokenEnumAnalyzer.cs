@@ -30,9 +30,12 @@ namespace Confuser.Renamer.Analyzers {
 							service.SetCanRename(field, false);
 					}
 					else if (instr.Operand is IMethod) {
-						MethodDef m = ((IMethod)instr.Operand).ResolveThrow();
-						if (context.Modules.Contains((ModuleDefMD)m.Module))
-							service.SetCanRename(method, false);
+						var im = (IMethod)instr.Operand;
+						if (!im.IsArrayAccessors()) {
+							MethodDef m = im.ResolveThrow();
+							if (context.Modules.Contains((ModuleDefMD)m.Module))
+								service.SetCanRename(method, false);
+						}
 					}
 					else if (instr.Operand is ITypeDefOrRef) {
 						if (!(instr.Operand is TypeSpec)) {
