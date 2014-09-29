@@ -215,7 +215,7 @@ namespace Confuser.Renamer {
 		// Inspired by: http://xkcd.com/1137/ :D
 		private static readonly char[] unicodeCharset = new char[] { }
 			.Concat(Enumerable.Range(0x200b, 5).Select(ord => (char)ord))
-			.Concat(Enumerable.Range(0x2028, 7).Select(ord => (char)ord))
+			.Concat(Enumerable.Range(0x2029, 6).Select(ord => (char)ord))
 			.Concat(Enumerable.Range(0x206a, 6).Select(ord => (char)ord))
 			.Except(new[] { '\u2029' })
 			.ToArray();
