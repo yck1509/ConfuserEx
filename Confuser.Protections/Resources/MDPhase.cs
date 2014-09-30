@@ -29,9 +29,11 @@ namespace Confuser.Protections.Resources {
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginAddResources) {
 				ctx.Context.CheckCancellation();
 				ctx.Context.Logger.Debug("Encrypting resources...");
+				bool hasPacker = ctx.Context.Packer != null;
 
 				List<EmbeddedResource> resources = ctx.Module.Resources.OfType<EmbeddedResource>().ToList();
-				ctx.Module.Resources.RemoveWhere(res => res is EmbeddedResource);
+				if (!hasPacker)
+					ctx.Module.Resources.RemoveWhere(res => res is EmbeddedResource);
 
 				// move resources
 				string asmName = ctx.Name.RandomName(RenameMode.Letters);
@@ -43,10 +45,12 @@ namespace Confuser.Protections.Resources {
 				ModuleDef module = assembly.ManifestModule;
 				assembly.ManifestModule.Kind = ModuleKind.Dll;
 				var asmRef = new AssemblyRefUser(module.Assembly);
-				foreach (EmbeddedResource res in resources) {
-					res.Attributes = ManifestResourceAttributes.Public;
-					module.Resources.Add(res);
-					ctx.Module.Resources.Add(new AssemblyLinkedResource(res.Name, asmRef, res.Attributes));
+				if (!hasPacker) {
+					foreach (EmbeddedResource res in resources) {
+						res.Attributes = ManifestResourceAttributes.Public;
+						module.Resources.Add(res);
+						ctx.Module.Resources.Add(new AssemblyLinkedResource(res.Name, asmRef, res.Attributes));
+					}
 				}
 				byte[] moduleBuff;
 				using (var ms = new MemoryStream()) {
