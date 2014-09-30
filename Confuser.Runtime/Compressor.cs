@@ -75,10 +75,14 @@ namespace Confuser.Runtime {
 
 		private static Assembly Resolve(object sender, ResolveEventArgs e) {
 			byte[] b = Encoding.UTF8.GetBytes(e.Name);
-			for (int i = 0; i < b.Length; i++)
-				b[i] *= key[i + 4];
-			string n = Convert.ToBase64String(b);
-			Stream m = Assembly.GetEntryAssembly().GetManifestResourceStream(n);
+
+			Stream m = null;
+			if (b.Length + 4 < key.Length) {
+				for (int i = 0; i < b.Length; i++)
+					b[i] *= key[i + 4];
+				string n = Convert.ToBase64String(b);
+				m = Assembly.GetEntryAssembly().GetManifestResourceStream(n);
+			}
 			if (m != null) {
 				var d = new uint[m.Length >> 2];
 				var t = new byte[0x100];
