@@ -41,7 +41,8 @@ namespace Confuser.CLI {
 				Console.Title = "ConfuserEx - Running...";
 				ConfuserEngine.Run(parameters).Wait();
 
-				if (NeedPause()) {
+				bool noPause = args.Length > 1 && args[1].ToUpperInvariant() == "NOPAUSE";
+				if (NeedPause() && !noPause) {
 					Console.WriteLine("Press any key to continue...");
 					Console.ReadKey(true);
 				}
