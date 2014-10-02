@@ -40,6 +40,9 @@ namespace Confuser.Core.Project.Patterns {
 				return ((PropertyDef)member).IsPublic();
 			if (member is EventDef)
 				return ((EventDef)member).IsPublic();
+			if (member is TypeDef)
+				return ((TypeDef)member).IsPublic || ((TypeDef)member).IsNestedPublic;
+
 			throw new NotSupportedException();
 		}
 
