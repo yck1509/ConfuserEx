@@ -362,23 +362,27 @@ namespace Confuser.Renamer.BAML {
 						type = GetAttributeType(attr);
 
 					if (extRec.Flags == 602) { // Static Extension
-						attrInfo = ResolveAttribute(extRec.ValueId);
+						// We only care about the references in user-defined assemblies, so skip built-in attributes
+						// Also, ValueId is a resource ID, which is not implemented, so just skip it.
+						if ((short)extRec.ValueId >= 0) {
+							attrInfo = ResolveAttribute(extRec.ValueId);
 
-						var attrTarget = attrInfo.Item1;
-						if (attrTarget == null) {
-							TypeSig declType;
-							TypeDef declTypeDef;
-							if (typeRefs.TryGetValue(attrInfo.Item2.OwnerTypeId, out declType))
-								declTypeDef = declType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
-							else {
-								Debug.Assert((short)attrInfo.Item2.OwnerTypeId < 0);
-								declTypeDef = things.Types((KnownTypes)(-(short)attrInfo.Item2.OwnerTypeId));
+							var attrTarget = attrInfo.Item1;
+							if (attrTarget == null) {
+								TypeSig declType;
+								TypeDef declTypeDef;
+								if (typeRefs.TryGetValue(attrInfo.Item2.OwnerTypeId, out declType))
+									declTypeDef = declType.ToBasicTypeDefOrRef().ResolveTypeDefThrow();
+								else {
+									Debug.Assert((short)attrInfo.Item2.OwnerTypeId < 0);
+									declTypeDef = things.Types((KnownTypes)(-(short)attrInfo.Item2.OwnerTypeId));
+								}
+								attrTarget = declTypeDef.FindField(attrInfo.Item2.Name);
 							}
-							attrTarget = declTypeDef.FindField(attrInfo.Item2.Name);
-						}
 
-						if (attrTarget != null)
-							service.AddReference(attrTarget, new BAMLAttributeReference(attrTarget, attrInfo.Item2));
+							if (attrTarget != null)
+								service.AddReference(attrTarget, new BAMLAttributeReference(attrTarget, attrInfo.Item2));
+						}
 					}
 				}
 			}
