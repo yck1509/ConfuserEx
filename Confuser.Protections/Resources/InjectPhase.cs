@@ -27,6 +27,11 @@ namespace Confuser.Protections.Resources {
 
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {
 			if (parameters.Targets.Any()) {
+				if (!UTF8String.IsNullOrEmpty(context.CurrentModule.Assembly.Culture)) {
+					context.Logger.DebugFormat("Skipping resource encryption for satellite assembly '{0}'.",
+						context.CurrentModule.Assembly.FullName);
+					return;
+				}
 				var compression = context.Registry.GetService<ICompressionService>();
 				var name = context.Registry.GetService<INameService>();
 				var marker = context.Registry.GetService<IMarkerService>();
