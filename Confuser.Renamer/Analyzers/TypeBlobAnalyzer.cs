@@ -122,7 +122,7 @@ namespace Confuser.Renamer.Analyzers {
 				sig = sig.Next;
 
 
-			Debug.Assert(sig is TypeDefOrRefSig || sig is GenericInstSig);
+			Debug.Assert(sig is TypeDefOrRefSig || sig is GenericInstSig || sig is GenericSig);
 			if (sig is GenericInstSig) {
 				var inst = (GenericInstSig)sig;
 				Debug.Assert(!(inst.GenericType.TypeDefOrRef is TypeSpec));

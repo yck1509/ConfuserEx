@@ -22,6 +22,9 @@ namespace Confuser.Renamer.Analyzers {
 			for (uint i = 1; i <= len; i++) {
 				MemberRef memberRef = module.ResolveMemberRef(i);
 
+				if (memberRef.DeclaringType.TryGetArraySig() != null)
+					continue;
+
 				TypeDef declType = memberRef.DeclaringType.ResolveTypeDefThrow();
 				if (declType.Module != module && context.Modules.Contains((ModuleDefMD)declType.Module)) {
 					var memberDef = (IDnlibDef)declType.ResolveThrow(memberRef);
