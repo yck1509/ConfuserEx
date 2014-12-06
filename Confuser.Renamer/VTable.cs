@@ -202,7 +202,8 @@ namespace Confuser.Renamer {
 
 					MethodDef targetMethod = impl.MethodDeclaration.ResolveThrow();
 					VTableSignature sig = VTableSignature.FromMethod(impl.MethodDeclaration);
-					Debug.Assert(slotDict.ContainsKey(sig));
+
+                    Debug.Assert(slotDict.ContainsKey(sig), string.Format("Assertion error on {0} ({1}).", typeDef.AssemblyQualifiedName, typeDef.Module.Name));
 
 					var methodSlot = new VTableSlot(ret, method, method.DeclaringType.ToTypeSig(), VTableSignature.FromMethod(method));
 					if (slotDict.ContainsKey(sig) && slotDict[sig].Count > 0) {
