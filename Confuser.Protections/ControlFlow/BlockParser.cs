@@ -79,6 +79,12 @@ namespace Confuser.Protections.ControlFlow {
 					scope.Children.Add(block = new InstrBlock());
 				block.Instructions.Add(instr);
 			}
+			foreach (ExceptionHandler eh in body.ExceptionHandlers) {
+				if (eh.TryEnd == null)
+					scopeStack.Pop();
+				if (eh.HandlerEnd == null)
+					scopeStack.Pop();
+			}
 			Debug.Assert(scopeStack.Count == 1);
 			return root;
 		}

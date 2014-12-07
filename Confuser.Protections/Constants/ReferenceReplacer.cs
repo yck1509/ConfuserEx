@@ -103,7 +103,6 @@ namespace Confuser.Protections.Constants {
 		}
 
 		private static void ReplaceCFG(MethodDef method, List<Tuple<Instruction, uint, IMethod>> instrs, CEContext ctx) {
-			if (method.Name == "GetCpuName") Debugger.Break();
 			var graph = ControlFlowGraph.Construct(method.Body);
 			var sequence = KeySequence.ComputeKeys(graph, ctx.Random);
 
