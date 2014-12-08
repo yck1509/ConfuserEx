@@ -180,7 +180,6 @@ namespace Confuser.Renamer {
 				}
 			}
 
-			if (typeDef.Name == "PresentationBasedTool`2") Debugger.Break();
 			// Normal overrides
 			foreach (var method in virtualMethods) {
 				VTableSlot slot;

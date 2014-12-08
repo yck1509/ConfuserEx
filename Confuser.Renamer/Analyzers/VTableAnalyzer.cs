@@ -10,26 +10,6 @@ namespace Confuser.Renamer.Analyzers {
 	internal class VTableAnalyzer : IRenamer {
 
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
-			var method = def as MethodDef;
-			if (method == null || !method.IsVirtual)
-				return;
-
-			VTable vTbl = service.GetVTables()[method.DeclaringType];
-			VTableSignature sig = VTableSignature.FromMethod(method);
-			var slots = vTbl.FindSlots(method);
-
-			if (!method.IsAbstract) {
-				foreach (var slot in slots) {
-					if (slot.Overrides == null)
-						continue;
-					// Better on safe side, add references to both methods.
-					service.AddReference(method, new OverrideDirectiveReference(slot, slot.Overrides));
-					service.AddReference(slot.Overrides.MethodDef, new OverrideDirectiveReference(slot, slot.Overrides));
-				}
-			}
-		}
-
-		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
 			VTable vTbl;
 
 			if (def is TypeDef) {
@@ -57,6 +37,29 @@ namespace Confuser.Renamer.Analyzers {
 					}
 				}
 			}
+			else if (def is MethodDef) {
+				var method = (MethodDef)def;
+				if (!method.IsVirtual)
+					return;
+
+				vTbl = service.GetVTables()[method.DeclaringType];
+				VTableSignature sig = VTableSignature.FromMethod(method);
+				var slots = vTbl.FindSlots(method);
+
+				if (!method.IsAbstract) {
+					foreach (var slot in slots) {
+						if (slot.Overrides == null)
+							continue;
+						// Better on safe side, add references to both methods.
+						service.AddReference(method, new OverrideDirectiveReference(slot, slot.Overrides));
+						service.AddReference(slot.Overrides.MethodDef, new OverrideDirectiveReference(slot, slot.Overrides));
+					}
+				}
+			}
+		}
+
+		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
+			//
 		}
 
 		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
