@@ -91,6 +91,8 @@
     <Compile Include="Project\InvalidPatternException.cs" />
     <Compile Include="Project\PatternParser.cs" />
     <Compile Include="Project\Patterns\AndOperator.cs" />
+    <Compile Include="Project\Patterns\IsTypeFunction.cs" />
+    <Compile Include="Project\Patterns\InheritsFunction.cs" />
     <Compile Include="Project\Patterns\IsPublicFunction.cs" />
     <Compile Include="Project\Patterns\FullNameFunction.cs" />
     <Compile Include="Project\Patterns\NotOperator.cs" />
