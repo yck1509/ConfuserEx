@@ -125,8 +125,6 @@ namespace Confuser.Core {
 				context.OutputModules = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
 				context.OutputSymbols = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
 				context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToArray();
-				foreach (ModuleDefMD module in context.Modules)
-					asmResolver.AddToCache(module);
 				context.Packer = markings.Packer;
 
 				context.CheckCancellation();

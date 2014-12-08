@@ -106,9 +106,8 @@ namespace Confuser.Core {
 				packerParams = new Dictionary<string, string>(proj.Packer, StringComparer.OrdinalIgnoreCase);
 			}
 
-			var modules = new List<ModuleDefMD>();
+			var modules = new List<Tuple<ProjectModule, ModuleDefMD>>();
 			foreach (ProjectModule module in proj) {
-				context.Logger.InfoFormat("Loading '{0}'...", module.Path);
 
 				ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
 				context.CheckCancellation();
@@ -116,23 +115,27 @@ namespace Confuser.Core {
 				if (proj.Debug)
 					modDef.LoadPdb();
 
-				Rules rules = ParseRules(proj, module, context);
+				context.Resolver.AddToCache(modDef);
+				modules.Add(Tuple.Create(module, modDef));
+			}
 
-				context.Annotations.Set(modDef, SNKey, LoadSNKey(context, module.SNKeyPath == null ? null : Path.Combine(proj.BaseDirectory, module.SNKeyPath), module.SNKeyPassword));
-				context.Annotations.Set(modDef, RulesKey, rules);
+			foreach (var module in modules) {
+				context.Logger.InfoFormat("Loading '{0}'...", module.Item1.Path);
+				Rules rules = ParseRules(proj, module.Item1, context);
 
-				foreach (IDnlibDef def in modDef.FindDefinitions()) {
+				context.Annotations.Set(module.Item2, SNKey, LoadSNKey(context, module.Item1.SNKeyPath == null ? null : Path.Combine(proj.BaseDirectory, module.Item1.SNKeyPath), module.Item1.SNKeyPassword));
+				context.Annotations.Set(module.Item2, RulesKey, rules);
+
+				foreach (IDnlibDef def in module.Item2.FindDefinitions()) {
 					ApplyRules(context, def, rules);
 					context.CheckCancellation();
 				}
 
 				// Packer parameters are stored in modules
 				if (packerParams != null)
-					ProtectionParameters.GetParameters(context, modDef)[packer] = packerParams;
-
-				modules.Add(modDef);
+					ProtectionParameters.GetParameters(context, module.Item2)[packer] = packerParams;
 			}
-			return new MarkerResult(modules, packer);
+			return new MarkerResult(modules.Select(module => module.Item2).ToList(), packer);
 		}
 
 		/// <summary>
