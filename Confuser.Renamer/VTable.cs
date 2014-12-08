@@ -61,10 +61,11 @@ namespace Confuser.Renamer {
 	public class VTableSlot {
 
 		internal VTableSlot(MethodDef def, TypeSig decl, VTableSignature signature)
-			: this(def, decl, signature, null) {
+			: this(def.DeclaringType.ToTypeSig(), def, decl, signature, null) {
 		}
 
-		internal VTableSlot(MethodDef def, TypeSig decl, VTableSignature signature, VTableSlot overrides) {
+		internal VTableSlot(TypeSig defDeclType, MethodDef def, TypeSig decl, VTableSignature signature, VTableSlot overrides) {
+			MethodDefDeclType = defDeclType;
 			MethodDef = def;
 			DeclaringType = decl;
 			Signature = signature;
@@ -77,17 +78,18 @@ namespace Confuser.Renamer {
 		public VTableSignature Signature { get; internal set; }
 
 		// This is the method that is currently in the slot.
+		public TypeSig MethodDefDeclType { get; private set; }
 		public MethodDef MethodDef { get; private set; }
 
 		// This is the 'parent slot' that this slot overrides.
 		public VTableSlot Overrides { get; private set; }
 
 		public VTableSlot OverridedBy(MethodDef method) {
-			return new VTableSlot(method, DeclaringType, Signature, this);
+			return new VTableSlot(method.DeclaringType.ToTypeSig(), method, DeclaringType, Signature, this);
 		}
 
 		internal VTableSlot Clone() {
-			return new VTableSlot(MethodDef, DeclaringType, Signature, Overrides);
+			return new VTableSlot(MethodDefDeclType, MethodDef, DeclaringType, Signature, Overrides);
 		}
 
 		public override string ToString() {
@@ -159,12 +161,9 @@ namespace Confuser.Renamer {
 
 			// Explicit interface implementation
 			foreach (InterfaceImpl iface in typeDef.Interfaces) {
-				var ifaceSig = iface.Interface.ToTypeSig();
-				var ifaceDef = iface.Interface.ResolveTypeDefThrow();
-
-				VTable ifaceVTbl = storage.GetVTable(ifaceDef);
+				VTable ifaceVTbl = storage.GetVTable(iface.Interface);
 				if (ifaceVTbl != null) {
-					Implements(vTbl, virtualMethods, ifaceVTbl, ifaceSig);
+					Implements(vTbl, virtualMethods, ifaceVTbl, iface.Interface.ToTypeSig());
 				}
 			}
 
@@ -184,6 +183,7 @@ namespace Confuser.Renamer {
 				}
 			}
 
+			if (typeDef.Name == "PresentationBasedTool`2") Debugger.Break();
 			// Normal overrides
 			foreach (var method in virtualMethods) {
 				VTableSlot slot;
@@ -210,7 +210,7 @@ namespace Confuser.Renamer {
 						var iface = impl.MethodDeclaration.DeclaringType.ToTypeSig();
 						var ifaceVTbl = vTbl.InterfaceSlots[iface];
 
-						var targetSlot = ifaceVTbl[VTableSignature.FromMethod(targetMethod)];
+						var targetSlot = ifaceVTbl[VTableSignature.FromMethod(impl.MethodDeclaration)];
 						// The Overrides of interface slots should directly points to the root interface slot
 						while (targetSlot.Overrides != null)
 							targetSlot = targetSlot.Overrides;
@@ -250,14 +250,11 @@ namespace Confuser.Renamer {
 				if (virtualMethods.TryGetValue(slot.Signature, out impl) &&
 					impl.IsNewSlot) {
 					// The Overrides of interface slots should directly points to the root interface slot
-					if (slot.Overrides != null) {
-						Debug.Assert(slot.Overrides.MethodDef.DeclaringType.IsInterface);
-						return slot.Overrides.OverridedBy(impl);
-					}
-					else {
-						Debug.Assert(slot.MethodDef.DeclaringType.IsInterface);
-						return slot.OverridedBy(impl);
-					}
+					var targetSlot = slot;
+					while (targetSlot.Overrides != null && !targetSlot.MethodDef.DeclaringType.IsInterface)
+						targetSlot = targetSlot.Overrides;
+					Debug.Assert(targetSlot.MethodDef.DeclaringType.IsInterface);
+					return targetSlot.OverridedBy(impl);
 				}
 				return slot;
 			};
@@ -350,12 +347,12 @@ namespace Confuser.Renamer {
 
 		private static VTableSlot ResolveSlot(TypeDef openType, VTableSlot slot, IList<TypeSig> genArgs) {
 			var newSig = GenericArgumentResolver.Resolve(slot.Signature.MethodSig, genArgs);
-			TypeSig newDecl = slot.DeclaringType;
+			TypeSig newDecl = slot.MethodDefDeclType;
 			if (new SigComparer().Equals(newDecl, openType))
 				newDecl = new GenericInstSig((ClassOrValueTypeSig)openType.ToTypeSig(), genArgs.ToArray());
 			else
 				newDecl = GenericArgumentResolver.Resolve(newDecl, genArgs);
-			return new VTableSlot(slot.MethodDef, newDecl, new VTableSignature(newSig, slot.Signature.Name), slot.Overrides);
+			return new VTableSlot(newDecl, slot.MethodDef, slot.DeclaringType, new VTableSignature(newSig, slot.Signature.Name), slot.Overrides);
 		}
 
 		private static VTable ResolveGenericArgument(TypeDef openType, GenericInstSig genInst, VTable vTable) {

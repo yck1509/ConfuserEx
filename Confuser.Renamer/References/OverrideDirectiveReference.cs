@@ -18,8 +18,8 @@ namespace Confuser.Renamer.References {
 			MethodDef method = thisSlot.MethodDef;
 
 			IMethodDefOrRef target;
-			if (baseSlot.DeclaringType is GenericInstSig) {
-				var declType = (GenericInstSig)baseSlot.DeclaringType;
+			if (baseSlot.MethodDefDeclType is GenericInstSig) {
+				var declType = (GenericInstSig)baseSlot.MethodDefDeclType;
 				target = new MemberRefUser(method.Module, baseSlot.MethodDef.Name, baseSlot.MethodDef.MethodSig, declType.ToTypeDefOrRef());
 				target = (IMethodDefOrRef)new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(target);
 			}
