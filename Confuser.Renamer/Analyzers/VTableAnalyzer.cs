@@ -44,11 +44,16 @@ namespace Confuser.Renamer.Analyzers {
 							continue;
 						Debug.Assert(slot.Overrides.MethodDef.DeclaringType.IsInterface);
 						// A method in base type can implements an interface method for a
-						// derived type. If the base type is not in our control, we should
-						// not rename the interface method.
-						if (!context.Modules.Contains(slot.MethodDef.DeclaringType.Module as ModuleDefMD) &&
-							context.Modules.Contains(slot.Overrides.MethodDef.DeclaringType.Module as ModuleDefMD))
+						// derived type. If the base type/interface is not in our control, we should
+						// not rename the methods.
+						bool baseUnderCtrl = context.Modules.Contains(slot.MethodDef.DeclaringType.Module as ModuleDefMD);
+						bool ifaceUnderCtrl = context.Modules.Contains(slot.Overrides.MethodDef.DeclaringType.Module as ModuleDefMD);
+						if (!baseUnderCtrl && ifaceUnderCtrl) {
 							service.SetCanRename(slot.Overrides.MethodDef, false);
+						}
+						else if (baseUnderCtrl && !ifaceUnderCtrl) {
+							service.SetCanRename(slot.MethodDef, false);
+						}
 					}
 				}
 			}

@@ -103,14 +103,12 @@ namespace Confuser.Renamer {
 		internal VTable(TypeSig type) {
 			Type = type;
 			Slots = new List<VTableSlot>();
-			Finals = new List<VTableSlot>();
 			InterfaceSlots = new Dictionary<TypeSig, IList<VTableSlot>>();
 		}
 
 		public TypeSig Type { get; private set; }
 
 		public IList<VTableSlot> Slots { get; private set; }
-		public IList<VTableSlot> Finals { get; private set; }
 		public IDictionary<TypeSig, IList<VTableSlot>> InterfaceSlots { get; private set; }
 
 		class VTableConstruction {
@@ -135,7 +133,6 @@ namespace Confuser.Renamer {
 
 		public IEnumerable<VTableSlot> FindSlots(IMethod method) {
 			return Slots
-				.Concat(Finals)
 				.Concat(InterfaceSlots.SelectMany(iface => iface.Value))
 				.Where(slot => slot.MethodDef == method);
 		}
@@ -191,8 +188,10 @@ namespace Confuser.Renamer {
 					slot = new VTableSlot(method.Value, typeDef.ToTypeSig(), method.Key);
 				}
 				else {
-					if (vTbl.SlotsMap.TryGetValue(method.Key, out slot))
+					if (vTbl.SlotsMap.TryGetValue(method.Key, out slot)) {
+						Debug.Assert(!slot.MethodDef.IsFinal);
 						slot = slot.OverridedBy(method.Value);
+					}
 					else
 						slot = new VTableSlot(method.Value, typeDef.ToTypeSig(), method.Key);
 				}
@@ -233,10 +232,7 @@ namespace Confuser.Renamer {
 				kvp => kvp.Key, kvp => (IList<VTableSlot>)kvp.Value.Values.ToList());
 
 			foreach (var slot in vTbl.AllSlots) {
-				if (slot.MethodDef.IsFinal)
-					ret.Finals.Add(slot);
-				else
-					ret.Slots.Add(slot);
+				ret.Slots.Add(slot);
 			}
 
 			return ret;
@@ -360,9 +356,6 @@ namespace Confuser.Renamer {
 			var ret = new VTable(genInst);
 			foreach (VTableSlot slot in vTable.Slots) {
 				ret.Slots.Add(ResolveSlot(openType, slot, genInst.GenericArguments));
-			}
-			foreach (VTableSlot slot in vTable.Finals) {
-				ret.Finals.Add(ResolveSlot(openType, slot, genInst.GenericArguments));
 			}
 			foreach (var iface in vTable.InterfaceSlots) {
 				ret.InterfaceSlots.Add(iface.Key,
