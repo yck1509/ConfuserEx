@@ -11,7 +11,8 @@ namespace Confuser.Runtime {
 		private static IntPtr moduleHnd;
 		private static compileMethod originalDelegate;
 
-		private static bool ver;
+		private static bool ver4;
+		private static bool ver5;
 
 		private static compileMethod handler;
 
@@ -61,6 +62,7 @@ namespace Confuser.Runtime {
 
 			uint h = 0;
 			uint* u = e;
+			VirtualProtect((IntPtr)e, l << 2, 0x40, out z);
 			for (uint i = 0; i < l; i++) {
 				*e ^= y[h & 0xf];
 				y[h & 0xf] = (y[h & 0xf] ^ (*e++)) + 0x3dbb2819;
@@ -70,12 +72,13 @@ namespace Confuser.Runtime {
 			ptr = u + 4;
 			len = *ptr++;
 
-			ver = RuntimeEnvironment.GetSystemVersion()[1] == '4';
+			ver4 = Environment.Version.Major == 4;
 			ModuleHandle hnd = m.ModuleHandle;
-			if (ver) {
+			if (ver4) {
 				ulong* str = stackalloc ulong[1];
 				str[0] = 0x0061746144705f6d; //m_pData.
 				moduleHnd = (IntPtr)m.GetType().GetField(new string((sbyte*)str), BindingFlags.NonPublic | BindingFlags.Instance).GetValue(m);
+				ver5 = Environment.Version.Revision > 17020;
 			}
 			else
 				moduleHnd = *(IntPtr*)(&hnd);
@@ -94,7 +97,7 @@ namespace Confuser.Runtime {
 
 		private static void Hook() {
 			ulong* ptr = stackalloc ulong[2];
-			if (ver) {
+			if (ver4) {
 				ptr[0] = 0x642e74696a726c63; //clrjit.d
 				ptr[1] = 0x0000000000006c6c; //ll......
 			}
@@ -141,11 +144,11 @@ namespace Confuser.Runtime {
 
 		private static void ExtractLocalVars(CORINFO_METHOD_INFO* info, uint len, byte* localVar) {
 			void* sigInfo;
-			if (ver) {
+			if (ver4) {
 				if (IntPtr.Size == 8)
-					sigInfo = (CORINFO_SIG_INFO_x64*)((uint*)(info + 1) + 5) + 1;
+					sigInfo = (CORINFO_SIG_INFO_x64*)((uint*)(info + 1) + (ver5 ? 7 : 5)) + 1;
 				else
-					sigInfo = (CORINFO_SIG_INFO_x86*)((uint*)(info + 1) + 4) + 1;
+					sigInfo = (CORINFO_SIG_INFO_x86*)((uint*)(info + 1) + (ver5 ? 5 : 4)) + 1;
 			}
 			else {
 				if (IntPtr.Size == 8)
@@ -190,13 +193,18 @@ namespace Confuser.Runtime {
 		}
 
 		private static uint HookHandler(IntPtr self, ICorJitInfo* comp, CORINFO_METHOD_INFO* info, uint flags, byte** nativeEntry, uint* nativeSizeOfCode) {
-			if (info != null &&
-			    info->scope == moduleHnd &&
-			    info->ILCode[0] == 0x14) {
-				ICorClassInfo* clsInfo = ICorStaticInfo.ICorClassInfo(ICorDynamicInfo.ICorStaticInfo(ICorJitInfo.ICorDynamicInfo(comp)));
-				int gmdSlot = 12 + (ver ? 2 : 1);
-				var getMethodDef = (getMethodDefFromMethod)Marshal.GetDelegateForFunctionPointer(clsInfo->vfptr[gmdSlot], typeof(getMethodDefFromMethod));
-				uint token = getMethodDef((IntPtr)clsInfo, info->ftn);
+			if (info != null && info->scope == moduleHnd && info->ILCode[0] == 0x14) {
+				uint token;
+				if (ver5) {
+					var getMethodDef = (getMethodDefFromMethod)Marshal.GetDelegateForFunctionPointer(comp->vfptr[0x64], typeof(getMethodDefFromMethod));
+					token = getMethodDef((IntPtr)comp, info->ftn);
+				}
+				else {
+					ICorClassInfo* clsInfo = ICorStaticInfo.ICorClassInfo(ICorDynamicInfo.ICorStaticInfo(ICorJitInfo.ICorDynamicInfo(comp)));
+					int gmdSlot = 12 + (ver4 ? 2 : 1);
+					var getMethodDef = (getMethodDefFromMethod)Marshal.GetDelegateForFunctionPointer(clsInfo->vfptr[gmdSlot], typeof(getMethodDefFromMethod));
+					token = getMethodDef((IntPtr)clsInfo, info->ftn);
+				}
 
 				uint lo = 0, hi = len;
 				uint? offset = null;
@@ -231,7 +239,7 @@ namespace Confuser.Runtime {
 					}
 
 					info->ILCodeSize = data->ILCodeSize;
-					if (ver) {
+					if (ver4) {
 						*((uint*)(info + 1) + 0) = data->MaxStack;
 						*((uint*)(info + 1) + 1) = data->EHCount;
 						*((uint*)(info + 1) + 2) = data->Options;
@@ -254,9 +262,17 @@ namespace Confuser.Runtime {
 
 					var ehPtr = (CORINFO_EH_CLAUSE*)body;
 
-					CorMethodInfoHook hook1 = CorMethodInfoHook.Hook(comp, info->ftn, ehPtr);
-					uint ret = originalDelegate(self, comp, info, flags, nativeEntry, nativeSizeOfCode);
-					hook1.Dispose();
+					uint ret;
+					if (ver5) {
+						CorJitInfoHook hook = CorJitInfoHook.Hook(comp, info->ftn, ehPtr);
+						ret = originalDelegate(self, comp, info, flags, nativeEntry, nativeSizeOfCode);
+						hook.Dispose();
+					}
+					else {
+						CorMethodInfoHook hook = CorMethodInfoHook.Hook(comp, info->ftn, ehPtr);
+						ret = originalDelegate(self, comp, info, flags, nativeEntry, nativeSizeOfCode);
+						hook.Dispose();
+					}
 
 					return ret;
 				}
@@ -468,6 +484,58 @@ namespace Confuser.Runtime {
 
 		}
 
+		private class CorJitInfoHook {
+
+			public CORINFO_EH_CLAUSE* clauses;
+			public IntPtr ftn;
+			public ICorJitInfo* info;
+			public getEHinfo n_getEHinfo;
+			public IntPtr* newVfTbl;
+
+			public getEHinfo o_getEHinfo;
+			public IntPtr* oldVfTbl;
+
+			private void hookEHInfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause) {
+				if (ftn == this.ftn) {
+					*clause = clauses[EHnumber];
+				}
+				else {
+					o_getEHinfo(self, ftn, EHnumber, clause);
+				}
+			}
+
+			public void Dispose() {
+				Marshal.FreeHGlobal((IntPtr)newVfTbl);
+				info->vfptr = oldVfTbl;
+			}
+
+			public static CorJitInfoHook Hook(ICorJitInfo* comp, IntPtr ftn, CORINFO_EH_CLAUSE* clauses) {
+				const int slotNum = 8;
+
+				IntPtr* vfTbl = comp->vfptr;
+				const int SLOT_NUM = 0x9E;
+				var newVfTbl = (IntPtr*)Marshal.AllocHGlobal(SLOT_NUM * IntPtr.Size);
+				for (int i = 0; i < SLOT_NUM; i++)
+					newVfTbl[i] = vfTbl[i];
+
+				var ret = new CorJitInfoHook {
+					ftn = ftn,
+					info = comp,
+					clauses = clauses,
+					newVfTbl = newVfTbl,
+					oldVfTbl = vfTbl
+				};
+
+				ret.n_getEHinfo = ret.hookEHInfo;
+				ret.o_getEHinfo = (getEHinfo)Marshal.GetDelegateForFunctionPointer(vfTbl[slotNum], typeof(getEHinfo));
+				newVfTbl[slotNum] = Marshal.GetFunctionPointerForDelegate(ret.n_getEHinfo);
+
+				comp->vfptr = newVfTbl;
+				return ret;
+			}
+
+		}
+
 		[StructLayout(LayoutKind.Sequential)]
 		private struct MethodData {
 
@@ -480,15 +548,15 @@ namespace Confuser.Runtime {
 
 		}
 
-		[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
+		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
 		private delegate uint compileMethod(IntPtr self, ICorJitInfo* comp, CORINFO_METHOD_INFO* info, uint flags, byte** nativeEntry, uint* nativeSizeOfCode);
 
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
 		private delegate void getEHinfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause);
 
 		private delegate IntPtr* getJit();
 
-		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
+		[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
 		private delegate uint getMethodDefFromMethod(IntPtr self, IntPtr ftn);
 
 	}
