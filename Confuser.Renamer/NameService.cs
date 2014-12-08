@@ -60,8 +60,7 @@ namespace Confuser.Renamer {
 				new VTableAnalyzer(),
 				new TypeBlobAnalyzer(),
 				new ResourceAnalyzer(),
-				new WPFAnalyzer(),
-				new LdtokenEnumAnalyzer()
+				new LdtokenEnumAnalyzer(),
 			};
 		}
 

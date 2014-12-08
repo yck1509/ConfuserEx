@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Confuser.Core;
+using Confuser.Renamer.Analyzers;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer {
@@ -49,11 +50,36 @@ namespace Confuser.Renamer {
 			}
 
 			context.Logger.Debug("Analyzing...");
+			RegisterRenamers(context, service);
 			IList<IRenamer> renamers = service.Renamers;
 			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
 				Analyze(service, context, parameters, def, true);
 				context.CheckCancellation();
 			}
+		}
+
+		private void RegisterRenamers(ConfuserContext context, NameService service) {
+			bool wpf = false,
+			     caliburn = false;
+
+			foreach (var module in context.Modules)
+				foreach (var asmRef in module.GetAssemblyRefs()) {
+					if (asmRef.Name == "WindowsBase" || asmRef.Name == "PresentationCore" ||
+						asmRef.Name == "PresentationFramework" || asmRef.Name == "System.Xaml") {
+						if (!wpf) {
+							context.Logger.Debug("WPF found, enabling compatibility.");
+							service.Renamers.Add(new WPFAnalyzer());
+							wpf = true;
+						}
+					}
+					else if (asmRef.Name == "Caliburn.Micro") {
+						if (!caliburn) {
+							context.Logger.Debug("Caliburn.Micro found, enabling compatibility.");
+							service.Renamers.Add(new CaliburnAnalyzer());
+							caliburn = true;
+						}
+					}
+				}
 		}
 
 		internal void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, IDnlibDef def, bool runAnalyzer) {

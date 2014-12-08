@@ -47,6 +47,7 @@
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AnalyzePhase.cs" />
+    <Compile Include="Analyzers\CaliburnAnalyzer.cs" />
     <Compile Include="Analyzers\InterReferenceAnalyzer.cs" />
     <Compile Include="Analyzers\LdtokenEnumAnalyzer.cs" />
     <Compile Include="Analyzers\ResourceAnalyzer.cs" />
