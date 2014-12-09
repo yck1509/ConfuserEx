@@ -10,15 +10,20 @@ using dnlib.DotNet;
 namespace Confuser.Renamer.BAML {
 	internal class BAMLAnalyzer {
 
-		private readonly Dictionary<ushort, AssemblyDef> assemblyRefs = new Dictionary<ushort, AssemblyDef>();
-		private readonly Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>>();
 		private readonly ConfuserContext context;
+		private readonly INameService service;
+
+		private readonly Dictionary<string, List<MethodDef>> methods = new Dictionary<string, List<MethodDef>>();
 		private readonly Dictionary<string, List<EventDef>> events = new Dictionary<string, List<EventDef>>();
 		private readonly Dictionary<string, List<PropertyDef>> properties = new Dictionary<string, List<PropertyDef>>();
-		private readonly INameService service;
+
+		private readonly Dictionary<ushort, AssemblyDef> assemblyRefs = new Dictionary<ushort, AssemblyDef>();
+		private readonly Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>>();
+		
 		private readonly Dictionary<ushort, StringInfoRecord> strings = new Dictionary<ushort, StringInfoRecord>();
 		private readonly Dictionary<ushort, TypeSig> typeRefs = new Dictionary<ushort, TypeSig>();
 		private readonly Dictionary<string, List<Tuple<AssemblyDef, string>>> xmlns = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
+		
 		private string bamlName;
 		private ModuleDefMD module;
 		private IKnownThings things;
@@ -27,6 +32,13 @@ namespace Confuser.Renamer.BAML {
 		private KnownThingsv4 thingsv4;
 		private XmlNsContext xmlnsCtx;
 
+		public event Action<BAMLAnalyzer, BamlElement> AnalyzeElement;
+
+		public ConfuserContext Context { get { return context; } }
+		public INameService NameService { get { return service; } }
+		public string CurrentBAMLName { get { return bamlName; } }
+		public ModuleDefMD Module { get { return module; } }
+
 		public BAMLAnalyzer(ConfuserContext context, INameService service) {
 			this.context = context;
 			this.service = service;
@@ -34,7 +46,7 @@ namespace Confuser.Renamer.BAML {
 		}
 
 		private void PreInit() {
-			// WPF will only look for public instance properties/events
+			// WPF will only look for public instance members
 			foreach (TypeDef type in context.Modules.SelectMany(m => m.GetTypes())) {
 				foreach (PropertyDef property in type.Properties) {
 					if (property.IsPublic() && !property.IsStatic())
@@ -45,7 +57,33 @@ namespace Confuser.Renamer.BAML {
 					if (evt.IsPublic() && !evt.IsStatic())
 						events.AddListEntry(evt.Name, evt);
 				}
+
+				foreach (MethodDef method in type.Methods) {
+					if (method.IsPublic && !method.IsStatic)
+						methods.AddListEntry(method.Name, method);
+				}
 			}
+		}
+
+		public IEnumerable<PropertyDef> LookupProperty(string name) {
+			List<PropertyDef> ret;
+			if (!properties.TryGetValue(name, out ret))
+				return Enumerable.Empty<PropertyDef>();
+			return ret;
+		}
+
+		public IEnumerable<EventDef> LookupEvent(string name) {
+			List<EventDef> ret;
+			if (!events.TryGetValue(name, out ret))
+				return Enumerable.Empty<EventDef>();
+			return ret;
+		}
+
+		public IEnumerable<MethodDef> LookupMethod(string name) {
+			List<MethodDef> ret;
+			if (!methods.TryGetValue(name, out ret))
+				return Enumerable.Empty<MethodDef>();
+			return ret;
 		}
 
 		public BamlDocument Analyze(ModuleDefMD module, string bamlName, byte[] data) {
@@ -162,7 +200,7 @@ namespace Confuser.Renamer.BAML {
 			}
 		}
 
-		private TypeDef ResolveType(ushort typeId) {
+		public TypeDef ResolveType(ushort typeId) {
 			if ((short)typeId < 0)
 				return things.Types((KnownTypes)(-(short)typeId));
 			return typeRefs[typeId].ToBasicTypeDefOrRef().ResolveTypeDefThrow();
@@ -193,7 +231,7 @@ namespace Confuser.Renamer.BAML {
 			return null;
 		}
 
-		private Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> ResolveAttribute(ushort attrId) {
+		public Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> ResolveAttribute(ushort attrId) {
 			if ((short)attrId < 0) {
 				Tuple<KnownTypes, PropertyDef, TypeDef> info = things.Properties((KnownProperties)(-(short)attrId));
 				return Tuple.Create<IDnlibDef, AttributeInfoRecord, TypeDef>(info.Item2, null, info.Item3);
@@ -214,6 +252,9 @@ namespace Confuser.Renamer.BAML {
 		private void ProcessBAMLElement(BamlElement root, BamlElement elem) {
 			ProcessElementHeader(elem);
 			ProcessElementBody(root, elem);
+
+			if (AnalyzeElement != null)
+				AnalyzeElement(this, elem);
 		}
 
 		private void ProcessElementHeader(BamlElement elem) {

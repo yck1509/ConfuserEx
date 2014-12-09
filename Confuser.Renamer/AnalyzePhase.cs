@@ -66,20 +66,22 @@ namespace Confuser.Renamer {
 				foreach (var asmRef in module.GetAssemblyRefs()) {
 					if (asmRef.Name == "WindowsBase" || asmRef.Name == "PresentationCore" ||
 						asmRef.Name == "PresentationFramework" || asmRef.Name == "System.Xaml") {
-						if (!wpf) {
-							context.Logger.Debug("WPF found, enabling compatibility.");
-							service.Renamers.Add(new WPFAnalyzer());
-							wpf = true;
-						}
+						wpf = true;
 					}
 					else if (asmRef.Name == "Caliburn.Micro") {
-						if (!caliburn) {
-							context.Logger.Debug("Caliburn.Micro found, enabling compatibility.");
-							service.Renamers.Add(new CaliburnAnalyzer());
-							caliburn = true;
-						}
+						caliburn = true;
 					}
 				}
+
+			if (wpf) {
+				var wpfAnalyzer = new WPFAnalyzer();
+				context.Logger.Debug("WPF found, enabling compatibility.");
+				service.Renamers.Add(wpfAnalyzer);
+				if (caliburn) {
+					context.Logger.Debug("Caliburn.Micro found, enabling compatibility.");
+					service.Renamers.Add(new CaliburnAnalyzer(wpfAnalyzer));
+				}
+			}
 		}
 
 		internal void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, IDnlibDef def, bool runAnalyzer) {

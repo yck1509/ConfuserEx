@@ -166,6 +166,10 @@ namespace Confuser.Renamer {
 			Renamers.Add(renamer);
 		}
 
+		public T FindRenamer<T>() {
+			return Renamers.OfType<T>().Single();
+		}
+
 		public void MarkHelper(IDnlibDef def, IMarkerService marker) {
 			if (marker.IsMarked(def))
 				return;

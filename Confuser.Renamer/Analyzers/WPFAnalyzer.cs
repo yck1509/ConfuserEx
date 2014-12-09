@@ -20,6 +20,8 @@ namespace Confuser.Renamer.Analyzers {
 		private static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
 		private BAMLAnalyzer analyzer;
 
+		public event Action<BAMLAnalyzer, BamlElement> AnalyzeBAMLElement;
+
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
 			var method = def as MethodDef;
 			if (method != null) {
@@ -208,8 +210,10 @@ namespace Confuser.Renamer.Analyzers {
 		}
 
 		private void AnalyzeResources(ConfuserContext context, INameService service, ModuleDefMD module) {
-			if (analyzer == null)
+			if (analyzer == null) {
 				analyzer = new BAMLAnalyzer(context, service);
+				analyzer.AnalyzeElement += AnalyzeBAMLElement;
+			}
 
 			var wpfResInfo = new Dictionary<string, Dictionary<string, BamlDocument>>();
 
