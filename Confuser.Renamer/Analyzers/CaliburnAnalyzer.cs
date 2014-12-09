@@ -23,6 +23,14 @@ namespace Confuser.Renamer.Analyzers {
 					service.SetCanRename(type, false);
 					service.SetCanRename(view, false);
 				}
+
+				// Test for Multi-view
+				string multiViewNs = type.Namespace + "." + type.Name.Replace("ViewModel", "");
+				foreach (var t in type.Module.Types)
+					if (t.Namespace == multiViewNs) {
+						service.SetCanRename(type, false);
+						service.SetCanRename(t, false);
+					}
 			}
 		}
 
