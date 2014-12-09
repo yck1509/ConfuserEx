@@ -1,0 +1,31 @@
+ConfuserEx declarative obfuscation:
+
+Attribute semantics:
+ApplyToMembers: The children uses this protection settings as base.
+Exclude: No protection will be applied to this item.
+!ApplyToMembers + !Exclude: The protection settings just apply to this item.
+ApplyToMembers + Exclude: This item and its chilren will have no protection.	
+
+Pattern examples:
+
+generate debug symbol:true
+random seed:ABCDEFG
+strong name key:C:\key.snk
+strong name key password:hunter2
+packer:compressor(mode=dynamic)
+namespace 'ConfuserEx.CLI':preset(normal);+rename;anti tamper(mode=jit,key=dynamic);-anti debug
+preset(none);+rename;
+
+Usage examples:
+
+[assembly: Obfuscation(Exclude = false, Feature = "preset(minimum);+ctrl flow;-anti debug;+rename(mode=letters,flatten=false);")]
+[assembly: Obfuscation(Exclude = false, Feature = "random seed: Hello!")]
+[assembly: Obfuscation(Exclude = false, Feature = "namespace 'Test':-rename")]
+namespace Test {
+	[Obfuscation(Exclude = false, Feature = "constants")]
+	class Program {
+		public static void Main() {
+			Console.WriteLine("Hi");
+		}
+	}
+}

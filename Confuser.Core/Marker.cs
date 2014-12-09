@@ -26,8 +26,14 @@ namespace Confuser.Core {
 		/// </summary>
 		public static readonly object RulesKey = new object();
 
-		private Dictionary<string, Packer> packers;
-		private Dictionary<string, Protection> protections;
+		/// <summary>
+		///     The packers available to use.
+		/// </summary>
+		protected Dictionary<string, Packer> packers;
+		/// <summary>
+		///     The protections available to use.
+		/// </summary>
+		protected Dictionary<string, Protection> protections;
 
 		/// <summary>
 		///     Initalizes the Marker with specified protections and packers.

@@ -58,6 +58,9 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ObfAttrMarker.cs" />
+    <Compile Include="ObfAttrParser.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -81,6 +84,10 @@
     <ProjectReference Include="..\Confuser.Runtime\Confuser.Runtime.csproj">
       <Project>{A45C184F-F98F-4258-A928-BFF437034791}</Project>
       <Name>Confuser.Runtime</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\dnlib\src\dnlib.csproj">
+      <Project>{FDFC1237-143F-4919-8318-4926901F4639}</Project>
+      <Name>dnlib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

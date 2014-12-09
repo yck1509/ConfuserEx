@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using Confuser.Core;
 using Confuser.Core.Project;
+using NDesk.Options;
 
 namespace Confuser.CLI {
 	internal class Program {
@@ -14,45 +16,82 @@ namespace Confuser.CLI {
 			string originalTitle = Console.Title;
 			Console.Title = "ConfuserEx";
 
+			bool noPause = false;
+			string outDir = null;
+			var p = new OptionSet() {
+				{ "n|nopause", "no pause after finishing protection.",
+				   value => { noPause = (value != null); } },
+				{ "o|out=", "specifies output directory.",
+				   value => { outDir = value; } },
+			};
+
+			List<string> files;
 			try {
-				if (args.Length < 1) {
-					PrintUsage();
-					return 0;
-				}
+				files = p.Parse(args);
+				if (files.Count == 0)
+					throw new ArgumentException("No input files specified.");
+			}
+			catch (Exception ex) {
+				Console.Write("ConfuserEx.CLI: ");
+				Console.WriteLine(ex.Message);
+				PrintUsage();
+				return -1;
+			}
 
-				var proj = new ConfuserProject();
-				try {
-					var xmlDoc = new XmlDocument();
-					xmlDoc.Load(args[0]);
-					proj.Load(xmlDoc);
-					proj.BaseDirectory = Path.Combine(Path.GetDirectoryName(args[0]), proj.BaseDirectory);
-				}
-				catch (Exception ex) {
-					WriteLineWithColor(ConsoleColor.Red, "Failed to load project:");
-					WriteLineWithColor(ConsoleColor.Red, ex.ToString());
-					return -1;
-				}
-
+			try {
 				var parameters = new ConfuserParameters();
-				parameters.Project = proj;
-				var logger = new ConsoleLogger();
-				parameters.Logger = new ConsoleLogger();
 
-				Console.Title = "ConfuserEx - Running...";
-				ConfuserEngine.Run(parameters).Wait();
+				if (files.Count == 1 && Path.GetExtension(files[0]) == "crproj") {
+					var proj = new ConfuserProject();
+					try {
+						var xmlDoc = new XmlDocument();
+						xmlDoc.Load(args[0]);
+						proj.Load(xmlDoc);
+						proj.BaseDirectory = Path.Combine(Path.GetDirectoryName(args[0]), proj.BaseDirectory);
+					}
+					catch (Exception ex) {
+						WriteLineWithColor(ConsoleColor.Red, "Failed to load project:");
+						WriteLineWithColor(ConsoleColor.Red, ex.ToString());
+						return -1;
+					}
 
-				bool noPause = args.Length > 1 && args[1].ToUpperInvariant() == "NOPAUSE";
+					parameters.Project = proj;
+				}
+				else {
+					// Generate a ConfuserProject for input modules
+					// Assuming first file = main module
+					var proj = new ConfuserProject();
+					foreach (var input in files)
+						proj.Add(new ProjectModule() { Path = input });
+					proj.BaseDirectory = Path.GetDirectoryName(files[0]);
+					proj.OutputDirectory = outDir;
+					parameters.Project = proj;
+					parameters.Marker = new ObfAttrMarker();
+				}
+
+				int retVal = RunProject(parameters);
+
 				if (NeedPause() && !noPause) {
 					Console.WriteLine("Press any key to continue...");
 					Console.ReadKey(true);
 				}
 
-				return logger.ReturnValue;
+				return retVal;
 			}
 			finally {
 				Console.ForegroundColor = original;
 				Console.Title = originalTitle;
 			}
+		}
+
+		private static int RunProject(ConfuserParameters parameters) {
+			var logger = new ConsoleLogger();
+			parameters.Logger = new ConsoleLogger();
+
+			Console.Title = "ConfuserEx - Running...";
+			ConfuserEngine.Run(parameters).Wait();
+
+			return logger.ReturnValue;
 		}
 
 		private static bool NeedPause() {
@@ -61,7 +100,10 @@ namespace Confuser.CLI {
 
 		private static void PrintUsage() {
 			WriteLine("Usage:");
-			WriteLine("Confuser.CLI.exe <project configuration>");
+			WriteLine("Confuser.CLI -n|noPause <project configuration>");
+			WriteLine("Confuser.CLI -n|noPause -o|out=<output directory> <modules>");
+			WriteLine("    -n|noPause : no pause after finishing protection.");
+			WriteLine("    -o|out     : specifies output directory.");
 		}
 
 		private static void WriteLineWithColor(ConsoleColor color, string txt) {
