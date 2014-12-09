@@ -41,7 +41,7 @@ namespace Confuser.CLI {
 			try {
 				var parameters = new ConfuserParameters();
 
-				if (files.Count == 1 && Path.GetExtension(files[0]) == "crproj") {
+				if (files.Count == 1 && Path.GetExtension(files[0]) == ".crproj") {
 					var proj = new ConfuserProject();
 					try {
 						var xmlDoc = new XmlDocument();
