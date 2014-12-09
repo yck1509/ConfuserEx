@@ -39,34 +39,66 @@ namespace Confuser.Renamer.Analyzers {
 				var prop = rec as PropertyWithConverterRecord;
 				if (prop == null)
 					continue;
+
 				var attr = analyzer.ResolveAttribute(prop.AttributeId);
-				if (attr.Item2 == null || attr.Item2.Name != "Attach")
-					continue;
-				var attrDeclType = analyzer.ResolveType(attr.Item2.OwnerTypeId);
-				if (attrDeclType.FullName != "Caliburn.Micro.Message")
+				if (attr.Item2 == null)
 					continue;
 
-				string actionStr = prop.Value;
-				foreach (var msg in actionStr.Split(';')) {
-					string msgStr;
-					if (msg.Contains("=")) {
-						msgStr = msg.Split('=')[1].Trim('[', ']', ' ');
-					}
-					else {
-						msgStr = msg.Trim('[', ']', ' ');
-					}
-					if (msgStr.StartsWith("Action"))
-						msgStr = msgStr.Substring(6);
-					int parenIndex = msgStr.IndexOf('(');
-					if (parenIndex != -1)
-						msgStr = msgStr.Substring(0, parenIndex);
+				if (attr.Item2.Name == "Attach")
+					AnalyzeMessageAttach(analyzer, attr, prop.Value);
 
-					string actName = msgStr.Trim();
-					foreach (var method in analyzer.LookupMethod(actName))
-						analyzer.NameService.SetCanRename(method, false);
-				}
+				if (attr.Item2.Name == "Name")
+					AnalyzeAutoBind(analyzer, attr, prop.Value);
+
+				if (attr.Item2.Name == "MethodName")
+					AnalyzeActionMessage(analyzer, attr, prop.Value);
 			}
 		}
+
+		private void AnalyzeMessageAttach(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
+			var attrDeclType = analyzer.ResolveType(attr.Item2.OwnerTypeId);
+			if (attrDeclType.FullName != "Caliburn.Micro.Message")
+				return;
+
+			foreach (var msg in value.Split(';')) {
+				string msgStr;
+				if (msg.Contains("=")) {
+					msgStr = msg.Split('=')[1].Trim('[', ']', ' ');
+				}
+				else {
+					msgStr = msg.Trim('[', ']', ' ');
+				}
+				if (msgStr.StartsWith("Action"))
+					msgStr = msgStr.Substring(6);
+				int parenIndex = msgStr.IndexOf('(');
+				if (parenIndex != -1)
+					msgStr = msgStr.Substring(0, parenIndex);
+
+				string actName = msgStr.Trim();
+				foreach (var method in analyzer.LookupMethod(actName))
+					analyzer.NameService.SetCanRename(method, false);
+			}
+		}
+
+		private void AnalyzeAutoBind(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
+			if (!(attr.Item1 is PropertyDef) || ((PropertyDef)attr.Item1).DeclaringType.FullName != "System.Windows.FrameworkElement")
+				return;
+
+			foreach (var method in analyzer.LookupMethod(value))
+				analyzer.NameService.SetCanRename(method, false);
+			foreach (var method in analyzer.LookupProperty(value))
+				analyzer.NameService.SetCanRename(method, false);
+		}
+
+		private void AnalyzeActionMessage(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
+			var attrDeclType = analyzer.ResolveType(attr.Item2.OwnerTypeId);
+			if (attrDeclType.FullName != "Caliburn.Micro.ActionMessage")
+				return;
+
+			foreach (var method in analyzer.LookupMethod(value))
+				analyzer.NameService.SetCanRename(method, false);
+		}
+
 
 		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
 			//
