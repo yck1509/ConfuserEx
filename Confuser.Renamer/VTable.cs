@@ -357,7 +357,7 @@ namespace Confuser.Renamer {
 				ret.Slots.Add(ResolveSlot(openType, slot, genInst.GenericArguments));
 			}
 			foreach (var iface in vTable.InterfaceSlots) {
-				ret.InterfaceSlots.Add(iface.Key,
+				ret.InterfaceSlots.Add(GenericArgumentResolver.Resolve(iface.Key, genInst.GenericArguments),
 					iface.Value.Select(slot => ResolveSlot(openType, slot, genInst.GenericArguments)).ToList());
 			}
 			return ret;
