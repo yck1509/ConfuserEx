@@ -2,6 +2,7 @@
 extern alias PTL;
 #endif
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -55,6 +56,8 @@ namespace ConfuserEx.ViewModel {
 		private void DoProtect() {
 			var parameters = new ConfuserParameters();
 			parameters.Project = ((IViewModel<ConfuserProject>)App.Project).Model;
+			if (File.Exists(App.FileName))
+				Environment.CurrentDirectory = Path.GetDirectoryName(App.FileName);
 			parameters.Logger = this;
 
 			documentContent.Inlines.Clear();
