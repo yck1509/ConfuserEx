@@ -65,6 +65,9 @@ namespace Confuser.CLI {
 		}
 
 		public void ParseProtectionString(ProtectionSettings settings, string str) {
+			if (str == null)
+				return;
+
 			this.str = str;
 			this.index = 0;
 
@@ -201,15 +204,18 @@ namespace Confuser.CLI {
 		}
 
 		public void ParsePackerString(string str, out Packer packer, out Dictionary<string, string> packerParams) {
+			packer = null;
+			packerParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+			if (str == null)
+				return;
+
 			this.str = str;
 			this.index = 0;
 
 			var state = ParseState.ReadItemName;
 			var buffer = new StringBuilder();
 			var ret = new ProtectionSettings();
-
-			packer = null;
-			packerParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 			while (state != ParseState.End) {
 				switch (state) {
