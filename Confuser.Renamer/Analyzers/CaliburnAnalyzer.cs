@@ -41,21 +41,26 @@ namespace Confuser.Renamer.Analyzers {
 					continue;
 
 				var attr = analyzer.ResolveAttribute(prop.AttributeId);
-				if (attr.Item2 == null)
-					continue;
+				string attrName = null;
+				if (attr.Item2 != null)
+					attrName = attr.Item2.Name;
+				else if (attr.Item1 != null)
+					attrName = attr.Item1.Name;
 
-				if (attr.Item2.Name == "Attach")
+				if (attrName == "Attach")
 					AnalyzeMessageAttach(analyzer, attr, prop.Value);
 
-				if (attr.Item2.Name == "Name")
+				if (attrName == "Name")
 					AnalyzeAutoBind(analyzer, attr, prop.Value);
 
-				if (attr.Item2.Name == "MethodName")
+				if (attrName == "MethodName")
 					AnalyzeActionMessage(analyzer, attr, prop.Value);
 			}
 		}
 
 		private void AnalyzeMessageAttach(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
+			if (attr.Item2 == null)
+				return;
 			var attrDeclType = analyzer.ResolveType(attr.Item2.OwnerTypeId);
 			if (attrDeclType.FullName != "Caliburn.Micro.Message")
 				return;
@@ -91,6 +96,8 @@ namespace Confuser.Renamer.Analyzers {
 		}
 
 		private void AnalyzeActionMessage(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
+			if (attr.Item2 == null)
+				return; 
 			var attrDeclType = analyzer.ResolveType(attr.Item2.OwnerTypeId);
 			if (attrDeclType.FullName != "Caliburn.Micro.ActionMessage")
 				return;
