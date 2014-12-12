@@ -488,6 +488,17 @@ namespace Confuser.Renamer.BAML {
 					AddTypeSigReference(sig, reference);
 				}
 			}
+
+			var attrInfo = ResolveAttribute(rec.AttributeId);
+			string attrName = null;
+			if (attrInfo.Item1 != null)
+				attrName = attrInfo.Item1.Name;
+			else if (attrInfo.Item2 != null)
+				attrName = attrInfo.Item2.Name;
+
+			if (attrName == "DisplayMemberPath") {
+				AnalyzePropertyPath(rec.Value);
+			}
 		}
 
 		private Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec) {
