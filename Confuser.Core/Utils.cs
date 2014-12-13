@@ -152,6 +152,36 @@ namespace Confuser.Core {
 			return ret.ToString();
 		}
 
+		/// <summary>
+		/// Returns a new string in which all occurrences of a specified string in 
+		/// <paramref name="str"/><paramref name="str"/> are replaced with another specified string.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="string"/> equivalent to <paramref name="str"/> but with all instances of <paramref name="oldValue"/> 
+		/// replaced with <paramref name="newValue"/>.
+		/// </returns>
+		/// <param name="str">A string to do the replace in. </param>
+		/// <param name="oldValue">A string to be replaced. </param>
+		/// <param name="newValue">A string to replace all occurrences of <paramref name="oldValue"/>. </param>
+		/// <param name="comparison">One of the <see cref="StringComparison"/> values. </param>
+		/// <remarks>Adopted from http://stackoverflow.com/a/244933 </remarks>
+		public static string Replace(this string str, string oldValue, string newValue, StringComparison comparison) {
+			StringBuilder sb = new StringBuilder();
+
+			int previousIndex = 0;
+			int index = str.IndexOf(oldValue, comparison);
+			while (index != -1) {
+				sb.Append(str.Substring(previousIndex, index - previousIndex));
+				sb.Append(newValue);
+				index += oldValue.Length;
+				previousIndex = index;
+				index = str.IndexOf(oldValue, index, comparison);
+			}
+			sb.Append(str.Substring(previousIndex));
+
+			return sb.ToString();
+		}
+
 
 		/// <summary>
 		///     Encode the buffer to a hexadecimal string.

@@ -18,8 +18,10 @@ namespace Confuser.Renamer.Analyzers {
 		private static readonly object BAMLKey = new object();
 
 		private static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
+		internal static readonly Regex UriPattern = new Regex(";COMPONENT/(.+\\.[BX]AML)$");
 		private BAMLAnalyzer analyzer;
 
+		internal Dictionary<string, List<IBAMLReference>> bamlRefs = new Dictionary<string, List<IBAMLReference>>(StringComparer.OrdinalIgnoreCase);
 		public event Action<BAMLAnalyzer, BamlElement> AnalyzeBAMLElement;
 
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
@@ -37,7 +39,29 @@ namespace Confuser.Renamer.Analyzers {
 		}
 
 		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
-			//
+			var module = def as ModuleDefMD;
+			if (module == null)
+				return;
+
+			var wpfResInfo = context.Annotations.Get<Dictionary<string, Dictionary<string, BamlDocument>>>(module, BAMLKey);
+			if (wpfResInfo == null)
+				return;
+
+			foreach (var res in wpfResInfo.Values)
+				foreach (var doc in res.Values) {
+					List<IBAMLReference> references;
+					if (bamlRefs.TryGetValue(doc.DocumentName, out references)) {
+						var newName = doc.DocumentName.ToUpperInvariant();
+						if (newName.EndsWith(".BAML"))
+							newName = service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".baml";
+						else if (newName.EndsWith(".XAML"))
+							newName = service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".xaml";
+
+						foreach (var bamlRef in references)
+							bamlRef.Rename(doc.DocumentName, newName);
+						doc.DocumentName = newName;
+					}
+				}
 		}
 
 		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
@@ -75,6 +99,7 @@ namespace Confuser.Renamer.Analyzers {
 						docStream.Position = 0;
 						docStream.Write(BitConverter.GetBytes((int)docStream.Length - 4), 0, 4);
 						data = docStream.ToArray();
+						name = document.DocumentName;
 					}
 
 					writer.AddResourceData(name, typeName, data);
@@ -98,6 +123,21 @@ namespace Confuser.Renamer.Analyzers {
 					else if (regMethod.DeclaringType.FullName == "System.Windows.EventManager" &&
 					         regMethod.Name.String == "RegisterRoutedEvent") {
 						routedEvtRegInstrs.Add(instr);
+					}
+				}
+				else if (instr.OpCode == OpCodes.Ldstr) {
+					var operand = ((string)instr.Operand).ToUpperInvariant();
+					if (operand.EndsWith(".BAML") || operand.EndsWith(".XAML")) {
+						var match = UriPattern.Match(operand);
+						if (match.Success)
+							operand = match.Groups[1].Value;
+
+						var reference = new BAMLStringReference(instr);
+						operand = operand.TrimStart('/');
+						var baml = operand.Substring(0, operand.Length - 5) + ".BAML";
+						var xaml = operand.Substring(0, operand.Length - 5) + ".XAML";
+						bamlRefs.AddListEntry(baml, reference);
+						bamlRefs.AddListEntry(xaml, reference);
 					}
 				}
 			}
@@ -236,6 +276,7 @@ namespace Confuser.Renamer.Analyzers {
 					byte[] data;
 					reader.GetResourceData(name, out typeName, out data);
 					BamlDocument document = analyzer.Analyze(module, name, data);
+					document.DocumentName = name;
 					resInfo.Add(name, document);
 				}
 

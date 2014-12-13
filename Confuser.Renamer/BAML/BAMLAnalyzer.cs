@@ -499,6 +499,33 @@ namespace Confuser.Renamer.BAML {
 			if (attrName == "DisplayMemberPath") {
 				AnalyzePropertyPath(rec.Value);
 			}
+			else if (attrName == "Source") {
+				string declType = null;
+				if (attrInfo.Item1 is IMemberDef)
+					declType = ((IMemberDef)attrInfo.Item1).DeclaringType.FullName;
+				else if (attrInfo.Item2 != null)
+					declType = ResolveType(attrInfo.Item2.OwnerTypeId).FullName;
+				if (declType == "System.Windows.ResourceDictionary") {
+					var src = rec.Value.ToUpperInvariant();
+					if (src.EndsWith(".BAML") || src.EndsWith(".XAML")) {
+						var match = Analyzers.WPFAnalyzer.UriPattern.Match(src);
+						if (match.Success)
+							src = match.Groups[1].Value;
+
+						if (src.StartsWith("./") || src.StartsWith("../")) {
+							var rel = new Uri(new Uri("pack://application:,,,/" + bamlName), src);
+							src = rel.LocalPath;
+						}
+						var reference = new BAMLPropertyReference(rec);
+						src = src.TrimStart('/');
+						var baml = src.Substring(0, src.Length - 5) + ".BAML";
+						var xaml = src.Substring(0, src.Length - 5) + ".XAML";
+						var bamlRefs = service.FindRenamer<Analyzers.WPFAnalyzer>().bamlRefs;
+						bamlRefs.AddListEntry(baml, reference);
+						bamlRefs.AddListEntry(xaml, reference);
+					}
+				}
+			}
 		}
 
 		private Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec) {

@@ -57,8 +57,11 @@
     <Compile Include="BAML\BAMLAnalyzer.cs" />
     <Compile Include="BAML\BamlDocument.cs" />
     <Compile Include="BAML\BamlElement.cs" />
+    <Compile Include="BAML\BAMLPropertyReference.cs" />
     <Compile Include="BAML\BamlRecords.cs" />
     <Compile Include="BAML\BamlRW.cs" />
+    <Compile Include="BAML\BAMLStringReference.cs" />
+    <Compile Include="BAML\IBAMLReference.cs" />
     <Compile Include="BAML\KnownThingsv4.cs" />
     <Compile Include="BAML\IKnownThings.cs" />
     <Compile Include="BAML\KnownThingsv3.cs" />

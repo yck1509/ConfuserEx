@@ -26,6 +26,7 @@ namespace Confuser.Renamer {
 		string RandomName(RenameMode mode);
 
 		void RegisterRenamer(IRenamer renamer);
+		T FindRenamer<T>();
 		void AddReference<T>(T obj, INameReference<T> reference);
 
 		void SetOriginalName(object obj, string name);
