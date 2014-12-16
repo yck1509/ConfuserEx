@@ -29,6 +29,9 @@ namespace Confuser.Renamer {
 			}
 
 			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
+				if (def is ModuleDef && parameters.GetParameter(context, def, "rickroll", true))
+					RickRoller.CommenceRickroll(context, (ModuleDef)def);
+
 				bool canRename = service.CanRename(def);
 				if (def is MethodDef)
 					if (canRename && parameters.GetParameter(context, def, "renameArgs", true)) {
