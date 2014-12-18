@@ -30,7 +30,7 @@ namespace Confuser.CLI {
 			foreach (var module in modules) {
 				context.Logger.InfoFormat("Loading '{0}'...", module.Item1.Path);
 
-				MarkModule(proj, context, module.Item2, module == modules[0], ref packerInfo);
+                MarkModule(proj, context, module.Item2, module == modules[0], ref packerInfo);
 
 				// Packer parameters are stored in modules
 				if (packerInfo != null)
@@ -78,56 +78,64 @@ namespace Confuser.CLI {
 
 		private static IEnumerable<ObfuscationAttributeInfo> ReadObfuscationAttributes(IHasCustomAttribute item) {
 			var ret = new List<ObfuscationAttributeInfo>();
-			for (int i = item.CustomAttributes.Count - 1; i >= 0; i--) {
-				var ca = item.CustomAttributes[i];
-				if (ca.TypeFullName != "System.Reflection.ObfuscationAttribute")
-					continue;
+		    if (item.HasCustomAttributes)
+		    {
+		        for (int i = item.CustomAttributes.Count - 1; i >= 0; i--)
+		        {
+		            var ca = item.CustomAttributes[i];
+		            if (ca.TypeFullName != "System.Reflection.ObfuscationAttribute")
+		                continue;
 
-				var info = new ObfuscationAttributeInfo();
-				bool strip = true;
-				foreach (var prop in ca.Properties) {
-					switch (prop.Name) {
+		            var info = new ObfuscationAttributeInfo();
+		            bool strip = true;
+		            foreach (var prop in ca.Properties)
+		            {
+		                switch (prop.Name)
+		                {
 
-						case "ApplyToMembers":
-							Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
-							info.ApplyToMembers = (bool)prop.Value;
-							break;
+		                    case "ApplyToMembers":
+		                        Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
+		                        info.ApplyToMembers = (bool) prop.Value;
+		                        break;
 
-						case "Exclude":
-							Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
-							info.Exclude = (bool)prop.Value;
-							break;
+		                    case "Exclude":
+		                        Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
+		                        info.Exclude = (bool) prop.Value;
+		                        break;
 
-						case "StripAfterObfuscation":
-							Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
-							strip = (bool)prop.Value;
-							break;
+		                    case "StripAfterObfuscation":
+		                        Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
+		                        strip = (bool) prop.Value;
+		                        break;
 
-						case "Feature":
-							Debug.Assert(prop.Type.ElementType == ElementType.String);
-							string feature = (UTF8String)prop.Value;
-							int sepIndex = feature.IndexOf(':');
-							if (sepIndex == -1) {
-								info.FeatureName = "";
-								info.FeatureValue = feature;
-							}
-							else {
-								info.FeatureName = feature.Substring(0, sepIndex);
-								info.FeatureValue = feature.Substring(sepIndex + 1);
-							}
-							break;
+		                    case "Feature":
+		                        Debug.Assert(prop.Type.ElementType == ElementType.String);
+		                        string feature = (UTF8String) prop.Value;
+		                        int sepIndex = feature.IndexOf(':');
+		                        if (sepIndex == -1)
+		                        {
+		                            info.FeatureName = "";
+		                            info.FeatureValue = feature;
+		                        }
+		                        else
+		                        {
+		                            info.FeatureName = feature.Substring(0, sepIndex);
+		                            info.FeatureValue = feature.Substring(sepIndex + 1);
+		                        }
+		                        break;
 
-						default:
-							throw new NotSupportedException("Unsupported property: " + prop.Name);
-					}
-				}
-				if (strip)
-					item.CustomAttributes.RemoveAt(i);
+		                    default:
+		                        throw new NotSupportedException("Unsupported property: " + prop.Name);
+		                }
+		            }
+		            if (strip)
+		                item.CustomAttributes.RemoveAt(i);
 
-				ret.Add(info);
-			}
-			ret.Reverse();
-			return ret;
+		            ret.Add(info);
+		        }
+		        ret.Reverse();
+		    }
+		    return ret;
 		}
 
 		private static IEnumerable<ProtectionSettingsInfo> ProcessAttributes(IEnumerable<ObfuscationAttributeInfo> attrs) {
@@ -277,7 +285,7 @@ namespace Confuser.CLI {
 					ProcessMember(prop.GetMethod, context, stack);
 				}
 				if (prop.SetMethod != null) {
-					ProcessMember(prop.GetMethod, context, stack);
+					ProcessMember(prop.SetMethod, context, stack);
 				}
 				foreach (var m in prop.OtherMethods)
 					ProcessMember(m, context, stack);
