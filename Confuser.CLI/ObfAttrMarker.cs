@@ -145,7 +145,7 @@ namespace Confuser.CLI {
 		static readonly Regex NSPattern = new Regex("namespace '([^']*)'");
 		static readonly Regex NSInModulePattern = new Regex("namespace '([^']*)' in module '([^'])'");
 
-		Dictionary<string, Dictionary<string, List<ObfuscationAttributeInfo>>> crossModuleAttrs;
+		Dictionary<string, Dictionary<Regex, List<ObfuscationAttributeInfo>>> crossModuleAttrs;
 		ConfuserContext context;
 		ConfuserProject project;
 		Packer packer;
@@ -158,7 +158,7 @@ namespace Confuser.CLI {
 		}
 
 		protected override MarkerResult MarkProject(ConfuserProject proj, ConfuserContext context) {
-			crossModuleAttrs = new Dictionary<string, Dictionary<string, List<ObfuscationAttributeInfo>>>();
+			crossModuleAttrs = new Dictionary<string, Dictionary<Regex, List<ObfuscationAttributeInfo>>>();
 			this.context = context;
 			project = proj;
 			extModules = new List<byte[]>();
@@ -186,9 +186,9 @@ namespace Confuser.CLI {
 		void MarkModule(ModuleDefMD module, bool isMain) {
 			var settingAttrs = new List<ObfuscationAttributeInfo>();
 			string snKeyPath = null, snKeyPass = null;
-			Dictionary<string, List<ObfuscationAttributeInfo>> namespaceAttrs;
+			Dictionary<Regex, List<ObfuscationAttributeInfo>> namespaceAttrs;
 			if (!crossModuleAttrs.TryGetValue(module.Name, out namespaceAttrs)) {
-				namespaceAttrs = new Dictionary<string, List<ObfuscationAttributeInfo>>();
+				namespaceAttrs = new Dictionary<Regex, List<ObfuscationAttributeInfo>>();
 			}
 
 			foreach (var attr in ReadObfuscationAttributes(module.Assembly)) {
@@ -231,20 +231,20 @@ namespace Confuser.CLI {
 					if (match.Success) {
 						if (!isMain)
 							throw new ArgumentException("Only main module can set cross module obfuscation.");
-						string ns = match.Groups[1].Value;
+						var ns = TranslateNamespaceRegex(match.Groups[1].Value);
 						string targetModule = match.Groups[2].Value;
 						var x = attr;
 						x.FeatureName = "";
-						Dictionary<string, List<ObfuscationAttributeInfo>> targetModuleAttrs;
+						Dictionary<Regex, List<ObfuscationAttributeInfo>> targetModuleAttrs;
 						if (!crossModuleAttrs.TryGetValue(targetModule, out targetModuleAttrs)) {
-							targetModuleAttrs = new Dictionary<string, List<ObfuscationAttributeInfo>>();
+							targetModuleAttrs = new Dictionary<Regex, List<ObfuscationAttributeInfo>>();
 							crossModuleAttrs[targetModule] = targetModuleAttrs;
 						}
 						targetModuleAttrs.AddListEntry(ns, x);
 					}
 					match = NSPattern.Match(attr.FeatureName);
 					if (match.Success) {
-						string ns = match.Groups[1].Value;
+						var ns = TranslateNamespaceRegex(match.Groups[1].Value);
 						var x = attr;
 						x.FeatureName = "";
 						namespaceAttrs.AddListEntry(ns, x);
@@ -255,9 +255,29 @@ namespace Confuser.CLI {
 			ProcessModule(module, snKeyPath, snKeyPass, settingAttrs, namespaceAttrs);
 		}
 
+		static Regex TranslateNamespaceRegex(string ns) {
+			if (ns == "*")
+				return new Regex(".*");
+			if (ns.Length >= 2 && ns[0] == '*' && ns[ns.Length - 1] == '*')
+				return new Regex(Regex.Escape(ns.Substring(1, ns.Length - 2)));
+			if (ns.Length >= 1 && ns[0] == '*')
+				return new Regex(Regex.Escape(ns.Substring(1)) + "$");
+			if (ns.Length >= 1 && ns[ns.Length - 1] == '*')
+				return new Regex(Regex.Escape("^" + ns.Substring(0, ns.Length - 1)));
+			return new Regex(Regex.Escape(ns));
+		}
+
+		static ProtectionSettingsStack MatchNamespace(Dictionary<Regex, ProtectionSettingsStack> attrs, string ns) {
+			foreach (var nsStack in attrs) {
+				if (nsStack.Key.IsMatch(ns))
+					return nsStack.Value;
+			}
+			return null;
+		}
+
 		void ProcessModule(ModuleDefMD module, string snKeyPath, string snKeyPass,
 		                   List<ObfuscationAttributeInfo> settingAttrs,
-		                   Dictionary<string, List<ObfuscationAttributeInfo>> namespaceAttrs) {
+		                   Dictionary<Regex, List<ObfuscationAttributeInfo>> namespaceAttrs) {
 			context.Annotations.Set(module, SNKey, LoadSNKey(context, snKeyPath, snKeyPass));
 
 			var moduleStack = new ProtectionSettingsStack();
@@ -271,7 +291,7 @@ namespace Confuser.CLI {
 			});
 
 			foreach (var type in module.Types) {
-				var typeStack = nsSettings.GetValueOrDefault(type.Namespace, moduleStack);
+				var typeStack = MatchNamespace(nsSettings, type.Namespace) ?? moduleStack;
 				typeStack.Push(ProcessAttributes(ReadObfuscationAttributes(type)));
 
 				ApplySettings(type, typeStack.GetInfos());
