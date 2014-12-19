@@ -78,18 +78,19 @@ namespace Confuser.Core {
 			return defValue;
 		}
 
-		/// <summary>
-		///     Sets the protection parameters of the specified target.
-		/// </summary>
-		/// <param name="context">The context.</param>
-		/// <param name="target">The protection target.</param>
-		/// <param name="parameters">The parameters.</param>
-		public static void SetParameters(
-			ConfuserContext context, IDnlibDef target, ProtectionSettings parameters) {
-			context.Annotations.Set(target, ParametersKey, parameters);
-		}
+	    /// <summary>
+	    ///     Sets the protection parameters of the specified target.
+	    /// </summary>
+	    /// <param name="context">The context.</param>
+	    /// <param name="target">The protection target.</param>
+	    /// <param name="parameters">The parameters.</param>
+	    public static void SetParameters(
+	        ConfuserContext context, IDnlibDef target, ProtectionSettings parameters)
+	    {
+	            context.Annotations.Set(target, ParametersKey, parameters);
+	    }
 
-		/// <summary>
+	    /// <summary>
 		///     Gets the protection parameters of the specified target.
 		/// </summary>
 		/// <param name="context">The context.</param>
