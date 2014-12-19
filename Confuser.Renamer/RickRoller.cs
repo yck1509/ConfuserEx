@@ -45,7 +45,7 @@ namespace Confuser.Renamer {
 			nameService.SetCanRename(trap, false);
 
 			foreach (var method in module.GetTypes().SelectMany(type => type.Methods)) {
-				if (method != trap)
+				if (method != trap && method.HasBody)
 					method.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, trap));
 			}
 		}
