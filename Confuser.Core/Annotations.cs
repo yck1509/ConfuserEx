@@ -125,7 +125,7 @@ namespace Confuser.Core {
 			objAnno[key] = value;
 		}
 
-		/// <summary>
+        /// <summary>
 		///     Trims the annotations of unreachable objects from this instance.
 		/// </summary>
 		public void Trim() {

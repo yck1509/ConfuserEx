@@ -16,27 +16,35 @@ namespace Confuser.CLI {
 		}
 
 		protected override MarkerResult MarkProject(ConfuserProject proj, ConfuserContext context) {
-			var modules = new List<Tuple<ProjectModule, ModuleDefMD>>();
-			foreach (ProjectModule module in proj) {
+            //var modules = new List<Tuple<ProjectModule, ModuleDefMD>>();
+            //foreach (ProjectModule module in proj) {
 
-				ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
-				context.CheckCancellation();
+            //    ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
+            //    context.CheckCancellation();
 
-				context.Resolver.AddToCache(modDef);
-				modules.Add(Tuple.Create(module, modDef));
-			}
+            //    context.Resolver.AddToCache(modDef);
+            //    modules.Add(Tuple.Create(module, modDef));
+            //}
 
-			Tuple<Packer, Dictionary<string, string>> packerInfo = null;
-			foreach (var module in modules) {
-				context.Logger.InfoFormat("Loading '{0}'...", module.Item1.Path);
+            //Tuple<Packer, Dictionary<string, string>> packerInfo = null;
+            //foreach (var module in modules) {
+            //    context.Logger.InfoFormat("Loading '{0}'...", module.Item1.Path);
 
-				MarkModule(proj, context, module.Item2, module == modules[0], ref packerInfo);
+            //    MarkModule(proj, context, module.Item2, module == modules[0], ref packerInfo);
 
-				// Packer parameters are stored in modules
-				if (packerInfo != null)
-					ProtectionParameters.GetParameters(context, module.Item2)[packerInfo.Item1] = packerInfo.Item2;
-			}
-			return new MarkerResult(modules.Select(module => module.Item2).ToList(), packerInfo == null ? null : packerInfo.Item1);
+            //    // Packer parameters are stored in modules
+            //    if (packerInfo != null)
+            //        ProtectionParameters.GetParameters(context, module.Item2)[packerInfo.Item1] = packerInfo.Item2;
+            //}
+            //return new MarkerResult(modules.Select(module => module.Item2).ToList(), packerInfo == null ? null : packerInfo.Item1);
+		    var result = base.MarkProject(proj, context);
+
+		    foreach (var module in result.Modules)
+		    {
+		        MarkModule(proj, context, module);
+		    }
+
+		    return result;
 		}
 
 		private struct ObfuscationAttributeInfo {
@@ -78,56 +86,63 @@ namespace Confuser.CLI {
 
 		private static IEnumerable<ObfuscationAttributeInfo> ReadObfuscationAttributes(IHasCustomAttribute item) {
 			var ret = new List<ObfuscationAttributeInfo>();
-			for (int i = item.CustomAttributes.Count - 1; i >= 0; i--) {
-				var ca = item.CustomAttributes[i];
-				if (ca.TypeFullName != "System.Reflection.ObfuscationAttribute")
-					continue;
+		    if (!item.HasCustomAttributes) return ret;
 
-				var info = new ObfuscationAttributeInfo();
-				bool strip = true;
-				foreach (var prop in ca.Properties) {
-					switch (prop.Name) {
+		    for (int i = item.CustomAttributes.Count - 1; i >= 0; i--)
+		    {
+		        var ca = item.CustomAttributes[i];
+		        if (ca.TypeFullName != "System.Reflection.ObfuscationAttribute")
+		            continue;
 
-						case "ApplyToMembers":
-							Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
-							info.ApplyToMembers = (bool)prop.Value;
-							break;
+		        var info = new ObfuscationAttributeInfo();
+		        bool strip = true;
+		        foreach (var prop in ca.Properties)
+		        {
+		            switch (prop.Name)
+		            {
 
-						case "Exclude":
-							Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
-							info.Exclude = (bool)prop.Value;
-							break;
+		                case "ApplyToMembers":
+		                    Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
+		                    info.ApplyToMembers = (bool) prop.Value;
+		                    break;
 
-						case "StripAfterObfuscation":
-							Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
-							strip = (bool)prop.Value;
-							break;
+		                case "Exclude":
+		                    Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
+		                    info.Exclude = (bool) prop.Value;
+		                    break;
 
-						case "Feature":
-							Debug.Assert(prop.Type.ElementType == ElementType.String);
-							string feature = (UTF8String)prop.Value;
-							int sepIndex = feature.IndexOf(':');
-							if (sepIndex == -1) {
-								info.FeatureName = "";
-								info.FeatureValue = feature;
-							}
-							else {
-								info.FeatureName = feature.Substring(0, sepIndex);
-								info.FeatureValue = feature.Substring(sepIndex + 1);
-							}
-							break;
+		                case "StripAfterObfuscation":
+		                    Debug.Assert(prop.Type.ElementType == ElementType.Boolean);
+		                    strip = (bool) prop.Value;
+		                    break;
 
-						default:
-							throw new NotSupportedException("Unsupported property: " + prop.Name);
-					}
-				}
-				if (strip)
-					item.CustomAttributes.RemoveAt(i);
+		                case "Feature":
+		                    Debug.Assert(prop.Type.ElementType == ElementType.String);
+		                    string feature = (UTF8String) prop.Value;
+		                    int sepIndex = feature.IndexOf(':');
+		                    if (sepIndex == -1)
+		                    {
+		                        info.FeatureName = "";
+		                        info.FeatureValue = feature;
+		                    }
+		                    else
+		                    {
+		                        info.FeatureName = feature.Substring(0, sepIndex);
+		                        info.FeatureValue = feature.Substring(sepIndex + 1);
+		                    }
+		                    break;
 
-				ret.Add(info);
-			}
-			ret.Reverse();
-			return ret;
+		                default:
+		                    throw new NotSupportedException("Unsupported property: " + prop.Name);
+		            }
+		        }
+		        if (strip)
+		            item.CustomAttributes.RemoveAt(i);
+
+		        ret.Add(info);
+		    }
+		    ret.Reverse();
+		    return ret;
 		}
 
 		private static IEnumerable<ProtectionSettingsInfo> ProcessAttributes(IEnumerable<ObfuscationAttributeInfo> attrs) {
@@ -147,36 +162,43 @@ namespace Confuser.CLI {
 			}
 		}
 
-		private void ApplySettings(ConfuserContext context, IDnlibDef def, IEnumerable<ProtectionSettingsInfo> infos) {
-			var settings = new ProtectionSettings();
+		private void ApplySettings(ConfuserContext context, IDnlibDef def, IEnumerable<ProtectionSettingsInfo> infos)
+		{
+		    var infoList = infos.ToList();
+		    if (!infoList.Any()) return;
 
-			ProtectionSettingsInfo? last = null;
-			var parser = new ObfAttrParser(protections);
-			foreach (var info in infos) {
+		    var settings = new ProtectionSettings();
 
-				if (info.Exclude) {
-					if (info.ApplyToMember)
-						settings.Clear();
-					continue;
-				}
+		    ProtectionSettingsInfo? last = null;
+		    var parser = new ObfAttrParser(protections);
+		    foreach (var info in infoList)
+		    {
 
-				last = info;
+		        if (info.Exclude)
+		        {
+		            if (info.ApplyToMember)
+		                settings.Clear();
+		            continue;
+		        }
 
-				if (info.ApplyToMember) {
-					parser.ParseProtectionString(settings, info.Settings);
-				}
-			}
-			if (last != null && !last.Value.ApplyToMember) {
-				parser.ParseProtectionString(settings, last.Value.Settings);
-			}
+		        last = info;
 
-			ProtectionParameters.SetParameters(context, def, settings);
+		        if (info.ApplyToMember)
+		        {
+		            parser.ParseProtectionString(settings, info.Settings);
+		        }
+		    }
+		    if (last != null && !last.Value.ApplyToMember)
+		    {
+		        parser.ParseProtectionString(settings, last.Value.Settings);
+		    }
+
+		    ProtectionParameters.SetParameters(context, def, settings);
 		}
 
 		private static readonly Regex NSPattern = new Regex("namespace '([^']*)'");
 
-		private void MarkModule(ConfuserProject proj, ConfuserContext context, ModuleDefMD module, bool isMain,
-			ref Tuple<Packer, Dictionary<string, string>> packerInfo) {
+		private void MarkModule(ConfuserProject proj, ConfuserContext context, ModuleDefMD module) {
 
 			var settingAttrs = new List<ObfuscationAttributeInfo>();
 			string snKeyPath = null, snKeyPass = null;
@@ -184,19 +206,8 @@ namespace Confuser.CLI {
 
 			foreach (var attr in ReadObfuscationAttributes(module.Assembly)) {
 
-				if (attr.FeatureName.Equals("generate debug symbol", StringComparison.OrdinalIgnoreCase)) {
-					if (!isMain)
-						throw new ArgumentException("Only main module can set 'generate debug symbol'.");
-					proj.Debug = bool.Parse(attr.FeatureValue);
-				}
 				if (proj.Debug) {
 					module.LoadPdb();
-				}
-
-				if (attr.FeatureName.Equals("random seed", StringComparison.OrdinalIgnoreCase)) {
-					if (!isMain)
-						throw new ArgumentException("Only main module can set 'random seed'.");
-					proj.Seed = attr.FeatureValue;
 				}
 
 				else if (attr.FeatureName.Equals("strong name key", StringComparison.OrdinalIgnoreCase)) {
@@ -207,14 +218,6 @@ namespace Confuser.CLI {
 					snKeyPass = attr.FeatureValue;
 				}
 
-				else if (attr.FeatureName.Equals("packer", StringComparison.OrdinalIgnoreCase)) {
-					if (!isMain)
-						throw new ArgumentException("Only main module can set 'packer'.");
-					Packer packer;
-					Dictionary<string, string> packerParams;
-					new ObfAttrParser(packers).ParsePackerString(attr.FeatureValue, out packer, out packerParams);
-					packerInfo = Tuple.Create(packer, packerParams);
-				}
 				else if (attr.FeatureName == "") {
 					settingAttrs.Add(attr);
 				}
@@ -228,8 +231,7 @@ namespace Confuser.CLI {
 					}
 				}
 			}
-
-			ProcessModule(module, context, snKeyPath, snKeyPass, settingAttrs, namespaceAttrs);
+            ProcessModule(module, context, snKeyPath, snKeyPass, settingAttrs, namespaceAttrs);
 		}
 
 		private void ProcessModule(ModuleDefMD module, ConfuserContext context, string snKeyPath, string snKeyPass,
@@ -277,7 +279,7 @@ namespace Confuser.CLI {
 					ProcessMember(prop.GetMethod, context, stack);
 				}
 				if (prop.SetMethod != null) {
-					ProcessMember(prop.GetMethod, context, stack);
+					ProcessMember(prop.SetMethod, context, stack);
 				}
 				foreach (var m in prop.OtherMethods)
 					ProcessMember(m, context, stack);

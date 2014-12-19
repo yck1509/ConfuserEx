@@ -66,8 +66,8 @@ namespace Confuser.CLI {
 					proj.BaseDirectory = Path.GetDirectoryName(files[0]);
 					proj.OutputDirectory = outDir;
 					parameters.Project = proj;
-					parameters.Marker = new ObfAttrMarker();
 				}
+                parameters.Marker = new ObfAttrMarker();
 
 				int retVal = RunProject(parameters);
 
