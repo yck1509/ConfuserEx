@@ -206,9 +206,13 @@ namespace Confuser.Renamer {
 					MethodDef targetMethod = impl.MethodDeclaration.ResolveThrow();
 					if (targetMethod.DeclaringType.IsInterface) {
 						var iface = impl.MethodDeclaration.DeclaringType.ToTypeSig();
+						CheckKeyExist(storage, vTbl.InterfaceSlots, iface, "MethodImpl Iface");
 						var ifaceVTbl = vTbl.InterfaceSlots[iface];
 
-						var targetSlot = ifaceVTbl[VTableSignature.FromMethod(impl.MethodDeclaration)];
+						var signature = VTableSignature.FromMethod(impl.MethodDeclaration);
+						CheckKeyExist(storage, ifaceVTbl, signature, "MethodImpl Iface Sig");
+						var targetSlot = ifaceVTbl[signature];
+
 						// The Overrides of interface slots should directly points to the root interface slot
 						while (targetSlot.Overrides != null)
 							targetSlot = targetSlot.Overrides;
@@ -217,6 +221,7 @@ namespace Confuser.Renamer {
 					}
 					else {
 						var targetSlot = vTbl.AllSlots.Single(slot => slot.MethodDef == targetMethod);
+						CheckKeyExist(storage, vTbl.SlotsMap, targetSlot.Signature, "MethodImpl Normal Sig");
 						targetSlot = vTbl.SlotsMap[targetSlot.Signature];  // Use the most derived slot
 						// Maybe implemented by above processes --- this process should take priority
 						while (targetSlot.MethodDef.DeclaringType == typeDef)
@@ -295,11 +300,27 @@ namespace Confuser.Renamer {
 			}
 		}
 
+		[Conditional("DEBUG")]
+		private static void CheckKeyExist<TKey, TValue>(VTableStorage storage, IDictionary<TKey, TValue> dictionary, TKey key, string name) {
+			if (!dictionary.ContainsKey(key)) {
+				storage.GetLogger().ErrorFormat("{0} not found: {1}", name, key);
+				foreach (var k in dictionary.Keys)
+					storage.GetLogger().ErrorFormat("    {0}", k);
+			}
+		}
 	}
 
 	public class VTableStorage {
-
 		private Dictionary<TypeDef, VTable> storage = new Dictionary<TypeDef, VTable>();
+		private Confuser.Core.ILogger logger;
+
+		public VTableStorage(Confuser.Core.ILogger logger) {
+			this.logger = logger;
+		}
+
+		public Confuser.Core.ILogger GetLogger() {
+			return logger;
+		}
 
 		public VTable this[TypeDef type] {
 			get { return storage.GetValueOrDefault(type, null); }

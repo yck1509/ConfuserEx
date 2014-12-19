@@ -47,12 +47,13 @@ namespace Confuser.Renamer {
 		private readonly ConfuserContext context;
 		private readonly byte[] nameSeed;
 		private readonly RandomGenerator random;
-		private readonly VTableStorage storage = new VTableStorage();
+		private readonly VTableStorage storage;
 		private AnalyzePhase analyze;
 		private readonly Dictionary<string, string> nameDict = new Dictionary<string, string>();
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
+			this.storage = new VTableStorage(context.Logger);
 			random = context.Registry.GetService<IRandomService>().GetRandomGenerator(NameProtection._FullId);
 			nameSeed = random.NextBytes(20);
 
