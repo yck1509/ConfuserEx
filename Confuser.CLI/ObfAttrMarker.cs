@@ -27,6 +27,7 @@ namespace Confuser.CLI {
 			}
 
 			Tuple<Packer, Dictionary<string, string>> packerInfo = null;
+			crossModuleAttrs = new Dictionary<string, Dictionary<string, List<ObfuscationAttributeInfo>>>();
 			foreach (var module in modules) {
 				context.Logger.InfoFormat("Loading '{0}'...", module.Item1.Path);
 
@@ -174,13 +175,18 @@ namespace Confuser.CLI {
 		}
 
 		private static readonly Regex NSPattern = new Regex("namespace '([^']*)'");
+		private static readonly Regex NSInModulePattern = new Regex("namespace '([^']*)' in module '([^'])'");
+		private Dictionary<string, Dictionary<string, List<ObfuscationAttributeInfo>>> crossModuleAttrs;
 
 		private void MarkModule(ConfuserProject proj, ConfuserContext context, ModuleDefMD module, bool isMain,
 			ref Tuple<Packer, Dictionary<string, string>> packerInfo) {
 
 			var settingAttrs = new List<ObfuscationAttributeInfo>();
 			string snKeyPath = null, snKeyPass = null;
-			var namespaceAttrs = new Dictionary<string, List<ObfuscationAttributeInfo>>();
+			Dictionary<string, List<ObfuscationAttributeInfo>> namespaceAttrs;
+			if (!crossModuleAttrs.TryGetValue(module.Name, out namespaceAttrs)) {
+				namespaceAttrs = new Dictionary<string, List<ObfuscationAttributeInfo>>();
+			}
 
 			foreach (var attr in ReadObfuscationAttributes(module.Assembly)) {
 
@@ -219,7 +225,22 @@ namespace Confuser.CLI {
 					settingAttrs.Add(attr);
 				}
 				else {
-					var match = NSPattern.Match(attr.FeatureName);
+					var match = NSInModulePattern.Match(attr.FeatureName);
+					if (match.Success) {
+						if (!isMain)
+							throw new ArgumentException("Only main module can set cross module obfuscation.");
+						string ns = match.Groups[1].Value;
+						string targetModule = match.Groups[2].Value;
+						var x = attr;
+						x.FeatureName = "";
+						Dictionary<string, List<ObfuscationAttributeInfo>> targetModuleAttrs;
+						if (!crossModuleAttrs.TryGetValue(targetModule, out targetModuleAttrs)) {
+							targetModuleAttrs = new Dictionary<string, List<ObfuscationAttributeInfo>>();
+							crossModuleAttrs[targetModule] = targetModuleAttrs;
+						}
+						targetModuleAttrs.AddListEntry(ns, x);
+					}
+					match = NSPattern.Match(attr.FeatureName);
 					if (match.Success) {
 						string ns = match.Groups[1].Value;
 						var x = attr;
