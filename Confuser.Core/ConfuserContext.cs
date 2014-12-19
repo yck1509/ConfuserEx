@@ -58,6 +58,12 @@ namespace Confuser.Core {
 		public IList<ModuleDefMD> Modules { get; internal set; }
 
 		/// <summary>
+		///     Gets the external modules.
+		/// </summary>
+		/// <value>The external modules.</value>
+		public IList<byte[]> ExternalModules { get; internal set; }
+
+		/// <summary>
 		///     Gets the base directory.
 		/// </summary>
 		/// <value>The base directory.</value>

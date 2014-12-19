@@ -82,6 +82,19 @@ namespace Confuser.Protections {
 			}
 		}
 
+		private static string GetFullName(byte[] module) {
+			var md = MetaDataCreator.CreateMetaData(new dnlib.PE.PEImage(module));
+			var assemblyRow = md.TablesStream.ReadAssemblyRow(1);
+			var assembly = new AssemblyNameInfo();
+			assembly.Name = md.StringsStream.ReadNoNull(assemblyRow.Name);
+			assembly.Culture = md.StringsStream.ReadNoNull(assemblyRow.Locale);
+			assembly.PublicKeyOrToken = new PublicKey(md.BlobStream.Read(assemblyRow.PublicKey));
+			assembly.HashAlgId = (AssemblyHashAlgorithm)assemblyRow.HashAlgId;
+			assembly.Version = new Version(assemblyRow.MajorVersion, assemblyRow.MinorVersion, assemblyRow.BuildNumber, assemblyRow.RevisionNumber);
+			assembly.Attributes = (AssemblyAttributes)assemblyRow.Flags;
+			return assembly.FullName;
+		}
+
 		private void PackModules(ConfuserContext context, CompressorContext compCtx, ModuleDef stubModule, ICompressionService comp, RandomGenerator random) {
 			int maxLen = 0;
 			var modules = new Dictionary<string, byte[]>();
@@ -91,6 +104,14 @@ namespace Confuser.Protections {
 
 				string fullName = context.Modules[i].Assembly.FullName;
 				modules.Add(fullName, context.OutputModules[i]);
+
+				int strLen = Encoding.UTF8.GetByteCount(fullName);
+				if (strLen > maxLen)
+					maxLen = strLen;
+			}
+			foreach (var extModule in context.ExternalModules) {
+				var fullName = GetFullName(extModule);
+				modules.Add(fullName, extModule);
 
 				int strLen = Encoding.UTF8.GetByteCount(fullName);
 				if (strLen > maxLen)

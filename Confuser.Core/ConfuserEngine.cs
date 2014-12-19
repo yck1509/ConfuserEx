@@ -128,6 +128,7 @@ namespace Confuser.Core {
 				context.OutputSymbols = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
 				context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToArray();
 				context.Packer = markings.Packer;
+				context.ExternalModules = markings.ExternalModules;
 
 				context.CheckCancellation();
 
