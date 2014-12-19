@@ -51,6 +51,7 @@
       <xs:element name="rule" type="rule" minOccurs="0" maxOccurs="unbounded" />
     </xs:sequence>
     <xs:attribute name="path" type="xs:string" use="required" />
+    <xs:attribute name="external" type="xs:boolean" default="false" />
     <xs:attribute name="snKey" type="xs:string" use="optional" />
     <xs:attribute name="snKeyPass" type="xs:string" use="optional" />
   </xs:complexType>

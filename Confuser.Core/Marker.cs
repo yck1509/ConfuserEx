@@ -113,8 +113,13 @@ namespace Confuser.Core {
 			}
 
 			var modules = new List<Tuple<ProjectModule, ModuleDefMD>>();
+			var extModules = new List<byte[]>();
 			foreach (ProjectModule module in proj) {
-
+				if (module.IsExternal) {
+					extModules.Add(module.LoadRaw(proj.BaseDirectory));
+					continue;
+				}
+				
 				ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
 				context.CheckCancellation();
 
@@ -141,7 +146,7 @@ namespace Confuser.Core {
 				if (packerParams != null)
 					ProtectionParameters.GetParameters(context, module.Item2)[packer] = packerParams;
 			}
-			return new MarkerResult(modules.Select(module => module.Item2).ToList(), packer);
+			return new MarkerResult(modules.Select(module => module.Item2).ToList(), packer, extModules);
 		}
 
 		/// <summary>

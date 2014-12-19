@@ -24,6 +24,11 @@ namespace Confuser.Core.Project {
 		public string Path { get; set; }
 
 		/// <summary>
+		///     Indicates whether this module is external and should not be obfuscated.
+		/// </summary>
+		public bool IsExternal { get; set; }
+
+		/// <summary>
 		///     Gets or sets the path to the strong name private key for signing.
 		/// </summary>
 		/// <value>The path to the strong name private key, or null if not necessary.</value>
@@ -57,6 +62,20 @@ namespace Confuser.Core.Project {
 		}
 
 		/// <summary>
+		///     Read the raw bytes of the module from the path.
+		/// </summary>
+		/// <param name="basePath">
+		///     The base path for the relative module path,
+		///     or null if the module path is absolute or relative to current directory.
+		/// </param>
+		/// <returns>The loaded module.</returns>
+		public byte[] LoadRaw(string basePath) {
+			if (basePath == null)
+				return System.IO.File.ReadAllBytes(Path);
+			return System.IO.File.ReadAllBytes(System.IO.Path.Combine(basePath, Path));
+		}
+
+		/// <summary>
 		///     Saves the module description as XML element.
 		/// </summary>
 		/// <param name="xmlDoc">The root XML document.</param>
@@ -68,6 +87,11 @@ namespace Confuser.Core.Project {
 			nameAttr.Value = Path;
 			elem.Attributes.Append(nameAttr);
 
+			if (IsExternal != false) {
+				XmlAttribute extAttr = xmlDoc.CreateAttribute("external");
+				extAttr.Value = IsExternal.ToString();
+				elem.Attributes.Append(extAttr);
+			}
 			if (SNKeyPath != null) {
 				XmlAttribute snKeyAttr = xmlDoc.CreateAttribute("snKey");
 				snKeyAttr.Value = SNKeyPath;
@@ -92,6 +116,11 @@ namespace Confuser.Core.Project {
 		/// <param name="elem">The serialized module description.</param>
 		internal void Load(XmlElement elem) {
 			Path = elem.Attributes["path"].Value;
+
+			if (elem.Attributes["external"] != null)
+				IsExternal = bool.Parse(elem.Attributes["external"].Value);
+			else
+				IsExternal = false;
 
 			if (elem.Attributes["snKey"] != null)
 				SNKeyPath = elem.Attributes["snKey"].Value.NullIfEmpty();
