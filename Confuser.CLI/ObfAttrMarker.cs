@@ -242,12 +242,14 @@ namespace Confuser.CLI {
 						}
 						targetModuleAttrs.AddListEntry(ns, x);
 					}
-					match = NSPattern.Match(attr.FeatureName);
-					if (match.Success) {
-						var ns = TranslateNamespaceRegex(match.Groups[1].Value);
-						var x = attr;
-						x.FeatureName = "";
-						namespaceAttrs.AddListEntry(ns, x);
+					else {
+						match = NSPattern.Match(attr.FeatureName);
+						if (match.Success) {
+							var ns = TranslateNamespaceRegex(match.Groups[1].Value);
+							var x = attr;
+							x.FeatureName = "";
+							namespaceAttrs.AddListEntry(ns, x);
+						}
 					}
 				}
 			}
