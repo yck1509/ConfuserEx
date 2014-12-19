@@ -277,7 +277,7 @@ namespace Confuser.CLI {
 					ProcessMember(prop.GetMethod, context, stack);
 				}
 				if (prop.SetMethod != null) {
-					ProcessMember(prop.GetMethod, context, stack);
+					ProcessMember(prop.SetMethod, context, stack);
 				}
 				foreach (var m in prop.OtherMethods)
 					ProcessMember(m, context, stack);
