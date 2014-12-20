@@ -145,5 +145,21 @@ namespace ConfuserEx.ViewModel {
 				OnPropertyChanged("Title");
 		}
 
+		protected override void OnPropertyChanged(string property) {
+			base.OnPropertyChanged(property);
+			if (property == "Project")
+				LoadPlugins();
+		}
+
+		private void LoadPlugins() {
+			foreach (var plugin in Project.Plugins) {
+				try {
+					ComponentDiscovery.LoadComponents(Project.Protections, Project.Packers, plugin.Item);
+				}
+				catch {
+					MessageBox.Show("Failed to load plugin '" + plugin + "'.");
+				}
+			}
+		}
 	}
 }
