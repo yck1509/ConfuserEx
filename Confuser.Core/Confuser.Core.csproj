@@ -10,11 +10,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Confuser.Core</RootNamespace>
     <AssemblyName>Confuser.Core</AssemblyName>
-    <TargetFrameworkVersion Condition=" !$(DefineConstants.Contains('NET45')) ">v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition=" !$(DefineConstants.Contains('NET45')) ">v4.0</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition=" $(DefineConstants.Contains('NET45')) ">v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,10 +45,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Threading, Version=1.0.2856.102, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" Condition=" !$(DefineConstants.Contains('NET45')) ">
-      <Private>True</Private>
-      <HintPath>..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -125,7 +122,6 @@
     <Compile Include="Services\MarkerService.cs" />
     <Compile Include="Services\RandomService.cs" />
     <Compile Include="Services\TraceService.cs" />
-    <Compile Include="Tuples.cs" Condition=" !$(DefineConstants.Contains('NET45')) " />
     <Compile Include="UnreachableException.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
@@ -144,7 +140,6 @@
     <None Include="..\ConfuserEx.snk">
       <Link>Properties\ConfuserEx.snk</Link>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

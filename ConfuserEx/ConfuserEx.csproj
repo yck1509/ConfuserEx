@@ -10,8 +10,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ConfuserEx</RootNamespace>
     <AssemblyName>ConfuserEx</AssemblyName>
-    <TargetFrameworkVersion Condition=" !$(DefineConstants.Contains('NET45')) ">v4.0</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition=" $(DefineConstants.Contains('NET45')) ">v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -58,10 +56,6 @@
       <HintPath>..\deps\Ookii.Dialogs.Wpf.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Threading, Version=1.0.2856.102, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" Condition=" !$(DefineConstants.Contains('NET45')) ">
-      <Private>True</Private>
-      <HintPath>..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.4.3.31.1\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -246,18 +240,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="solveAliasProblem">
-    <ConvertToAbsolutePath Paths="..\packages\TaskParallelLibrary.1.0.2856.0\lib\Net35\System.Threading.dll">
-      <Output TaskParameter="AbsolutePaths" PropertyName="FullPathOriginal" />
-    </ConvertToAbsolutePath>
-    <ItemGroup>
-      <ReferencePath Remove="$(FullPathOriginal)" />
-      <ReferencePath Include="$(FullPathOriginal)">
-        <Aliases>PTL</Aliases>
-      </ReferencePath>
-    </ItemGroup>
-  </Target>
-  <PropertyGroup Condition=" !$(DefineConstants.Contains('NET45')) ">
-    <CoreCompileDependsOn>solveAliasProblem;$(PrepareResourcesDependsOn)</CoreCompileDependsOn>
-  </PropertyGroup>
 </Project>
