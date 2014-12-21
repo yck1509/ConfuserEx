@@ -54,10 +54,18 @@ namespace ConfuserEx {
 			}
 
 			public void AddProtection(Info info) {
+				foreach (var comp in protections) {
+					if (comp.Id == info.id)
+						return;
+				}
 				protections.Add(new InfoComponent(info));
 			}
 
 			public void AddPacker(Info info) {
+				foreach (var comp in packers) {
+					if (comp.Id == info.id)
+						return;
+				}
 				packers.Add(new InfoComponent(info));
 			}
 
