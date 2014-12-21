@@ -40,7 +40,7 @@ namespace Confuser.Runtime {
 				int v = s.ReadByte();
 				outSize |= ((long)(byte)v) << (8 * i);
 			}
-			var b = new byte[outSize];
+			var b = new byte[(int)outSize];
 			var z = new MemoryStream(b, true);
 			long compressedSize = s.Length - 13;
 			decoder.Code(s, z, compressedSize, outSize);
