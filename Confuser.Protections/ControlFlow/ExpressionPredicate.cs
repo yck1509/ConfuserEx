@@ -34,7 +34,7 @@ namespace Confuser.Protections.ControlFlow {
 		public void EmitSwitchLoad(IList<Instruction> instrs) {
 			instrs.Add(Instruction.Create(OpCodes.Stloc, stateVar));
 			foreach (Instruction instr in invCompiled)
-				instrs.Add(instr);
+				instrs.Add(instr.Clone());
 		}
 
 		public int GetSwitchKey(int key) {

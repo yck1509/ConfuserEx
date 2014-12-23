@@ -173,7 +173,7 @@ namespace Confuser.Core {
 				ProtectionSettings parameters = ProtectionParameters.GetParameters(context, def);
 				Debug.Assert(parameters != null);
 				if (parameters == null) {
-					context.Logger.ErrorFormat("'{0}' not marked for obfuscation, possibly a bug.");
+					context.Logger.ErrorFormat("'{0}' not marked for obfuscation, possibly a bug.", def);
 					throw new ConfuserException(null);
 				}
 				return parameters.ContainsKey(phase.Parent);

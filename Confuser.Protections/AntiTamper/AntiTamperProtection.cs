@@ -5,8 +5,14 @@ using Confuser.Protections.AntiTamper;
 using dnlib.DotNet;
 
 namespace Confuser.Protections {
+	public interface IAntiTamperService {
+
+		void ExcludeMethod(ConfuserContext context, MethodDef method);
+
+	}
+
 	[BeforeProtection("Ki.ControlFlow"), AfterProtection("Ki.Constants")]
-	internal class AntiTamperProtection : Protection {
+	internal class AntiTamperProtection : Protection, IAntiTamperService {
 
 		public const string _Id = "anti tamper";
 		public const string _FullId = "Ki.AntiTamper";
@@ -34,7 +40,7 @@ namespace Confuser.Protections {
 		}
 
 		protected override void Initialize(ConfuserContext context) {
-			//
+			context.Registry.RegisterService(_ServiceId, typeof(IAntiTamperService), this);
 		}
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {

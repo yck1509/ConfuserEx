@@ -140,6 +140,13 @@ namespace Confuser.Protections.AntiTamper {
 		}
 
 		public void HandleMD(AntiTamperProtection parent, ConfuserContext context, ProtectionParameters parameters) {
+			// move initialization away from module initializer
+			cctorRepl.Body = cctor.Body;
+			cctor.Body = new CilBody();
+			cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, initMethod));
+			cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, cctorRepl));
+			cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
+
 			methods = parameters.Targets.OfType<MethodDef>().Where(method => method.HasBody).ToList();
 			context.CurrentModuleWriterListener.OnWriterEvent += OnWriterEvent;
 		}
@@ -198,13 +205,6 @@ namespace Confuser.Protections.AntiTamper {
 			// create index
 			var bodyIndex = new JITBodyIndex(methods.Select(method => writer.MetaData.GetToken(method).Raw));
 			newSection.Add(bodyIndex, 0x10);
-
-			// move initialization away from module initializer
-			cctorRepl.Body = cctor.Body;
-			cctor.Body = new CilBody();
-			cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, initMethod));
-			cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Call, cctorRepl));
-			cctor.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 
 			// save methods
 			foreach (MethodDef method in methods.WithProgress(context.Logger)) {
