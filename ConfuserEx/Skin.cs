@@ -5,7 +5,6 @@ using System.Windows.Documents;
 
 namespace ConfuserEx {
 	public class Skin {
-
 		public static readonly DependencyProperty EmptyPromptProperty =
 			DependencyProperty.RegisterAttached("EmptyPrompt", typeof(string), typeof(Skin), new UIPropertyMetadata(null));
 
@@ -59,6 +58,5 @@ namespace ConfuserEx {
 		public static void SetRTBDocument(DependencyObject obj, FlowDocument value) {
 			obj.SetValue(RTBDocumentProperty, value);
 		}
-
 	}
 }

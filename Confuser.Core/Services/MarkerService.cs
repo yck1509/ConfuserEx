@@ -3,9 +3,8 @@ using dnlib.DotNet;
 
 namespace Confuser.Core.Services {
 	internal class MarkerService : IMarkerService {
-
-		private readonly ConfuserContext context;
-		private readonly Marker marker;
+		readonly ConfuserContext context;
+		readonly Marker marker;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="MarkerService" /> class.
@@ -33,14 +32,12 @@ namespace Confuser.Core.Services {
 		public bool IsMarked(IDnlibDef def) {
 			return ProtectionParameters.GetParameters(context, def) != null;
 		}
-
 	}
 
 	/// <summary>
 	///     Provides methods to access the obfuscation marker.
 	/// </summary>
 	public interface IMarkerService {
-
 		/// <summary>
 		///     Marks the helper member.
 		/// </summary>
@@ -55,6 +52,5 @@ namespace Confuser.Core.Services {
 		/// <param name="def">The definition.</param>
 		/// <returns><c>true</c> if the specified definition is marked; otherwise, <c>false</c>.</returns>
 		bool IsMarked(IDnlibDef def);
-
 	}
 }

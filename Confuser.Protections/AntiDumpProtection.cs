@@ -11,7 +11,6 @@ using dnlib.DotNet.Emit;
 namespace Confuser.Protections {
 	[BeforeProtection("Ki.ControlFlow")]
 	internal class AntiDumpProtection : Protection {
-
 		public const string _Id = "anti dump";
 		public const string _FullId = "Ki.AntiDump";
 
@@ -43,8 +42,7 @@ namespace Confuser.Protections {
 			pipeline.InsertPreStage(PipelineStage.ProcessModule, new AntiDumpPhase(this));
 		}
 
-		private class AntiDumpPhase : ProtectionPhase {
-
+		class AntiDumpPhase : ProtectionPhase {
 			public AntiDumpPhase(AntiDumpProtection parent)
 				: base(parent) { }
 
@@ -73,8 +71,6 @@ namespace Confuser.Protections {
 						name.MarkHelper(member, marker);
 				}
 			}
-
 		}
-
 	}
 }

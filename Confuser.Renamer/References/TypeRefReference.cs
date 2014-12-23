@@ -4,9 +4,8 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	public class TypeRefReference : INameReference<TypeDef> {
-
-		private readonly TypeDef typeDef;
-		private readonly TypeRef typeRef;
+		readonly TypeDef typeDef;
+		readonly TypeRef typeRef;
 
 		public TypeRefReference(TypeRef typeRef, TypeDef typeDef) {
 			this.typeRef = typeRef;
@@ -22,6 +21,5 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
-
 	}
 }

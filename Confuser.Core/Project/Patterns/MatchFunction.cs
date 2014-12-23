@@ -7,7 +7,6 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that match the full name of the definition with specified RegEx.
 	/// </summary>
 	public class MatchFunction : PatternFunction {
-
 		internal const string FnName = "match";
 
 		/// <inheritdoc />
@@ -25,14 +24,12 @@ namespace Confuser.Core.Project.Patterns {
 			string regex = Arguments[0].Evaluate(definition).ToString();
 			return Regex.IsMatch(definition.FullName, regex);
 		}
-
 	}
 
 	/// <summary>
 	///     A function that match the name of the definition with specified RegEx.
 	/// </summary>
 	public class MatchNameFunction : PatternFunction {
-
 		internal const string FnName = "match-name";
 
 		/// <inheritdoc />
@@ -50,14 +47,12 @@ namespace Confuser.Core.Project.Patterns {
 			string regex = Arguments[0].Evaluate(definition).ToString();
 			return Regex.IsMatch(definition.Name, regex);
 		}
-
 	}
 
 	/// <summary>
 	///     A function that match the name of declaring type with specified RegEx.
 	/// </summary>
 	public class MatchTypeNameFunction : PatternFunction {
-
 		internal const string FnName = "match-type-name";
 
 		/// <inheritdoc />
@@ -82,6 +77,5 @@ namespace Confuser.Core.Project.Patterns {
 			}
 			return false;
 		}
-
 	}
 }

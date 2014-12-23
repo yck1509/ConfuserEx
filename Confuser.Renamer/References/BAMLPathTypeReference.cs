@@ -5,11 +5,10 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class BAMLPathTypeReference : INameReference<TypeDef> {
-
-		private readonly PropertyPathPart attachedDP;
-		private readonly PropertyPathIndexer indexer;
-		private readonly TypeSig sig;
-		private readonly BAMLAnalyzer.XmlNsContext xmlnsCtx;
+		readonly PropertyPathPart attachedDP;
+		readonly PropertyPathIndexer indexer;
+		readonly TypeSig sig;
+		readonly BAMLAnalyzer.XmlNsContext xmlnsCtx;
 
 		public BAMLPathTypeReference(BAMLAnalyzer.XmlNsContext xmlnsCtx, TypeSig sig, PropertyPathIndexer indexer) {
 			this.xmlnsCtx = xmlnsCtx;
@@ -44,6 +43,5 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
-
 	}
 }

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 using Confuser.Core;
 using Confuser.Renamer.BAML;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class CaliburnAnalyzer : IRenamer {
-
 		public CaliburnAnalyzer(WPFAnalyzer wpfAnalyzer) {
 			wpfAnalyzer.AnalyzeBAMLElement += AnalyzeBAMLElement;
 		}
@@ -34,7 +32,7 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		private void AnalyzeBAMLElement(BAMLAnalyzer analyzer, BamlElement elem) {
+		void AnalyzeBAMLElement(BAMLAnalyzer analyzer, BamlElement elem) {
 			foreach (var rec in elem.Body) {
 				var prop = rec as PropertyWithConverterRecord;
 				if (prop == null)
@@ -58,7 +56,7 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		private void AnalyzeMessageAttach(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
+		void AnalyzeMessageAttach(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
 			if (attr.Item2 == null)
 				return;
 			var attrDeclType = analyzer.ResolveType(attr.Item2.OwnerTypeId);
@@ -85,7 +83,7 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		private void AnalyzeAutoBind(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
+		void AnalyzeAutoBind(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
 			if (!(attr.Item1 is PropertyDef) || ((PropertyDef)attr.Item1).DeclaringType.FullName != "System.Windows.FrameworkElement")
 				return;
 
@@ -95,9 +93,9 @@ namespace Confuser.Renamer.Analyzers {
 				analyzer.NameService.SetCanRename(method, false);
 		}
 
-		private void AnalyzeActionMessage(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
+		void AnalyzeActionMessage(BAMLAnalyzer analyzer, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> attr, string value) {
 			if (attr.Item2 == null)
-				return; 
+				return;
 			var attrDeclType = analyzer.ResolveType(attr.Item2.OwnerTypeId);
 			if (attrDeclType.FullName != "Caliburn.Micro.ActionMessage")
 				return;

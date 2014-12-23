@@ -5,14 +5,11 @@ using System.Text;
 
 namespace Confuser.Renamer.BAML {
 	internal class PropertyPathIndexer {
-
 		public string Type { get; set; }
 		public string Value { get; set; }
-
 	}
 
 	internal class PropertyPathPart {
-
 		public PropertyPathPart(bool isIndexer, bool? isHiera, string name) {
 			IsIndexer = isIndexer;
 			IsHierarchical = isHiera;
@@ -43,21 +40,19 @@ namespace Confuser.Renamer.BAML {
 				property = name.Substring(dot + 1).Trim();
 			}
 		}
-
 	}
 
 	internal class PropertyPath {
-
 		// See: MS.Internal.Data.PathParser
 
-		private static readonly char[] SpecialChars = {
+		static readonly char[] SpecialChars = {
 			'.',
 			'/',
 			'[',
 			']'
 		};
 
-		private readonly PropertyPathPart[] parts;
+		readonly PropertyPathPart[] parts;
 
 		public PropertyPath(string path) {
 			parts = Parse(path);
@@ -67,7 +62,7 @@ namespace Confuser.Renamer.BAML {
 			get { return parts; }
 		}
 
-		private static PropertyPathPart ReadIndexer(string path, ref int index, bool? isHiera) {
+		static PropertyPathPart ReadIndexer(string path, ref int index, bool? isHiera) {
 			index++;
 
 			var args = new List<PropertyPathIndexer>();
@@ -169,7 +164,7 @@ namespace Confuser.Renamer.BAML {
 			};
 		}
 
-		private static PropertyPathPart ReadProperty(string path, ref int index, bool? isHiera) {
+		static PropertyPathPart ReadProperty(string path, ref int index, bool? isHiera) {
 			int begin = index;
 			while (index < path.Length && path[index] == '.')
 				index++;
@@ -190,7 +185,7 @@ namespace Confuser.Renamer.BAML {
 			return new PropertyPathPart(false, isHiera, name);
 		}
 
-		private static PropertyPathPart[] Parse(string path) {
+		static PropertyPathPart[] Parse(string path) {
 			if (string.IsNullOrEmpty(path))
 				return new[] { new PropertyPathPart(true, null, "") };
 
@@ -262,6 +257,5 @@ namespace Confuser.Renamer.BAML {
 			}
 			return ret.ToString();
 		}
-
 	}
 }

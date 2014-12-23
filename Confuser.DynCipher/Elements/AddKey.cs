@@ -5,7 +5,6 @@ using Confuser.DynCipher.Generation;
 
 namespace Confuser.DynCipher.Elements {
 	internal class AddKey : CryptoElement {
-
 		public AddKey(int index)
 			: base(0) {
 			Index = index;
@@ -15,7 +14,7 @@ namespace Confuser.DynCipher.Elements {
 
 		public override void Initialize(RandomGenerator random) { }
 
-		private void EmitCore(CipherGenContext context) {
+		void EmitCore(CipherGenContext context) {
 			Expression val = context.GetDataExpression(Index);
 
 			context.Emit(new AssignmentStatement {
@@ -31,6 +30,5 @@ namespace Confuser.DynCipher.Elements {
 		public override void EmitInverse(CipherGenContext context) {
 			EmitCore(context);
 		}
-
 	}
 }

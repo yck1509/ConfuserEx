@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -7,15 +8,13 @@ using System.Windows.Media;
 using Confuser.Core;
 using Confuser.Core.Project;
 using GalaSoft.MvvmLight.Command;
-using System.Threading;
 
 namespace ConfuserEx.ViewModel {
 	internal class ProtectTabVM : TabViewModel, ILogger {
-
-		private readonly Paragraph documentContent;
-		private CancellationTokenSource cancelSrc;
-		private double? progress = 0;
-		private bool? result;
+		readonly Paragraph documentContent;
+		CancellationTokenSource cancelSrc;
+		double? progress = 0;
+		bool? result;
 
 		public ProtectTabVM(AppVM app)
 			: base(app, "Protect!") {
@@ -44,7 +43,7 @@ namespace ConfuserEx.ViewModel {
 			set { SetProperty(ref result, value, "Result"); }
 		}
 
-		private void DoProtect() {
+		void DoProtect() {
 			var parameters = new ConfuserParameters();
 			parameters.Project = ((IViewModel<ConfuserProject>)App.Project).Model;
 			if (File.Exists(App.FileName))
@@ -67,11 +66,11 @@ namespace ConfuserEx.ViewModel {
 			                            })));
 		}
 
-		private void DoCancel() {
+		void DoCancel() {
 			cancelSrc.Cancel();
 		}
 
-		private void AppendLine(string format, Brush foreground, params object[] args) {
+		void AppendLine(string format, Brush foreground, params object[] args) {
 			Application.Current.Dispatcher.BeginInvoke(new Action(() => {
 				documentContent.Inlines.Add(new Run(string.Format(format, args)) { Foreground = foreground });
 				documentContent.Inlines.Add(new LineBreak());
@@ -80,7 +79,7 @@ namespace ConfuserEx.ViewModel {
 
 		#region Logger Impl
 
-		private DateTime begin;
+		DateTime begin;
 
 		void ILogger.Debug(string msg) {
 			AppendLine("[DEBUG] {0}", Brushes.Gray, msg);

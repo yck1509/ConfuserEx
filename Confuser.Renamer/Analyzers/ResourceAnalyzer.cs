@@ -7,8 +7,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class ResourceAnalyzer : IRenamer {
-
-		private static readonly Regex ResourceNamePattern = new Regex("^(.*)\\.resources$");
+		static readonly Regex ResourceNamePattern = new Regex("^(.*)\\.resources$");
 
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
 			var module = def as ModuleDef;
@@ -68,6 +67,5 @@ namespace Confuser.Renamer.Analyzers {
 		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
 			//
 		}
-
 	}
 }

@@ -3,31 +3,30 @@ using System.IO;
 
 namespace Confuser.Runtime {
 	internal static class Lzma {
+		const uint kNumStates = 12;
 
-		private const uint kNumStates = 12;
+		const int kNumPosSlotBits = 6;
 
-		private const int kNumPosSlotBits = 6;
+		const uint kNumLenToPosStates = 4;
 
-		private const uint kNumLenToPosStates = 4;
+		const uint kMatchMinLen = 2;
 
-		private const uint kMatchMinLen = 2;
+		const int kNumAlignBits = 4;
+		const uint kAlignTableSize = 1 << kNumAlignBits;
 
-		private const int kNumAlignBits = 4;
-		private const uint kAlignTableSize = 1 << kNumAlignBits;
+		const uint kStartPosModelIndex = 4;
+		const uint kEndPosModelIndex = 14;
 
-		private const uint kStartPosModelIndex = 4;
-		private const uint kEndPosModelIndex = 14;
+		const uint kNumFullDistances = 1 << ((int)kEndPosModelIndex / 2);
 
-		private const uint kNumFullDistances = 1 << ((int)kEndPosModelIndex / 2);
+		const int kNumPosStatesBitsMax = 4;
+		const uint kNumPosStatesMax = (1 << kNumPosStatesBitsMax);
 
-		private const int kNumPosStatesBitsMax = 4;
-		private const uint kNumPosStatesMax = (1 << kNumPosStatesBitsMax);
-
-		private const int kNumLowLenBits = 3;
-		private const int kNumMidLenBits = 3;
-		private const int kNumHighLenBits = 8;
-		private const uint kNumLowLenSymbols = 1 << kNumLowLenBits;
-		private const uint kNumMidLenSymbols = 1 << kNumMidLenBits;
+		const int kNumLowLenBits = 3;
+		const int kNumMidLenBits = 3;
+		const int kNumHighLenBits = 8;
+		const uint kNumLowLenSymbols = 1 << kNumLowLenBits;
+		const uint kNumMidLenSymbols = 1 << kNumMidLenBits;
 
 		public static byte[] Decompress(byte[] data) {
 			var s = new MemoryStream(data);
@@ -47,13 +46,12 @@ namespace Confuser.Runtime {
 			return b;
 		}
 
-		private struct BitDecoder {
-
+		struct BitDecoder {
 			public const int kNumBitModelTotalBits = 11;
 			public const uint kBitModelTotal = (1 << kNumBitModelTotalBits);
-			private const int kNumMoveBits = 5;
+			const int kNumMoveBits = 5;
 
-			private uint Prob;
+			uint Prob;
 
 			public void Init() {
 				Prob = kBitModelTotal >> 1;
@@ -79,13 +77,11 @@ namespace Confuser.Runtime {
 				}
 				return 1;
 			}
-
 		}
 
-		private struct BitTreeDecoder {
-
-			private readonly BitDecoder[] Models;
-			private readonly int NumBitLevels;
+		struct BitTreeDecoder {
+			readonly BitDecoder[] Models;
+			readonly int NumBitLevels;
 
 			public BitTreeDecoder(int numBitLevels) {
 				NumBitLevels = numBitLevels;
@@ -128,11 +124,9 @@ namespace Confuser.Runtime {
 				}
 				return symbol;
 			}
-
 		}
 
-		private class Decoder {
-
+		class Decoder {
 			public const uint kTopValue = (1 << 24);
 			public uint Code;
 			public uint Range;
@@ -186,33 +180,31 @@ namespace Confuser.Runtime {
 				Code = code;
 				return result;
 			}
-
 		}
 
-		private class LzmaDecoder {
+		class LzmaDecoder {
+			readonly BitDecoder[] m_IsMatchDecoders = new BitDecoder[kNumStates << kNumPosStatesBitsMax];
+			readonly BitDecoder[] m_IsRep0LongDecoders = new BitDecoder[kNumStates << kNumPosStatesBitsMax];
+			readonly BitDecoder[] m_IsRepDecoders = new BitDecoder[kNumStates];
+			readonly BitDecoder[] m_IsRepG0Decoders = new BitDecoder[kNumStates];
+			readonly BitDecoder[] m_IsRepG1Decoders = new BitDecoder[kNumStates];
+			readonly BitDecoder[] m_IsRepG2Decoders = new BitDecoder[kNumStates];
 
-			private readonly BitDecoder[] m_IsMatchDecoders = new BitDecoder[kNumStates << kNumPosStatesBitsMax];
-			private readonly BitDecoder[] m_IsRep0LongDecoders = new BitDecoder[kNumStates << kNumPosStatesBitsMax];
-			private readonly BitDecoder[] m_IsRepDecoders = new BitDecoder[kNumStates];
-			private readonly BitDecoder[] m_IsRepG0Decoders = new BitDecoder[kNumStates];
-			private readonly BitDecoder[] m_IsRepG1Decoders = new BitDecoder[kNumStates];
-			private readonly BitDecoder[] m_IsRepG2Decoders = new BitDecoder[kNumStates];
+			readonly LenDecoder m_LenDecoder = new LenDecoder();
 
-			private readonly LenDecoder m_LenDecoder = new LenDecoder();
+			readonly LiteralDecoder m_LiteralDecoder = new LiteralDecoder();
+			readonly OutWindow m_OutWindow = new OutWindow();
+			readonly BitDecoder[] m_PosDecoders = new BitDecoder[kNumFullDistances - kEndPosModelIndex];
+			readonly BitTreeDecoder[] m_PosSlotDecoder = new BitTreeDecoder[kNumLenToPosStates];
+			readonly Decoder m_RangeDecoder = new Decoder();
+			readonly LenDecoder m_RepLenDecoder = new LenDecoder();
+			bool _solid = false;
 
-			private readonly LiteralDecoder m_LiteralDecoder = new LiteralDecoder();
-			private readonly OutWindow m_OutWindow = new OutWindow();
-			private readonly BitDecoder[] m_PosDecoders = new BitDecoder[kNumFullDistances - kEndPosModelIndex];
-			private readonly BitTreeDecoder[] m_PosSlotDecoder = new BitTreeDecoder[kNumLenToPosStates];
-			private readonly Decoder m_RangeDecoder = new Decoder();
-			private readonly LenDecoder m_RepLenDecoder = new LenDecoder();
-			private bool _solid = false;
+			uint m_DictionarySize;
+			uint m_DictionarySizeCheck;
+			BitTreeDecoder m_PosAlignDecoder = new BitTreeDecoder(kNumAlignBits);
 
-			private uint m_DictionarySize;
-			private uint m_DictionarySizeCheck;
-			private BitTreeDecoder m_PosAlignDecoder = new BitTreeDecoder(kNumAlignBits);
-
-			private uint m_PosStateMask;
+			uint m_PosStateMask;
 
 			public LzmaDecoder() {
 				m_DictionarySize = 0xFFFFFFFF;
@@ -220,7 +212,7 @@ namespace Confuser.Runtime {
 					m_PosSlotDecoder[i] = new BitTreeDecoder(kNumPosSlotBits);
 			}
 
-			private void SetDictionarySize(uint dictionarySize) {
+			void SetDictionarySize(uint dictionarySize) {
 				if (m_DictionarySize != dictionarySize) {
 					m_DictionarySize = dictionarySize;
 					m_DictionarySizeCheck = Math.Max(m_DictionarySize, 1);
@@ -229,18 +221,18 @@ namespace Confuser.Runtime {
 				}
 			}
 
-			private void SetLiteralProperties(int lp, int lc) {
+			void SetLiteralProperties(int lp, int lc) {
 				m_LiteralDecoder.Create(lp, lc);
 			}
 
-			private void SetPosBitsProperties(int pb) {
+			void SetPosBitsProperties(int pb) {
 				uint numPosStates = (uint)1 << pb;
 				m_LenDecoder.Create(numPosStates);
 				m_RepLenDecoder.Create(numPosStates);
 				m_PosStateMask = numPosStates - 1;
 			}
 
-			private void Init(Stream inStream, Stream outStream) {
+			void Init(Stream inStream, Stream outStream) {
 				m_RangeDecoder.Init(inStream);
 				m_OutWindow.Init(outStream, _solid);
 
@@ -383,21 +375,20 @@ namespace Confuser.Runtime {
 				SetPosBitsProperties(pb);
 			}
 
-			private static uint GetLenToPosState(uint len) {
+			static uint GetLenToPosState(uint len) {
 				len -= kMatchMinLen;
 				if (len < kNumLenToPosStates)
 					return len;
 				return unchecked((kNumLenToPosStates - 1));
 			}
 
-			private class LenDecoder {
-
-				private readonly BitTreeDecoder[] m_LowCoder = new BitTreeDecoder[kNumPosStatesMax];
-				private readonly BitTreeDecoder[] m_MidCoder = new BitTreeDecoder[kNumPosStatesMax];
-				private BitDecoder m_Choice = new BitDecoder();
-				private BitDecoder m_Choice2 = new BitDecoder();
-				private BitTreeDecoder m_HighCoder = new BitTreeDecoder(kNumHighLenBits);
-				private uint m_NumPosStates;
+			class LenDecoder {
+				readonly BitTreeDecoder[] m_LowCoder = new BitTreeDecoder[kNumPosStatesMax];
+				readonly BitTreeDecoder[] m_MidCoder = new BitTreeDecoder[kNumPosStatesMax];
+				BitDecoder m_Choice = new BitDecoder();
+				BitDecoder m_Choice2 = new BitDecoder();
+				BitTreeDecoder m_HighCoder = new BitTreeDecoder(kNumHighLenBits);
+				uint m_NumPosStates;
 
 				public void Create(uint numPosStates) {
 					for (uint posState = m_NumPosStates; posState < numPosStates; posState++) {
@@ -429,15 +420,13 @@ namespace Confuser.Runtime {
 					}
 					return symbol;
 				}
-
 			}
 
-			private class LiteralDecoder {
-
-				private Decoder2[] m_Coders;
-				private int m_NumPosBits;
-				private int m_NumPrevBits;
-				private uint m_PosMask;
+			class LiteralDecoder {
+				Decoder2[] m_Coders;
+				int m_NumPosBits;
+				int m_NumPrevBits;
+				uint m_PosMask;
 
 				public void Create(int numPosBits, int numPrevBits) {
 					if (m_Coders != null && m_NumPrevBits == numPrevBits &&
@@ -458,7 +447,7 @@ namespace Confuser.Runtime {
 						m_Coders[i].Init();
 				}
 
-				private uint GetState(uint pos, byte prevByte) {
+				uint GetState(uint pos, byte prevByte) {
 					return ((pos & m_PosMask) << m_NumPrevBits) + (uint)(prevByte >> (8 - m_NumPrevBits));
 				}
 
@@ -470,9 +459,8 @@ namespace Confuser.Runtime {
 					return m_Coders[GetState(pos, prevByte)].DecodeWithMatchByte(rangeDecoder, matchByte);
 				}
 
-				private struct Decoder2 {
-
-					private BitDecoder[] m_Decoders;
+				struct Decoder2 {
+					BitDecoder[] m_Decoders;
 
 					public void Create() {
 						m_Decoders = new BitDecoder[0x300];
@@ -504,20 +492,16 @@ namespace Confuser.Runtime {
 						} while (symbol < 0x100);
 						return (byte)symbol;
 					}
-
 				}
-
 			};
-
 		}
 
-		private class OutWindow {
-
-			private byte[] _buffer;
-			private uint _pos;
-			private Stream _stream;
-			private uint _streamPos;
-			private uint _windowSize;
+		class OutWindow {
+			byte[] _buffer;
+			uint _pos;
+			Stream _stream;
+			uint _streamPos;
+			uint _windowSize;
 
 			public void Create(uint windowSize) {
 				if (_windowSize != windowSize) {
@@ -578,11 +562,9 @@ namespace Confuser.Runtime {
 					pos += _windowSize;
 				return _buffer[pos];
 			}
-
 		}
 
-		private struct State {
-
+		struct State {
 			public uint Index;
 
 			public void Init() {
@@ -610,8 +592,6 @@ namespace Confuser.Runtime {
 			public bool IsCharState() {
 				return Index < 7;
 			}
-
 		}
-
 	}
 }

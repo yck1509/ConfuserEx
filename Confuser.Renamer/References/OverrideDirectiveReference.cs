@@ -5,9 +5,8 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class OverrideDirectiveReference : INameReference<MethodDef> {
-
-		private readonly VTableSlot baseSlot;
-		private readonly VTableSlot thisSlot;
+		readonly VTableSlot baseSlot;
+		readonly VTableSlot thisSlot;
 
 		public OverrideDirectiveReference(VTableSlot thisSlot, VTableSlot baseSlot) {
 			this.thisSlot = thisSlot;
@@ -44,6 +43,5 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
-
 	}
 }

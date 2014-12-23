@@ -6,7 +6,6 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class LdtokenEnumAnalyzer : IRenamer {
-
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
 			var method = def as MethodDef;
 			if (method == null || !method.HasBody)
@@ -68,7 +67,7 @@ namespace Confuser.Renamer.Analyzers {
 			//
 		}
 
-		private void HandleEnum(ConfuserContext context, INameService service, MethodDef method, int index) {
+		void HandleEnum(ConfuserContext context, INameService service, MethodDef method, int index) {
 			var target = (IMethod)method.Body.Instructions[index].Operand;
 			if (target.FullName == "System.String System.Object::ToString()" ||
 			    target.FullName == "System.String System.Enum::ToString(System.String)") {
@@ -114,7 +113,7 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		private bool HandleTypeOf(ConfuserContext context, INameService service, MethodDef method, int index) {
+		bool HandleTypeOf(ConfuserContext context, INameService service, MethodDef method, int index) {
 			if (index + 1 >= method.Body.Instructions.Count)
 				return true;
 
@@ -160,7 +159,7 @@ namespace Confuser.Renamer.Analyzers {
 			return true;
 		}
 
-		private void DisableRename(INameService service, TypeDef typeDef, bool memberOnly = true) {
+		void DisableRename(INameService service, TypeDef typeDef, bool memberOnly = true) {
 			service.SetCanRename(typeDef, false);
 
 			foreach (MethodDef m in typeDef.Methods)
@@ -178,6 +177,5 @@ namespace Confuser.Renamer.Analyzers {
 			foreach (TypeDef nested in typeDef.NestedTypes)
 				DisableRename(service, nested, false);
 		}
-
 	}
 }

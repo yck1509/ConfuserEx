@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using Confuser.Core;
 using dnlib.DotNet;
+using ILogger = Confuser.Core.ILogger;
 
 namespace Confuser.Renamer {
 	public class VTableSignature {
-
 		internal VTableSignature(MethodSig sig, string name) {
 			MethodSig = sig;
 			Name = name;
@@ -30,7 +30,7 @@ namespace Confuser.Renamer {
 			if (other == null)
 				return false;
 			return new SigComparer().Equals(MethodSig, other.MethodSig) &&
-				Name.Equals(other.Name, StringComparison.Ordinal);
+			       Name.Equals(other.Name, StringComparison.Ordinal);
 		}
 
 		public override int GetHashCode() {
@@ -55,14 +55,11 @@ namespace Confuser.Renamer {
 		public override string ToString() {
 			return FullNameCreator.MethodFullName("", Name, MethodSig);
 		}
-
 	}
 
 	public class VTableSlot {
-
 		internal VTableSlot(MethodDef def, TypeSig decl, VTableSignature signature)
-			: this(def.DeclaringType.ToTypeSig(), def, decl, signature, null) {
-		}
+			: this(def.DeclaringType.ToTypeSig(), def, decl, signature, null) { }
 
 		internal VTableSlot(TypeSig defDeclType, MethodDef def, TypeSig decl, VTableSignature signature, VTableSlot overrides) {
 			MethodDefDeclType = defDeclType;
@@ -95,11 +92,9 @@ namespace Confuser.Renamer {
 		public override string ToString() {
 			return MethodDef.ToString();
 		}
-
 	}
 
 	public class VTable {
-
 		internal VTable(TypeSig type) {
 			Type = type;
 			Slots = new List<VTableSlot>();
@@ -141,10 +136,10 @@ namespace Confuser.Renamer {
 			var ret = new VTable(typeDef.ToTypeSig());
 
 			var virtualMethods = typeDef.Methods
-				.Where(method => method.IsVirtual)
-				.ToDictionary(
-					method => VTableSignature.FromMethod(method),
-					method => method
+			                            .Where(method => method.IsVirtual)
+			                            .ToDictionary(
+				                            method => VTableSignature.FromMethod(method),
+				                            method => method
 				);
 
 			// See Partition II 12.2 for implementation algorithm
@@ -222,7 +217,7 @@ namespace Confuser.Renamer {
 					else {
 						var targetSlot = vTbl.AllSlots.Single(slot => slot.MethodDef == targetMethod);
 						CheckKeyExist(storage, vTbl.SlotsMap, targetSlot.Signature, "MethodImpl Normal Sig");
-						targetSlot = vTbl.SlotsMap[targetSlot.Signature];  // Use the most derived slot
+						targetSlot = vTbl.SlotsMap[targetSlot.Signature]; // Use the most derived slot
 						// Maybe implemented by above processes --- this process should take priority
 						while (targetSlot.MethodDef.DeclaringType == typeDef)
 							targetSlot = targetSlot.Overrides;
@@ -242,13 +237,13 @@ namespace Confuser.Renamer {
 			return ret;
 		}
 
-		private static void Implements(VTableConstruction vTbl, Dictionary<VTableSignature, MethodDef> virtualMethods, VTable ifaceVTbl, TypeSig iface) {
+		static void Implements(VTableConstruction vTbl, Dictionary<VTableSignature, MethodDef> virtualMethods, VTable ifaceVTbl, TypeSig iface) {
 			// This is the step 2 of 12.2 algorithm -- use virtual newslot methods for explicit implementation.
 
 			Func<VTableSlot, VTableSlot> implLookup = slot => {
 				MethodDef impl;
 				if (virtualMethods.TryGetValue(slot.Signature, out impl) &&
-					impl.IsNewSlot) {
+				    impl.IsNewSlot) {
 					// The Overrides of interface slots should directly points to the root interface slot
 					var targetSlot = slot;
 					while (targetSlot.Overrides != null && !targetSlot.MethodDef.DeclaringType.IsInterface)
@@ -280,7 +275,7 @@ namespace Confuser.Renamer {
 			}
 		}
 
-		private static void Inherits(VTableConstruction vTbl, VTable baseVTbl) {
+		static void Inherits(VTableConstruction vTbl, VTable baseVTbl) {
 			foreach (VTableSlot slot in baseVTbl.Slots) {
 				vTbl.AllSlots.Add(slot);
 				// It's possible to have same signature in multiple slots,
@@ -301,7 +296,7 @@ namespace Confuser.Renamer {
 		}
 
 		[Conditional("DEBUG")]
-		private static void CheckKeyExist<TKey, TValue>(VTableStorage storage, IDictionary<TKey, TValue> dictionary, TKey key, string name) {
+		static void CheckKeyExist<TKey, TValue>(VTableStorage storage, IDictionary<TKey, TValue> dictionary, TKey key, string name) {
 			if (!dictionary.ContainsKey(key)) {
 				storage.GetLogger().ErrorFormat("{0} not found: {1}", name, key);
 				foreach (var k in dictionary.Keys)
@@ -311,14 +306,14 @@ namespace Confuser.Renamer {
 	}
 
 	public class VTableStorage {
-		private Dictionary<TypeDef, VTable> storage = new Dictionary<TypeDef, VTable>();
-		private Confuser.Core.ILogger logger;
+		Dictionary<TypeDef, VTable> storage = new Dictionary<TypeDef, VTable>();
+		ILogger logger;
 
-		public VTableStorage(Confuser.Core.ILogger logger) {
+		public VTableStorage(ILogger logger) {
 			this.logger = logger;
 		}
 
-		public Confuser.Core.ILogger GetLogger() {
+		public ILogger GetLogger() {
 			return logger;
 		}
 
@@ -327,7 +322,7 @@ namespace Confuser.Renamer {
 			internal set { storage[type] = value; }
 		}
 
-		private VTable GetOrConstruct(TypeDef type) {
+		VTable GetOrConstruct(TypeDef type) {
 			VTable ret;
 			if (!storage.TryGetValue(type, out ret))
 				ret = storage[type] = VTable.ConstructVTable(type, this);
@@ -339,29 +334,27 @@ namespace Confuser.Renamer {
 				return null;
 			if (type is TypeDef)
 				return GetOrConstruct((TypeDef)type);
-			else if (type is TypeRef)
+			if (type is TypeRef)
 				return GetOrConstruct(((TypeRef)type).ResolveThrow());
-			else if (type is TypeSpec) {
+			if (type is TypeSpec) {
 				TypeSig sig = ((TypeSpec)type).TypeSig;
 				if (sig is TypeDefOrRefSig) {
 					TypeDef typeDef = ((TypeDefOrRefSig)sig).TypeDefOrRef.ResolveTypeDefThrow();
 					return GetOrConstruct(typeDef);
 				}
-				else if (sig is GenericInstSig) {
+				if (sig is GenericInstSig) {
 					var genInst = (GenericInstSig)sig;
 					TypeDef openType = genInst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
 					VTable vTable = GetOrConstruct(openType);
 
 					return ResolveGenericArgument(openType, genInst, vTable);
 				}
-				else
-					throw new NotSupportedException("Unexpected type: " + type.ToString());
+				throw new NotSupportedException("Unexpected type: " + type);
 			}
-			else
-				throw new UnreachableException();
+			throw new UnreachableException();
 		}
 
-		private static VTableSlot ResolveSlot(TypeDef openType, VTableSlot slot, IList<TypeSig> genArgs) {
+		static VTableSlot ResolveSlot(TypeDef openType, VTableSlot slot, IList<TypeSig> genArgs) {
 			var newSig = GenericArgumentResolver.Resolve(slot.Signature.MethodSig, genArgs);
 			TypeSig newDecl = slot.MethodDefDeclType;
 			if (new SigComparer().Equals(newDecl, openType))
@@ -371,7 +364,7 @@ namespace Confuser.Renamer {
 			return new VTableSlot(newDecl, slot.MethodDef, slot.DeclaringType, new VTableSignature(newSig, slot.Signature.Name), slot.Overrides);
 		}
 
-		private static VTable ResolveGenericArgument(TypeDef openType, GenericInstSig genInst, VTable vTable) {
+		static VTable ResolveGenericArgument(TypeDef openType, GenericInstSig genInst, VTable vTable) {
 			Debug.Assert(new SigComparer().Equals(openType, vTable.Type));
 			var ret = new VTable(genInst);
 			foreach (VTableSlot slot in vTable.Slots) {
@@ -379,10 +372,9 @@ namespace Confuser.Renamer {
 			}
 			foreach (var iface in vTable.InterfaceSlots) {
 				ret.InterfaceSlots.Add(GenericArgumentResolver.Resolve(iface.Key, genInst.GenericArguments),
-					iface.Value.Select(slot => ResolveSlot(openType, slot, genInst.GenericArguments)).ToList());
+				                       iface.Value.Select(slot => ResolveSlot(openType, slot, genInst.GenericArguments)).ToList());
 			}
 			return ret;
 		}
-
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
@@ -10,7 +11,6 @@ namespace Confuser.Core.Project {
 	///     A module description in a Confuser project.
 	/// </summary>
 	public class ProjectModule {
-
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProjectModule" /> class.
 		/// </summary>
@@ -71,8 +71,8 @@ namespace Confuser.Core.Project {
 		/// <returns>The loaded module.</returns>
 		public byte[] LoadRaw(string basePath) {
 			if (basePath == null)
-				return System.IO.File.ReadAllBytes(Path);
-			return System.IO.File.ReadAllBytes(System.IO.Path.Combine(basePath, Path));
+				return File.ReadAllBytes(Path);
+			return File.ReadAllBytes(System.IO.Path.Combine(basePath, Path));
 		}
 
 		/// <summary>
@@ -87,7 +87,7 @@ namespace Confuser.Core.Project {
 			nameAttr.Value = Path;
 			elem.Attributes.Append(nameAttr);
 
-			if (IsExternal != false) {
+			if (IsExternal) {
 				XmlAttribute extAttr = xmlDoc.CreateAttribute("external");
 				extAttr.Value = IsExternal.ToString();
 				elem.Attributes.Append(extAttr);
@@ -147,14 +147,12 @@ namespace Confuser.Core.Project {
 		public override string ToString() {
 			return Path;
 		}
-
 	}
 
 	/// <summary>
 	///     Indicates add or remove the protection from the active protections
 	/// </summary>
 	public enum SettingItemAction {
-
 		/// <summary>
 		///     Add the protection to the active protections
 		/// </summary>
@@ -164,7 +162,6 @@ namespace Confuser.Core.Project {
 		///     Remove the protection from the active protections
 		/// </summary>
 		Remove
-
 	}
 
 	/// <summary>
@@ -172,7 +169,6 @@ namespace Confuser.Core.Project {
 	/// </summary>
 	/// <typeparam name="T"><see cref="Protection" /> or <see cref="Packer" /></typeparam>
 	public class SettingItem<T> : Dictionary<string, string> {
-
 		/// <summary>
 		///     The identifier of component
 		/// </summary>
@@ -236,7 +232,6 @@ namespace Confuser.Core.Project {
 			foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>())
 				Add(i.Attributes["name"].Value, i.Attributes["value"].Value);
 		}
-
 	}
 
 
@@ -244,7 +239,6 @@ namespace Confuser.Core.Project {
 	///     A rule that control how <see cref="Protection" />s are applied to module
 	/// </summary>
 	public class Rule : List<SettingItem<Protection>> {
-
 		/// <summary>
 		///     Gets or sets the pattern that determine the target components of the rule.
 		/// </summary>
@@ -338,14 +332,12 @@ namespace Confuser.Core.Project {
 			}
 			return ret;
 		}
-
 	}
 
 	/// <summary>
 	///     The exception that is thrown when there exists schema errors in the project XML.
 	/// </summary>
 	public class ProjectValidationException : Exception {
-
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProjectValidationException" /> class.
 		/// </summary>
@@ -360,14 +352,12 @@ namespace Confuser.Core.Project {
 		/// </summary>
 		/// <value>A list of schema exceptions.</value>
 		public IList<XmlSchemaException> Errors { get; private set; }
-
 	}
 
 	/// <summary>
 	///     Represent a project of Confuser.
 	/// </summary>
 	public class ConfuserProject : List<ProjectModule> {
-
 		/// <summary>
 		///     The namespace of Confuser project schema
 		/// </summary>
@@ -551,6 +541,5 @@ namespace Confuser.Core.Project {
 				}
 			}
 		}
-
 	}
 }

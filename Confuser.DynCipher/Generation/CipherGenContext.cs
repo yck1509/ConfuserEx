@@ -5,12 +5,11 @@ using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Generation {
 	internal class CipherGenContext {
-
-		private readonly Variable[] dataVars;
-		private readonly Variable keyVar = new Variable("{KEY}");
-		private readonly RandomGenerator random;
-		private readonly List<Variable> tempVars = new List<Variable>();
-		private int tempVarCounter;
+		readonly Variable[] dataVars;
+		readonly Variable keyVar = new Variable("{KEY}");
+		readonly RandomGenerator random;
+		readonly List<Variable> tempVars = new List<Variable>();
+		int tempVarCounter;
 
 		public CipherGenContext(RandomGenerator random, int dataVarCount) {
 			this.random = random;
@@ -50,10 +49,9 @@ namespace Confuser.DynCipher.Generation {
 			return new TempVarHolder(this, var);
 		}
 
-		private struct TempVarHolder : IDisposable {
-
-			private readonly CipherGenContext parent;
-			private readonly Variable tempVar;
+		struct TempVarHolder : IDisposable {
+			readonly CipherGenContext parent;
+			readonly Variable tempVar;
 
 			public TempVarHolder(CipherGenContext p, Variable v) {
 				parent = p;
@@ -63,8 +61,6 @@ namespace Confuser.DynCipher.Generation {
 			public void Dispose() {
 				parent.tempVars.Add(tempVar);
 			}
-
 		}
-
 	}
 }

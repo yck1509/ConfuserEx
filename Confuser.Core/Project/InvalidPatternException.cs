@@ -5,7 +5,6 @@ namespace Confuser.Core.Project {
 	///     The exception that is thrown when attempted to parse an invalid pattern.
 	/// </summary>
 	public class InvalidPatternException : Exception {
-
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ConfuserException" /> class.
 		/// </summary>
@@ -23,6 +22,5 @@ namespace Confuser.Core.Project {
 		/// </param>
 		public InvalidPatternException(string message, Exception innerException)
 			: base(message, innerException) { }
-
 	}
 }

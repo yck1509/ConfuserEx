@@ -9,7 +9,6 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.Compress {
 	internal class ExtractPhase : ProtectionPhase {
-
 		public ExtractPhase(Compressor parent) : base(parent) { }
 
 		public override ProtectionTargets Targets {
@@ -55,10 +54,9 @@ namespace Confuser.Protections.Compress {
 			}
 		}
 
-		private class ResourceRecorder {
-
-			private readonly CompressorContext ctx;
-			private ModuleDef targetModule;
+		class ResourceRecorder {
+			readonly CompressorContext ctx;
+			ModuleDef targetModule;
 
 			public ResourceRecorder(CompressorContext ctx, ModuleDef module) {
 				this.ctx = ctx;
@@ -75,8 +73,6 @@ namespace Confuser.Protections.Compress {
 					ctx.EntryPointToken = writer.MetaData.GetToken(ctx.EntryPoint).Raw;
 				}
 			}
-
 		}
-
 	}
 }

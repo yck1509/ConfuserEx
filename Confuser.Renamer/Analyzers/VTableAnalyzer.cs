@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Confuser.Core;
 using Confuser.Renamer.References;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class VTableAnalyzer : IRenamer {
-
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
 			VTable vTbl;
 
@@ -69,13 +67,12 @@ namespace Confuser.Renamer.Analyzers {
 
 			var methods = new HashSet<IMethodDefOrRef>(MethodDefOrRefComparer.Instance);
 			method.Overrides
-				  .RemoveWhere(impl => MethodDefOrRefComparer.Instance.Equals(impl.MethodDeclaration, method));
+			      .RemoveWhere(impl => MethodDefOrRefComparer.Instance.Equals(impl.MethodDeclaration, method));
 		}
 
-		private class MethodDefOrRefComparer : IEqualityComparer<IMethodDefOrRef> {
-
+		class MethodDefOrRefComparer : IEqualityComparer<IMethodDefOrRef> {
 			public static readonly MethodDefOrRefComparer Instance = new MethodDefOrRefComparer();
-			private MethodDefOrRefComparer() { }
+			MethodDefOrRefComparer() { }
 
 			public bool Equals(IMethodDefOrRef x, IMethodDefOrRef y) {
 				return new SigComparer().Equals(x, y) && new SigComparer().Equals(x.DeclaringType, y.DeclaringType);
@@ -84,8 +81,6 @@ namespace Confuser.Renamer.Analyzers {
 			public int GetHashCode(IMethodDefOrRef obj) {
 				return new SigComparer().GetHashCode(obj) * 5 + new SigComparer().GetHashCode(obj.DeclaringType);
 			}
-
 		}
-
 	}
 }

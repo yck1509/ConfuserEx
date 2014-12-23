@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Confuser.Core;
 using Confuser.Core.Helpers;
 using Confuser.Core.Services;
@@ -9,7 +8,6 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Constants {
 	internal class ReferenceReplacer {
-
 		public static void ReplaceReference(CEContext ctx, ProtectionParameters parameters) {
 			foreach (var entry in ctx.ReferenceRepl) {
 				if (parameters.GetParameter<bool>(ctx.Context, entry.Key, "cfg"))
@@ -19,7 +17,7 @@ namespace Confuser.Protections.Constants {
 			}
 		}
 
-		private static void ReplaceNormal(MethodDef method, List<Tuple<Instruction, uint, IMethod>> instrs) {
+		static void ReplaceNormal(MethodDef method, List<Tuple<Instruction, uint, IMethod>> instrs) {
 			foreach (var instr in instrs) {
 				int i = method.Body.Instructions.IndexOf(instr.Item1);
 				instr.Item1.OpCode = OpCodes.Ldc_I4;
@@ -28,16 +26,14 @@ namespace Confuser.Protections.Constants {
 			}
 		}
 
-		private struct CFGContext {
-
+		struct CFGContext {
 			public ControlFlowGraph Graph;
 			public BlockKey[] Keys;
 			public RandomGenerator Random;
 			public Local StateVariable;
-
 		}
 
-		private static void InsertEmptyStateUpdate(CFGContext ctx, ControlFlowBlock block) {
+		static void InsertEmptyStateUpdate(CFGContext ctx, ControlFlowBlock block) {
 			var body = ctx.Graph.Body;
 			var key = ctx.Keys[block.Id];
 			if (key.EntryState == key.ExitState)
@@ -73,7 +69,7 @@ namespace Confuser.Protections.Constants {
 			ctx.Graph.Body.ReplaceReference(block.Header, first);
 		}
 
-		private static int InsertStateGetAndUpdate(CFGContext ctx, int index, BlockKeyType type, uint currentState, uint targetState) {
+		static int InsertStateGetAndUpdate(CFGContext ctx, int index, BlockKeyType type, uint currentState, uint targetState) {
 			var body = ctx.Graph.Body;
 
 			if (type == BlockKeyType.Incremental) {
@@ -102,7 +98,7 @@ namespace Confuser.Protections.Constants {
 			return index + 3;
 		}
 
-		private static void ReplaceCFG(MethodDef method, List<Tuple<Instruction, uint, IMethod>> instrs, CEContext ctx) {
+		static void ReplaceCFG(MethodDef method, List<Tuple<Instruction, uint, IMethod>> instrs, CEContext ctx) {
 			var graph = ControlFlowGraph.Construct(method.Body);
 			var sequence = KeySequence.ComputeKeys(graph, ctx.Random);
 
@@ -157,6 +153,5 @@ namespace Confuser.Protections.Constants {
 				}
 			}
 		}
-
 	}
 }

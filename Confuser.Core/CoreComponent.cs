@@ -6,7 +6,6 @@ namespace Confuser.Core {
 	///     Core component of Confuser.
 	/// </summary>
 	public class CoreComponent : ConfuserComponent {
-
 		/// <summary>
 		///     The service ID of RNG
 		/// </summary>
@@ -32,8 +31,8 @@ namespace Confuser.Core {
 		/// </summary>
 		public const string _CompressionServiceId = "Confuser.Compression";
 
-		private readonly Marker marker;
-		private readonly ConfuserParameters parameters;
+		readonly Marker marker;
+		readonly ConfuserParameters parameters;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="CoreComponent" /> class.
@@ -78,6 +77,5 @@ namespace Confuser.Core {
 		protected internal override void PopulatePipeline(ProtectionPipeline pipeline) {
 			//
 		}
-
 	}
 }

@@ -4,40 +4,44 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Confuser.Core;
+using Confuser.Renamer.Analyzers;
 using Confuser.Renamer.References;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer.BAML {
 	internal class BAMLAnalyzer {
+		readonly ConfuserContext context;
+		readonly INameService service;
 
-		private readonly ConfuserContext context;
-		private readonly INameService service;
+		readonly Dictionary<string, List<MethodDef>> methods = new Dictionary<string, List<MethodDef>>();
+		readonly Dictionary<string, List<EventDef>> events = new Dictionary<string, List<EventDef>>();
+		readonly Dictionary<string, List<PropertyDef>> properties = new Dictionary<string, List<PropertyDef>>();
 
-		private readonly Dictionary<string, List<MethodDef>> methods = new Dictionary<string, List<MethodDef>>();
-		private readonly Dictionary<string, List<EventDef>> events = new Dictionary<string, List<EventDef>>();
-		private readonly Dictionary<string, List<PropertyDef>> properties = new Dictionary<string, List<PropertyDef>>();
+		readonly Dictionary<ushort, AssemblyDef> assemblyRefs = new Dictionary<ushort, AssemblyDef>();
+		readonly Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>>();
 
-		private readonly Dictionary<ushort, AssemblyDef> assemblyRefs = new Dictionary<ushort, AssemblyDef>();
-		private readonly Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>> attrRefs = new Dictionary<ushort, Tuple<IDnlibDef, AttributeInfoRecord, TypeDef>>();
-		
-		private readonly Dictionary<ushort, StringInfoRecord> strings = new Dictionary<ushort, StringInfoRecord>();
-		private readonly Dictionary<ushort, TypeSig> typeRefs = new Dictionary<ushort, TypeSig>();
-		private readonly Dictionary<string, List<Tuple<AssemblyDef, string>>> xmlns = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
-		
-		private string bamlName;
-		private ModuleDefMD module;
-		private IKnownThings things;
+		readonly Dictionary<ushort, StringInfoRecord> strings = new Dictionary<ushort, StringInfoRecord>();
+		readonly Dictionary<ushort, TypeSig> typeRefs = new Dictionary<ushort, TypeSig>();
+		readonly Dictionary<string, List<Tuple<AssemblyDef, string>>> xmlns = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
 
-		private KnownThingsv3 thingsv3;
-		private KnownThingsv4 thingsv4;
-		private XmlNsContext xmlnsCtx;
+		IKnownThings things;
+
+		KnownThingsv3 thingsv3;
+		KnownThingsv4 thingsv4;
+		XmlNsContext xmlnsCtx;
 
 		public event Action<BAMLAnalyzer, BamlElement> AnalyzeElement;
 
-		public ConfuserContext Context { get { return context; } }
-		public INameService NameService { get { return service; } }
-		public string CurrentBAMLName { get { return bamlName; } }
-		public ModuleDefMD Module { get { return module; } }
+		public ConfuserContext Context {
+			get { return context; }
+		}
+
+		public INameService NameService {
+			get { return service; }
+		}
+
+		public string CurrentBAMLName { get; set; }
+		public ModuleDefMD Module { get; set; }
 
 		public BAMLAnalyzer(ConfuserContext context, INameService service) {
 			this.context = context;
@@ -45,7 +49,7 @@ namespace Confuser.Renamer.BAML {
 			PreInit();
 		}
 
-		private void PreInit() {
+		void PreInit() {
 			// WPF will only look for public instance members
 			foreach (TypeDef type in context.Modules.SelectMany(m => m.GetTypes())) {
 				foreach (PropertyDef property in type.Properties) {
@@ -87,8 +91,8 @@ namespace Confuser.Renamer.BAML {
 		}
 
 		public BamlDocument Analyze(ModuleDefMD module, string bamlName, byte[] data) {
-			this.module = module;
-			this.bamlName = bamlName;
+			this.Module = module;
+			this.CurrentBAMLName = bamlName;
 			if (module.IsClr40) {
 				things = thingsv4 ?? (thingsv4 = new KnownThingsv4(context, module));
 			}
@@ -121,12 +125,12 @@ namespace Confuser.Renamer.BAML {
 			return document;
 		}
 
-		private void PopulateReferences(BamlDocument document) {
+		void PopulateReferences(BamlDocument document) {
 			var clrNs = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
 
 			assemblyRefs.Clear();
 			foreach (AssemblyInfoRecord rec in document.OfType<AssemblyInfoRecord>()) {
-				AssemblyDef assembly = context.Resolver.ResolveThrow(rec.AssemblyFullName, module);
+				AssemblyDef assembly = context.Resolver.ResolveThrow(rec.AssemblyFullName, Module);
 				assemblyRefs.Add(rec.AssemblyId, assembly);
 
 				if (!context.Modules.Any(m => m.Assembly == assembly))
@@ -150,9 +154,9 @@ namespace Confuser.Renamer.BAML {
 				else
 					assembly = assemblyRefs[(ushort)asmId];
 
-				AssemblyDef assemblyRef = module.Assembly == assembly ? null : assembly;
+				AssemblyDef assemblyRef = Module.Assembly == assembly ? null : assembly;
 
-				TypeSig typeSig = TypeNameParser.ParseAsTypeSigReflectionThrow(module, rec.TypeFullName, new DummyAssemblyRefFinder(assemblyRef));
+				TypeSig typeSig = TypeNameParser.ParseAsTypeSigReflectionThrow(Module, rec.TypeFullName, new DummyAssemblyRefFinder(assemblyRef));
 				typeRefs[rec.TypeId] = typeSig;
 
 				AddTypeSigReference(typeSig, new BAMLTypeReference(typeSig, rec));
@@ -206,7 +210,7 @@ namespace Confuser.Renamer.BAML {
 			return typeRefs[typeId].ToBasicTypeDefOrRef().ResolveTypeDefThrow();
 		}
 
-		private TypeSig ResolveType(string typeName, out string prefix) {
+		TypeSig ResolveType(string typeName, out string prefix) {
 			List<Tuple<AssemblyDef, string>> clrNs;
 
 			int index = typeName.IndexOf(':');
@@ -224,7 +228,7 @@ namespace Confuser.Renamer.BAML {
 			}
 
 			foreach (var ns in clrNs) {
-				TypeSig sig = TypeNameParser.ParseAsTypeSigReflectionThrow(module, ns.Item2 + "." + typeName, new DummyAssemblyRefFinder(ns.Item1));
+				TypeSig sig = TypeNameParser.ParseAsTypeSigReflectionThrow(Module, ns.Item2 + "." + typeName, new DummyAssemblyRefFinder(ns.Item1));
 				if (sig.ToBasicTypeDefOrRef().ResolveTypeDef() != null)
 					return sig;
 			}
@@ -239,7 +243,7 @@ namespace Confuser.Renamer.BAML {
 			return attrRefs[attrId];
 		}
 
-		private void AddTypeSigReference(TypeSig typeSig, INameReference<IDnlibDef> reference) {
+		void AddTypeSigReference(TypeSig typeSig, INameReference<IDnlibDef> reference) {
 			foreach (ITypeDefOrRef type in typeSig.FindTypeRefs()) {
 				TypeDef typeDef = type.ResolveTypeDefThrow();
 				if (context.Modules.Contains((ModuleDefMD)typeDef.Module)) {
@@ -249,7 +253,7 @@ namespace Confuser.Renamer.BAML {
 			}
 		}
 
-		private void ProcessBAMLElement(BamlElement root, BamlElement elem) {
+		void ProcessBAMLElement(BamlElement root, BamlElement elem) {
 			ProcessElementHeader(elem);
 			ProcessElementBody(root, elem);
 
@@ -257,7 +261,7 @@ namespace Confuser.Renamer.BAML {
 				AnalyzeElement(this, elem);
 		}
 
-		private void ProcessElementHeader(BamlElement elem) {
+		void ProcessElementHeader(BamlElement elem) {
 			// Resolve type & properties of the element.
 			switch (elem.Header.Type) {
 				case BamlRecordType.ConstructorParametersStart:
@@ -320,13 +324,13 @@ namespace Confuser.Renamer.BAML {
 				case BamlRecordType.KeyElementStart:
 				case BamlRecordType.StaticResourceStart:
 					// i.e. <x:Key></x:Key>
-					elem.Type = module.CorLibTypes.Object.TypeDefOrRef.ResolveTypeDef();
+					elem.Type = Module.CorLibTypes.Object.TypeDefOrRef.ResolveTypeDef();
 					elem.Attribute = null;
 					break;
 			}
 		}
 
-		private TypeDef GetAttributeType(IDnlibDef attr) {
+		TypeDef GetAttributeType(IDnlibDef attr) {
 			ITypeDefOrRef retType = null;
 			if (attr is PropertyDef)
 				retType = ((PropertyDef)attr).PropertySig.RetType.ToBasicTypeDefOrRef();
@@ -336,7 +340,7 @@ namespace Confuser.Renamer.BAML {
 			throw new UnreachableException();
 		}
 
-		private void ProcessElementBody(BamlElement root, BamlElement elem) {
+		void ProcessElementBody(BamlElement root, BamlElement elem) {
 			foreach (BamlRecord rec in elem.Body) {
 				// Resolve the type & property for simple property record too.
 				TypeDef type = null;
@@ -402,7 +406,8 @@ namespace Confuser.Renamer.BAML {
 					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
 
-					if (extRec.Flags == 602) { // Static Extension
+					if (extRec.Flags == 602) {
+						// Static Extension
 						// We only care about the references in user-defined assemblies, so skip built-in attributes
 						// Also, ValueId is a resource ID, which is not implemented, so just skip it.
 						if ((short)extRec.ValueId >= 0) {
@@ -429,7 +434,7 @@ namespace Confuser.Renamer.BAML {
 			}
 		}
 
-		private void ProcessConverter(PropertyWithConverterRecord rec, TypeDef type) {
+		void ProcessConverter(PropertyWithConverterRecord rec, TypeDef type) {
 			TypeDef converter = ResolveType(rec.ConverterTypeId);
 
 			if (converter.FullName == "System.ComponentModel.EnumConverter") {
@@ -466,7 +471,7 @@ namespace Confuser.Renamer.BAML {
 								service.AddReference(field, reference);
 							}
 							if (property == null && field == null)
-								context.Logger.WarnFormat("Could not resolve command '{0}' in '{1}'.", cmd, bamlName);
+								context.Logger.WarnFormat("Could not resolve command '{0}' in '{1}'.", cmd, CurrentBAMLName);
 						}
 					}
 				}
@@ -508,19 +513,19 @@ namespace Confuser.Renamer.BAML {
 				if (declType == "System.Windows.ResourceDictionary") {
 					var src = rec.Value.ToUpperInvariant();
 					if (src.EndsWith(".BAML") || src.EndsWith(".XAML")) {
-						var match = Analyzers.WPFAnalyzer.UriPattern.Match(src);
+						var match = WPFAnalyzer.UriPattern.Match(src);
 						if (match.Success)
 							src = match.Groups[1].Value;
 
 						if (src.StartsWith("./") || src.StartsWith("../")) {
-							var rel = new Uri(new Uri("pack://application:,,,/" + bamlName), src);
+							var rel = new Uri(new Uri("pack://application:,,,/" + CurrentBAMLName), src);
 							src = rel.LocalPath;
 						}
 						var reference = new BAMLPropertyReference(rec);
 						src = src.TrimStart('/');
 						var baml = src.Substring(0, src.Length - 5) + ".BAML";
 						var xaml = src.Substring(0, src.Length - 5) + ".XAML";
-						var bamlRefs = service.FindRenamer<Analyzers.WPFAnalyzer>().bamlRefs;
+						var bamlRefs = service.FindRenamer<WPFAnalyzer>().bamlRefs;
 						bamlRefs.AddListEntry(baml, reference);
 						bamlRefs.AddListEntry(xaml, reference);
 					}
@@ -528,7 +533,7 @@ namespace Confuser.Renamer.BAML {
 			}
 		}
 
-		private Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec) {
+		Tuple<IDnlibDef, AttributeInfoRecord, TypeDef> AnalyzeAttributeReference(TypeDef declType, AttributeInfoRecord rec) {
 			IDnlibDef retDef = null;
 			ITypeDefOrRef retType = null;
 			while (declType != null) {
@@ -557,7 +562,7 @@ namespace Confuser.Renamer.BAML {
 			return Tuple.Create(retDef, rec, retType == null ? null : retType.ResolveTypeDefThrow());
 		}
 
-		private void AnalyzePropertyPath(string path) {
+		void AnalyzePropertyPath(string path) {
 			var propertyPath = new PropertyPath(path);
 			foreach (PropertyPathPart part in propertyPath.Parts) {
 				if (part.IsAttachedDP()) {
@@ -594,9 +599,8 @@ namespace Confuser.Renamer.BAML {
 			}
 		}
 
-		private class DummyAssemblyRefFinder : IAssemblyRefFinder {
-
-			private readonly AssemblyDef assemblyDef;
+		class DummyAssemblyRefFinder : IAssemblyRefFinder {
+			readonly AssemblyDef assemblyDef;
 
 			public DummyAssemblyRefFinder(AssemblyDef assemblyDef) {
 				this.assemblyDef = assemblyDef;
@@ -605,16 +609,14 @@ namespace Confuser.Renamer.BAML {
 			public AssemblyRef FindAssemblyRef(TypeRef nonNestedTypeRef) {
 				return assemblyDef.ToAssemblyRef();
 			}
-
 		}
 
 		internal class XmlNsContext {
-
-			private readonly Dictionary<AssemblyDef, ushort> assemblyRefs;
-			private readonly BamlDocument doc;
-			private readonly Dictionary<Tuple<AssemblyDef, string>, string> xmlNsMap = new Dictionary<Tuple<AssemblyDef, string>, string>();
-			private int rootIndex = -1;
-			private int x;
+			readonly Dictionary<AssemblyDef, ushort> assemblyRefs;
+			readonly BamlDocument doc;
+			readonly Dictionary<Tuple<AssemblyDef, string>, string> xmlNsMap = new Dictionary<Tuple<AssemblyDef, string>, string>();
+			int rootIndex = -1;
+			int x;
 
 			public XmlNsContext(BamlDocument doc, Dictionary<ushort, AssemblyDef> assemblyRefs) {
 				this.doc = doc;
@@ -654,8 +656,6 @@ namespace Confuser.Renamer.BAML {
 				}
 				return prefix;
 			}
-
 		}
-
 	}
 }

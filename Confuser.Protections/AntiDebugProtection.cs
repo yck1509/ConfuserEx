@@ -11,7 +11,6 @@ using dnlib.DotNet.Emit;
 namespace Confuser.Protections {
 	[BeforeProtection("Ki.ControlFlow")]
 	internal class AntiDebugProtection : Protection {
-
 		public const string _Id = "anti debug";
 		public const string _FullId = "Ki.AntiDebug";
 
@@ -43,8 +42,7 @@ namespace Confuser.Protections {
 			pipeline.InsertPreStage(PipelineStage.ProcessModule, new AntiDebugPhase(this));
 		}
 
-		private class AntiDebugPhase : ProtectionPhase {
-
+		class AntiDebugPhase : ProtectionPhase {
 			public AntiDebugPhase(AntiDebugProtection parent)
 				: base(parent) { }
 
@@ -130,15 +128,11 @@ namespace Confuser.Protections {
 				}
 			}
 
-			private enum AntiMode {
-
+			enum AntiMode {
 				Safe,
 				Win32,
 				Antinet
-
 			}
-
 		}
-
 	}
 }

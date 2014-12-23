@@ -9,15 +9,14 @@ namespace Confuser.Core {
 	///     Parameters of <see cref="ConfuserComponent" />.
 	/// </summary>
 	public class ProtectionParameters {
-
-		private static readonly object ParametersKey = new object();
+		static readonly object ParametersKey = new object();
 
 		/// <summary>
 		///     A empty instance of <see cref="ProtectionParameters" />.
 		/// </summary>
 		public static readonly ProtectionParameters Empty = new ProtectionParameters(null, new IDnlibDef[0]);
 
-		private readonly ConfuserComponent comp;
+		readonly ConfuserComponent comp;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProtectionParameters" /> class.
@@ -99,6 +98,5 @@ namespace Confuser.Core {
 			ConfuserContext context, IDnlibDef target) {
 			return context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
 		}
-
 	}
 }

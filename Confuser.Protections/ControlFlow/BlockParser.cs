@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Confuser.Core;
 using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ControlFlow {
 	internal static class BlockParser {
-
 		public static ScopeBlock ParseBody(CilBody body) {
 			var ehScopes = new Dictionary<ExceptionHandler, Tuple<ScopeBlock, ScopeBlock, ScopeBlock>>();
 			foreach (ExceptionHandler eh in body.ExceptionHandlers) {
@@ -88,6 +86,5 @@ namespace Confuser.Protections.ControlFlow {
 			Debug.Assert(scopeStack.Count == 1);
 			return root;
 		}
-
 	}
 }

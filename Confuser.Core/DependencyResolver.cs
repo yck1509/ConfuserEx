@@ -8,8 +8,7 @@ namespace Confuser.Core {
 	///     Resolves dependency between protections.
 	/// </summary>
 	internal class DependencyResolver {
-
-		private readonly List<Protection> protections;
+		readonly List<Protection> protections;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="DependencyResolver" /> class.
@@ -77,7 +76,7 @@ namespace Confuser.Core {
 		/// <param name="roots">The root protections.</param>
 		/// <param name="edges">The dependency graph edges.</param>
 		/// <returns>Topological sorted protections.</returns>
-		private IEnumerable<Protection> SortGraph(IEnumerable<Protection> roots, IList<DependencyGraphEdge> edges) {
+		IEnumerable<Protection> SortGraph(IEnumerable<Protection> roots, IList<DependencyGraphEdge> edges) {
 			var queue = new Queue<Protection>(roots.OrderBy(prot => prot.FullId));
 			while (queue.Count > 0) {
 				Protection root = queue.Dequeue(); // Find a node with no incoming edges
@@ -97,8 +96,7 @@ namespace Confuser.Core {
 		/// <summary>
 		///     An edge of dependency graph.
 		/// </summary>
-		private class DependencyGraphEdge {
-
+		class DependencyGraphEdge {
 			/// <summary>
 			///     Initializes a new instance of the <see cref="DependencyGraphEdge" /> class.
 			/// </summary>
@@ -118,16 +116,13 @@ namespace Confuser.Core {
 			///     The destination protection node.
 			/// </summary>
 			public Protection To { get; private set; }
-
 		}
-
 	}
 
 	/// <summary>
 	///     The exception that is thrown when there exists circular dependency between protections.
 	/// </summary>
 	internal class CircularDependencyException : Exception {
-
 		/// <summary>
 		///     Initializes a new instance of the <see cref="CircularDependencyException" /> class.
 		/// </summary>
@@ -150,6 +145,5 @@ namespace Confuser.Core {
 		///     Second protection that involved in circular dependency.
 		/// </summary>
 		public Protection ProtectionB { get; private set; }
-
 	}
 }

@@ -5,7 +5,6 @@ namespace Confuser.Core {
 	///     Represent a component in Confuser
 	/// </summary>
 	public abstract class ConfuserComponent {
-
 		/// <summary>
 		///     Gets the name of component.
 		/// </summary>
@@ -41,6 +40,5 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="pipeline">The processing pipeline.</param>
 		protected internal abstract void PopulatePipeline(ProtectionPipeline pipeline);
-
 	}
 }

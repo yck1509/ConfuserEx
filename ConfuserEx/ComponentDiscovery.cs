@@ -5,8 +5,7 @@ using Confuser.Core;
 
 namespace ConfuserEx {
 	internal class ComponentDiscovery {
-
-		private static void CrossDomainLoadComponents() {
+		static void CrossDomainLoadComponents() {
 			var ctx = (CrossDomainContext)AppDomain.CurrentDomain.GetData("ctx");
 			Assembly assembly = Assembly.LoadFile(ctx.PluginPath);
 			foreach (Type i in assembly.GetTypes()) {
@@ -37,11 +36,10 @@ namespace ConfuserEx {
 			packers.RemoveWhere(comp => comp is InfoComponent && ((InfoComponent)comp).info.path == pluginPath);
 		}
 
-		private class CrossDomainContext : MarshalByRefObject {
-
-			private readonly IList<ConfuserComponent> packers;
-			private readonly string pluginPath;
-			private readonly IList<ConfuserComponent> protections;
+		class CrossDomainContext : MarshalByRefObject {
+			readonly IList<ConfuserComponent> packers;
+			readonly string pluginPath;
+			readonly IList<ConfuserComponent> protections;
 
 			public CrossDomainContext(IList<ConfuserComponent> protections, IList<ConfuserComponent> packers, string pluginPath) {
 				this.protections = protections;
@@ -68,12 +66,10 @@ namespace ConfuserEx {
 				}
 				packers.Add(new InfoComponent(info));
 			}
-
 		}
 
 		[Serializable]
-		private class Info {
-
+		class Info {
 			public string desc;
 			public string fullId;
 			public string id;
@@ -89,11 +85,9 @@ namespace ConfuserEx {
 				ret.path = pluginPath;
 				return ret;
 			}
-
 		}
 
-		private class InfoComponent : ConfuserComponent {
-
+		class InfoComponent : ConfuserComponent {
 			public readonly Info info;
 
 			public InfoComponent(Info info) {
@@ -123,8 +117,6 @@ namespace ConfuserEx {
 			protected override void PopulatePipeline(ProtectionPipeline pipeline) {
 				throw new NotSupportedException();
 			}
-
 		}
-
 	}
 }

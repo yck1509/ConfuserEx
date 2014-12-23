@@ -12,9 +12,8 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.Resources {
 	internal class MDPhase {
-
-		private readonly REContext ctx;
-		private ByteArrayChunk encryptedResource;
+		readonly REContext ctx;
+		ByteArrayChunk encryptedResource;
 
 		public MDPhase(REContext ctx) {
 			this.ctx = ctx;
@@ -24,7 +23,7 @@ namespace Confuser.Protections.Resources {
 			ctx.Context.CurrentModuleWriterListener.OnWriterEvent += OnWriterEvent;
 		}
 
-		private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
+		void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginAddResources) {
 				ctx.Context.CheckCancellation();
@@ -109,6 +108,5 @@ namespace Confuser.Protections.Resources {
 				tblHeap.FieldRVATable[writer.MetaData.GetFieldRVARid(ctx.DataField)].RVA = (uint)encryptedResource.RVA;
 			}
 		}
-
 	}
 }

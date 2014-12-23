@@ -6,7 +6,6 @@ namespace Confuser.Core {
 	///     The listener of module writer event.
 	/// </summary>
 	public class ModuleWriterListener : IModuleWriterListener {
-
 		/// <inheritdoc />
 		void IModuleWriterListener.OnWriterEvent(ModuleWriterBase writer, ModuleWriterEvent evt) {
 			if (OnWriterEvent != null) {
@@ -18,14 +17,12 @@ namespace Confuser.Core {
 		///     Occurs when a module writer event is triggered.
 		/// </summary>
 		public event EventHandler<ModuleWriterListenerEventArgs> OnWriterEvent;
-
 	}
 
 	/// <summary>
 	///     Indicates the triggered writer event.
 	/// </summary>
 	public class ModuleWriterListenerEventArgs : EventArgs {
-
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ModuleWriterListenerEventArgs" /> class.
 		/// </summary>
@@ -39,6 +36,5 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <value>The triggered writer event.</value>
 		public ModuleWriterEvent WriterEvent { get; private set; }
-
 	}
 }

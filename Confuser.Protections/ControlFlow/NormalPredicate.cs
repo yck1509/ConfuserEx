@@ -4,10 +4,9 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ControlFlow {
 	internal class NormalPredicate : IPredicate {
-
-		private readonly CFContext ctx;
-		private bool inited;
-		private int xorKey;
+		readonly CFContext ctx;
+		bool inited;
+		int xorKey;
 
 		public NormalPredicate(CFContext ctx) {
 			this.ctx = ctx;
@@ -29,6 +28,5 @@ namespace Confuser.Protections.ControlFlow {
 		public int GetSwitchKey(int key) {
 			return key ^ xorKey;
 		}
-
 	}
 }

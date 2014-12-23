@@ -6,7 +6,6 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that indicate whether the type inherits from the specified type.
 	/// </summary>
 	public class InheritsFunction : PatternFunction {
-
 		internal const string FnName = "inherits";
 
 		/// <inheritdoc />
@@ -32,6 +31,5 @@ namespace Confuser.Core.Project.Patterns {
 			}
 			return false;
 		}
-
 	}
 }

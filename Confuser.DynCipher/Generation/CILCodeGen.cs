@@ -6,8 +6,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.DynCipher.Generation {
 	public class CILCodeGen {
-
-		private readonly Dictionary<string, Local> localMap = new Dictionary<string, Local>();
+		readonly Dictionary<string, Local> localMap = new Dictionary<string, Local>();
 
 		public CILCodeGen(MethodDef method, IList<Instruction> instrs) {
 			Method = method;
@@ -55,7 +54,7 @@ namespace Confuser.DynCipher.Generation {
 			EmitStatement(statement);
 		}
 
-		private void EmitLoad(Expression exp) {
+		void EmitLoad(Expression exp) {
 			if (exp is ArrayIndexExpression) {
 				var arrIndex = (ArrayIndexExpression)exp;
 				EmitLoad(arrIndex.Array);
@@ -128,7 +127,7 @@ namespace Confuser.DynCipher.Generation {
 				throw new NotSupportedException();
 		}
 
-		private void EmitStore(Expression exp, Expression value) {
+		void EmitStore(Expression exp, Expression value) {
 			if (exp is ArrayIndexExpression) {
 				var arrIndex = (ArrayIndexExpression)exp;
 				EmitLoad(arrIndex.Array);
@@ -145,7 +144,7 @@ namespace Confuser.DynCipher.Generation {
 				throw new NotSupportedException();
 		}
 
-		private void EmitStatement(Statement statement) {
+		void EmitStatement(Statement statement) {
 			if (statement is AssignmentStatement) {
 				var assignment = (AssignmentStatement)statement;
 				EmitStore(assignment.Target, assignment.Value);
@@ -190,6 +189,5 @@ namespace Confuser.DynCipher.Generation {
 			else
 				throw new NotSupportedException();
 		}
-
 	}
 }

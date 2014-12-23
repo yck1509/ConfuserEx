@@ -2,7 +2,5 @@
 using System.Windows;
 
 namespace ConfuserEx {
-	public partial class App : Application {
-
-	}
+	public partial class App : Application { }
 }

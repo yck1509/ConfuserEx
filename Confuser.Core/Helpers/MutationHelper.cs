@@ -10,10 +10,9 @@ namespace Confuser.Core.Helpers {
 	///     Provides methods to mutated injected methods.
 	/// </summary>
 	public static class MutationHelper {
+		const string mutationType = "Mutation";
 
-		private const string mutationType = "Mutation";
-
-		private static readonly Dictionary<string, int> field2index = new Dictionary<string, int> {
+		static readonly Dictionary<string, int> field2index = new Dictionary<string, int> {
 			{ "KeyI0", 0 },
 			{ "KeyI1", 1 },
 			{ "KeyI2", 2 },
@@ -104,6 +103,5 @@ namespace Confuser.Core.Helpers {
 				}
 			}
 		}
-
 	}
 }

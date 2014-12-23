@@ -3,11 +3,10 @@ using System.Reflection;
 
 namespace Confuser.Runtime {
 	internal static class Resource {
-
-		private static Assembly c;
+		static Assembly c;
 
 		// Hmm... Too lazy.
-		private static void Initialize() {
+		static void Initialize() {
 			var l = (uint)Mutation.KeyI0;
 			uint[] q = Mutation.Placeholder(new uint[Mutation.KeyI0]);
 
@@ -42,20 +41,18 @@ namespace Confuser.Runtime {
 			AppDomain.CurrentDomain.AssemblyResolve += Handler;
 		}
 
-		private static Assembly Handler(object sender, ResolveEventArgs args) {
+		static Assembly Handler(object sender, ResolveEventArgs args) {
 			if (c.FullName == args.Name)
 				return c;
 			return null;
 		}
-
 	}
 
 	internal static class Resource_Packer {
-
-		private static Assembly c;
+		static Assembly c;
 
 		// Hmm... Too lazy.
-		private static void Initialize() {
+		static void Initialize() {
 			var l = (uint)Mutation.KeyI0;
 			uint[] q = Mutation.Placeholder(new uint[Mutation.KeyI0]);
 
@@ -90,12 +87,11 @@ namespace Confuser.Runtime {
 			AppDomain.CurrentDomain.ResourceResolve += Handler;
 		}
 
-		private static Assembly Handler(object sender, ResolveEventArgs args) {
+		static Assembly Handler(object sender, ResolveEventArgs args) {
 			var n = c.GetManifestResourceNames();
 			if (Array.IndexOf(n, args.Name) != -1)
 				return c;
 			return null;
 		}
-
 	}
 }

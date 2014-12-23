@@ -5,16 +5,15 @@ using System.Runtime.InteropServices;
 
 namespace Confuser.Runtime {
 	internal static unsafe class AntiTamperJIT {
+		static uint* ptr;
+		static uint len;
+		static IntPtr moduleHnd;
+		static compileMethod originalDelegate;
 
-		private static uint* ptr;
-		private static uint len;
-		private static IntPtr moduleHnd;
-		private static compileMethod originalDelegate;
+		static bool ver4;
+		static bool ver5;
 
-		private static bool ver4;
-		private static bool ver5;
-
-		private static compileMethod handler;
+		static compileMethod handler;
 
 		public static void Initialize() {
 			Module m = typeof(AntiTamperNormal).Module;
@@ -87,15 +86,15 @@ namespace Confuser.Runtime {
 		}
 
 		[DllImport("kernel32.dll")]
-		private static extern IntPtr LoadLibrary(string lib);
+		static extern IntPtr LoadLibrary(string lib);
 
 		[DllImport("kernel32.dll")]
-		private static extern IntPtr GetProcAddress(IntPtr lib, string proc);
+		static extern IntPtr GetProcAddress(IntPtr lib, string proc);
 
 		[DllImport("kernel32.dll")]
-		private static extern bool VirtualProtect(IntPtr lpAddress, uint dwSize, uint flNewProtect, out uint lpflOldProtect);
+		static extern bool VirtualProtect(IntPtr lpAddress, uint dwSize, uint flNewProtect, out uint lpflOldProtect);
 
-		private static void Hook() {
+		static void Hook() {
 			ulong* ptr = stackalloc ulong[2];
 			if (ver4) {
 				ptr[0] = 0x642e74696a726c63; //clrjit.d
@@ -142,7 +141,7 @@ namespace Confuser.Runtime {
 			VirtualProtect(hookPosition, (uint)IntPtr.Size, oldPl, out oldPl);
 		}
 
-		private static void ExtractLocalVars(CORINFO_METHOD_INFO* info, uint len, byte* localVar) {
+		static void ExtractLocalVars(CORINFO_METHOD_INFO* info, uint len, byte* localVar) {
 			void* sigInfo;
 			if (ver4) {
 				if (IntPtr.Size == 8)
@@ -192,7 +191,7 @@ namespace Confuser.Runtime {
 			}
 		}
 
-		private static uint HookHandler(IntPtr self, ICorJitInfo* comp, CORINFO_METHOD_INFO* info, uint flags, byte** nativeEntry, uint* nativeSizeOfCode) {
+		static uint HookHandler(IntPtr self, ICorJitInfo* comp, CORINFO_METHOD_INFO* info, uint flags, byte** nativeEntry, uint* nativeSizeOfCode) {
 			if (info != null && info->scope == moduleHnd && info->ILCode[0] == 0x14) {
 				uint token;
 				if (ver5) {
@@ -285,46 +284,39 @@ namespace Confuser.Runtime {
 
 		#region JIT internal
 
-		private static bool hasLinkInfo;
+		static bool hasLinkInfo;
 
 		[StructLayout(LayoutKind.Sequential, Size = 0x18)]
-		private struct CORINFO_EH_CLAUSE {
-
-		}
+		struct CORINFO_EH_CLAUSE { }
 
 		[StructLayout(LayoutKind.Sequential, Pack = 1)]
-		private struct CORINFO_METHOD_INFO {
-
+		struct CORINFO_METHOD_INFO {
 			public IntPtr ftn;
 			public IntPtr scope;
 			public byte* ILCode;
 			public uint ILCodeSize;
-
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct CORINFO_SIG_INFO_x64 {
-
+		struct CORINFO_SIG_INFO_x64 {
 			public uint callConv;
-			private uint pad1;
+			uint pad1;
 			public IntPtr retTypeClass;
 			public IntPtr retTypeSigClass;
 			public byte retType;
 			public byte flags;
 			public ushort numArgs;
-			private uint pad2;
+			uint pad2;
 			public CORINFO_SIG_INST_x64 sigInst;
 			public IntPtr args;
 			public IntPtr sig;
 			public IntPtr scope;
 			public uint token;
-			private uint pad3;
-
+			uint pad3;
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct CORINFO_SIG_INFO_x86 {
-
+		struct CORINFO_SIG_INFO_x86 {
 			public uint callConv;
 			public IntPtr retTypeClass;
 			public IntPtr retTypeSigClass;
@@ -336,41 +328,31 @@ namespace Confuser.Runtime {
 			public IntPtr sig;
 			public IntPtr scope;
 			public uint token;
-
 		}
 
 		[StructLayout(LayoutKind.Sequential, Size = 32)]
-		private struct CORINFO_SIG_INST_x64 {
-
-		}
+		struct CORINFO_SIG_INST_x64 { }
 
 		[StructLayout(LayoutKind.Sequential, Size = 16)]
-		private struct CORINFO_SIG_INST_x86 {
-
-		}
+		struct CORINFO_SIG_INST_x86 { }
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ICorClassInfo {
-
+		struct ICorClassInfo {
 			public readonly IntPtr* vfptr;
-
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ICorDynamicInfo {
-
+		struct ICorDynamicInfo {
 			public IntPtr* vfptr;
 			public int* vbptr;
 
 			public static ICorStaticInfo* ICorStaticInfo(ICorDynamicInfo* ptr) {
 				return (ICorStaticInfo*)((byte*)&ptr->vbptr + ptr->vbptr[hasLinkInfo ? 9 : 8]);
 			}
-
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ICorJitInfo {
-
+		struct ICorJitInfo {
 			public IntPtr* vfptr;
 			public int* vbptr;
 
@@ -378,26 +360,20 @@ namespace Confuser.Runtime {
 				hasLinkInfo = ptr->vbptr[10] > 0 && ptr->vbptr[10] >> 16 == 0; // != 0 and hiword byte == 0
 				return (ICorDynamicInfo*)((byte*)&ptr->vbptr + ptr->vbptr[hasLinkInfo ? 10 : 9]);
 			}
-
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ICorMethodInfo {
-
+		struct ICorMethodInfo {
 			public IntPtr* vfptr;
-
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ICorModuleInfo {
-
+		struct ICorModuleInfo {
 			public IntPtr* vfptr;
-
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ICorStaticInfo {
-
+		struct ICorStaticInfo {
 			public IntPtr* vfptr;
 			public int* vbptr;
 
@@ -412,14 +388,12 @@ namespace Confuser.Runtime {
 			public static ICorClassInfo* ICorClassInfo(ICorStaticInfo* ptr) {
 				return (ICorClassInfo*)((byte*)&ptr->vbptr + ptr->vbptr[3]);
 			}
-
 		}
 
 		#endregion
 
-		private class CorMethodInfoHook {
-
-			private static int ehNum = -1;
+		class CorMethodInfoHook {
+			static int ehNum = -1;
 			public CORINFO_EH_CLAUSE* clauses;
 			public IntPtr ftn;
 			public ICorMethodInfo* info;
@@ -429,7 +403,7 @@ namespace Confuser.Runtime {
 			public getEHinfo o_getEHinfo;
 			public IntPtr* oldVfTbl;
 
-			private void hookEHInfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause) {
+			void hookEHInfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause) {
 				if (ftn == this.ftn) {
 					*clause = clauses[EHnumber];
 				}
@@ -481,11 +455,9 @@ namespace Confuser.Runtime {
 				mtdInfo->vfptr = newVfTbl;
 				return ret;
 			}
-
 		}
 
-		private class CorJitInfoHook {
-
+		class CorJitInfoHook {
 			public CORINFO_EH_CLAUSE* clauses;
 			public IntPtr ftn;
 			public ICorJitInfo* info;
@@ -495,7 +467,7 @@ namespace Confuser.Runtime {
 			public getEHinfo o_getEHinfo;
 			public IntPtr* oldVfTbl;
 
-			private void hookEHInfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause) {
+			void hookEHInfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause) {
 				if (ftn == this.ftn) {
 					*clause = clauses[EHnumber];
 				}
@@ -533,31 +505,27 @@ namespace Confuser.Runtime {
 				comp->vfptr = newVfTbl;
 				return ret;
 			}
-
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
-		private struct MethodData {
-
+		struct MethodData {
 			public readonly uint ILCodeSize;
 			public readonly uint MaxStack;
 			public readonly uint EHCount;
 			public readonly uint LocalVars;
 			public readonly uint Options;
 			public readonly uint MulSeed;
-
 		}
 
 		[UnmanagedFunctionPointer(CallingConvention.StdCall)]
-		private delegate uint compileMethod(IntPtr self, ICorJitInfo* comp, CORINFO_METHOD_INFO* info, uint flags, byte** nativeEntry, uint* nativeSizeOfCode);
+		delegate uint compileMethod(IntPtr self, ICorJitInfo* comp, CORINFO_METHOD_INFO* info, uint flags, byte** nativeEntry, uint* nativeSizeOfCode);
 
 		[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-		private delegate void getEHinfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause);
+		delegate void getEHinfo(IntPtr self, IntPtr ftn, uint EHnumber, CORINFO_EH_CLAUSE* clause);
 
-		private delegate IntPtr* getJit();
+		delegate IntPtr* getJit();
 
 		[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-		private delegate uint getMethodDefFromMethod(IntPtr self, IntPtr ftn);
-
+		delegate uint getMethodDefFromMethod(IntPtr self, IntPtr ftn);
 	}
 }

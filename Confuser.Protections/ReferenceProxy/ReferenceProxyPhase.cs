@@ -11,7 +11,6 @@ using dnlib.DotNet.MD;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class ReferenceProxyPhase : ProtectionPhase {
-
 		public ReferenceProxyPhase(ReferenceProxyProtection parent)
 			: base(parent) { }
 
@@ -23,7 +22,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			get { return "Encoding reference proxies"; }
 		}
 
-		private static RPContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RPStore store) {
+		static RPContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RPStore store) {
 			var ret = new RPContext();
 			ret.Mode = parameters.GetParameter(context, method, "mode", Mode.Mild);
 			ret.Encoding = parameters.GetParameter(context, method, "encoding", EncodingType.Normal);
@@ -81,7 +80,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			return ret;
 		}
 
-		private static RPContext ParseParameters(ModuleDef module, ConfuserContext context, ProtectionParameters parameters, RPStore store) {
+		static RPContext ParseParameters(ModuleDef module, ConfuserContext context, ProtectionParameters parameters, RPStore store) {
 			var ret = new RPContext();
 			ret.Depth = parameters.GetParameter(context, module, "depth", 3);
 			ret.InitCount = parameters.GetParameter(context, module, "initCount", 0x10);
@@ -118,7 +117,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				store.strong.Finalize(ctx);
 		}
 
-		private void ProcessMethod(RPContext ctx) {
+		void ProcessMethod(RPContext ctx) {
 			for (int i = 0; i < ctx.Body.Instructions.Count; i++) {
 				Instruction instr = ctx.Body.Instructions[i];
 				if (instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt || instr.OpCode.Code == Code.Newobj) {
@@ -151,8 +150,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			}
 		}
 
-		private class RPStore {
-
+		class RPStore {
 			public readonly Dictionary<MethodSig, TypeDef> delegates = new Dictionary<MethodSig, TypeDef>(new MethodSigComparer());
 			public ExpressionEncoding expression;
 			public MildMode mild;
@@ -162,8 +160,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			public StrongMode strong;
 			public x86Encoding x86;
 
-			private class MethodSigComparer : IEqualityComparer<MethodSig> {
-
+			class MethodSigComparer : IEqualityComparer<MethodSig> {
 				public bool Equals(MethodSig x, MethodSig y) {
 					return new SigComparer().Equals(x, y);
 				}
@@ -171,10 +168,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				public int GetHashCode(MethodSig obj) {
 					return new SigComparer().GetHashCode(obj);
 				}
-
 			}
-
 		}
-
 	}
 }

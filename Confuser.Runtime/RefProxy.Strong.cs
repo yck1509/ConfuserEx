@@ -4,8 +4,7 @@ using System.Reflection.Emit;
 
 namespace Confuser.Runtime {
 	internal class RefProxyKey : Attribute {
-
-		private readonly int key;
+		readonly int key;
 
 		public RefProxyKey(int key) {
 			this.key = Mutation.Placeholder(key);
@@ -14,11 +13,9 @@ namespace Confuser.Runtime {
 		public override int GetHashCode() {
 			return key;
 		}
-
 	}
 
 	internal static class RefProxyStrong {
-
 		internal static void Initialize(RuntimeFieldHandle field, byte opKey) {
 			FieldInfo fieldInfo = FieldInfo.GetFieldFromHandle(field);
 			byte[] sig = fieldInfo.Module.ResolveSignature(fieldInfo.MetadataToken);
@@ -75,6 +72,5 @@ namespace Confuser.Runtime {
 				fieldInfo.SetValue(null, dm.CreateDelegate(delegateType));
 			}
 		}
-
 	}
 }

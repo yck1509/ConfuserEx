@@ -7,7 +7,6 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.AntiTamper {
 	internal class NormalDeriver : IKeyDeriver {
-
 		public void Init(ConfuserContext ctx, RandomGenerator random) {
 			//
 		}
@@ -54,6 +53,5 @@ namespace Confuser.Protections.AntiTamper {
 				yield return Instruction.Create(OpCodes.Stelem_I4);
 			}
 		}
-
 	}
 }

@@ -4,9 +4,8 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class CAMemberReference : INameReference<IDnlibDef> {
-
-		private readonly IDnlibDef definition;
-		private readonly CANamedArgument namedArg;
+		readonly IDnlibDef definition;
+		readonly CANamedArgument namedArg;
 
 		public CAMemberReference(CANamedArgument namedArg, IDnlibDef definition) {
 			this.namedArg = namedArg;
@@ -21,6 +20,5 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
-
 	}
 }

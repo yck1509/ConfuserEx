@@ -9,7 +9,6 @@ namespace Confuser.Core {
 	///     Various stages in <see cref="ProtectionPipeline" />.
 	/// </summary>
 	public enum PipelineStage {
-
 		/// <summary>
 		///     Confuser engine inspects the loaded modules and makes necessary changes.
 		///     This stage occurs only once per pipeline run.
@@ -63,16 +62,14 @@ namespace Confuser.Core {
 		///     This stage occurs only once per pipeline run.
 		/// </summary>
 		SaveModules
-
 	}
 
 	/// <summary>
 	///     Protection processing pipeline.
 	/// </summary>
 	public class ProtectionPipeline {
-
-		private readonly Dictionary<PipelineStage, List<ProtectionPhase>> postStage;
-		private readonly Dictionary<PipelineStage, List<ProtectionPhase>> preStage;
+		readonly Dictionary<PipelineStage, List<ProtectionPhase>> postStage;
+		readonly Dictionary<PipelineStage, List<ProtectionPhase>> preStage;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProtectionPipeline" /> class.
@@ -150,7 +147,7 @@ namespace Confuser.Core {
 		/// <param name="targets">List of targets.</param>
 		/// <param name="phase">The component phase.</param>
 		/// <returns>Filtered targets.</returns>
-		private static IList<IDnlibDef> Filter(ConfuserContext context, IList<IDnlibDef> targets, ProtectionPhase phase) {
+		static IList<IDnlibDef> Filter(ConfuserContext context, IList<IDnlibDef> targets, ProtectionPhase phase) {
 			ProtectionTargets targetType = phase.Targets;
 
 			IEnumerable<IDnlibDef> filter = targets;
@@ -179,6 +176,5 @@ namespace Confuser.Core {
 				return parameters.ContainsKey(phase.Parent);
 			}).ToList();
 		}
-
 	}
 }

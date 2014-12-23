@@ -7,11 +7,10 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Compress {
 	internal class NormalDeriver : IKeyDeriver {
-
-		private uint k1;
-		private uint k2;
-		private uint k3;
-		private uint seed;
+		uint k1;
+		uint k2;
+		uint k3;
+		uint seed;
 
 		public void Init(ConfuserContext ctx, RandomGenerator random) {
 			k1 = random.NextUInt32() | 1;
@@ -93,6 +92,5 @@ namespace Confuser.Protections.Compress {
 				yield return Instruction.Create(OpCodes.Stelem_I4);
 			}
 		}
-
 	}
 }

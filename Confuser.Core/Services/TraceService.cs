@@ -7,9 +7,8 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Core.Services {
 	internal class TraceService : ITraceService {
-
-		private readonly Dictionary<MethodDef, MethodTrace> cache = new Dictionary<MethodDef, MethodTrace>();
-		private ConfuserContext context;
+		readonly Dictionary<MethodDef, MethodTrace> cache = new Dictionary<MethodDef, MethodTrace>();
+		ConfuserContext context;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="TraceService" /> class.
@@ -26,14 +25,12 @@ namespace Confuser.Core.Services {
 				throw new ArgumentNullException("method");
 			return cache.GetValueOrDefaultLazy(method, m => cache[m] = new MethodTrace(m)).Trace();
 		}
-
 	}
 
 	/// <summary>
 	///     Provides methods to trace stack of method body.
 	/// </summary>
 	public interface ITraceService {
-
 		/// <summary>
 		///     Trace the stack of the specified method.
 		/// </summary>
@@ -41,7 +38,6 @@ namespace Confuser.Core.Services {
 		/// <exception cref="InvalidMethodException"><paramref name="method" /> has invalid body.</exception>
 		/// <exception cref="System.ArgumentNullException"><paramref name="method" /> is <c>null</c>.</exception>
 		MethodTrace Trace(MethodDef method);
-
 	}
 
 
@@ -49,10 +45,9 @@ namespace Confuser.Core.Services {
 	///     The trace result of a method.
 	/// </summary>
 	public class MethodTrace {
-
-		private readonly MethodDef method;
-		private Dictionary<int, List<Instruction>> fromInstrs;
-		private Dictionary<uint, int> offset2index;
+		readonly MethodDef method;
+		Dictionary<int, List<Instruction>> fromInstrs;
+		Dictionary<uint, int> offset2index;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="MethodTrace" /> class.
@@ -310,6 +305,5 @@ namespace Confuser.Core.Services {
 			Array.Reverse(ret);
 			return ret;
 		}
-
 	}
 }

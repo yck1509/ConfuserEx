@@ -7,11 +7,10 @@ using Confuser.Core.Project;
 
 namespace ConfuserEx.ViewModel {
 	public class ProjectModuleVM : ViewModelBase, IViewModel<ProjectModule>, IRuleContainer {
-
-		private readonly ProjectModule module;
-		private readonly ProjectVM parent;
-		private string asmName = "Unknown";
-		private string simpleName;
+		readonly ProjectModule module;
+		readonly ProjectVM parent;
+		string asmName = "Unknown";
+		string simpleName;
 
 		public ProjectModuleVM(ProjectVM parent, ProjectModule module) {
 			this.parent = parent;
@@ -74,7 +73,7 @@ namespace ConfuserEx.ViewModel {
 			get { return module; }
 		}
 
-		private void LoadAssemblyName() {
+		void LoadAssemblyName() {
 			AssemblyName = "Loading...";
 			ThreadPool.QueueUserWorkItem(_ => {
 				try {
@@ -87,6 +86,5 @@ namespace ConfuserEx.ViewModel {
 				}
 			});
 		}
-
 	}
 }

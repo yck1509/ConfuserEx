@@ -13,10 +13,9 @@ using MethodBody = dnlib.DotNet.Writer.MethodBody;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class x86Encoding : IRPEncoding {
-
-		private readonly Dictionary<MethodDef, Tuple<MethodDef, Func<int, int>>> keys = new Dictionary<MethodDef, Tuple<MethodDef, Func<int, int>>>();
-		private readonly List<Tuple<MethodDef, byte[], MethodBody>> nativeCodes = new List<Tuple<MethodDef, byte[], MethodBody>>();
-		private bool addedHandler;
+		readonly Dictionary<MethodDef, Tuple<MethodDef, Func<int, int>>> keys = new Dictionary<MethodDef, Tuple<MethodDef, Func<int, int>>>();
+		readonly List<Tuple<MethodDef, byte[], MethodBody>> nativeCodes = new List<Tuple<MethodDef, byte[], MethodBody>>();
+		bool addedHandler;
 
 		public Instruction[] EmitDecode(MethodDef init, RPContext ctx, Instruction[] arg) {
 			Tuple<MethodDef, Func<int, int>> key = GetKey(ctx, init);
@@ -32,7 +31,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			return key.Item2(value);
 		}
 
-		private void Compile(RPContext ctx, out Func<int, int> expCompiled, out MethodDef native) {
+		void Compile(RPContext ctx, out Func<int, int> expCompiled, out MethodDef native) {
 			var var = new Variable("{VAR}");
 			var result = new Variable("{RESULT}");
 
@@ -69,7 +68,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			}
 		}
 
-		private void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
+		void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 				for (int n = 0; n < nativeCodes.Count; n++)
@@ -86,7 +85,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			}
 		}
 
-		private Tuple<MethodDef, Func<int, int>> GetKey(RPContext ctx, MethodDef init) {
+		Tuple<MethodDef, Func<int, int>> GetKey(RPContext ctx, MethodDef init) {
 			Tuple<MethodDef, Func<int, int>> ret;
 			if (!keys.TryGetValue(init, out ret)) {
 				Func<int, int> keyFunc;
@@ -97,9 +96,8 @@ namespace Confuser.Protections.ReferenceProxy {
 			return ret;
 		}
 
-		private class CodeGen : CILCodeGen {
-
-			private readonly Instruction[] arg;
+		class CodeGen : CILCodeGen {
+			readonly Instruction[] arg;
 
 			public CodeGen(Instruction[] arg, MethodDef method, IList<Instruction> instrs)
 				: base(method, instrs) {
@@ -109,13 +107,11 @@ namespace Confuser.Protections.ReferenceProxy {
 			protected override void LoadVar(Variable var) {
 				if (var.Name == "{RESULT}") {
 					foreach (Instruction instr in arg)
-						base.Emit(instr);
+						Emit(instr);
 				}
 				else
 					base.LoadVar(var);
 			}
-
 		}
-
 	}
 }

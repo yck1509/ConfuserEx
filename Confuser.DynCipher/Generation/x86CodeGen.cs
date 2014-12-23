@@ -7,9 +7,8 @@ using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Generation {
 	public class x86CodeGen {
-
-		private List<x86Instruction> instrs;
-		private bool[] usedRegs;
+		List<x86Instruction> instrs;
+		bool[] usedRegs;
 
 		public IList<x86Instruction> Instructions {
 			get { return instrs; }
@@ -36,7 +35,7 @@ namespace Confuser.DynCipher.Generation {
 			}
 		}
 
-		private x86Register GetFreeRegister() {
+		x86Register GetFreeRegister() {
 			for (int i = 0; i < 8; i++)
 				if (!usedRegs[i])
 					return (x86Register)i;
@@ -44,17 +43,17 @@ namespace Confuser.DynCipher.Generation {
 			throw new Exception("Register overflowed.");
 		}
 
-		private void TakeRegister(x86Register reg) {
+		void TakeRegister(x86Register reg) {
 			usedRegs[(int)reg] = true;
 			if ((int)reg > MaxUsedRegister)
 				MaxUsedRegister = (int)reg;
 		}
 
-		private void ReleaseRegister(x86Register reg) {
+		void ReleaseRegister(x86Register reg) {
 			usedRegs[(int)reg] = false;
 		}
 
-		private x86Register Normalize(x86Instruction instr) {
+		x86Register Normalize(x86Instruction instr) {
 			if (instr.Operands.Length == 2 &&
 			    instr.Operands[0] is x86ImmediateOperand &&
 			    instr.Operands[1] is x86ImmediateOperand) {
@@ -135,7 +134,7 @@ namespace Confuser.DynCipher.Generation {
 			return ((x86RegisterOperand)instr.Operands[0]).Register;
 		}
 
-		private Ix86Operand Emit(Expression exp, Func<Variable, x86Register, IEnumerable<x86Instruction>> loadArg) {
+		Ix86Operand Emit(Expression exp, Func<Variable, x86Register, IEnumerable<x86Instruction>> loadArg) {
 			if (exp is BinOpExpression) {
 				var binOp = (BinOpExpression)exp;
 				x86Register reg;
@@ -198,11 +197,9 @@ namespace Confuser.DynCipher.Generation {
 		public override string ToString() {
 			return string.Join("\r\n", instrs.Select(instr => instr.ToString()).ToArray());
 		}
-
 	}
 
 	public enum x86OpCode {
-
 		MOV,
 		ADD,
 		SUB,
@@ -212,11 +209,9 @@ namespace Confuser.DynCipher.Generation {
 		NOT,
 		XOR,
 		POP
-
 	}
 
 	public enum x86Register {
-
 		EAX,
 		ECX,
 		EDX,
@@ -225,15 +220,11 @@ namespace Confuser.DynCipher.Generation {
 		EBP,
 		ESI,
 		EDI
-
 	}
 
-	public interface Ix86Operand {
-
-	}
+	public interface Ix86Operand { }
 
 	public class x86RegisterOperand : Ix86Operand {
-
 		public x86RegisterOperand(x86Register reg) {
 			Register = reg;
 		}
@@ -243,11 +234,9 @@ namespace Confuser.DynCipher.Generation {
 		public override string ToString() {
 			return Register.ToString();
 		}
-
 	}
 
 	public class x86ImmediateOperand : Ix86Operand {
-
 		public x86ImmediateOperand(int imm) {
 			Immediate = imm;
 		}
@@ -257,11 +246,9 @@ namespace Confuser.DynCipher.Generation {
 		public override string ToString() {
 			return Immediate.ToString("X") + "h";
 		}
-
 	}
 
 	public class x86Instruction {
-
 		public x86OpCode OpCode { get; set; }
 		public Ix86Operand[] Operands { get; set; }
 
@@ -438,6 +425,5 @@ namespace Confuser.DynCipher.Generation {
 			}
 			return ret.ToString();
 		}
-
 	}
 }

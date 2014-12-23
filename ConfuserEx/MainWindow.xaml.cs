@@ -8,7 +8,6 @@ using ConfuserEx.ViewModel;
 
 namespace ConfuserEx {
 	public partial class MainWindow : Window {
-
 		public MainWindow() {
 			InitializeComponent();
 
@@ -24,7 +23,7 @@ namespace ConfuserEx {
 			DataContext = app;
 		}
 
-		private void OpenMenu(object sender, RoutedEventArgs e) {
+		void OpenMenu(object sender, RoutedEventArgs e) {
 			var btn = (Button)sender;
 			ContextMenu menu = btn.ContextMenu;
 			menu.PlacementTarget = btn;
@@ -36,6 +35,5 @@ namespace ConfuserEx {
 			base.OnClosing(e);
 			e.Cancel = !((AppVM)DataContext).OnWindowClosing();
 		}
-
 	}
 }

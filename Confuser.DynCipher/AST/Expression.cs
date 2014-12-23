@@ -2,7 +2,6 @@
 
 namespace Confuser.DynCipher.AST {
 	public abstract class Expression {
-
 		public object Tag { get; set; }
 		public abstract override string ToString();
 
@@ -83,6 +82,5 @@ namespace Confuser.DynCipher.AST {
 				Operation = UnaryOps.Negate
 			};
 		}
-
 	}
 }

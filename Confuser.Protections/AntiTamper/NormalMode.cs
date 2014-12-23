@@ -15,16 +15,15 @@ using MethodBody = dnlib.DotNet.Writer.MethodBody;
 
 namespace Confuser.Protections.AntiTamper {
 	internal class NormalMode : IModeHandler {
+		uint c;
+		IKeyDeriver deriver;
 
-		private uint c;
-		private IKeyDeriver deriver;
-
-		private List<MethodDef> methods;
-		private uint name1, name2;
-		private RandomGenerator random;
-		private uint v;
-		private uint x;
-		private uint z;
+		List<MethodDef> methods;
+		uint name1, name2;
+		RandomGenerator random;
+		uint v;
+		uint x;
+		uint z;
 
 		public void HandleInject(AntiTamperProtection parent, ConfuserContext context, ProtectionParameters parameters) {
 			random = context.Registry.GetService<IRandomService>().GetRandomGenerator(parent.FullId);
@@ -100,7 +99,7 @@ namespace Confuser.Protections.AntiTamper {
 			context.CurrentModuleWriterListener.OnWriterEvent += OnWriterEvent;
 		}
 
-		private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
+		void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDEndCreateTables) {
 				CreateSections(writer);
@@ -110,7 +109,7 @@ namespace Confuser.Protections.AntiTamper {
 			}
 		}
 
-		private void CreateSections(ModuleWriter writer) {
+		void CreateSections(ModuleWriter writer) {
 			var nameBuffer = new byte[8];
 			nameBuffer[0] = (byte)(name1 >> 0);
 			nameBuffer[1] = (byte)(name1 >> 8);
@@ -170,7 +169,7 @@ namespace Confuser.Protections.AntiTamper {
 			newSection.Add(new ByteArrayChunk(new byte[4]), 4);
 		}
 
-		private void EncryptSection(ModuleWriter writer) {
+		void EncryptSection(ModuleWriter writer) {
 			Stream stream = writer.DestinationStream;
 			var reader = new BinaryReader(writer.DestinationStream);
 			stream.Position = 0x3C;
@@ -213,7 +212,7 @@ namespace Confuser.Protections.AntiTamper {
 			stream.Write(byteResult, 0, byteResult.Length);
 		}
 
-		private void Hash(Stream stream, BinaryReader reader, uint offset, uint size) {
+		void Hash(Stream stream, BinaryReader reader, uint offset, uint size) {
 			long original = stream.Position;
 			stream.Position = offset;
 			size >>= 2;
@@ -228,7 +227,7 @@ namespace Confuser.Protections.AntiTamper {
 			stream.Position = original;
 		}
 
-		private uint[] DeriveKey() {
+		uint[] DeriveKey() {
 			uint[] dst = new uint[0x10], src = new uint[0x10];
 			for (int i = 0; i < 0x10; i++) {
 				dst[i] = v;
@@ -240,6 +239,5 @@ namespace Confuser.Protections.AntiTamper {
 			}
 			return deriver.DeriveKey(dst, src);
 		}
-
 	}
 }

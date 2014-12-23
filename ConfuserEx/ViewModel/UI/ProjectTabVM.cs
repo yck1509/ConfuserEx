@@ -11,8 +11,7 @@ using Ookii.Dialogs.Wpf;
 
 namespace ConfuserEx.ViewModel {
 	public class ProjectTabVM : TabViewModel {
-
-		private int selIndex = -1;
+		int selIndex = -1;
 
 		public ProjectTabVM(AppVM app)
 			: base(app, "Project") { }
@@ -112,7 +111,7 @@ namespace ConfuserEx.ViewModel {
 			}
 		}
 
-		private void AddModule(string file) {
+		void AddModule(string file) {
 			if (!File.Exists(file)) {
 				MessageBox.Show(string.Format("File '{0}' does not exists!", file), "ConfuserEx", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
@@ -131,6 +130,5 @@ namespace ConfuserEx.ViewModel {
 			}
 			App.Project.Modules.Add(module);
 		}
-
 	}
 }

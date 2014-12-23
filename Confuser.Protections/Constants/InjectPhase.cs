@@ -13,7 +13,6 @@ using dnlib.DotNet.MD;
 
 namespace Confuser.Protections.Constants {
 	internal class InjectPhase : ProtectionPhase {
-
 		public InjectPhase(ConstantProtection parent)
 			: base(parent) { }
 
@@ -78,7 +77,7 @@ namespace Confuser.Protections.Constants {
 			}
 		}
 
-		private void InjectHelpers(ConfuserContext context, ICompressionService compression, IRuntimeService rt, CEContext moduleCtx) {
+		void InjectHelpers(ConfuserContext context, ICompressionService compression, IRuntimeService rt, CEContext moduleCtx) {
 			IEnumerable<IDnlibDef> members = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Constant"), context.CurrentModule.GlobalType, context.CurrentModule);
 			foreach (IDnlibDef member in members) {
 				if (member.Name == "Get") {
@@ -147,7 +146,7 @@ namespace Confuser.Protections.Constants {
 			}
 		}
 
-		private void MutateInitializer(CEContext moduleCtx, MethodDef decomp) {
+		void MutateInitializer(CEContext moduleCtx, MethodDef decomp) {
 			moduleCtx.InitMethod.Body.SimplifyMacros(moduleCtx.InitMethod.Parameters);
 			List<Instruction> instrs = moduleCtx.InitMethod.Body.Instructions.ToList();
 			for (int i = 0; i < instrs.Count; i++) {
@@ -174,6 +173,5 @@ namespace Confuser.Protections.Constants {
 			foreach (Instruction instr in instrs)
 				moduleCtx.InitMethod.Body.Instructions.Add(instr);
 		}
-
 	}
 }

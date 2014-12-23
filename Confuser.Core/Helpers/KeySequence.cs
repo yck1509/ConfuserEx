@@ -9,7 +9,6 @@ namespace Confuser.Core.Helpers {
 	///     The type of block in the key sequence
 	/// </summary>
 	public enum BlockKeyType {
-
 		/// <summary>
 		///     The state key should be explicitly set in the block
 		/// </summary>
@@ -19,14 +18,12 @@ namespace Confuser.Core.Helpers {
 		///     The state key could be assumed to be same as <see cref="BlockKey.EntryState" /> at the beginning of block.
 		/// </summary>
 		Incremental
-
 	}
 
 	/// <summary>
 	///     The information of the block in the key sequence
 	/// </summary>
 	public struct BlockKey {
-
 		/// <summary>
 		///     The state key at the beginning of the block
 		/// </summary>
@@ -41,7 +38,6 @@ namespace Confuser.Core.Helpers {
 		///     The type of block
 		/// </summary>
 		public BlockKeyType Type;
-
 	}
 
 	/// <summary>
@@ -63,7 +59,6 @@ namespace Confuser.Core.Helpers {
 	///     </code>
 	/// </remarks>
 	public static class KeySequence {
-
 		/// <summary>
 		///     Computes a key sequence of the given CFG.
 		/// </summary>
@@ -85,7 +80,7 @@ namespace Confuser.Core.Helpers {
 			return keys;
 		}
 
-		private static void ProcessBlocks(BlockKey[] keys, ControlFlowGraph graph, RandomGenerator random) {
+		static void ProcessBlocks(BlockKey[] keys, ControlFlowGraph graph, RandomGenerator random) {
 			uint id = 0;
 			for (int i = 0; i < keys.Length; i++) {
 				keys[i].EntryState = id++;
@@ -125,13 +120,13 @@ namespace Confuser.Core.Helpers {
 							foreach (var eh in graph.Body.ExceptionHandlers) {
 								if (eh.FilterStart != null && block.Footer.OpCode.Code == Code.Endfilter) {
 									if (footerIndex >= graph.IndexOf(eh.FilterStart) &&
-										footerIndex < graph.IndexOf(eh.HandlerStart))
+									    footerIndex < graph.IndexOf(eh.HandlerStart))
 										ehs.Add(eh);
 								}
 								else if (eh.HandlerType == ExceptionHandlerType.Finally ||
-										 eh.HandlerType == ExceptionHandlerType.Fault) {
+								         eh.HandlerType == ExceptionHandlerType.Fault) {
 									if (footerIndex >= graph.IndexOf(eh.HandlerStart) &&
-										(eh.HandlerEnd == null || footerIndex < graph.IndexOf(eh.HandlerEnd)))
+									    (eh.HandlerEnd == null || footerIndex < graph.IndexOf(eh.HandlerEnd)))
 										ehs.Add(eh);
 								}
 							}
@@ -163,7 +158,7 @@ namespace Confuser.Core.Helpers {
 							int footerIndex = graph.IndexOf(block.Footer);
 							foreach (var eh in graph.Body.ExceptionHandlers) {
 								if (footerIndex >= graph.IndexOf(eh.TryStart) &&
-									(eh.TryEnd == null || footerIndex < graph.IndexOf(eh.TryEnd)))
+								    (eh.TryEnd == null || footerIndex < graph.IndexOf(eh.TryEnd)))
 									ehs.Add(eh);
 							}
 							ehMap[block] = ehs;
@@ -211,6 +206,5 @@ namespace Confuser.Core.Helpers {
 				keys[i] = key;
 			}
 		}
-
 	}
 }

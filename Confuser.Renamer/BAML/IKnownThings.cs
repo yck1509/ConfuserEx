@@ -1,10 +1,8 @@
 ﻿using System;
-using Confuser.Core;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer.BAML {
 	internal enum KnownTypes : short {
-
 		Unknown = 0,
 		AccessText,
 		AdornedElementPlaceholder,
@@ -765,11 +763,9 @@ namespace Confuser.Renamer.BAML {
 		XmlLanguageConverter,
 		XmlNamespaceMapping,
 		ZoomPercentageConverter
-
 	}
 
 	internal enum KnownProperties : short {
-
 		Unknown = 0,
 		AccessText_Text,
 		BeginStoryboard_Storyboard,
@@ -1039,14 +1035,11 @@ namespace Confuser.Renamer.BAML {
 		Window_Content,
 		WrapPanel_Children,
 		XmlDataProvider_XmlSerializer
-
 	}
 
 	internal interface IKnownThings {
-
 		Func<KnownTypes, TypeDef> Types { get; }
 		Func<KnownProperties, Tuple<KnownTypes, PropertyDef, TypeDef>> Properties { get; }
 		AssemblyDef FrameworkAssembly { get; }
-
 	}
 }

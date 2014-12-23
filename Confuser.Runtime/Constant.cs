@@ -3,10 +3,9 @@ using System.Text;
 
 namespace Confuser.Runtime {
 	internal static class Constant {
+		static byte[] b;
 
-		private static byte[] b;
-
-		private static void Initialize() {
+		static void Initialize() {
 			var l = (uint)Mutation.KeyI0;
 			uint[] q = Mutation.Placeholder(new uint[Mutation.KeyI0]);
 
@@ -40,7 +39,7 @@ namespace Confuser.Runtime {
 			b = Lzma.Decompress(o);
 		}
 
-		private static T Get<T>(uint id) {
+		static T Get<T>(uint id) {
 			id = (uint)Mutation.Placeholder((int)id);
 			uint t = id >> 30;
 
@@ -52,7 +51,7 @@ namespace Confuser.Runtime {
 				int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
 				ret = (T)(object)Encoding.UTF8.GetString(b, (int)id, l);
 			}
-				// NOTE: Assume little-endian
+			// NOTE: Assume little-endian
 			else if (t == Mutation.KeyI1) {
 				var v = new T[1];
 				Buffer.BlockCopy(b, (int)id, v, 0, Mutation.Value<int>());
@@ -67,6 +66,5 @@ namespace Confuser.Runtime {
 			}
 			return ret;
 		}
-
 	}
 }

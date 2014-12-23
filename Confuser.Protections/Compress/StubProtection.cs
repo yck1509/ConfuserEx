@@ -9,9 +9,8 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.Compress {
 	internal class StubProtection : Protection {
-
-		private readonly CompressorContext ctx;
-		private readonly ModuleDef originModule;
+		readonly CompressorContext ctx;
+		readonly ModuleDef originModule;
 
 		internal StubProtection(CompressorContext ctx, ModuleDef originModule) {
 			this.ctx = ctx;
@@ -47,8 +46,7 @@ namespace Confuser.Protections.Compress {
 			pipeline.InsertPostStage(PipelineStage.BeginModule, new SigPhase(this));
 		}
 
-		private class InjPhase : ProtectionPhase {
-
+		class InjPhase : ProtectionPhase {
 			public InjPhase(StubProtection parent)
 				: base(parent) { }
 
@@ -70,11 +68,9 @@ namespace Confuser.Protections.Compress {
 				originModule.Assembly.Modules.Remove(originModule);
 				context.Modules[0].Assembly.Modules.Add(((StubProtection)Parent).originModule);
 			}
-
 		}
 
-		private class SigPhase : ProtectionPhase {
-
+		class SigPhase : ProtectionPhase {
 			public SigPhase(StubProtection parent)
 				: base(parent) { }
 
@@ -112,8 +108,6 @@ namespace Confuser.Protections.Compress {
 					}
 				};
 			}
-
 		}
-
 	}
 }

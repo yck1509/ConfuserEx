@@ -7,17 +7,13 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.AntiTamper {
 	internal enum Mode {
-
 		Normal,
 		Dynamic
-
 	}
 
 	internal interface IKeyDeriver {
-
 		void Init(ConfuserContext ctx, RandomGenerator random);
 		uint[] DeriveKey(uint[] a, uint[] b);
 		IEnumerable<Instruction> EmitDerivation(MethodDef method, ConfuserContext ctx, Local dst, Local src);
-
 	}
 }

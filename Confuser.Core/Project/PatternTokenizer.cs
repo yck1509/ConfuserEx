@@ -4,33 +4,32 @@ using System.Text;
 
 namespace Confuser.Core.Project {
 	internal class PatternTokenizer {
-
-		private int index;
-		private string rulePattern;
+		int index;
+		string rulePattern;
 
 		public void Initialize(string pattern) {
 			rulePattern = pattern;
 			index = 0;
 		}
 
-		private void SkipWhitespace() {
+		void SkipWhitespace() {
 			while (index < rulePattern.Length && char.IsWhiteSpace(rulePattern[index]))
 				index++;
 		}
 
-		private char? PeekChar() {
+		char? PeekChar() {
 			if (index >= rulePattern.Length)
 				return null;
 			return rulePattern[index];
 		}
 
-		private char NextChar() {
+		char NextChar() {
 			if (index >= rulePattern.Length)
 				throw new InvalidPatternException("Unexpected end of pattern.");
 			return rulePattern[index++];
 		}
 
-		private string ReadLiteral() {
+		string ReadLiteral() {
 			var ret = new StringBuilder();
 			char delim = NextChar();
 			Debug.Assert(delim == '"' || delim == '\'');
@@ -47,7 +46,7 @@ namespace Confuser.Core.Project {
 			return ret.ToString();
 		}
 
-		private string ReadIdentifier() {
+		string ReadIdentifier() {
 			var ret = new StringBuilder();
 
 			char? chr = PeekChar();
@@ -91,6 +90,5 @@ namespace Confuser.Core.Project {
 					return new PatternToken(pos, TokenType.Identifier, ReadIdentifier());
 			}
 		}
-
 	}
 }

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Confuser.Core;
 using Confuser.Core.Services;
 using dnlib.DotNet;
 
 namespace Confuser.Protections.Compress {
 	internal class CompressorContext {
-
 		public AssemblyDef Assembly;
 		public IKeyDeriver Deriver;
 		public byte[] EncryptedModule;
@@ -56,6 +54,5 @@ namespace Confuser.Protections.Compress {
 
 			return encryptedData;
 		}
-
 	}
 }

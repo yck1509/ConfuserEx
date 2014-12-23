@@ -9,13 +9,12 @@ namespace Confuser.Core.Helpers {
 	///     Provides methods to inject a <see cref="TypeDef" /> into another module.
 	/// </summary>
 	public static class InjectHelper {
-
 		/// <summary>
 		///     Clones the specified origin TypeDef.
 		/// </summary>
 		/// <param name="origin">The origin TypeDef.</param>
 		/// <returns>The cloned TypeDef.</returns>
-		private static TypeDefUser Clone(TypeDef origin) {
+		static TypeDefUser Clone(TypeDef origin) {
 			var ret = new TypeDefUser(origin.Namespace, origin.Name);
 			ret.Attributes = origin.Attributes;
 
@@ -33,7 +32,7 @@ namespace Confuser.Core.Helpers {
 		/// </summary>
 		/// <param name="origin">The origin MethodDef.</param>
 		/// <returns>The cloned MethodDef.</returns>
-		private static MethodDefUser Clone(MethodDef origin) {
+		static MethodDefUser Clone(MethodDef origin) {
 			var ret = new MethodDefUser(origin.Name, null, origin.ImplAttributes, origin.Attributes);
 
 			foreach (GenericParam genericParam in origin.GenericParameters)
@@ -47,7 +46,7 @@ namespace Confuser.Core.Helpers {
 		/// </summary>
 		/// <param name="origin">The origin FieldDef.</param>
 		/// <returns>The cloned FieldDef.</returns>
-		private static FieldDefUser Clone(FieldDef origin) {
+		static FieldDefUser Clone(FieldDef origin) {
 			var ret = new FieldDefUser(origin.Name, null, origin.Attributes);
 			return ret;
 		}
@@ -58,7 +57,7 @@ namespace Confuser.Core.Helpers {
 		/// <param name="typeDef">The origin TypeDef.</param>
 		/// <param name="ctx">The injection context.</param>
 		/// <returns>The new TypeDef.</returns>
-		private static TypeDef PopulateContext(TypeDef typeDef, InjectContext ctx) {
+		static TypeDef PopulateContext(TypeDef typeDef, InjectContext ctx) {
 			TypeDef ret;
 			IDnlibDef existing;
 			if (!ctx.Map.TryGetValue(typeDef, out existing)) {
@@ -85,7 +84,7 @@ namespace Confuser.Core.Helpers {
 		/// </summary>
 		/// <param name="typeDef">The origin TypeDef.</param>
 		/// <param name="ctx">The injection context.</param>
-		private static void CopyTypeDef(TypeDef typeDef, InjectContext ctx) {
+		static void CopyTypeDef(TypeDef typeDef, InjectContext ctx) {
 			var newTypeDef = (TypeDef)ctx.Map[typeDef];
 
 			newTypeDef.BaseType = (ITypeDefOrRef)ctx.Importer.Import(typeDef.BaseType);
@@ -99,7 +98,7 @@ namespace Confuser.Core.Helpers {
 		/// </summary>
 		/// <param name="methodDef">The origin MethodDef.</param>
 		/// <param name="ctx">The injection context.</param>
-		private static void CopyMethodDef(MethodDef methodDef, InjectContext ctx) {
+		static void CopyMethodDef(MethodDef methodDef, InjectContext ctx) {
 			var newMethodDef = (MethodDef)ctx.Map[methodDef];
 
 			newMethodDef.Signature = ctx.Importer.Import(methodDef.Signature);
@@ -165,7 +164,7 @@ namespace Confuser.Core.Helpers {
 		/// </summary>
 		/// <param name="fieldDef">The origin FieldDef.</param>
 		/// <param name="ctx">The injection context.</param>
-		private static void CopyFieldDef(FieldDef fieldDef, InjectContext ctx) {
+		static void CopyFieldDef(FieldDef fieldDef, InjectContext ctx) {
 			var newFieldDef = (FieldDef)ctx.Map[fieldDef];
 
 			newFieldDef.Signature = ctx.Importer.Import(fieldDef.Signature);
@@ -177,7 +176,7 @@ namespace Confuser.Core.Helpers {
 		/// <param name="typeDef">The origin TypeDef.</param>
 		/// <param name="ctx">The injection context.</param>
 		/// <param name="copySelf">if set to <c>true</c>, copy information of <paramref name="typeDef" />.</param>
-		private static void Copy(TypeDef typeDef, InjectContext ctx, bool copySelf) {
+		static void Copy(TypeDef typeDef, InjectContext ctx, bool copySelf) {
 			if (copySelf)
 				CopyTypeDef(typeDef, ctx);
 
@@ -235,8 +234,7 @@ namespace Confuser.Core.Helpers {
 		/// <summary>
 		///     Context of the injection process.
 		/// </summary>
-		private class InjectContext : ImportResolver {
-
+		class InjectContext : ImportResolver {
 			/// <summary>
 			///     The mapping of origin definitions to injected definitions.
 			/// </summary>
@@ -255,7 +253,7 @@ namespace Confuser.Core.Helpers {
 			/// <summary>
 			///     The importer.
 			/// </summary>
-			private readonly Importer importer;
+			readonly Importer importer;
 
 			/// <summary>
 			///     Initializes a new instance of the <see cref="InjectContext" /> class.
@@ -297,8 +295,6 @@ namespace Confuser.Core.Helpers {
 					return (FieldDef)Map[fieldDef];
 				return null;
 			}
-
 		}
-
 	}
 }

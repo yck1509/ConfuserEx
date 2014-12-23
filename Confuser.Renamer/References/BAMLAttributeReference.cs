@@ -5,10 +5,9 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class BAMLAttributeReference : INameReference<IDnlibDef> {
-
-		private readonly AttributeInfoRecord attrRec;
-		private readonly IDnlibDef member;
-		private readonly PropertyRecord propRec;
+		readonly AttributeInfoRecord attrRec;
+		readonly IDnlibDef member;
+		readonly PropertyRecord propRec;
 
 		public BAMLAttributeReference(IDnlibDef member, AttributeInfoRecord rec) {
 			this.member = member;
@@ -31,6 +30,5 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
-
 	}
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Confuser.Core;
 using Confuser.DynCipher.AST;
 using Confuser.DynCipher.Generation;
 using dnlib.DotNet;
@@ -8,8 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class ExpressionEncoding : IRPEncoding {
-
-		private readonly Dictionary<MethodDef, Tuple<Expression, Func<int, int>>> keys = new Dictionary<MethodDef, Tuple<Expression, Func<int, int>>>();
+		readonly Dictionary<MethodDef, Tuple<Expression, Func<int, int>>> keys = new Dictionary<MethodDef, Tuple<Expression, Func<int, int>>>();
 
 		public Instruction[] EmitDecode(MethodDef init, RPContext ctx, Instruction[] arg) {
 			Tuple<Expression, Func<int, int>> key = GetKey(ctx, init);
@@ -25,7 +23,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			return key.Item2(value);
 		}
 
-		private void Compile(RPContext ctx, CilBody body, out Func<int, int> expCompiled, out Expression inverse) {
+		void Compile(RPContext ctx, CilBody body, out Func<int, int> expCompiled, out Expression inverse) {
 			var var = new Variable("{VAR}");
 			var result = new Variable("{RESULT}");
 
@@ -40,7 +38,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				.Compile<Func<int, int>>();
 		}
 
-		private Tuple<Expression, Func<int, int>> GetKey(RPContext ctx, MethodDef init) {
+		Tuple<Expression, Func<int, int>> GetKey(RPContext ctx, MethodDef init) {
 			Tuple<Expression, Func<int, int>> ret;
 			if (!keys.TryGetValue(init, out ret)) {
 				Func<int, int> keyFunc;
@@ -51,9 +49,8 @@ namespace Confuser.Protections.ReferenceProxy {
 			return ret;
 		}
 
-		private class CodeGen : CILCodeGen {
-
-			private readonly Instruction[] arg;
+		class CodeGen : CILCodeGen {
+			readonly Instruction[] arg;
 
 			public CodeGen(Instruction[] arg, MethodDef method, IList<Instruction> instrs)
 				: base(method, instrs) {
@@ -63,13 +60,11 @@ namespace Confuser.Protections.ReferenceProxy {
 			protected override void LoadVar(Variable var) {
 				if (var.Name == "{RESULT}") {
 					foreach (Instruction instr in arg)
-						base.Emit(instr);
+						Emit(instr);
 				}
 				else
 					base.LoadVar(var);
 			}
-
 		}
-
 	}
 }

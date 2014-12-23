@@ -7,8 +7,7 @@ using Ookii.Dialogs.Wpf;
 
 namespace ConfuserEx.Views {
 	public partial class ProjectTabAdvancedView : Window {
-
-		private readonly ProjectVM project;
+		readonly ProjectVM project;
 
 		public ProjectTabAdvancedView(ProjectVM project) {
 			InitializeComponent();
@@ -61,6 +60,5 @@ namespace ConfuserEx.Views {
 				ProbePaths.SelectedIndex = selIndex >= project.ProbePaths.Count ? project.ProbePaths.Count - 1 : selIndex;
 			}, () => ProbePaths.SelectedIndex != -1);
 		}
-
 	}
 }

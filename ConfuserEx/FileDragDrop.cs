@@ -11,7 +11,6 @@ using GalaSoft.MvvmLight.Command;
 
 namespace ConfuserEx {
 	public class FileDragDrop {
-
 		public static readonly DependencyProperty CommandProperty =
 			DependencyProperty.RegisterAttached("Command", typeof(ICommand), typeof(FileDragDrop), new UIPropertyMetadata(null, OnCommandChanged));
 
@@ -70,7 +69,7 @@ namespace ConfuserEx {
 			obj.SetValue(CommandProperty, value);
 		}
 
-		private static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+		static void OnCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
 			var elem = (UIElement)d;
 			if (e.NewValue != null) {
 				elem.AllowDrop = true;
@@ -84,7 +83,7 @@ namespace ConfuserEx {
 			}
 		}
 
-		private static void OnDragOver(object sender, DragEventArgs e) {
+		static void OnDragOver(object sender, DragEventArgs e) {
 			ICommand cmd = GetCommand((DependencyObject)sender);
 			e.Effects = DragDropEffects.None;
 			if (cmd is DragDropCommand) {
@@ -98,7 +97,7 @@ namespace ConfuserEx {
 			e.Handled = true;
 		}
 
-		private static void OnDrop(object sender, DragEventArgs e) {
+		static void OnDrop(object sender, DragEventArgs e) {
 			ICommand cmd = GetCommand((DependencyObject)sender);
 			if (cmd is DragDropCommand) {
 				if (cmd.CanExecute(Tuple.Create((UIElement)sender, e.Data)))
@@ -112,12 +111,9 @@ namespace ConfuserEx {
 		}
 
 
-		private class DragDropCommand : RelayCommand<Tuple<UIElement, IDataObject>> {
-
+		class DragDropCommand : RelayCommand<Tuple<UIElement, IDataObject>> {
 			public DragDropCommand(Action<Tuple<UIElement, IDataObject>> execute, Func<Tuple<UIElement, IDataObject>, bool> canExecute)
 				: base(execute, canExecute) { }
-
 		}
-
 	}
 }

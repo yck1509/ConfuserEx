@@ -7,9 +7,8 @@ namespace Confuser.Renamer {
 	///     Resolves generic arguments
 	/// </summary>
 	public struct GenericArgumentResolver {
-
-		private GenericArguments genericArguments;
-		private RecursionCounter recursionCounter;
+		GenericArguments genericArguments;
+		RecursionCounter recursionCounter;
 
 		/// <summary>
 		///     Resolves the type signature with the specified generic arguments.
@@ -53,7 +52,7 @@ namespace Confuser.Renamer {
 			return resolver.ResolveGenericArgs(methodSig);
 		}
 
-		private bool ReplaceGenericArg(ref TypeSig typeSig) {
+		bool ReplaceGenericArg(ref TypeSig typeSig) {
 			if (genericArguments == null)
 				return false;
 			TypeSig newTypeSig = genericArguments.Resolve(typeSig);
@@ -64,7 +63,7 @@ namespace Confuser.Renamer {
 			return false;
 		}
 
-		private MethodSig ResolveGenericArgs(MethodSig sig) {
+		MethodSig ResolveGenericArgs(MethodSig sig) {
 			if (sig == null)
 				return null;
 			if (!recursionCounter.Increment())
@@ -76,7 +75,7 @@ namespace Confuser.Renamer {
 			return result;
 		}
 
-		private MethodSig ResolveGenericArgs(MethodSig sig, MethodSig old) {
+		MethodSig ResolveGenericArgs(MethodSig sig, MethodSig old) {
 			sig.RetType = ResolveGenericArgs(old.RetType);
 			foreach (TypeSig p in old.Params)
 				sig.Params.Add(ResolveGenericArgs(p));
@@ -88,7 +87,7 @@ namespace Confuser.Renamer {
 			return sig;
 		}
 
-		private TypeSig ResolveGenericArgs(TypeSig typeSig) {
+		TypeSig ResolveGenericArgs(TypeSig typeSig) {
 			if (!recursionCounter.Increment())
 				return null;
 
@@ -156,6 +155,5 @@ namespace Confuser.Renamer {
 
 			return result;
 		}
-
 	}
 }

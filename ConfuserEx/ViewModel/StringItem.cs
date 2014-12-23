@@ -2,7 +2,6 @@
 
 namespace ConfuserEx.ViewModel {
 	public class StringItem : IViewModel<string> {
-
 		public StringItem(string item) {
 			Item = item;
 		}
@@ -16,6 +15,5 @@ namespace ConfuserEx.ViewModel {
 		public override string ToString() {
 			return Item;
 		}
-
 	}
 }

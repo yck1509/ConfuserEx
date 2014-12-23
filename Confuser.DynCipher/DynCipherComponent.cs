@@ -3,7 +3,6 @@ using Confuser.Core;
 
 namespace Confuser.DynCipher {
 	internal class DynCipherComponent : ConfuserComponent {
-
 		public const string _ServiceId = "Confuser.DynCipher";
 
 		public override string Name {
@@ -29,6 +28,5 @@ namespace Confuser.DynCipher {
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
 			//
 		}
-
 	}
 }

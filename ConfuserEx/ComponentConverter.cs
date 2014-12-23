@@ -9,7 +9,6 @@ using Confuser.Core;
 
 namespace ConfuserEx {
 	internal class ComponentConverter : Freezable, IValueConverter {
-
 		public static readonly DependencyProperty ComponentsProperty = DependencyProperty.Register("Components", typeof(IList<ConfuserComponent>), typeof(ComponentConverter), new UIPropertyMetadata(null));
 
 		public IList<ConfuserComponent> Components {
@@ -37,6 +36,5 @@ namespace ConfuserEx {
 		protected override Freezable CreateInstanceCore() {
 			return new ComponentConverter();
 		}
-
 	}
 }

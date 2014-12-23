@@ -4,10 +4,9 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class ResourceReference : INameReference<TypeDef> {
-
-		private readonly string format;
-		private readonly Resource resource;
-		private readonly TypeDef typeDef;
+		readonly string format;
+		readonly Resource resource;
+		readonly TypeDef typeDef;
 
 		public ResourceReference(Resource resource, TypeDef typeDef, string format) {
 			this.resource = resource;
@@ -23,6 +22,5 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
-
 	}
 }

@@ -5,11 +5,10 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.BAML {
 	internal class KnownThingsv4 : IKnownThings {
-
-		private readonly Dictionary<int, AssemblyDef> assemblies;
-		private readonly ConfuserContext context;
-		private readonly Dictionary<KnownProperties, Tuple<KnownTypes, PropertyDef, TypeDef>> properties;
-		private readonly Dictionary<KnownTypes, TypeDef> types;
+		readonly Dictionary<int, AssemblyDef> assemblies;
+		readonly ConfuserContext context;
+		readonly Dictionary<KnownProperties, Tuple<KnownTypes, PropertyDef, TypeDef>> properties;
+		readonly Dictionary<KnownTypes, TypeDef> types;
 
 		public KnownThingsv4(ConfuserContext context, ModuleDefMD initMod) {
 			this.context = context;
@@ -35,7 +34,7 @@ namespace Confuser.Renamer.BAML {
 			get { return assemblies[0]; }
 		}
 
-		private Tuple<KnownTypes, PropertyDef, TypeDef> InitProperty(KnownTypes parent, string propertyName, TypeDef propertyType) {
+		Tuple<KnownTypes, PropertyDef, TypeDef> InitProperty(KnownTypes parent, string propertyName, TypeDef propertyType) {
 			if (propertyName != null)
 				return Tuple.Create(parent, types[parent].FindProperty(propertyName), propertyType);
 			return Tuple.Create(parent, (PropertyDef)null, propertyType);
@@ -43,7 +42,7 @@ namespace Confuser.Renamer.BAML {
 
 		// Following codes are auto-generated, do not modify.
 
-		private void InitAssemblies(ModuleDefMD initMod) {
+		void InitAssemblies(ModuleDefMD initMod) {
 			assemblies[0] = context.Resolver.ResolveThrow("PresentationFramework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35", initMod);
 			assemblies[1] = context.Resolver.ResolveThrow("PresentationCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35", initMod);
 			assemblies[2] = context.Resolver.ResolveThrow("System.Xaml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", initMod);
@@ -53,7 +52,7 @@ namespace Confuser.Renamer.BAML {
 			assemblies[6] = context.Resolver.ResolveThrow("System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", initMod);
 		}
 
-		private void InitTypes() {
+		void InitTypes() {
 			types[KnownTypes.AccessText] = assemblies[0].Find("System.Windows.Controls.AccessText", true);
 			types[KnownTypes.AdornedElementPlaceholder] = assemblies[0].Find("System.Windows.Controls.AdornedElementPlaceholder", true);
 			types[KnownTypes.Adorner] = assemblies[0].Find("System.Windows.Documents.Adorner", true);
@@ -815,7 +814,7 @@ namespace Confuser.Renamer.BAML {
 			types[KnownTypes.ZoomPercentageConverter] = assemblies[0].Find("System.Windows.Documents.ZoomPercentageConverter", true);
 		}
 
-		private void InitProperties() {
+		void InitProperties() {
 			properties[KnownProperties.AccessText_Text] = InitProperty(KnownTypes.AccessText, "Text", assemblies[3].Find("System.Char", true));
 			properties[KnownProperties.BeginStoryboard_Storyboard] = InitProperty(KnownTypes.BeginStoryboard, "Storyboard", assemblies[0].Find("System.Windows.Media.Animation.Storyboard", true));
 			properties[KnownProperties.BitmapEffectGroup_Children] = InitProperty(KnownTypes.BitmapEffectGroup, "Children", assemblies[1].Find("System.Windows.Media.Effects.BitmapEffect", true));
@@ -1084,6 +1083,5 @@ namespace Confuser.Renamer.BAML {
 			properties[KnownProperties.WrapPanel_Children] = InitProperty(KnownTypes.WrapPanel, "Children", assemblies[1].Find("System.Windows.UIElement", true));
 			properties[KnownProperties.XmlDataProvider_XmlSerializer] = InitProperty(KnownTypes.XmlDataProvider, "XmlSerializer", assemblies[6].Find("System.Xml.Serialization.IXmlSerializable", true));
 		}
-
 	}
 }

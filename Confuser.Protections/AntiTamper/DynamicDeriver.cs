@@ -10,9 +10,8 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.AntiTamper {
 	internal class DynamicDeriver : IKeyDeriver {
-
-		private StatementBlock derivation;
-		private Action<uint[], uint[]> encryptFunc;
+		StatementBlock derivation;
+		Action<uint[], uint[]> encryptFunc;
 
 		public void Init(ConfuserContext ctx, RandomGenerator random) {
 			StatementBlock dummy;
@@ -41,10 +40,9 @@ namespace Confuser.Protections.AntiTamper {
 			return ret;
 		}
 
-		private class CodeGen : CILCodeGen {
-
-			private readonly Local block;
-			private readonly Local key;
+		class CodeGen : CILCodeGen {
+			readonly Local block;
+			readonly Local key;
 
 			public CodeGen(Local block, Local key, MethodDef method, IList<Instruction> instrs)
 				: base(method, instrs) {
@@ -59,8 +57,6 @@ namespace Confuser.Protections.AntiTamper {
 					return key;
 				return base.Var(var);
 			}
-
 		}
-
 	}
 }

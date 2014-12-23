@@ -6,7 +6,6 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ControlFlow {
 	internal abstract class BlockBase {
-
 		public BlockBase(BlockType type) {
 			Type = type;
 		}
@@ -15,22 +14,18 @@ namespace Confuser.Protections.ControlFlow {
 
 		public BlockType Type { get; private set; }
 		public abstract void ToBody(CilBody body);
-
 	}
 
 	internal enum BlockType {
-
 		Normal,
 		Try,
 		Handler,
 		Finally,
 		Filter,
 		Fault
-
 	}
 
 	internal class ScopeBlock : BlockBase {
-
 		public ScopeBlock(BlockType type, ExceptionHandler handler)
 			: base(type) {
 			Handler = handler;
@@ -90,11 +85,9 @@ namespace Confuser.Protections.ControlFlow {
 			foreach (BlockBase block in Children)
 				block.ToBody(body);
 		}
-
 	}
 
 	internal class InstrBlock : BlockBase {
-
 		public InstrBlock()
 			: base(BlockType.Normal) {
 			Instructions = new List<Instruction>();
@@ -113,6 +106,5 @@ namespace Confuser.Protections.ControlFlow {
 			foreach (Instruction instr in Instructions)
 				body.Instructions.Add(instr);
 		}
-
 	}
 }

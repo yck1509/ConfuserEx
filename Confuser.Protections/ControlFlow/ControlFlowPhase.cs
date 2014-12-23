@@ -11,9 +11,8 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.ControlFlow {
 	internal class ControlFlowPhase : ProtectionPhase {
-
-		private static readonly JumpMangler Jump = new JumpMangler();
-		private static readonly SwitchMangler Switch = new SwitchMangler();
+		static readonly JumpMangler Jump = new JumpMangler();
+		static readonly SwitchMangler Switch = new SwitchMangler();
 
 		public ControlFlowPhase(ControlFlowProtection parent)
 			: base(parent) { }
@@ -26,7 +25,7 @@ namespace Confuser.Protections.ControlFlow {
 			get { return "Control flow mangling"; }
 		}
 
-		private static CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random, bool disableOpti) {
+		static CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random, bool disableOpti) {
 			var ret = new CFContext();
 			ret.Type = parameters.GetParameter(context, method, "type", CFType.Switch);
 			ret.Predicate = parameters.GetParameter(context, method, "predicate", PredicateType.Normal);
@@ -50,7 +49,7 @@ namespace Confuser.Protections.ControlFlow {
 			return ret;
 		}
 
-		private static bool DisabledOptimization(ModuleDef module) {
+		static bool DisabledOptimization(ModuleDef module) {
 			bool disableOpti = false;
 			CustomAttribute debugAttr = module.Assembly.CustomAttributes.Find("System.Diagnostics.DebuggableAttribute");
 			if (debugAttr != null) {
@@ -80,13 +79,13 @@ namespace Confuser.Protections.ControlFlow {
 				}
 		}
 
-		private static ManglerBase GetMangler(CFType type) {
+		static ManglerBase GetMangler(CFType type) {
 			if (type == CFType.Switch)
 				return Switch;
 			return Jump;
 		}
 
-		private void ProcessMethod(CilBody body, CFContext ctx) {
+		void ProcessMethod(CilBody body, CFContext ctx) {
 			uint maxStack;
 			if (!MaxStackCalculator.GetMaxStack(body.Instructions, body.ExceptionHandlers, out maxStack)) {
 				ctx.Context.Logger.Error("Failed to calcuate maxstack.");
@@ -107,6 +106,5 @@ namespace Confuser.Protections.ControlFlow {
 			}
 			body.KeepOldMaxStack = true;
 		}
-
 	}
 }

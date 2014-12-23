@@ -8,17 +8,16 @@ using Confuser.DynCipher.Transforms;
 
 namespace Confuser.DynCipher.Generation {
 	internal class CipherGenerator {
+		const int MAT_RATIO = 4;
+		const int NUMOP_RATIO = 10;
+		const int SWAP_RATIO = 6;
+		const int BINOP_RATIO = 9;
+		const int ROTATE_RATIO = 6;
+		const int RATIO_SUM = MAT_RATIO + NUMOP_RATIO + SWAP_RATIO + BINOP_RATIO + ROTATE_RATIO;
+		const double VARIANCE = 0.2;
 
-		private const int MAT_RATIO = 4;
-		private const int NUMOP_RATIO = 10;
-		private const int SWAP_RATIO = 6;
-		private const int BINOP_RATIO = 9;
-		private const int ROTATE_RATIO = 6;
-		private const int RATIO_SUM = MAT_RATIO + NUMOP_RATIO + SWAP_RATIO + BINOP_RATIO + ROTATE_RATIO;
-		private const double VARIANCE = 0.2;
 
-
-		private static void Shuffle<T>(RandomGenerator random, IList<T> arr) {
+		static void Shuffle<T>(RandomGenerator random, IList<T> arr) {
 			for (int i = 1; i < arr.Count; i++) {
 				int j = random.NextInt32(i + 1);
 				T tmp = arr[i];
@@ -27,7 +26,7 @@ namespace Confuser.DynCipher.Generation {
 			}
 		}
 
-		private static void PostProcessStatements(StatementBlock block, RandomGenerator random) {
+		static void PostProcessStatements(StatementBlock block, RandomGenerator random) {
 			MulToShiftTransform.Run(block);
 			NormalizeBinOpTransform.Run(block);
 			ExpansionTransform.Run(block);
@@ -87,6 +86,5 @@ namespace Confuser.DynCipher.Generation {
 			decrypt = decryptContext.Block;
 			PostProcessStatements(decrypt, random);
 		}
-
 	}
 }

@@ -10,7 +10,6 @@ using dnlib.DotNet.MD;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class TypeBlobAnalyzer : IRenamer {
-
 		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
 			var module = def as ModuleDefMD;
 			if (module == null) return;
@@ -93,7 +92,7 @@ namespace Confuser.Renamer.Analyzers {
 			//
 		}
 
-		private void AnalyzeCAArgument(ConfuserContext context, INameService service, CAArgument arg) {
+		void AnalyzeCAArgument(ConfuserContext context, INameService service, CAArgument arg) {
 			if (arg.Type.DefinitionAssembly.IsCorLib() && arg.Type.FullName == "System.Type") {
 				var typeSig = (TypeSig)arg.Value;
 				foreach (ITypeDefOrRef typeRef in typeSig.FindTypeRefs()) {
@@ -111,7 +110,7 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		private void AnalyzeMemberRef(ConfuserContext context, INameService service, MemberRef memberRef) {
+		void AnalyzeMemberRef(ConfuserContext context, INameService service, MemberRef memberRef) {
 			ITypeDefOrRef declType = memberRef.DeclaringType;
 			var typeSpec = declType as TypeSpec;
 			if (typeSpec == null)
@@ -128,7 +127,7 @@ namespace Confuser.Renamer.Analyzers {
 				Debug.Assert(!(inst.GenericType.TypeDefOrRef is TypeSpec));
 				TypeDef openType = inst.GenericType.TypeDefOrRef.ResolveTypeDefThrow();
 				if (!context.Modules.Contains((ModuleDefMD)openType.Module) ||
-					memberRef.IsArrayAccessors())
+				    memberRef.IsArrayAccessors())
 					return;
 
 				IDnlibDef member;
@@ -139,6 +138,5 @@ namespace Confuser.Renamer.Analyzers {
 				service.AddReference(member, new MemberRefReference(memberRef, member));
 			}
 		}
-
 	}
 }

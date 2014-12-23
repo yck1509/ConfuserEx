@@ -9,13 +9,12 @@ namespace Confuser.Core.Helpers {
 	///     A Control Flow Graph (CFG) of a method
 	/// </summary>
 	public class ControlFlowGraph : IEnumerable<ControlFlowBlock> {
+		readonly List<ControlFlowBlock> blocks;
+		readonly CilBody body;
+		readonly int[] instrBlocks;
+		readonly Dictionary<Instruction, int> indexMap;
 
-		private readonly List<ControlFlowBlock> blocks;
-		private readonly CilBody body;
-		private readonly int[] instrBlocks;
-		private readonly Dictionary<Instruction, int> indexMap;
-
-		private ControlFlowGraph(CilBody body) {
+		ControlFlowGraph(CilBody body) {
 			this.body = body;
 			instrBlocks = new int[body.Instructions.Count];
 			blocks = new List<ControlFlowBlock>();
@@ -76,7 +75,7 @@ namespace Confuser.Core.Helpers {
 			return indexMap[instr];
 		}
 
-		private void PopulateBlockHeaders(HashSet<Instruction> blockHeaders, HashSet<Instruction> entryHeaders) {
+		void PopulateBlockHeaders(HashSet<Instruction> blockHeaders, HashSet<Instruction> entryHeaders) {
 			for (int i = 0; i < body.Instructions.Count; i++) {
 				Instruction instr = body.Instructions[i];
 
@@ -106,7 +105,7 @@ namespace Confuser.Core.Helpers {
 			}
 		}
 
-		private void SplitBlocks(HashSet<Instruction> blockHeaders, HashSet<Instruction> entryHeaders) {
+		void SplitBlocks(HashSet<Instruction> blockHeaders, HashSet<Instruction> entryHeaders) {
 			int nextBlockId = 0;
 			int currentBlockId = -1;
 			Instruction currentBlockHdr = null;
@@ -145,7 +144,7 @@ namespace Confuser.Core.Helpers {
 			}
 		}
 
-		private void LinkBlocks() {
+		void LinkBlocks() {
 			for (int i = 0; i < body.Instructions.Count; i++) {
 				Instruction instr = body.Instructions[i];
 				if (instr.Operand is Instruction) {
@@ -196,7 +195,6 @@ namespace Confuser.Core.Helpers {
 
 			return graph;
 		}
-
 	}
 
 	/// <summary>
@@ -204,7 +202,6 @@ namespace Confuser.Core.Helpers {
 	/// </summary>
 	[Flags]
 	public enum ControlFlowBlockType {
-
 		/// <summary>
 		///     The block is a normal block
 		/// </summary>
@@ -218,15 +215,13 @@ namespace Confuser.Core.Helpers {
 		/// <summary>
 		///     There are unknown edges from this block. Usually used at filter blocks / throw / method exit.
 		/// </summary>
-		Exit = 2,
-
+		Exit = 2
 	}
 
 	/// <summary>
 	///     A block in Control Flow Graph (CFG).
 	/// </summary>
 	public class ControlFlowBlock {
-
 		/// <summary>
 		///     The footer instruction
 		/// </summary>
@@ -276,6 +271,5 @@ namespace Confuser.Core.Helpers {
 		public override string ToString() {
 			return string.Format("Block {0} => {1} {2}", Id, Type, string.Join(", ", Targets.Select(block => block.Id.ToString()).ToArray()));
 		}
-
 	}
 }

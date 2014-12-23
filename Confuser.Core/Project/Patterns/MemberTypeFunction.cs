@@ -6,7 +6,6 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that compare the type of definition.
 	/// </summary>
 	public class MemberTypeFunction : PatternFunction {
-
 		internal const string FnName = "member-type";
 
 		/// <inheritdoc />
@@ -43,6 +42,5 @@ namespace Confuser.Core.Project.Patterns {
 
 			return false;
 		}
-
 	}
 }

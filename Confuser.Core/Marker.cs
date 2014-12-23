@@ -15,7 +15,6 @@ namespace Confuser.Core {
 	///     Resolves and marks the modules with protection settings according to the rules.
 	/// </summary>
 	public class Marker {
-
 		/// <summary>
 		///     Annotation key of Strong Name Key.
 		/// </summary>
@@ -30,6 +29,7 @@ namespace Confuser.Core {
 		///     The packers available to use.
 		/// </summary>
 		protected Dictionary<string, Packer> packers;
+
 		/// <summary>
 		///     The protections available to use.
 		/// </summary>
@@ -50,7 +50,7 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="preset">The preset.</param>
 		/// <param name="settings">The settings.</param>
-		private void FillPreset(ProtectionPreset preset, ProtectionSettings settings) {
+		void FillPreset(ProtectionPreset preset, ProtectionSettings settings) {
 			foreach (Protection prot in protections.Values)
 				if (prot.Preset <= preset && !settings.ContainsKey(prot))
 					settings.Add(prot, new Dictionary<string, string>());
@@ -119,7 +119,7 @@ namespace Confuser.Core {
 					extModules.Add(module.LoadRaw(proj.BaseDirectory));
 					continue;
 				}
-				
+
 				ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
 				context.CheckCancellation();
 
@@ -216,6 +216,5 @@ namespace Confuser.Core {
 
 			ProtectionParameters.SetParameters(context, target, ret);
 		}
-
 	}
 }

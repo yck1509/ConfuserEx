@@ -2,8 +2,7 @@
 
 namespace Confuser.Runtime {
 	static partial class AntiDebugAntinet {
-
-		private static void Initialize() {
+		static void Initialize() {
 			if (!InitializeAntiDebugger())
 				Environment.FailFast(null);
 			InitializeAntiProfiler();
@@ -12,6 +11,5 @@ namespace Confuser.Runtime {
 				PreventActiveProfilerFromReceivingProfilingMessages();
 			}
 		}
-
 	}
 }

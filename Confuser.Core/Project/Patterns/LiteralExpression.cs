@@ -7,7 +7,6 @@ namespace Confuser.Core.Project.Patterns {
 	///     A literal expression.
 	/// </summary>
 	public class LiteralExpression : PatternExpression {
-
 		/// <summary>
 		///     Initializes a new instance of the <see cref="LiteralExpression" /> class.
 		/// </summary>
@@ -36,6 +35,5 @@ namespace Confuser.Core.Project.Patterns {
 			else
 				tokens.Add(new PatternToken(TokenType.Literal, Literal.ToString()));
 		}
-
 	}
 }

@@ -6,7 +6,6 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that compare the namespace of definition.
 	/// </summary>
 	public class NamespaceFunction : PatternFunction {
-
 		internal const string FnName = "namespace";
 
 		/// <inheritdoc />
@@ -34,6 +33,5 @@ namespace Confuser.Core.Project.Patterns {
 
 			return type != null && type.Namespace == ns.ToString();
 		}
-
 	}
 }

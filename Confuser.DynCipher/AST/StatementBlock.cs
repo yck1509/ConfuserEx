@@ -4,7 +4,6 @@ using System.Text;
 
 namespace Confuser.DynCipher.AST {
 	public class StatementBlock : Statement {
-
 		public StatementBlock() {
 			Statements = new List<Statement>();
 		}
@@ -19,6 +18,5 @@ namespace Confuser.DynCipher.AST {
 			sb.AppendLine("}");
 			return sb.ToString();
 		}
-
 	}
 }

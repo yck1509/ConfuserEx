@@ -13,7 +13,6 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Resources {
 	internal class InjectPhase : ProtectionPhase {
-
 		public InjectPhase(ResourceProtection parent)
 			: base(parent) { }
 
@@ -29,7 +28,7 @@ namespace Confuser.Protections.Resources {
 			if (parameters.Targets.Any()) {
 				if (!UTF8String.IsNullOrEmpty(context.CurrentModule.Assembly.Culture)) {
 					context.Logger.DebugFormat("Skipping resource encryption for satellite assembly '{0}'.",
-						context.CurrentModule.Assembly.FullName);
+					                           context.CurrentModule.Assembly.FullName);
 					return;
 				}
 				var compression = context.Registry.GetService<ICompressionService>();
@@ -77,7 +76,7 @@ namespace Confuser.Protections.Resources {
 			}
 		}
 
-		private void InjectHelpers(ConfuserContext context, ICompressionService compression, IRuntimeService rt, REContext moduleCtx) {
+		void InjectHelpers(ConfuserContext context, ICompressionService compression, IRuntimeService rt, REContext moduleCtx) {
 			var rtName = context.Packer != null ? "Confuser.Runtime.Resource_Packer" : "Confuser.Runtime.Resource";
 			IEnumerable<IDnlibDef> members = InjectHelper.Inject(rt.GetRuntimeType(rtName), context.CurrentModule.GlobalType, context.CurrentModule);
 			foreach (IDnlibDef member in members) {
@@ -105,7 +104,7 @@ namespace Confuser.Protections.Resources {
 			moduleCtx.Name.MarkHelper(moduleCtx.DataField, moduleCtx.Marker);
 		}
 
-		private void MutateInitializer(REContext moduleCtx, MethodDef decomp) {
+		void MutateInitializer(REContext moduleCtx, MethodDef decomp) {
 			moduleCtx.InitMethod.Body.SimplifyMacros(moduleCtx.InitMethod.Parameters);
 			List<Instruction> instrs = moduleCtx.InitMethod.Body.Instructions.ToList();
 			for (int i = 0; i < instrs.Count; i++) {
@@ -143,6 +142,5 @@ namespace Confuser.Protections.Resources {
 			});
 			moduleCtx.Context.Registry.GetService<IConstantService>().ExcludeMethod(moduleCtx.Context, moduleCtx.InitMethod);
 		}
-
 	}
 }

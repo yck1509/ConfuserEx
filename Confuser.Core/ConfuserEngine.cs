@@ -22,13 +22,12 @@ namespace Confuser.Core {
 	///     The processing engine of ConfuserEx.
 	/// </summary>
 	public static class ConfuserEngine {
-
 		/// <summary>
 		///     The version of ConfuserEx.
 		/// </summary>
 		public static readonly string Version;
 
-		private static readonly string Copyright;
+		static readonly string Copyright;
 
 		static ConfuserEngine() {
 			Assembly assembly = typeof(ConfuserEngine).Assembly;
@@ -61,7 +60,7 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="parameters">The parameters.</param>
 		/// <param name="token">The cancellation token.</param>
-		private static void RunInternal(ConfuserParameters parameters, CancellationToken token) {
+		static void RunInternal(ConfuserParameters parameters, CancellationToken token) {
 			// 1. Setup context
 			var context = new ConfuserContext();
 			context.Logger = parameters.GetLogger();
@@ -198,7 +197,7 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="pipeline">The protection pipeline.</param>
 		/// <param name="context">The context.</param>
-		private static void RunPipeline(ProtectionPipeline pipeline, ConfuserContext context) {
+		static void RunPipeline(ProtectionPipeline pipeline, ConfuserContext context) {
 			Func<IList<IDnlibDef>> getAllDefs = () => context.Modules.SelectMany(module => module.FindDefinitions()).ToList();
 			Func<ModuleDef, IList<IDnlibDef>> getModuleDefs = module => module.FindDefinitions().ToList();
 
@@ -247,7 +246,7 @@ namespace Confuser.Core {
 				context.Logger.Info("Done.");
 		}
 
-		private static void Inspection(ConfuserContext context) {
+		static void Inspection(ConfuserContext context) {
 			context.Logger.Info("Resolving dependencies...");
 			foreach (var dependency in context.Modules
 			                                  .SelectMany(module => module.GetAssemblyRefs().Select(asmRef => Tuple.Create(asmRef, module)))) {
@@ -315,7 +314,7 @@ namespace Confuser.Core {
 			}
 		}
 
-		private static void BeginModule(ConfuserContext context) {
+		static void BeginModule(ConfuserContext context) {
 			context.Logger.InfoFormat("Processing module '{0}'...", context.CurrentModule.Name);
 
 			context.CurrentModuleWriterListener = new ModuleWriterListener();
@@ -332,9 +331,9 @@ namespace Confuser.Core {
 				}
 		}
 
-		private static void ProcessModule(ConfuserContext context) { }
+		static void ProcessModule(ConfuserContext context) { }
 
-		private static void OptimizeMethods(ConfuserContext context) {
+		static void OptimizeMethods(ConfuserContext context) {
 			foreach (TypeDef type in context.CurrentModule.GetTypes())
 				foreach (MethodDef method in type.Methods) {
 					if (method.Body != null)
@@ -342,7 +341,7 @@ namespace Confuser.Core {
 				}
 		}
 
-		private static void EndModule(ConfuserContext context) {
+		static void EndModule(ConfuserContext context) {
 			string output = context.Modules[context.CurrentModuleIndex].Location;
 			if (output != null) {
 				if (!Path.IsPathRooted(output))
@@ -355,7 +354,7 @@ namespace Confuser.Core {
 			context.OutputPaths[context.CurrentModuleIndex] = output;
 		}
 
-		private static void WriteModule(ConfuserContext context) {
+		static void WriteModule(ConfuserContext context) {
 			context.Logger.InfoFormat("Writing module '{0}'...", context.CurrentModule.Name);
 
 			MemoryStream pdb = null, output = new MemoryStream();
@@ -377,7 +376,7 @@ namespace Confuser.Core {
 				context.CurrentModuleSymbol = pdb.ToArray();
 		}
 
-		private static void Debug(ConfuserContext context) {
+		static void Debug(ConfuserContext context) {
 			context.Logger.Info("Finalizing...");
 			for (int i = 0; i < context.OutputModules.Count; i++) {
 				if (context.OutputSymbols[i] == null)
@@ -390,14 +389,14 @@ namespace Confuser.Core {
 			}
 		}
 
-		private static void Pack(ConfuserContext context) {
+		static void Pack(ConfuserContext context) {
 			if (context.Packer != null) {
 				context.Logger.Info("Packing...");
 				context.Packer.Pack(context, new ProtectionParameters(context.Packer, context.Modules.OfType<IDnlibDef>().ToList()));
 			}
 		}
 
-		private static void SaveModules(ConfuserContext context) {
+		static void SaveModules(ConfuserContext context) {
 			context.Resolver.Clear();
 			for (int i = 0; i < context.OutputModules.Count; i++) {
 				string path = Path.GetFullPath(Path.Combine(context.OutputDirectory, context.OutputPaths[i]));
@@ -413,7 +412,7 @@ namespace Confuser.Core {
 		///     Prints the copyright stuff and environment information.
 		/// </summary>
 		/// <param name="context">The working context.</param>
-		private static void PrintInfo(ConfuserContext context) {
+		static void PrintInfo(ConfuserContext context) {
 			if (context.PackerInitiated) {
 				context.Logger.Info("Protecting packer stub...");
 			}
@@ -430,7 +429,7 @@ namespace Confuser.Core {
 			}
 		}
 
-		private static IEnumerable<string> GetFrameworkVersions() {
+		static IEnumerable<string> GetFrameworkVersions() {
 			// http://msdn.microsoft.com/en-us/library/hh925568.aspx
 
 			using (RegistryKey ndpKey =
@@ -479,7 +478,7 @@ namespace Confuser.Core {
 		///     Prints the environment information when error occurred.
 		/// </summary>
 		/// <param name="context">The working context.</param>
-		private static void PrintEnvironmentInfo(ConfuserContext context) {
+		static void PrintEnvironmentInfo(ConfuserContext context) {
 			if (context.PackerInitiated)
 				return;
 
@@ -505,6 +504,5 @@ namespace Confuser.Core {
 
 			context.Logger.Error("---END DEBUG INFO---");
 		}
-
 	}
 }

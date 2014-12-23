@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
-using Confuser.Core;
 using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Generation {
 	public class DMCodeGen {
+		readonly DynamicMethod dm;
+		readonly ILGenerator ilGen;
 
-		private readonly DynamicMethod dm;
-		private readonly ILGenerator ilGen;
-
-		private readonly Dictionary<string, LocalBuilder> localMap = new Dictionary<string, LocalBuilder>();
-		private readonly Dictionary<string, int> paramMap;
+		readonly Dictionary<string, LocalBuilder> localMap = new Dictionary<string, LocalBuilder>();
+		readonly Dictionary<string, int> paramMap;
 
 		public DMCodeGen(Type returnType, Tuple<string, Type>[] parameters) {
 			dm = new DynamicMethod("", returnType, parameters.Select(param => param.Item2).ToArray(), true);
@@ -61,7 +59,7 @@ namespace Confuser.DynCipher.Generation {
 			return this;
 		}
 
-		private void EmitLoad(Expression exp) {
+		void EmitLoad(Expression exp) {
 			if (exp is ArrayIndexExpression) {
 				var arrIndex = (ArrayIndexExpression)exp;
 				EmitLoad(arrIndex.Array);
@@ -134,7 +132,7 @@ namespace Confuser.DynCipher.Generation {
 				throw new NotSupportedException();
 		}
 
-		private void EmitStore(Expression exp, Expression value) {
+		void EmitStore(Expression exp, Expression value) {
 			if (exp is ArrayIndexExpression) {
 				var arrIndex = (ArrayIndexExpression)exp;
 				EmitLoad(arrIndex.Array);
@@ -151,7 +149,7 @@ namespace Confuser.DynCipher.Generation {
 				throw new NotSupportedException();
 		}
 
-		private void EmitStatement(Statement statement) {
+		void EmitStatement(Statement statement) {
 			if (statement is AssignmentStatement) {
 				var assignment = (AssignmentStatement)statement;
 				EmitStore(assignment.Target, assignment.Value);
@@ -197,6 +195,5 @@ namespace Confuser.DynCipher.Generation {
 			else
 				throw new NotSupportedException();
 		}
-
 	}
 }

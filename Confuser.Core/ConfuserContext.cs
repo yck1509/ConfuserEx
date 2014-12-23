@@ -10,9 +10,8 @@ namespace Confuser.Core {
 	///     Context providing information on the current protection process.
 	/// </summary>
 	public class ConfuserContext {
-
-		private readonly Annotations annotations = new Annotations();
-		private readonly ServiceRegistry registry = new ServiceRegistry();
+		readonly Annotations annotations = new Annotations();
+		readonly ServiceRegistry registry = new ServiceRegistry();
 		internal CancellationToken token;
 
 		/// <summary>
@@ -181,6 +180,5 @@ namespace Confuser.Core {
 			CurrentModuleWriterOptions = newOptions;
 			return newOptions;
 		}
-
 	}
 }

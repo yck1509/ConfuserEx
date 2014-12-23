@@ -6,7 +6,6 @@ namespace Confuser.Core.Project.Patterns {
 	///     A function that indicate the type of type(?).
 	/// </summary>
 	public class IsTypeFunction : PatternFunction {
-
 		internal const string FnName = "is-type";
 
 		/// <inheritdoc />
@@ -44,6 +43,5 @@ namespace Confuser.Core.Project.Patterns {
 
 			return false;
 		}
-
 	}
 }

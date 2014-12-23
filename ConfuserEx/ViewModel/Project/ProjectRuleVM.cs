@@ -7,17 +7,14 @@ using Confuser.Core.Project.Patterns;
 
 namespace ConfuserEx.ViewModel {
 	internal interface IRuleContainer {
-
 		IList<ProjectRuleVM> Rules { get; }
-
 	}
 
 	public class ProjectRuleVM : ViewModelBase, IViewModel<Rule> {
-
-		private readonly ProjectVM parent;
-		private readonly Rule rule;
-		private string error;
-		private PatternExpression exp;
+		readonly ProjectVM parent;
+		readonly Rule rule;
+		string error;
+		PatternExpression exp;
 
 		public ProjectRuleVM(ProjectVM parent, Rule rule) {
 			this.parent = parent;
@@ -76,7 +73,7 @@ namespace ConfuserEx.ViewModel {
 			get { return rule; }
 		}
 
-		private void ParseExpression() {
+		void ParseExpression() {
 			if (Pattern == null)
 				return;
 			PatternExpression expression;
@@ -90,6 +87,5 @@ namespace ConfuserEx.ViewModel {
 			}
 			Expression = expression;
 		}
-
 	}
 }

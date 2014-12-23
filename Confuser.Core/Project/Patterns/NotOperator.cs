@@ -6,7 +6,6 @@ namespace Confuser.Core.Project.Patterns {
 	///     The NOT operator.
 	/// </summary>
 	public class NotOperator : PatternOperator {
-
 		internal const string OpName = "not";
 
 		/// <inheritdoc />
@@ -23,6 +22,5 @@ namespace Confuser.Core.Project.Patterns {
 		public override object Evaluate(IDnlibDef definition) {
 			return !(bool)OperandA.Evaluate(definition);
 		}
-
 	}
 }

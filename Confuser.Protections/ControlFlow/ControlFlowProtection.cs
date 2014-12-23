@@ -5,13 +5,10 @@ using dnlib.DotNet;
 
 namespace Confuser.Protections {
 	public interface IControlFlowService {
-
 		void ExcludeMethod(ConfuserContext context, MethodDef method);
-
 	}
 
 	internal class ControlFlowProtection : Protection, IControlFlowService {
-
 		public const string _Id = "ctrl flow";
 		public const string _FullId = "Ki.ControlFlow";
 		public const string _ServiceId = "Ki.ControlFlow";
@@ -47,6 +44,5 @@ namespace Confuser.Protections {
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
 			pipeline.InsertPreStage(PipelineStage.OptimizeMethods, new ControlFlowPhase(this));
 		}
-
 	}
 }

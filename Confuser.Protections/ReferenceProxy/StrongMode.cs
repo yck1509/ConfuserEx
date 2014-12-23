@@ -14,16 +14,15 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class StrongMode : RPMode {
-
 		// { invoke opCode, invoke target, encoding}, { proxy field, bridge method }
-		private readonly List<FieldDesc> fieldDescs = new List<FieldDesc>();
-		private readonly Dictionary<Tuple<Code, IMethod, IRPEncoding>, Tuple<FieldDef, MethodDef>> fields = new Dictionary<Tuple<Code, IMethod, IRPEncoding>, Tuple<FieldDef, MethodDef>>();
+		readonly List<FieldDesc> fieldDescs = new List<FieldDesc>();
+		readonly Dictionary<Tuple<Code, IMethod, IRPEncoding>, Tuple<FieldDef, MethodDef>> fields = new Dictionary<Tuple<Code, IMethod, IRPEncoding>, Tuple<FieldDef, MethodDef>>();
 
-		private readonly Dictionary<IRPEncoding, InitMethodDesc[]> inits = new Dictionary<IRPEncoding, InitMethodDesc[]>();
-		private RPContext encodeCtx;
-		private Tuple<TypeDef, Func<int, int>>[] keyAttrs;
+		readonly Dictionary<IRPEncoding, InitMethodDesc[]> inits = new Dictionary<IRPEncoding, InitMethodDesc[]>();
+		RPContext encodeCtx;
+		Tuple<TypeDef, Func<int, int>>[] keyAttrs;
 
-		private static int? TraceBeginning(RPContext ctx, int index, int argCount) {
+		static int? TraceBeginning(RPContext ctx, int index, int argCount) {
 			if (ctx.BranchTargets.Contains(ctx.Body.Instructions[index]))
 				return null;
 
@@ -85,7 +84,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			}
 		}
 
-		private void ProcessBridge(RPContext ctx, int instrIndex) {
+		void ProcessBridge(RPContext ctx, int instrIndex) {
 			Instruction instr = ctx.Body.Instructions[instrIndex];
 			var target = (IMethod)instr.Operand;
 
@@ -130,7 +129,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			instr.Operand = proxy.Item2;
 		}
 
-		private void ProcessInvoke(RPContext ctx, int instrIndex, int argBeginIndex) {
+		void ProcessInvoke(RPContext ctx, int instrIndex, int argBeginIndex) {
 			Instruction instr = ctx.Body.Instructions[instrIndex];
 			var target = (IMethod)instr.Operand;
 
@@ -164,7 +163,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			}
 		}
 
-		private MethodDef CreateBridge(RPContext ctx, TypeDef delegateType, FieldDef field, MethodSig sig) {
+		MethodDef CreateBridge(RPContext ctx, TypeDef delegateType, FieldDef field, MethodSig sig) {
 			var method = new MethodDefUser(ctx.Name.RandomName(), sig);
 			method.Attributes = MethodAttributes.PrivateScope | MethodAttributes.Static;
 			method.ImplAttributes = MethodImplAttributes.Managed | MethodImplAttributes.IL;
@@ -184,7 +183,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			return method;
 		}
 
-		private FieldDef CreateField(RPContext ctx, TypeDef delegateType) {
+		FieldDef CreateField(RPContext ctx, TypeDef delegateType) {
 			// Details will be filled in during metadata writing
 			TypeDef randomType;
 			do {
@@ -203,7 +202,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			return field;
 		}
 
-		private TypeDef GetKeyAttr(RPContext ctx) {
+		TypeDef GetKeyAttr(RPContext ctx) {
 			if (keyAttrs == null)
 				keyAttrs = new Tuple<TypeDef, Func<int, int>>[0x10];
 
@@ -249,7 +248,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			return keyAttrs[index].Item1;
 		}
 
-		private InitMethodDesc GetInitMethod(RPContext ctx, IRPEncoding encoding) {
+		InitMethodDesc GetInitMethod(RPContext ctx, IRPEncoding encoding) {
 			InitMethodDesc[] initDescs;
 			if (!inits.TryGetValue(encoding, out initDescs))
 				inits[encoding] = initDescs = new InitMethodDesc[ctx.InitCount];
@@ -328,7 +327,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			encodeCtx = ctx;
 		}
 
-		private void EncodeField(object sender, ModuleWriterListenerEventArgs e) {
+		void EncodeField(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDMemberDefRidsAllocated) {
 				Dictionary<TypeDef, Func<int, int>> keyFuncs = keyAttrs
@@ -379,9 +378,8 @@ namespace Confuser.Protections.ReferenceProxy {
 			}
 		}
 
-		private class CodeGen : CILCodeGen {
-
-			private readonly Instruction[] arg;
+		class CodeGen : CILCodeGen {
+			readonly Instruction[] arg;
 
 			public CodeGen(Instruction[] arg, MethodDef method, IList<Instruction> instrs)
 				: base(method, instrs) {
@@ -391,33 +389,27 @@ namespace Confuser.Protections.ReferenceProxy {
 			protected override void LoadVar(Variable var) {
 				if (var.Name == "{RESULT}") {
 					foreach (Instruction instr in arg)
-						base.Emit(instr);
+						Emit(instr);
 				}
 				else
 					base.LoadVar(var);
 			}
-
 		}
 
-		private class FieldDesc {
-
+		class FieldDesc {
 			public FieldDef Field;
 			public InitMethodDesc InitDesc;
 			public IMethod Method;
 			public Code OpCode;
 			public byte OpKey;
-
 		}
 
-		private class InitMethodDesc {
-
+		class InitMethodDesc {
 			public IRPEncoding Encoding;
 			public MethodDef Method;
 			public int OpCodeIndex;
 			public int[] TokenByteOrder;
 			public int[] TokenNameOrder;
-
 		}
-
 	}
 }

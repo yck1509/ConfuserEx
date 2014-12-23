@@ -11,7 +11,6 @@ namespace Confuser.Core {
 	///     Provides a set of utility methods about dnlib
 	/// </summary>
 	public static class DnlibUtils {
-
 		/// <summary>
 		///     Finds all definitions of interest in a module.
 		/// </summary>
@@ -214,7 +213,7 @@ namespace Confuser.Core {
 			return ret;
 		}
 
-		private static void FindTypeRefsInternal(TypeSig typeSig, IList<ITypeDefOrRef> ret) {
+		static void FindTypeRefsInternal(TypeSig typeSig, IList<ITypeDefOrRef> ret) {
 			while (typeSig.Next != null) {
 				if (typeSig is ModifierSig)
 					ret.Add(((ModifierSig)typeSig).Modifier);
@@ -348,7 +347,6 @@ namespace Confuser.Core {
 	///     <see cref="Stream" /> wrapper of <see cref="IImageStream" />.
 	/// </summary>
 	public class ImageStream : Stream {
-
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ImageStream" /> class.
 		/// </summary>
@@ -422,6 +420,5 @@ namespace Confuser.Core {
 		public override void Write(byte[] buffer, int offset, int count) {
 			throw new NotSupportedException();
 		}
-
 	}
 }

@@ -14,29 +14,28 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections.AntiTamper {
 	internal class JITMode : IModeHandler {
-
-		private static readonly CilBody NopBody = new CilBody {
+		static readonly CilBody NopBody = new CilBody {
 			Instructions = {
 				Instruction.Create(OpCodes.Ldnull),
 				Instruction.Create(OpCodes.Throw)
 			}
 		};
 
-		private uint c;
-		private MethodDef cctor;
-		private MethodDef cctorRepl;
-		private ConfuserContext context;
-		private IKeyDeriver deriver;
-		private byte[] fieldLayout;
+		uint c;
+		MethodDef cctor;
+		MethodDef cctorRepl;
+		ConfuserContext context;
+		IKeyDeriver deriver;
+		byte[] fieldLayout;
 
-		private MethodDef initMethod;
-		private uint key;
-		private List<MethodDef> methods;
-		private uint name1, name2;
-		private RandomGenerator random;
-		private uint v;
-		private uint x;
-		private uint z;
+		MethodDef initMethod;
+		uint key;
+		List<MethodDef> methods;
+		uint name1, name2;
+		RandomGenerator random;
+		uint v;
+		uint x;
+		uint z;
 
 		public void HandleInject(AntiTamperProtection parent, ConfuserContext context, ProtectionParameters parameters) {
 			this.context = context;
@@ -151,7 +150,7 @@ namespace Confuser.Protections.AntiTamper {
 			context.CurrentModuleWriterListener.OnWriterEvent += OnWriterEvent;
 		}
 
-		private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
+		void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriter)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginWriteMethodBodies) {
 				context.Logger.Debug("Extracting method bodies...");
@@ -163,7 +162,7 @@ namespace Confuser.Protections.AntiTamper {
 			}
 		}
 
-		private void CreateSection(ModuleWriter writer) {
+		void CreateSection(ModuleWriter writer) {
 			// move some PE parts to separate section to prevent it from being hashed
 			var peSection = new PESection("", 0x60000020);
 			bool moved = false;
@@ -229,7 +228,7 @@ namespace Confuser.Protections.AntiTamper {
 			newSection.Add(new ByteArrayChunk(new byte[4]), 4);
 		}
 
-		private void EncryptSection(ModuleWriter writer) {
+		void EncryptSection(ModuleWriter writer) {
 			Stream stream = writer.DestinationStream;
 			var reader = new BinaryReader(writer.DestinationStream);
 			stream.Position = 0x3C;
@@ -272,7 +271,7 @@ namespace Confuser.Protections.AntiTamper {
 			stream.Write(byteResult, 0, byteResult.Length);
 		}
 
-		private void Hash(Stream stream, BinaryReader reader, uint offset, uint size) {
+		void Hash(Stream stream, BinaryReader reader, uint offset, uint size) {
 			long original = stream.Position;
 			stream.Position = offset;
 			size >>= 2;
@@ -287,7 +286,7 @@ namespace Confuser.Protections.AntiTamper {
 			stream.Position = original;
 		}
 
-		private uint[] DeriveKey() {
+		uint[] DeriveKey() {
 			uint[] dst = new uint[0x10], src = new uint[0x10];
 			for (int i = 0; i < 0x10; i++) {
 				dst[i] = v;
@@ -299,6 +298,5 @@ namespace Confuser.Protections.AntiTamper {
 			}
 			return deriver.DeriveKey(dst, src);
 		}
-
 	}
 }

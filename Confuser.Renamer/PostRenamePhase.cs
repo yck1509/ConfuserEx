@@ -4,7 +4,6 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer {
 	internal class PostRenamePhase : ProtectionPhase {
-
 		public PostRenamePhase(NameProtection parent)
 			: base(parent) { }
 
@@ -29,6 +28,5 @@ namespace Confuser.Renamer {
 				context.CheckCancellation();
 			}
 		}
-
 	}
 }

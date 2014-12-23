@@ -4,7 +4,6 @@ using System.Text;
 namespace Confuser.DynCipher.AST {
 	// i.e. for loop
 	public class LoopStatement : StatementBlock {
-
 		public int Begin { get; set; }
 		public int Limit { get; set; }
 
@@ -15,6 +14,5 @@ namespace Confuser.DynCipher.AST {
 			ret.Append(base.ToString());
 			return ret.ToString();
 		}
-
 	}
 }

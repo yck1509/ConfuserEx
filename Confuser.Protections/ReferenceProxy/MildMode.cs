@@ -6,9 +6,8 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class MildMode : RPMode {
-
 		// proxy method, { opCode, calling type, target method}
-		private readonly Dictionary<Tuple<Code, TypeDef, IMethod>, MethodDef> proxies = new Dictionary<Tuple<Code, TypeDef, IMethod>, MethodDef>();
+		readonly Dictionary<Tuple<Code, TypeDef, IMethod>, MethodDef> proxies = new Dictionary<Tuple<Code, TypeDef, IMethod>, MethodDef>();
 
 		public override void ProcessCall(RPContext ctx, int instrIndex) {
 			Instruction invoke = ctx.Body.Instructions[instrIndex];
@@ -68,6 +67,5 @@ namespace Confuser.Protections.ReferenceProxy {
 		}
 
 		public override void Finalize(RPContext ctx) { }
-
 	}
 }

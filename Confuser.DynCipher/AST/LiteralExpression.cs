@@ -2,7 +2,6 @@
 
 namespace Confuser.DynCipher.AST {
 	public class LiteralExpression : Expression {
-
 		public uint Value { get; set; }
 
 		public static implicit operator LiteralExpression(uint val) {
@@ -12,6 +11,5 @@ namespace Confuser.DynCipher.AST {
 		public override string ToString() {
 			return Value.ToString("x8") + "h";
 		}
-
 	}
 }

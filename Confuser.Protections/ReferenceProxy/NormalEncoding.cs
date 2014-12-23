@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Confuser.Core;
 using Confuser.Core.Services;
 using Confuser.DynCipher;
 using dnlib.DotNet;
@@ -8,8 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ReferenceProxy {
 	internal class NormalEncoding : IRPEncoding {
-
-		private readonly Dictionary<MethodDef, Tuple<int, int>> keys = new Dictionary<MethodDef, Tuple<int, int>>();
+		readonly Dictionary<MethodDef, Tuple<int, int>> keys = new Dictionary<MethodDef, Tuple<int, int>>();
 
 		public Instruction[] EmitDecode(MethodDef init, RPContext ctx, Instruction[] arg) {
 			Tuple<int, int> key = GetKey(ctx.Random, init);
@@ -31,7 +29,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			return value * key.Item2;
 		}
 
-		private Tuple<int, int> GetKey(RandomGenerator random, MethodDef init) {
+		Tuple<int, int> GetKey(RandomGenerator random, MethodDef init) {
 			Tuple<int, int> ret;
 			if (!keys.TryGetValue(init, out ret)) {
 				int key = random.NextInt32() | 1;
@@ -39,6 +37,5 @@ namespace Confuser.Protections.ReferenceProxy {
 			}
 			return ret;
 		}
-
 	}
 }

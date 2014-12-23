@@ -2,7 +2,6 @@
 
 namespace Confuser.DynCipher.AST {
 	public class Variable {
-
 		public Variable(string name) {
 			Name = name;
 		}
@@ -13,6 +12,5 @@ namespace Confuser.DynCipher.AST {
 		public override string ToString() {
 			return Name;
 		}
-
 	}
 }

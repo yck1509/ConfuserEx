@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,18 +7,18 @@ using Confuser.Core;
 
 namespace Confuser.CLI {
 	internal struct ObfAttrParser {
-		private System.Collections.IDictionary items;
+		IDictionary items;
 
-		private string str;
-		private int index;
+		string str;
+		int index;
 
-		public ObfAttrParser(System.Collections.IDictionary items) {
+		public ObfAttrParser(IDictionary items) {
 			this.items = items;
-			this.str = null;
-			this.index = -1;
+			str = null;
+			index = -1;
 		}
 
-		private enum ParseState {
+		enum ParseState {
 			Init,
 			ReadPreset,
 			ReadItemName,
@@ -27,7 +28,7 @@ namespace Confuser.CLI {
 			End
 		}
 
-		private bool ReadId(StringBuilder sb) {
+		bool ReadId(StringBuilder sb) {
 			while (index < str.Length) {
 				switch (str[index]) {
 					case '(':
@@ -46,21 +47,21 @@ namespace Confuser.CLI {
 			return false;
 		}
 
-		private void Expect(char chr) {
+		void Expect(char chr) {
 			if (str[index] != chr)
 				throw new ArgumentException("Expect '" + chr + "' at position " + (index + 1) + ".");
 			index++;
 		}
 
-		private char Peek() {
+		char Peek() {
 			return str[index];
 		}
 
-		private void Next() {
+		void Next() {
 			index++;
 		}
 
-		private bool IsEnd() {
+		bool IsEnd() {
 			return index == str.Length;
 		}
 
@@ -69,7 +70,7 @@ namespace Confuser.CLI {
 				return;
 
 			this.str = str;
-			this.index = 0;
+			index = 0;
 
 			var state = ParseState.Init;
 			var buffer = new StringBuilder();
@@ -80,7 +81,6 @@ namespace Confuser.CLI {
 
 			while (state != ParseState.End) {
 				switch (state) {
-
 					case ParseState.Init:
 						ReadId(buffer);
 						if (buffer.ToString().Equals("preset", StringComparison.OrdinalIgnoreCase)) {
@@ -211,7 +211,7 @@ namespace Confuser.CLI {
 				return;
 
 			this.str = str;
-			this.index = 0;
+			index = 0;
 
 			var state = ParseState.ReadItemName;
 			var buffer = new StringBuilder();

@@ -6,7 +6,6 @@ namespace Confuser.Core {
 	/// </summary>
 	[Flags]
 	public enum ProtectionTargets {
-
 		/// <summary> Type definitions. </summary>
 		Types = 1,
 
@@ -29,7 +28,6 @@ namespace Confuser.Core {
 		Modules = 32,
 
 		/// <summary> All definitions (i.e. All member definitions and modules). </summary>
-		AllDefinitions = AllMembers | Modules,
-
+		AllDefinitions = AllMembers | Modules
 	}
 }

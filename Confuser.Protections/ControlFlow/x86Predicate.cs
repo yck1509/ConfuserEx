@@ -13,12 +13,11 @@ using MethodBody = dnlib.DotNet.Writer.MethodBody;
 
 namespace Confuser.Protections.ControlFlow {
 	internal class x86Predicate : IPredicate {
+		static readonly object Encoding = new object();
+		readonly CFContext ctx;
+		x86Encoding encoding;
 
-		private static readonly object Encoding = new object();
-		private readonly CFContext ctx;
-		private x86Encoding encoding;
-
-		private bool inited;
+		bool inited;
 
 		public x86Predicate(CFContext ctx) {
 			this.ctx = ctx;
@@ -46,14 +45,13 @@ namespace Confuser.Protections.ControlFlow {
 			return encoding.expCompiled(key);
 		}
 
-		private class x86Encoding {
-
-			private byte[] code;
-			private MethodBody codeChunk;
+		class x86Encoding {
+			byte[] code;
+			MethodBody codeChunk;
 
 			public Func<int, int> expCompiled;
-			private Expression expression;
-			private Expression inverse;
+			Expression expression;
+			Expression inverse;
 			public MethodDef native;
 
 			public void Compile(CFContext ctx) {
@@ -93,7 +91,7 @@ namespace Confuser.Protections.ControlFlow {
 				ctx.Context.CurrentModuleWriterListener.OnWriterEvent += InjectNativeCode;
 			}
 
-			private void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
+			void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
 				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 					codeChunk = writer.MethodBodies.Add(new MethodBody(code));
@@ -103,8 +101,6 @@ namespace Confuser.Protections.ControlFlow {
 					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)codeChunk.RVA;
 				}
 			}
-
 		}
-
 	}
 }

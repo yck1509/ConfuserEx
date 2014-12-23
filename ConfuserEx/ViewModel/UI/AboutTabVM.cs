@@ -7,7 +7,6 @@ using GalaSoft.MvvmLight.Command;
 
 namespace ConfuserEx.ViewModel {
 	internal class AboutTabVM : TabViewModel {
-
 		public AboutTabVM(AppVM app)
 			: base(app, "About") {
 			var decoder = new IconBitmapDecoder(new Uri("pack://application:,,,/ConfuserEx.ico"), BitmapCreateOptions.DelayCreation, BitmapCacheOption.OnDemand);
@@ -20,6 +19,5 @@ namespace ConfuserEx.ViewModel {
 		}
 
 		public BitmapSource Icon { get; private set; }
-
 	}
 }

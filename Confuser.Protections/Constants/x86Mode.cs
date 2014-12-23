@@ -12,8 +12,7 @@ using MethodBody = dnlib.DotNet.Writer.MethodBody;
 
 namespace Confuser.Protections.Constants {
 	internal class x86Mode : IEncodeMode {
-
-		private Action<uint[], uint[]> encryptFunc;
+		Action<uint[], uint[]> encryptFunc;
 
 		public IEnumerable<Instruction> EmitDecrypt(MethodDef init, CEContext ctx, Local block, Local key) {
 			StatementBlock encrypt, decrypt;
@@ -58,10 +57,9 @@ namespace Confuser.Protections.Constants {
 			return (uint)encoding.expCompiled((int)id);
 		}
 
-		private class CipherCodeGen : CILCodeGen {
-
-			private readonly Local block;
-			private readonly Local key;
+		class CipherCodeGen : CILCodeGen {
+			readonly Local block;
+			readonly Local key;
 
 			public CipherCodeGen(Local block, Local key, MethodDef init, IList<Instruction> instrs)
 				: base(init, instrs) {
@@ -76,17 +74,15 @@ namespace Confuser.Protections.Constants {
 					return key;
 				return base.Var(var);
 			}
-
 		}
 
-		private class x86Encoding {
-
-			private byte[] code;
-			private MethodBody codeChunk;
+		class x86Encoding {
+			byte[] code;
+			MethodBody codeChunk;
 
 			public Func<int, int> expCompiled;
-			private Expression expression;
-			private Expression inverse;
+			Expression expression;
+			Expression inverse;
 			public MethodDef native;
 
 			public void Compile(CEContext ctx) {
@@ -125,7 +121,7 @@ namespace Confuser.Protections.Constants {
 				ctx.Context.CurrentModuleWriterListener.OnWriterEvent += InjectNativeCode;
 			}
 
-			private void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
+			void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
 				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 					codeChunk = writer.MethodBodies.Add(new MethodBody(code));
@@ -135,8 +131,6 @@ namespace Confuser.Protections.Constants {
 					writer.MetaData.TablesHeap.MethodTable[rid].RVA = (uint)codeChunk.RVA;
 				}
 			}
-
 		}
-
 	}
 }

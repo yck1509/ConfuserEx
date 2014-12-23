@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Confuser.Core;
 using Confuser.DynCipher.AST;
 using Confuser.DynCipher.Generation;
 using dnlib.DotNet;
@@ -8,8 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.Resources {
 	internal class DynamicMode : IEncodeMode {
-
-		private Action<uint[], uint[]> encryptFunc;
+		Action<uint[], uint[]> encryptFunc;
 
 		public IEnumerable<Instruction> EmitDecrypt(MethodDef init, REContext ctx, Local block, Local key) {
 			StatementBlock encrypt, decrypt;
@@ -37,10 +35,9 @@ namespace Confuser.Protections.Resources {
 			return ret;
 		}
 
-		private class CodeGen : CILCodeGen {
-
-			private readonly Local block;
-			private readonly Local key;
+		class CodeGen : CILCodeGen {
+			readonly Local block;
+			readonly Local key;
 
 			public CodeGen(Local block, Local key, MethodDef init, IList<Instruction> instrs)
 				: base(init, instrs) {
@@ -55,8 +52,6 @@ namespace Confuser.Protections.Resources {
 					return key;
 				return base.Var(var);
 			}
-
 		}
-
 	}
 }

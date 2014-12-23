@@ -6,10 +6,9 @@ using System.Text;
 
 namespace Confuser.Runtime {
 	internal static class Compressor {
+		static byte[] key;
 
-		private static byte[] key;
-
-		private static GCHandle Decrypt(uint[] data, uint seed) {
+		static GCHandle Decrypt(uint[] data, uint seed) {
 			var w = new uint[0x10];
 			var k = new uint[0x10];
 			ulong s = seed;
@@ -47,7 +46,7 @@ namespace Confuser.Runtime {
 		}
 
 		[STAThread]
-		private static int Main(string[] args) {
+		static int Main(string[] args) {
 			var l = (uint)Mutation.KeyI0;
 			uint[] q = Mutation.Placeholder(new uint[Mutation.KeyI0]);
 
@@ -73,7 +72,7 @@ namespace Confuser.Runtime {
 			return 0;
 		}
 
-		private static Assembly Resolve(object sender, ResolveEventArgs e) {
+		static Assembly Resolve(object sender, ResolveEventArgs e) {
 			byte[] b = Encoding.UTF8.GetBytes(e.Name);
 
 			Stream m = null;
@@ -107,6 +106,5 @@ namespace Confuser.Runtime {
 			}
 			return null;
 		}
-
 	}
 }

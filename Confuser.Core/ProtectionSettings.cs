@@ -6,7 +6,6 @@ namespace Confuser.Core {
 	///     Protection settings for a certain component
 	/// </summary>
 	public class ProtectionSettings : Dictionary<ConfuserComponent, Dictionary<string, string>> {
-
 		/// <summary>
 		///     Initializes a new instance of the <see cref="ProtectionSettings" /> class.
 		/// </summary>
@@ -29,6 +28,5 @@ namespace Confuser.Core {
 		public bool IsEmpty() {
 			return Count == 0;
 		}
-
 	}
 }

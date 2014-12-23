@@ -6,7 +6,6 @@ namespace Confuser.Core.Project.Patterns {
 	///     A pattern function.
 	/// </summary>
 	public abstract class PatternFunction : PatternExpression {
-
 		/// <summary>
 		///     Gets the name of function.
 		/// </summary>
@@ -36,6 +35,5 @@ namespace Confuser.Core.Project.Patterns {
 			}
 			tokens.Add(new PatternToken(TokenType.RParens));
 		}
-
 	}
 }

@@ -4,7 +4,6 @@ using System.IO;
 
 namespace Confuser.Renamer.BAML {
 	internal enum BamlRecordType : byte {
-
 		ClrEvent = 0x13,
 		Comment = 0x17,
 		AssemblyInfo = 0x1c,
@@ -62,20 +61,16 @@ namespace Confuser.Renamer.BAML {
 		TypeSerializerInfo = 0x1e,
 		XmlAttribute = 0x15,
 		XmlnsProperty = 0x14
-
 	}
 
 	internal abstract class BamlRecord {
-
 		public abstract BamlRecordType Type { get; }
 		public long Position { get; internal set; }
 		public abstract void Read(BamlBinaryReader reader);
 		public abstract void Write(BamlBinaryWriter writer);
-
 	}
 
 	internal abstract class SizedBamlRecord : BamlRecord {
-
 		public override void Read(BamlBinaryReader reader) {
 			long pos = reader.BaseStream.Position;
 			int size = reader.ReadEncodedInt();
@@ -84,7 +79,7 @@ namespace Confuser.Renamer.BAML {
 			Debug.Assert(reader.BaseStream.Position - pos == size);
 		}
 
-		private int SizeofEncodedInt(int val) {
+		int SizeofEncodedInt(int val) {
 			if ((val & ~0x7F) == 0) {
 				return 1;
 			}
@@ -112,19 +107,15 @@ namespace Confuser.Renamer.BAML {
 
 		protected abstract void ReadData(BamlBinaryReader reader, int size);
 		protected abstract void WriteData(BamlBinaryWriter writer);
-
 	}
 
 	internal interface IBamlDeferRecord {
-
 		BamlRecord Record { get; set; }
 		void ReadDefer(BamlDocument doc, int index, Func<long, BamlRecord> resolve);
 		void WriteDefer(BamlDocument doc, int index, BinaryWriter wtr);
-
 	}
 
 	internal class XmlnsPropertyRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.XmlnsProperty; }
 		}
@@ -148,11 +139,9 @@ namespace Confuser.Renamer.BAML {
 			foreach (ushort i in AssemblyIds)
 				writer.Write(i);
 		}
-
 	}
 
 	internal class PresentationOptionsAttributeRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PresentationOptionsAttribute; }
 		}
@@ -169,11 +158,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(Value);
 			writer.Write(NameId);
 		}
-
 	}
 
 	internal class PIMappingRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PIMapping; }
 		}
@@ -193,11 +180,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(ClrNamespace);
 			writer.Write(AssemblyId);
 		}
-
 	}
 
 	internal class AssemblyInfoRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.AssemblyInfo; }
 		}
@@ -214,11 +199,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(AssemblyId);
 			writer.Write(AssemblyFullName);
 		}
-
 	}
 
 	internal class PropertyRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.Property; }
 		}
@@ -235,11 +218,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(AttributeId);
 			writer.Write(Value);
 		}
-
 	}
 
 	internal class PropertyWithConverterRecord : PropertyRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyWithConverter; }
 		}
@@ -255,11 +236,9 @@ namespace Confuser.Renamer.BAML {
 			base.WriteData(writer);
 			writer.Write(ConverterTypeId);
 		}
-
 	}
 
 	internal class PropertyCustomRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyCustom; }
 		}
@@ -280,11 +259,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(SerializerTypeId);
 			writer.Write(Data);
 		}
-
 	}
 
 	internal class DefAttributeRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.DefAttribute; }
 		}
@@ -301,11 +278,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(Value);
 			writer.Write(NameId);
 		}
-
 	}
 
 	internal class DefAttributeKeyStringRecord : SizedBamlRecord, IBamlDeferRecord {
-
 		internal uint pos = 0xffffffff;
 
 		public override BamlRecordType Type {
@@ -388,7 +363,7 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(SharedSet);
 		}
 
-		private static void NavigateTree(BamlDocument doc, BamlRecordType start, BamlRecordType end, ref int index) {
+		static void NavigateTree(BamlDocument doc, BamlRecordType start, BamlRecordType end, ref int index) {
 			index++;
 			while (true) //Assume there alway is a end
 			{
@@ -399,11 +374,9 @@ namespace Confuser.Renamer.BAML {
 				index++;
 			}
 		}
-
 	}
 
 	internal class TypeInfoRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.TypeInfo; }
 		}
@@ -423,11 +396,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(AssemblyId);
 			writer.Write(TypeFullName);
 		}
-
 	}
 
 	internal class TypeSerializerInfoRecord : TypeInfoRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.TypeSerializerInfo; }
 		}
@@ -443,11 +414,9 @@ namespace Confuser.Renamer.BAML {
 			base.WriteData(writer);
 			writer.Write(SerializerTypeId);
 		}
-
 	}
 
 	internal class AttributeInfoRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.AttributeInfo; }
 		}
@@ -470,11 +439,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(AttributeUsage);
 			writer.Write(Name);
 		}
-
 	}
 
 	internal class StringInfoRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.StringInfo; }
 		}
@@ -491,11 +458,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(StringId);
 			writer.Write(Value);
 		}
-
 	}
 
 	internal class TextRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.Text; }
 		}
@@ -509,11 +474,9 @@ namespace Confuser.Renamer.BAML {
 		protected override void WriteData(BamlBinaryWriter writer) {
 			writer.Write(Value);
 		}
-
 	}
 
 	internal class TextWithConverterRecord : TextRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.TextWithConverter; }
 		}
@@ -529,11 +492,9 @@ namespace Confuser.Renamer.BAML {
 			base.WriteData(writer);
 			writer.Write(ConverterTypeId);
 		}
-
 	}
 
 	internal class TextWithIdRecord : TextRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.TextWithId; }
 		}
@@ -547,11 +508,9 @@ namespace Confuser.Renamer.BAML {
 		protected override void WriteData(BamlBinaryWriter writer) {
 			writer.Write(ValueId);
 		}
-
 	}
 
 	internal class LiteralContentRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.LiteralContent; }
 		}
@@ -571,11 +530,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(Reserved0);
 			writer.Write(Reserved1);
 		}
-
 	}
 
 	internal class RoutedEventRecord : SizedBamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.RoutedEvent; }
 		}
@@ -593,11 +550,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(Value);
 			writer.Write(AttributeId);
 		}
-
 	}
 
 	internal class DocumentStartRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.DocumentStart; }
 		}
@@ -617,22 +572,18 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(MaxAsyncRecords);
 			writer.Write(DebugBaml);
 		}
-
 	}
 
 	internal class DocumentEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.DocumentEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class ElementStartRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.ElementStart; }
 		}
@@ -649,41 +600,33 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(TypeId);
 			writer.Write(Flags);
 		}
-
 	}
 
 	internal class ElementEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.ElementEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class KeyElementStartRecord : DefAttributeKeyTypeRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.KeyElementStart; }
 		}
-
 	}
 
 	internal class KeyElementEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.KeyElementEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class ConnectionIdRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.ConnectionId; }
 		}
@@ -697,11 +640,9 @@ namespace Confuser.Renamer.BAML {
 		public override void Write(BamlBinaryWriter writer) {
 			writer.Write(ConnectionId);
 		}
-
 	}
 
 	internal class PropertyWithExtensionRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyWithExtension; }
 		}
@@ -721,11 +662,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(Flags);
 			writer.Write(ValueId);
 		}
-
 	}
 
 	internal class PropertyTypeReferenceRecord : PropertyComplexStartRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyTypeReference; }
 		}
@@ -741,11 +680,9 @@ namespace Confuser.Renamer.BAML {
 			base.Write(writer);
 			writer.Write(TypeId);
 		}
-
 	}
 
 	internal class PropertyStringReferenceRecord : PropertyComplexStartRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyStringReference; }
 		}
@@ -761,11 +698,9 @@ namespace Confuser.Renamer.BAML {
 			base.Write(writer);
 			writer.Write(StringId);
 		}
-
 	}
 
 	internal class PropertyWithStaticResourceIdRecord : StaticResourceIdRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyWithStaticResourceId; }
 		}
@@ -781,11 +716,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(AttributeId);
 			base.Write(writer);
 		}
-
 	}
 
 	internal class ContentPropertyRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.ContentProperty; }
 		}
@@ -799,11 +732,9 @@ namespace Confuser.Renamer.BAML {
 		public override void Write(BamlBinaryWriter writer) {
 			writer.Write(AttributeId);
 		}
-
 	}
 
 	internal class DefAttributeKeyTypeRecord : ElementStartRecord, IBamlDeferRecord {
-
 		internal uint pos = 0xffffffff;
 
 		public override BamlRecordType Type {
@@ -885,7 +816,7 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(SharedSet);
 		}
 
-		private static void NavigateTree(BamlDocument doc, BamlRecordType start, BamlRecordType end, ref int index) {
+		static void NavigateTree(BamlDocument doc, BamlRecordType start, BamlRecordType end, ref int index) {
 			index++;
 			while (true) {
 				if (doc[index].Type == start)
@@ -895,68 +826,54 @@ namespace Confuser.Renamer.BAML {
 				index++;
 			}
 		}
-
 	}
 
 	internal class PropertyListStartRecord : PropertyComplexStartRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyListStart; }
 		}
-
 	}
 
 	internal class PropertyListEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyListEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class PropertyDictionaryStartRecord : PropertyComplexStartRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyDictionaryStart; }
 		}
-
 	}
 
 	internal class PropertyDictionaryEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyDictionaryEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class PropertyArrayStartRecord : PropertyComplexStartRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyArrayStart; }
 		}
-
 	}
 
 	internal class PropertyArrayEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyArrayEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class PropertyComplexStartRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyComplexStart; }
 		}
@@ -970,44 +887,36 @@ namespace Confuser.Renamer.BAML {
 		public override void Write(BamlBinaryWriter writer) {
 			writer.Write(AttributeId);
 		}
-
 	}
 
 	internal class PropertyComplexEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.PropertyComplexEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class ConstructorParametersStartRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.ConstructorParametersStart; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class ConstructorParametersEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.ConstructorParametersEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class ConstructorParameterTypeRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.ConstructorParameterType; }
 		}
@@ -1021,12 +930,10 @@ namespace Confuser.Renamer.BAML {
 		public override void Write(BamlBinaryWriter writer) {
 			writer.Write(TypeId);
 		}
-
 	}
 
 	internal class DeferableContentStartRecord : BamlRecord, IBamlDeferRecord {
-
-		private long pos;
+		long pos;
 		internal uint size = 0xffffffff;
 
 		public override BamlRecordType Type {
@@ -1053,30 +960,24 @@ namespace Confuser.Renamer.BAML {
 			pos = writer.BaseStream.Position;
 			writer.Write((uint)0);
 		}
-
 	}
 
 	internal class StaticResourceStartRecord : ElementStartRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.StaticResourceStart; }
 		}
-
 	}
 
 	internal class StaticResourceEndRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.StaticResourceEnd; }
 		}
 
 		public override void Read(BamlBinaryReader reader) { }
 		public override void Write(BamlBinaryWriter writer) { }
-
 	}
 
 	internal class StaticResourceIdRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.StaticResourceId; }
 		}
@@ -1090,11 +991,9 @@ namespace Confuser.Renamer.BAML {
 		public override void Write(BamlBinaryWriter writer) {
 			writer.Write(StaticResourceId);
 		}
-
 	}
 
 	internal class OptimizedStaticResourceRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.OptimizedStaticResource; }
 		}
@@ -1111,11 +1010,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(Flags);
 			writer.Write(ValueId);
 		}
-
 	}
 
 	internal class LineNumberAndPositionRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.LineNumberAndPosition; }
 		}
@@ -1132,11 +1029,9 @@ namespace Confuser.Renamer.BAML {
 			writer.Write(LineNumber);
 			writer.Write(LinePosition);
 		}
-
 	}
 
 	internal class LinePositionRecord : BamlRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.LinePosition; }
 		}
@@ -1150,11 +1045,9 @@ namespace Confuser.Renamer.BAML {
 		public override void Write(BamlBinaryWriter writer) {
 			writer.Write(LinePosition);
 		}
-
 	}
 
 	internal class NamedElementStartRecord : ElementStartRecord {
-
 		public override BamlRecordType Type {
 			get { return BamlRecordType.NamedElementStart; }
 		}
@@ -1162,16 +1055,15 @@ namespace Confuser.Renamer.BAML {
 		public string RuntimeName { get; set; }
 
 		public override void Read(BamlBinaryReader reader) {
-			base.TypeId = reader.ReadUInt16();
+			TypeId = reader.ReadUInt16();
 			RuntimeName = reader.ReadString();
 		}
 
 		public override void Write(BamlBinaryWriter writer) {
-			writer.Write(base.TypeId);
+			writer.Write(TypeId);
 			if (RuntimeName != null) {
 				writer.Write(RuntimeName);
 			}
 		}
-
 	}
 }

@@ -6,7 +6,6 @@ using System.Linq;
 
 namespace ConfuserEx.ViewModel {
 	public static class Utils {
-
 		public static ObservableCollection<T> Wrap<T>(IList<T> list) {
 			var ret = new ObservableCollection<T>(list);
 
@@ -76,6 +75,5 @@ namespace ConfuserEx.ViewModel {
 			};
 			return ret;
 		}
-
 	}
 }

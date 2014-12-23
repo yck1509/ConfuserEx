@@ -9,7 +9,6 @@ using dnlib.DotNet.Writer;
 
 namespace Confuser.Protections {
 	internal class InvalidMetadataProtection : Protection {
-
 		public const string _Id = "invalid metadata";
 		public const string _FullId = "Ki.InvalidMD";
 
@@ -41,9 +40,8 @@ namespace Confuser.Protections {
 			pipeline.InsertPostStage(PipelineStage.BeginModule, new InvalidMDPhase(this));
 		}
 
-		private class InvalidMDPhase : ProtectionPhase {
-
-			private RandomGenerator random;
+		class InvalidMDPhase : ProtectionPhase {
+			RandomGenerator random;
 
 			public InvalidMDPhase(InvalidMetadataProtection parent)
 				: base(parent) { }
@@ -63,7 +61,7 @@ namespace Confuser.Protections {
 				}
 			}
 
-			private void Randomize<T>(MDTable<T> table) where T : IRawRow {
+			void Randomize<T>(MDTable<T> table) where T : IRawRow {
 				List<T> rows = table.ToList();
 				random.Shuffle(rows);
 				table.Reset();
@@ -71,7 +69,7 @@ namespace Confuser.Protections {
 					table.Add(row);
 			}
 
-			private void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
+			void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
 				var writer = (ModuleWriter)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndCreateTables) {
 					// These hurts reflection
@@ -131,13 +129,11 @@ namespace Confuser.Protections {
 					*/
 				}
 			}
-
 		}
 
-		private class RawHeap : HeapBase {
-
-			private readonly byte[] content;
-			private readonly string name;
+		class RawHeap : HeapBase {
+			readonly byte[] content;
+			readonly string name;
 
 			public RawHeap(string name, byte[] content) {
 				this.name = name;
@@ -155,8 +151,6 @@ namespace Confuser.Protections {
 			protected override void WriteToImpl(BinaryWriter writer) {
 				writer.Write(content);
 			}
-
 		}
-
 	}
 }

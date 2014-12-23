@@ -7,8 +7,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Protections.ControlFlow {
 	internal class SwitchMangler : ManglerBase {
-
-		private LinkedList<Instruction[]> SpiltStatements(InstrBlock block, MethodTrace trace, CFContext ctx) {
+		LinkedList<Instruction[]> SpiltStatements(InstrBlock block, MethodTrace trace, CFContext ctx) {
 			var statements = new LinkedList<Instruction[]>();
 			var currentStatement = new List<Instruction>();
 
@@ -31,7 +30,7 @@ namespace Confuser.Protections.ControlFlow {
 			return statements;
 		}
 
-		private static OpCode InverseBranch(OpCode opCode) {
+		static OpCode InverseBranch(OpCode opCode) {
 			switch (opCode.Code) {
 				case Code.Bge:
 					return OpCodes.Blt;
@@ -221,6 +220,5 @@ namespace Confuser.Protections.ControlFlow {
 				block.Instructions.AddRange(last);
 			}
 		}
-
 	}
 }

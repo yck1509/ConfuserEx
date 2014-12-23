@@ -3,8 +3,7 @@ using System.Windows.Markup;
 
 namespace ConfuserEx {
 	public class EnumValuesExtension : MarkupExtension {
-
-		private readonly Type enumType;
+		readonly Type enumType;
 
 		public EnumValuesExtension(Type enumType) {
 			this.enumType = enumType;
@@ -13,6 +12,5 @@ namespace ConfuserEx {
 		public override object ProvideValue(IServiceProvider serviceProvider) {
 			return Enum.GetValues(enumType);
 		}
-
 	}
 }

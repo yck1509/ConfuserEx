@@ -9,8 +9,7 @@ using NDesk.Options;
 
 namespace Confuser.CLI {
 	internal class Program {
-
-		private static int Main(string[] args) {
+		static int Main(string[] args) {
 			ConsoleColor original = Console.ForegroundColor;
 			Console.ForegroundColor = ConsoleColor.White;
 			string originalTitle = Console.Title;
@@ -18,11 +17,14 @@ namespace Confuser.CLI {
 
 			bool noPause = false;
 			string outDir = null;
-			var p = new OptionSet() {
-				{ "n|nopause", "no pause after finishing protection.",
-				   value => { noPause = (value != null); } },
-				{ "o|out=", "specifies output directory.",
-				   value => { outDir = value; } },
+			var p = new OptionSet {
+				{
+					"n|nopause", "no pause after finishing protection.",
+					value => { noPause = (value != null); }
+				}, {
+					"o|out=", "specifies output directory.",
+					value => { outDir = value; }
+				}
 			};
 
 			List<string> files;
@@ -62,7 +64,7 @@ namespace Confuser.CLI {
 					// Assuming first file = main module
 					var proj = new ConfuserProject();
 					foreach (var input in files)
-						proj.Add(new ProjectModule() { Path = input });
+						proj.Add(new ProjectModule { Path = input });
 					proj.BaseDirectory = Path.GetDirectoryName(files[0]);
 					proj.OutputDirectory = outDir;
 					parameters.Project = proj;
@@ -84,7 +86,7 @@ namespace Confuser.CLI {
 			}
 		}
 
-		private static int RunProject(ConfuserParameters parameters) {
+		static int RunProject(ConfuserParameters parameters) {
 			var logger = new ConsoleLogger();
 			parameters.Logger = new ConsoleLogger();
 
@@ -94,11 +96,11 @@ namespace Confuser.CLI {
 			return logger.ReturnValue;
 		}
 
-		private static bool NeedPause() {
+		static bool NeedPause() {
 			return Debugger.IsAttached || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("PROMPT"));
 		}
 
-		private static void PrintUsage() {
+		static void PrintUsage() {
 			WriteLine("Usage:");
 			WriteLine("Confuser.CLI -n|noPause <project configuration>");
 			WriteLine("Confuser.CLI -n|noPause -o|out=<output directory> <modules>");
@@ -106,24 +108,23 @@ namespace Confuser.CLI {
 			WriteLine("    -o|out     : specifies output directory.");
 		}
 
-		private static void WriteLineWithColor(ConsoleColor color, string txt) {
+		static void WriteLineWithColor(ConsoleColor color, string txt) {
 			ConsoleColor original = Console.ForegroundColor;
 			Console.ForegroundColor = color;
 			Console.WriteLine(txt);
 			Console.ForegroundColor = original;
 		}
 
-		private static void WriteLine(string txt) {
+		static void WriteLine(string txt) {
 			Console.WriteLine(txt);
 		}
 
-		private static void WriteLine() {
+		static void WriteLine() {
 			Console.WriteLine();
 		}
 
-		private class ConsoleLogger : ILogger {
-
-			private readonly DateTime begin;
+		class ConsoleLogger : ILogger {
+			readonly DateTime begin;
 
 			public ConsoleLogger() {
 				begin = DateTime.Now;
@@ -195,8 +196,6 @@ namespace Confuser.CLI {
 					ReturnValue = 1;
 				}
 			}
-
 		}
-
 	}
 }

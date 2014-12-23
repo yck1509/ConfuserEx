@@ -8,7 +8,6 @@ namespace Confuser.Core {
 	///     Discovers available protection plugins.
 	/// </summary>
 	public class PluginDiscovery {
-
 		/// <summary>
 		///     The default plugin discovery service.
 		/// </summary>
@@ -132,6 +131,5 @@ namespace Confuser.Core {
 				}
 			}
 		}
-
 	}
 }

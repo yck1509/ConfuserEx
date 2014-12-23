@@ -14,11 +14,11 @@ using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using dnlib.DotNet.MD;
 using dnlib.DotNet.Writer;
+using dnlib.PE;
 using FileAttributes = dnlib.DotNet.FileAttributes;
 
 namespace Confuser.Protections {
 	internal class Compressor : Packer {
-
 		public const string _Id = "compressor";
 		public const string _FullId = "Ki.Compressor";
 		public const string _ServiceId = "Ki.Compressor";
@@ -78,12 +78,12 @@ namespace Confuser.Protections {
 					StrongNameKey = snKey
 				});
 				context.CheckCancellation();
-				base.ProtectStub(context, context.OutputPaths[ctx.ModuleIndex], ms.ToArray(), snKey, new StubProtection(ctx, originModule));
+				ProtectStub(context, context.OutputPaths[ctx.ModuleIndex], ms.ToArray(), snKey, new StubProtection(ctx, originModule));
 			}
 		}
 
-		private static string GetFullName(byte[] module) {
-			var md = MetaDataCreator.CreateMetaData(new dnlib.PE.PEImage(module));
+		static string GetFullName(byte[] module) {
+			var md = MetaDataCreator.CreateMetaData(new PEImage(module));
 			var assemblyRow = md.TablesStream.ReadAssemblyRow(1);
 			var assembly = new AssemblyNameInfo();
 			assembly.Name = md.StringsStream.ReadNoNull(assemblyRow.Name);
@@ -95,7 +95,7 @@ namespace Confuser.Protections {
 			return assembly.FullName;
 		}
 
-		private void PackModules(ConfuserContext context, CompressorContext compCtx, ModuleDef stubModule, ICompressionService comp, RandomGenerator random) {
+		void PackModules(ConfuserContext context, CompressorContext compCtx, ModuleDef stubModule, ICompressionService comp, RandomGenerator random) {
 			int maxLen = 0;
 			var modules = new Dictionary<string, byte[]>();
 			for (int i = 0; i < context.OutputModules.Count; i++) {
@@ -149,7 +149,7 @@ namespace Confuser.Protections {
 			context.Logger.EndProgress();
 		}
 
-		private void InjectData(ModuleDef stubModule, MethodDef method, byte[] data) {
+		void InjectData(ModuleDef stubModule, MethodDef method, byte[] data) {
 			var dataType = new TypeDefUser("", "DataType", stubModule.CorLibTypes.GetTypeRef("System", "ValueType"));
 			dataType.Layout = TypeAttributes.ExplicitLayout;
 			dataType.Visibility = TypeAttributes.NestedPrivate;
@@ -176,7 +176,7 @@ namespace Confuser.Protections {
 			});
 		}
 
-		private void InjectStub(ConfuserContext context, CompressorContext compCtx, ProtectionParameters parameters, ModuleDef stubModule) {
+		void InjectStub(ConfuserContext context, CompressorContext compCtx, ProtectionParameters parameters, ModuleDef stubModule) {
 			var rt = context.Registry.GetService<IRuntimeService>();
 			RandomGenerator random = context.Registry.GetService<IRandomService>().GetRandomGenerator(Id);
 			var comp = context.Registry.GetService<ICompressionService>();
@@ -248,7 +248,7 @@ namespace Confuser.Protections {
 			PackModules(context, compCtx, stubModule, comp, random);
 		}
 
-		private void ImportAssemblyTypeReferences(ModuleDef originModule, ModuleDef stubModule) {
+		void ImportAssemblyTypeReferences(ModuleDef originModule, ModuleDef stubModule) {
 			var assembly = stubModule.Assembly;
 			foreach (var ca in assembly.CustomAttributes) {
 				if (ca.AttributeType.Scope == originModule)
@@ -260,9 +260,8 @@ namespace Confuser.Protections {
 			}
 		}
 
-		private class KeyInjector : IModuleWriterListener {
-
-			private readonly CompressorContext ctx;
+		class KeyInjector : IModuleWriterListener {
+			readonly CompressorContext ctx;
 
 			public KeyInjector(CompressorContext ctx) {
 				this.ctx = ctx;
@@ -296,8 +295,6 @@ namespace Confuser.Protections {
 						resTbl.Add(new RawManifestResourceRow(resource.Item1, resource.Item2, writer.MetaData.StringsHeap.Add(resource.Item3), impl));
 				}
 			}
-
 		}
-
 	}
 }

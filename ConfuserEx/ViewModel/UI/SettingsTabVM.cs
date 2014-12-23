@@ -11,10 +11,9 @@ using GalaSoft.MvvmLight.Command;
 
 namespace ConfuserEx.ViewModel {
 	internal class SettingsTabVM : TabViewModel {
-
-		private bool hasPacker;
-		private IRuleContainer selectedList;
-		private int selectedRuleIndex;
+		bool hasPacker;
+		IRuleContainer selectedList;
+		int selectedRuleIndex;
 
 		public SettingsTabVM(AppVM app)
 			: base(app, "Settings") {
@@ -84,7 +83,7 @@ namespace ConfuserEx.ViewModel {
 			}
 		}
 
-		private void InitProject() {
+		void InitProject() {
 			ModulesView = new CompositeCollection {
 				App.Project,
 				new CollectionContainer { Collection = App.Project.Modules }
@@ -102,6 +101,5 @@ namespace ConfuserEx.ViewModel {
 			}
 			base.OnPropertyChanged(property);
 		}
-
 	}
 }

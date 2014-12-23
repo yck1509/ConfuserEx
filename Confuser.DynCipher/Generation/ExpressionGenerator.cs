@@ -7,8 +7,7 @@ using Confuser.DynCipher.AST;
 
 namespace Confuser.DynCipher.Generation {
 	internal class ExpressionGenerator {
-
-		private static Expression GenerateExpression(RandomGenerator random, Expression current, int currentDepth, int targetDepth) {
+		static Expression GenerateExpression(RandomGenerator random, Expression current, int currentDepth, int targetDepth) {
 			if (currentDepth == targetDepth || (currentDepth > targetDepth / 3 && random.NextInt32(100) > 85))
 				return current;
 
@@ -37,7 +36,7 @@ namespace Confuser.DynCipher.Generation {
 			throw new UnreachableException();
 		}
 
-		private static void SwapOperands(RandomGenerator random, Expression exp) {
+		static void SwapOperands(RandomGenerator random, Expression exp) {
 			if (exp is BinOpExpression) {
 				var binExp = (BinOpExpression)exp;
 				if (random.NextBoolean()) {
@@ -56,7 +55,7 @@ namespace Confuser.DynCipher.Generation {
 				throw new UnreachableException();
 		}
 
-		private static bool HasVariable(Expression exp, Dictionary<Expression, bool> hasVar) {
+		static bool HasVariable(Expression exp, Dictionary<Expression, bool> hasVar) {
 			bool ret;
 			if (!hasVar.TryGetValue(exp, out ret)) {
 				if (exp is VariableExpression)
@@ -77,7 +76,7 @@ namespace Confuser.DynCipher.Generation {
 			return ret;
 		}
 
-		private static Expression GenerateInverse(Expression exp, Expression var, Dictionary<Expression, bool> hasVar) {
+		static Expression GenerateInverse(Expression exp, Expression var, Dictionary<Expression, bool> hasVar) {
 			Expression result = var;
 			while (!(exp is VariableExpression)) {
 				Debug.Assert(hasVar[exp]);
@@ -153,16 +152,13 @@ namespace Confuser.DynCipher.Generation {
 			inverse = GenerateInverse(expression, result, hasVar);
 		}
 
-		private enum ExpressionOps {
-
+		enum ExpressionOps {
 			Add,
 			Sub,
 			Mul,
 			Xor,
 			Not,
-			Neg,
-
+			Neg
 		}
-
 	}
 }

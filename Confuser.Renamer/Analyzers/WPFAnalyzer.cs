@@ -14,12 +14,11 @@ using dnlib.IO;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class WPFAnalyzer : IRenamer {
+		static readonly object BAMLKey = new object();
 
-		private static readonly object BAMLKey = new object();
-
-		private static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
+		static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
 		internal static readonly Regex UriPattern = new Regex(";COMPONENT/(.+\\.[BX]AML)$");
-		private BAMLAnalyzer analyzer;
+		BAMLAnalyzer analyzer;
 
 		internal Dictionary<string, List<IBAMLReference>> bamlRefs = new Dictionary<string, List<IBAMLReference>>(StringComparer.OrdinalIgnoreCase);
 		public event Action<BAMLAnalyzer, BamlElement> AnalyzeBAMLElement;
@@ -109,7 +108,7 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		private void AnalyzeMethod(ConfuserContext context, INameService service, MethodDef method) {
+		void AnalyzeMethod(ConfuserContext context, INameService service, MethodDef method) {
 			var dpRegInstrs = new List<Tuple<bool, Instruction>>();
 			var routedEvtRegInstrs = new List<Instruction>();
 			foreach (Instruction instr in method.Body.Instructions) {
@@ -249,7 +248,7 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		private void AnalyzeResources(ConfuserContext context, INameService service, ModuleDefMD module) {
+		void AnalyzeResources(ConfuserContext context, INameService service, ModuleDefMD module) {
 			if (analyzer == null) {
 				analyzer = new BAMLAnalyzer(context, service);
 				analyzer.AnalyzeElement += AnalyzeBAMLElement;
@@ -286,6 +285,5 @@ namespace Confuser.Renamer.Analyzers {
 			if (wpfResInfo.Count > 0)
 				context.Annotations.Set(module, BAMLKey, wpfResInfo);
 		}
-
 	}
 }

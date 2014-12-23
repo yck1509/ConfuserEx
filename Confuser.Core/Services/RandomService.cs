@@ -8,16 +8,15 @@ namespace Confuser.Core.Services {
 	///     A seeded SHA256 PRNG.
 	/// </summary>
 	public class RandomGenerator {
-
 		/// <summary>
 		///     The prime numbers used for generation
 		/// </summary>
-		private static readonly byte[] primes = { 7, 11, 23, 37, 43, 59, 71 };
+		static readonly byte[] primes = { 7, 11, 23, 37, 43, 59, 71 };
 
-		private readonly SHA256Managed sha256 = new SHA256Managed();
-		private int mixIndex;
-		private byte[] state; //32 bytes
-		private int stateFilled;
+		readonly SHA256Managed sha256 = new SHA256Managed();
+		int mixIndex;
+		byte[] state; //32 bytes
+		int stateFilled;
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="RandomGenerator" /> class.
@@ -51,7 +50,7 @@ namespace Confuser.Core.Services {
 		/// <summary>
 		///     Refills the state buffer.
 		/// </summary>
-		private void NextState() {
+		void NextState() {
 			for (int i = 0; i < 32; i++)
 				state[i] ^= primes[mixIndex = (mixIndex + 1) % primes.Length];
 			state = sha256.ComputeHash(state);
@@ -188,15 +187,13 @@ namespace Confuser.Core.Services {
 				list[i] = tmp;
 			}
 		}
-
 	}
 
 	/// <summary>
 	///     Implementation of <see cref="IRandomService" />.
 	/// </summary>
 	internal class RandomService : IRandomService {
-
-		private readonly byte[] seed; //32 bytes
+		readonly byte[] seed; //32 bytes
 
 		/// <summary>
 		///     Initializes a new instance of the <see cref="RandomService" /> class.
@@ -216,14 +213,12 @@ namespace Confuser.Core.Services {
 				newSeed[i] ^= idHash[i];
 			return new RandomGenerator(Utils.SHA256(newSeed));
 		}
-
 	}
 
 	/// <summary>
 	///     Provides methods to obtain a unique stable PRNG for any given ID.
 	/// </summary>
 	public interface IRandomService {
-
 		/// <summary>
 		///     Gets a RNG with the specified identifier.
 		/// </summary>
@@ -231,6 +226,5 @@ namespace Confuser.Core.Services {
 		/// <returns>The requested RNG.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="id" /> is <c>null</c>.</exception>
 		RandomGenerator GetRandomGenerator(string id);
-
 	}
 }

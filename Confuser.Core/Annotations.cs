@@ -11,8 +11,7 @@ namespace Confuser.Core {
 	///     The annotations are stored using <see cref="WeakReference" />
 	/// </remarks>
 	public class Annotations {
-
-		private readonly Dictionary<object, ListDictionary> annotations = new Dictionary<object, ListDictionary>(WeakReferenceComparer.Instance);
+		readonly Dictionary<object, ListDictionary> annotations = new Dictionary<object, ListDictionary>(WeakReferenceComparer.Instance);
 
 		/// <summary>
 		///     Retrieves the annotation on the specified object associated with the specified key.
@@ -136,8 +135,7 @@ namespace Confuser.Core {
 		/// <summary>
 		///     Equality comparer of weak references.
 		/// </summary>
-		private class WeakReferenceComparer : IEqualityComparer<object> {
-
+		class WeakReferenceComparer : IEqualityComparer<object> {
 			/// <summary>
 			///     The singleton instance of this comparer.
 			/// </summary>
@@ -146,7 +144,7 @@ namespace Confuser.Core {
 			/// <summary>
 			///     Prevents a default instance of the <see cref="WeakReferenceComparer" /> class from being created.
 			/// </summary>
-			private WeakReferenceComparer() { }
+			WeakReferenceComparer() { }
 
 			/// <inheritdoc />
 			public new bool Equals(object x, object y) {
@@ -172,14 +170,12 @@ namespace Confuser.Core {
 					return ((WeakReferenceKey)obj).HashCode;
 				return obj.GetHashCode();
 			}
-
 		}
 
 		/// <summary>
 		///     Represent a key using <see cref="WeakReference" />.
 		/// </summary>
-		private class WeakReferenceKey : WeakReference {
-
+		class WeakReferenceKey : WeakReference {
 			/// <inheritdoc />
 			public WeakReferenceKey(object target)
 				: base(target) {
@@ -191,8 +187,6 @@ namespace Confuser.Core {
 			/// </summary>
 			/// <value>The hash code.</value>
 			public int HashCode { get; private set; }
-
 		}
-
 	}
 }

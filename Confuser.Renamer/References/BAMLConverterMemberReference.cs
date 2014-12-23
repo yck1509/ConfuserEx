@@ -5,11 +5,10 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.References {
 	internal class BAMLConverterMemberReference : INameReference<IDnlibDef> {
-
-		private readonly IDnlibDef member;
-		private readonly PropertyRecord rec;
-		private readonly TypeSig sig;
-		private readonly BAMLAnalyzer.XmlNsContext xmlnsCtx;
+		readonly IDnlibDef member;
+		readonly PropertyRecord rec;
+		readonly TypeSig sig;
+		readonly BAMLAnalyzer.XmlNsContext xmlnsCtx;
 
 		public BAMLConverterMemberReference(BAMLAnalyzer.XmlNsContext xmlnsCtx, TypeSig sig, IDnlibDef member, PropertyRecord rec) {
 			this.xmlnsCtx = xmlnsCtx;
@@ -30,6 +29,5 @@ namespace Confuser.Renamer.References {
 		public bool ShouldCancelRename() {
 			return false;
 		}
-
 	}
 }

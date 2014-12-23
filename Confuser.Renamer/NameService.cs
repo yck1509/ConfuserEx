@@ -9,7 +9,6 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer {
 	public interface INameService {
-
 		VTableStorage GetVTables();
 
 		void Analyze(IDnlibDef def);
@@ -33,27 +32,25 @@ namespace Confuser.Renamer {
 		void SetOriginalNamespace(object obj, string ns);
 
 		void MarkHelper(IDnlibDef def, IMarkerService marker);
-
 	}
 
 	internal class NameService : INameService {
+		static readonly object CanRenameKey = new object();
+		static readonly object RenameModeKey = new object();
+		static readonly object ReferencesKey = new object();
+		static readonly object OriginalNameKey = new object();
+		static readonly object OriginalNamespaceKey = new object();
 
-		private static readonly object CanRenameKey = new object();
-		private static readonly object RenameModeKey = new object();
-		private static readonly object ReferencesKey = new object();
-		private static readonly object OriginalNameKey = new object();
-		private static readonly object OriginalNamespaceKey = new object();
-
-		private readonly ConfuserContext context;
-		private readonly byte[] nameSeed;
-		private readonly RandomGenerator random;
-		private readonly VTableStorage storage;
-		private AnalyzePhase analyze;
-		private readonly Dictionary<string, string> nameDict = new Dictionary<string, string>();
+		readonly ConfuserContext context;
+		readonly byte[] nameSeed;
+		readonly RandomGenerator random;
+		readonly VTableStorage storage;
+		AnalyzePhase analyze;
+		readonly Dictionary<string, string> nameDict = new Dictionary<string, string>();
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
-			this.storage = new VTableStorage(context.Logger);
+			storage = new VTableStorage(context.Logger);
 			random = context.Registry.GetService<IRandomService>().GetRandomGenerator(NameProtection._FullId);
 			nameSeed = random.NextBytes(20);
 
@@ -62,7 +59,7 @@ namespace Confuser.Renamer {
 				new VTableAnalyzer(),
 				new TypeBlobAnalyzer(),
 				new ResourceAnalyzer(),
-				new LdtokenEnumAnalyzer(),
+				new LdtokenEnumAnalyzer()
 			};
 		}
 
@@ -202,23 +199,23 @@ namespace Confuser.Renamer {
 
 		#region Charsets
 
-		private static readonly char[] asciiCharset = Enumerable.Range(32, 95)
-		                                                        .Select(ord => (char)ord)
-		                                                        .Except(new[] { '.' })
-		                                                        .ToArray();
+		static readonly char[] asciiCharset = Enumerable.Range(32, 95)
+		                                                .Select(ord => (char)ord)
+		                                                .Except(new[] { '.' })
+		                                                .ToArray();
 
-		private static readonly char[] letterCharset = Enumerable.Range(0, 26)
-		                                                         .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
-		                                                         .ToArray();
+		static readonly char[] letterCharset = Enumerable.Range(0, 26)
+		                                                 .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
+		                                                 .ToArray();
 
-		private static readonly char[] alphaNumCharset = Enumerable.Range(0, 26)
-		                                                           .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
-		                                                           .Concat(Enumerable.Range(0, 10).Select(ord => (char)('0' + ord)))
-		                                                           .ToArray();
+		static readonly char[] alphaNumCharset = Enumerable.Range(0, 26)
+		                                                   .SelectMany(ord => new[] { (char)('a' + ord), (char)('A' + ord) })
+		                                                   .Concat(Enumerable.Range(0, 10).Select(ord => (char)('0' + ord)))
+		                                                   .ToArray();
 
 		// Especially chosen, just to mess with people.
 		// Inspired by: http://xkcd.com/1137/ :D
-		private static readonly char[] unicodeCharset = new char[] { }
+		static readonly char[] unicodeCharset = new char[] { }
 			.Concat(Enumerable.Range(0x200b, 5).Select(ord => (char)ord))
 			.Concat(Enumerable.Range(0x2029, 6).Select(ord => (char)ord))
 			.Concat(Enumerable.Range(0x206a, 6).Select(ord => (char)ord))
@@ -246,6 +243,5 @@ namespace Confuser.Renamer {
 		public ICollection<KeyValuePair<string, string>> GetNameMap() {
 			return nameDict;
 		}
-
 	}
 }
