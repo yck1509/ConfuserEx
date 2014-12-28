@@ -1,4 +1,5 @@
 ﻿using System;
+using Confuser.Core.API;
 using Confuser.Core.Services;
 
 namespace Confuser.Core {
@@ -30,6 +31,11 @@ namespace Confuser.Core {
 		///     The service ID of Compression
 		/// </summary>
 		public const string _CompressionServiceId = "Confuser.Compression";
+
+		/// <summary>
+		///     The service ID of API Store
+		/// </summary>
+		public const string _APIStoreId = "Confuser.APIStore";
 
 		readonly Marker marker;
 		readonly ConfuserParameters parameters;
@@ -71,6 +77,7 @@ namespace Confuser.Core {
 			context.Registry.RegisterService(_TraceServiceId, typeof(ITraceService), new TraceService(context));
 			context.Registry.RegisterService(_RuntimeServiceId, typeof(IRuntimeService), new RuntimeService());
 			context.Registry.RegisterService(_CompressionServiceId, typeof(ICompressionService), new CompressionService(context));
+			context.Registry.RegisterService(_APIStoreId, typeof(IAPIStore), new APIStore(context));
 		}
 
 		/// <inheritdoc />

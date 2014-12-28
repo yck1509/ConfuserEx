@@ -98,7 +98,7 @@ namespace Confuser.Protections.Constants {
 				//native.HasSecurity = true;
 				ctx.Module.GlobalType.Methods.Add(native);
 
-				ctx.Name.MarkHelper(native, ctx.Marker);
+				ctx.Name.MarkHelper(native, ctx.Marker, ctx.Protection);
 
 				x86Register? reg;
 				var codeGen = new x86CodeGen();

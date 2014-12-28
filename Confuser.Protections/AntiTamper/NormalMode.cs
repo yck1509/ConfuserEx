@@ -83,7 +83,7 @@ namespace Confuser.Protections.AntiTamper {
 			var name = context.Registry.GetService<INameService>();
 			var marker = context.Registry.GetService<IMarkerService>();
 			foreach (IDnlibDef def in members) {
-				name.MarkHelper(def, marker);
+				name.MarkHelper(def, marker, parent);
 				if (def is MethodDef)
 					parent.ExcludeMethod(context, (MethodDef)def);
 			}

@@ -177,7 +177,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 			delegateType.Methods.Add(method);
 
-			ctx.Context.Registry.GetService<IMarkerService>().Mark(method);
+			ctx.Context.Registry.GetService<IMarkerService>().Mark(method, ctx.Protection);
 			ctx.Name.SetCanRename(method, false);
 
 			return method;
@@ -196,7 +196,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			field.CustomAttributes.Add(new CustomAttribute(GetKeyAttr(ctx).FindInstanceConstructors().First()));
 			delegateType.Fields.Add(field);
 
-			ctx.Marker.Mark(field);
+			ctx.Marker.Mark(field, ctx.Protection);
 			ctx.Name.SetCanRename(field, false);
 
 			return field;
@@ -238,11 +238,11 @@ namespace Confuser.Protections.ReferenceProxy {
 
 				foreach (IDnlibDef def in injectedAttr.FindDefinitions()) {
 					if (def.Name == "GetHashCode") {
-						ctx.Name.MarkHelper(def, ctx.Marker);
+						ctx.Name.MarkHelper(def, ctx.Marker, ctx.Protection);
 						((MethodDef)def).Access = MethodAttributes.Public;
 					}
 					else
-						ctx.Name.MarkHelper(def, ctx.Marker);
+						ctx.Name.MarkHelper(def, ctx.Marker, ctx.Protection);
 				}
 			}
 			return keyAttrs[index].Item1;
@@ -262,7 +262,7 @@ namespace Confuser.Protections.ReferenceProxy {
 				injectedMethod.Access = MethodAttributes.PrivateScope;
 				injectedMethod.Name = ctx.Name.RandomName();
 				ctx.Name.SetCanRename(injectedMethod, false);
-				ctx.Marker.Mark(injectedMethod);
+				ctx.Marker.Mark(injectedMethod, ctx.Protection);
 
 				var desc = new InitMethodDesc { Method = injectedMethod };
 
@@ -318,7 +318,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 			foreach (TypeDef delegateType in ctx.Delegates.Values) {
 				MethodDef cctor = delegateType.FindOrCreateStaticConstructor();
-				ctx.Marker.Mark(cctor);
+				ctx.Marker.Mark(cctor, ctx.Protection);
 				ctx.Name.SetCanRename(cctor, false);
 			}
 

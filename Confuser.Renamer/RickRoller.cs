@@ -40,8 +40,8 @@ namespace Confuser.Renamer {
 			trap.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 			newType.Methods.Add(trap);
 
-			marker.Mark(newType);
-			marker.Mark(trap);
+			marker.Mark(newType, null);
+			marker.Mark(trap, null);
 			nameService.SetCanRename(trap, false);
 
 			foreach (var method in module.GetTypes().SelectMany(type => type.Methods)) {

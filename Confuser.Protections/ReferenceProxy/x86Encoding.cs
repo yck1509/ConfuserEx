@@ -40,7 +40,7 @@ namespace Confuser.Protections.ReferenceProxy {
 			native.ImplAttributes = MethodImplAttributes.Native | MethodImplAttributes.Unmanaged | MethodImplAttributes.PreserveSig;
 			ctx.Module.GlobalType.Methods.Add(native);
 
-			ctx.Context.Registry.GetService<IMarkerService>().Mark(native);
+			ctx.Context.Registry.GetService<IMarkerService>().Mark(native, ctx.Protection);
 			ctx.Context.Registry.GetService<INameService>().SetCanRename(native, false);
 
 			x86Register? reg;

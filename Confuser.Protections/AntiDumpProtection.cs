@@ -68,7 +68,7 @@ namespace Confuser.Protections {
 					cctor.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, init));
 
 					foreach (IDnlibDef member in members)
-						name.MarkHelper(member, marker);
+						name.MarkHelper(member, marker, (Protection)Parent);
 				}
 			}
 		}

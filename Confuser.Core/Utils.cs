@@ -58,7 +58,7 @@ namespace Confuser.Core {
 		/// <param name="key">The key of the element to add.</param>
 		/// <param name="value">The value of the element to add.</param>
 		/// <exception cref="System.ArgumentNullException">key is <c>null</c>.</exception>
-		public static void AddListEntry<TKey, TValue>(this Dictionary<TKey, List<TValue>> self, TKey key, TValue value) {
+		public static void AddListEntry<TKey, TValue>(this IDictionary<TKey, List<TValue>> self, TKey key, TValue value) {
 			if (key == null)
 				throw new ArgumentNullException("key");
 			List<TValue> list;

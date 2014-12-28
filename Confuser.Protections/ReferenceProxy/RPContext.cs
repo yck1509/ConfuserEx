@@ -21,6 +21,7 @@ namespace Confuser.Protections.ReferenceProxy {
 	}
 
 	internal class RPContext {
+		public ReferenceProxyProtection Protection;
 		public CilBody Body;
 		public HashSet<Instruction> BranchTargets;
 		public ConfuserContext Context;

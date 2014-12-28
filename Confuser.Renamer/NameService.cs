@@ -31,7 +31,7 @@ namespace Confuser.Renamer {
 		void SetOriginalName(object obj, string name);
 		void SetOriginalNamespace(object obj, string ns);
 
-		void MarkHelper(IDnlibDef def, IMarkerService marker);
+		void MarkHelper(IDnlibDef def, IMarkerService marker, ConfuserComponent parentComp);
 	}
 
 	internal class NameService : INameService {
@@ -169,7 +169,7 @@ namespace Confuser.Renamer {
 			return Renamers.OfType<T>().Single();
 		}
 
-		public void MarkHelper(IDnlibDef def, IMarkerService marker) {
+		public void MarkHelper(IDnlibDef def, IMarkerService marker, ConfuserComponent parentComp) {
 			if (marker.IsMarked(def))
 				return;
 			if (def is MethodDef) {
@@ -194,7 +194,7 @@ namespace Confuser.Renamer {
 			}
 			SetCanRename(def, false);
 			Analyze(def);
-			marker.Mark(def);
+			marker.Mark(def, parentComp);
 		}
 
 		#region Charsets

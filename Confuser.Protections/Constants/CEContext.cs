@@ -10,6 +10,7 @@ using dnlib.DotNet.Emit;
 namespace Confuser.Protections.Constants {
 	internal class CEContext {
 		public ConfuserContext Context;
+		public ConstantProtection Protection;
 		public ModuleDef Module;
 
 		public FieldDef BufferField;

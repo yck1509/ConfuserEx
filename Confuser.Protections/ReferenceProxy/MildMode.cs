@@ -37,7 +37,7 @@ namespace Confuser.Protections.ReferenceProxy {
 					sig.Params.RemoveAt(0);
 				}
 
-				ctx.Marker.Mark(proxy);
+				ctx.Marker.Mark(proxy, ctx.Protection);
 				ctx.Name.Analyze(proxy);
 				ctx.Name.SetCanRename(proxy, false);
 

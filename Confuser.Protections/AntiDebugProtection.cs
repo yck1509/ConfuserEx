@@ -78,7 +78,7 @@ namespace Confuser.Protections {
 							attr = rt.GetRuntimeType(attrName);
 							module.Types.Add(attr = InjectHelper.Inject(attr, module));
 							foreach (IDnlibDef member in attr.FindDefinitions()) {
-								marker.Mark(member);
+								marker.Mark(member, (Protection)Parent);
 								name.Analyze(member);
 							}
 							name.SetCanRename(attr, false);
@@ -94,7 +94,7 @@ namespace Confuser.Protections {
 					cctor.Body.Instructions.Insert(0, Instruction.Create(OpCodes.Call, init));
 
 					foreach (IDnlibDef member in members) {
-						marker.Mark(member);
+						marker.Mark(member, (Protection)Parent);
 						name.Analyze(member);
 
 						bool ren = true;

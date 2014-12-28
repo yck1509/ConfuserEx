@@ -20,6 +20,7 @@ namespace Confuser.Protections.ControlFlow {
 
 	internal class CFContext {
 		public ConfuserContext Context;
+		public ControlFlowProtection Protection;
 		public int Depth;
 		public IDynCipherService DynCipher;
 

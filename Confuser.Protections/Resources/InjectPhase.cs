@@ -60,7 +60,7 @@ namespace Confuser.Protections.Resources {
 
 				// Inject helpers
 				MethodDef decomp = compression.GetRuntimeDecompressor(context.CurrentModule, member => {
-					name.MarkHelper(member, marker);
+					name.MarkHelper(member, marker, (Protection)Parent);
 					if (member is MethodDef)
 						ProtectionParameters.GetParameters(context, member).Remove(Parent);
 				});
@@ -82,7 +82,7 @@ namespace Confuser.Protections.Resources {
 			foreach (IDnlibDef member in members) {
 				if (member.Name == "Initialize")
 					moduleCtx.InitMethod = (MethodDef)member;
-				moduleCtx.Name.MarkHelper(member, moduleCtx.Marker);
+				moduleCtx.Name.MarkHelper(member, moduleCtx.Marker, (Protection)Parent);
 			}
 
 			var dataType = new TypeDefUser("", moduleCtx.Name.RandomName(), context.CurrentModule.CorLibTypes.GetTypeRef("System", "ValueType"));
@@ -92,7 +92,7 @@ namespace Confuser.Protections.Resources {
 			dataType.ClassLayout = new ClassLayoutUser(1, 0);
 			moduleCtx.DataType = dataType;
 			context.CurrentModule.GlobalType.NestedTypes.Add(dataType);
-			moduleCtx.Name.MarkHelper(dataType, moduleCtx.Marker);
+			moduleCtx.Name.MarkHelper(dataType, moduleCtx.Marker, (Protection)Parent);
 
 			moduleCtx.DataField = new FieldDefUser(moduleCtx.Name.RandomName(), new FieldSig(dataType.ToTypeSig())) {
 				IsStatic = true,
@@ -101,7 +101,7 @@ namespace Confuser.Protections.Resources {
 				Access = FieldAttributes.CompilerControlled
 			};
 			context.CurrentModule.GlobalType.Fields.Add(moduleCtx.DataField);
-			moduleCtx.Name.MarkHelper(moduleCtx.DataField, moduleCtx.Marker);
+			moduleCtx.Name.MarkHelper(moduleCtx.DataField, moduleCtx.Marker, (Protection)Parent);
 		}
 
 		void MutateInitializer(REContext moduleCtx, MethodDef decomp) {

@@ -67,7 +67,7 @@ namespace Confuser.Protections.ControlFlow {
 				//native.HasSecurity = true;
 				ctx.Method.Module.GlobalType.Methods.Add(native);
 
-				ctx.Context.Registry.GetService<IMarkerService>().Mark(native);
+				ctx.Context.Registry.GetService<IMarkerService>().Mark(native, ctx.Protection);
 				ctx.Context.Registry.GetService<INameService>().SetCanRename(native, false);
 
 				x86Register? reg;

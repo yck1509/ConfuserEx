@@ -113,7 +113,7 @@ namespace Confuser.Protections.AntiTamper {
 			cctorRepl.Body = new CilBody();
 			cctorRepl.Body.Instructions.Add(Instruction.Create(OpCodes.Ret));
 			context.CurrentModule.GlobalType.Methods.Add(cctorRepl);
-			name.MarkHelper(cctorRepl, marker);
+			name.MarkHelper(cctorRepl, marker, parent);
 
 			MutationHelper.InjectKeys(defs.OfType<MethodDef>().Single(method => method.Name == "HookHandler"),
 			                          new[] { 0 }, new[] { (int)key });
@@ -131,7 +131,7 @@ namespace Confuser.Protections.AntiTamper {
 					foreach (FieldDef f in fields)
 						dataType.Fields.Add(f);
 				}
-				name.MarkHelper(def, marker);
+				name.MarkHelper(def, marker, parent);
 				if (def is MethodDef)
 					parent.ExcludeMethod(context, (MethodDef)def);
 			}

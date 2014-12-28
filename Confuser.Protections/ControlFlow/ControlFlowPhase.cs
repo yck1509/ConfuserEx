@@ -25,7 +25,7 @@ namespace Confuser.Protections.ControlFlow {
 			get { return "Control flow mangling"; }
 		}
 
-		static CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random, bool disableOpti) {
+		CFContext ParseParameters(MethodDef method, ConfuserContext context, ProtectionParameters parameters, RandomGenerator random, bool disableOpti) {
 			var ret = new CFContext();
 			ret.Type = parameters.GetParameter(context, method, "type", CFType.Switch);
 			ret.Predicate = parameters.GetParameter(context, method, "predicate", PredicateType.Normal);
@@ -36,6 +36,7 @@ namespace Confuser.Protections.ControlFlow {
 
 			ret.JunkCode = parameters.GetParameter(context, method, "junk", false) && !disableOpti;
 
+			ret.Protection = (ControlFlowProtection)Parent;
 			ret.Random = random;
 			ret.Method = method;
 			ret.Context = context;
