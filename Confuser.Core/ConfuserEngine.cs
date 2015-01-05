@@ -162,22 +162,22 @@ namespace Confuser.Core {
 				ok = true;
 			}
 			catch (AssemblyResolveException ex) {
-				context.Logger.ErrorException("Failed to resolve a assembly, check if all dependencies are of correct version.", ex);
+				context.Logger.ErrorException("Failed to resolve an assembly, check if all dependencies are present in the correct version.", ex);
 				PrintEnvironmentInfo(context);
 			}
 			catch (TypeResolveException ex) {
-				context.Logger.ErrorException("Failed to resolve a type, check if all dependencies are of correct version.", ex);
+                context.Logger.ErrorException("Failed to resolve a type, check if all dependencies are present in the correct version.", ex);
 				PrintEnvironmentInfo(context);
 			}
 			catch (MemberRefResolveException ex) {
-				context.Logger.ErrorException("Failed to resolve a member, check if all dependencies are of correct version.", ex);
+				context.Logger.ErrorException("Failed to resolve a member, check if all dependencies are present in the correct version.", ex);
 				PrintEnvironmentInfo(context);
 			}
 			catch (IOException ex) {
-				context.Logger.ErrorException("An IO error occurred, check if all input/output locations are read/writable.", ex);
+				context.Logger.ErrorException("An IO error occurred, check if all input/output locations are readable/writable.", ex);
 			}
 			catch (OperationCanceledException) {
-				context.Logger.Error("Operation is canceled.");
+				context.Logger.Error("Operation cancelled.");
 			}
 			catch (ConfuserException) {
 				// Exception is already handled/logged, so just ignore and report failure
@@ -265,7 +265,7 @@ namespace Confuser.Core {
 				if (snKey == null && module.IsStrongNameSigned)
 					context.Logger.WarnFormat("[{0}] SN Key is not provided for a signed module, the output may not be working.", module.Name);
 				else if (snKey != null && !module.IsStrongNameSigned)
-					context.Logger.WarnFormat("[{0}] SN Key is provided for a unsigned module, the output may not be working.", module.Name);
+					context.Logger.WarnFormat("[{0}] SN Key is provided for an unsigned module, the output may not be working.", module.Name);
 				else if (snKey != null && module.IsStrongNameSigned &&
 				         !module.Assembly.PublicKey.Data.SequenceEqual(snKey.PublicKey))
 					context.Logger.WarnFormat("[{0}] Provided SN Key and signed module's public key do not match, the output may not be working.", module.Name);
