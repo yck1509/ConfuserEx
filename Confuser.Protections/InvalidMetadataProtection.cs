@@ -70,7 +70,7 @@ namespace Confuser.Protections {
 			}
 
 			void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
-				var writer = (ModuleWriter)sender;
+				var writer = (ModuleWriterBase)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndCreateTables) {
 					// These hurts reflection
 
@@ -112,13 +112,13 @@ namespace Confuser.Protections {
 					Randomize(writer.MetaData.TablesHeap.ManifestResourceTable);
 					//Randomize(writer.MetaData.TablesHeap.GenericParamConstraintTable);
 
-					writer.Options.MetaDataOptions.TablesHeapOptions.ExtraData = random.NextUInt32();
-					writer.Options.MetaDataOptions.TablesHeapOptions.UseENC = false;
-					writer.Options.MetaDataOptions.MetaDataHeaderOptions.VersionString += "\0\0\0\0";
+					writer.TheOptions.MetaDataOptions.TablesHeapOptions.ExtraData = random.NextUInt32();
+					writer.TheOptions.MetaDataOptions.TablesHeapOptions.UseENC = false;
+					writer.TheOptions.MetaDataOptions.MetaDataHeaderOptions.VersionString += "\0\0\0\0";
 
-					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Strings", new byte[1]));
-					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Blob", new byte[1]));
-					writer.Options.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Schema", new byte[1]));
+					writer.TheOptions.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Strings", new byte[1]));
+					writer.TheOptions.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Blob", new byte[1]));
+					writer.TheOptions.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Schema", new byte[1]));
 				}
 				else if (e.WriterEvent == ModuleWriterEvent.MDOnAllTablesSorted) {
 					writer.MetaData.TablesHeap.DeclSecurityTable.Add(new RawDeclSecurityRow(

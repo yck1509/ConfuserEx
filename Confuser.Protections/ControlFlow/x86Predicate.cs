@@ -92,7 +92,7 @@ namespace Confuser.Protections.ControlFlow {
 			}
 
 			void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
-				var writer = (ModuleWriter)sender;
+				var writer = (ModuleWriterBase)sender;
 				if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 					codeChunk = writer.MethodBodies.Add(new MethodBody(code));
 				}

@@ -320,6 +320,10 @@ namespace Confuser.Core {
 			context.CurrentModuleWriterListener = new ModuleWriterListener();
 			context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => context.CheckCancellation();
 			context.CurrentModuleWriterOptions = new ModuleWriterOptions(context.CurrentModule, context.CurrentModuleWriterListener);
+
+			if (!context.CurrentModule.IsILOnly)
+				context.RequestNative();
+			
 			var snKey = context.Annotations.Get<StrongNameKey>(context.CurrentModule, Marker.SNKey);
 			context.CurrentModuleWriterOptions.InitializeStrongNameSigning(context.CurrentModule, snKey);
 

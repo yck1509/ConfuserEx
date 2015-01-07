@@ -100,7 +100,7 @@ namespace Confuser.Protections.AntiTamper {
 		}
 
 		void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
-			var writer = (ModuleWriter)sender;
+			var writer = (ModuleWriterBase)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDEndCreateTables) {
 				CreateSections(writer);
 			}
@@ -109,7 +109,7 @@ namespace Confuser.Protections.AntiTamper {
 			}
 		}
 
-		void CreateSections(ModuleWriter writer) {
+		void CreateSections(ModuleWriterBase writer) {
 			var nameBuffer = new byte[8];
 			nameBuffer[0] = (byte)(name1 >> 0);
 			nameBuffer[1] = (byte)(name1 >> 8);
@@ -141,15 +141,18 @@ namespace Confuser.Protections.AntiTamper {
 				peSection.Add(writer.StrongNameSignature, alignment);
 				moved = true;
 			}
-			if (writer.ImportAddressTable != null) {
-				alignment = writer.TextSection.Remove(writer.ImportAddressTable).Value;
-				peSection.Add(writer.ImportAddressTable, alignment);
-				moved = true;
-			}
-			if (writer.StartupStub != null) {
-				alignment = writer.TextSection.Remove(writer.StartupStub).Value;
-				peSection.Add(writer.StartupStub, alignment);
-				moved = true;
+			var managedWriter = writer as ModuleWriter;
+			if (managedWriter != null) {
+				if (managedWriter.ImportAddressTable != null) {
+					alignment = writer.TextSection.Remove(managedWriter.ImportAddressTable).Value;
+					peSection.Add(managedWriter.ImportAddressTable, alignment);
+					moved = true;
+				}
+				if (managedWriter.StartupStub != null) {
+					alignment = writer.TextSection.Remove(managedWriter.StartupStub).Value;
+					peSection.Add(managedWriter.StartupStub, alignment);
+					moved = true;
+				}
 			}
 			if (moved)
 				writer.Sections.Add(peSection);
@@ -169,7 +172,7 @@ namespace Confuser.Protections.AntiTamper {
 			newSection.Add(new ByteArrayChunk(new byte[4]), 4);
 		}
 
-		void EncryptSection(ModuleWriter writer) {
+		void EncryptSection(ModuleWriterBase writer) {
 			Stream stream = writer.DestinationStream;
 			var reader = new BinaryReader(writer.DestinationStream);
 			stream.Position = 0x3C;

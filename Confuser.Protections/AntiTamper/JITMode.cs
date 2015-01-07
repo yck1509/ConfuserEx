@@ -151,7 +151,7 @@ namespace Confuser.Protections.AntiTamper {
 		}
 
 		void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
-			var writer = (ModuleWriter)sender;
+			var writer = (ModuleWriterBase)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginWriteMethodBodies) {
 				context.Logger.Debug("Extracting method bodies...");
 				CreateSection(writer);
@@ -162,7 +162,7 @@ namespace Confuser.Protections.AntiTamper {
 			}
 		}
 
-		void CreateSection(ModuleWriter writer) {
+		void CreateSection(ModuleWriterBase writer) {
 			// move some PE parts to separate section to prevent it from being hashed
 			var peSection = new PESection("", 0x60000020);
 			bool moved = false;
@@ -172,15 +172,18 @@ namespace Confuser.Protections.AntiTamper {
 				peSection.Add(writer.StrongNameSignature, alignment);
 				moved = true;
 			}
-			if (writer.ImportAddressTable != null) {
-				alignment = writer.TextSection.Remove(writer.ImportAddressTable).Value;
-				peSection.Add(writer.ImportAddressTable, alignment);
-				moved = true;
-			}
-			if (writer.StartupStub != null) {
-				alignment = writer.TextSection.Remove(writer.StartupStub).Value;
-				peSection.Add(writer.StartupStub, alignment);
-				moved = true;
+			var managedWriter = writer as ModuleWriter;
+			if (managedWriter != null) {
+				if (managedWriter.ImportAddressTable != null) {
+					alignment = writer.TextSection.Remove(managedWriter.ImportAddressTable).Value;
+					peSection.Add(managedWriter.ImportAddressTable, alignment);
+					moved = true;
+				}
+				if (managedWriter.StartupStub != null) {
+					alignment = writer.TextSection.Remove(managedWriter.StartupStub).Value;
+					peSection.Add(managedWriter.StartupStub, alignment);
+					moved = true;
+				}
 			}
 			if (moved)
 				writer.Sections.Add(peSection);
@@ -228,7 +231,7 @@ namespace Confuser.Protections.AntiTamper {
 			newSection.Add(new ByteArrayChunk(new byte[4]), 4);
 		}
 
-		void EncryptSection(ModuleWriter writer) {
+		void EncryptSection(ModuleWriterBase writer) {
 			Stream stream = writer.DestinationStream;
 			var reader = new BinaryReader(writer.DestinationStream);
 			stream.Position = 0x3C;

@@ -24,7 +24,7 @@ namespace Confuser.Protections.Resources {
 		}
 
 		void OnWriterEvent(object sender, ModuleWriterListenerEventArgs e) {
-			var writer = (ModuleWriter)sender;
+			var writer = (ModuleWriterBase)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDBeginAddResources) {
 				ctx.Context.CheckCancellation();
 				ctx.Context.Logger.Debug("Encrypting resources...");
@@ -37,8 +37,8 @@ namespace Confuser.Protections.Resources {
 				// move resources
 				string asmName = ctx.Name.RandomName(RenameMode.Letters);
 				PublicKey pubKey = null;
-				if (writer.Options.StrongNameKey != null)
-					pubKey = PublicKeyBase.CreatePublicKey(writer.Options.StrongNameKey.PublicKey);
+				if (writer.TheOptions.StrongNameKey != null)
+					pubKey = PublicKeyBase.CreatePublicKey(writer.TheOptions.StrongNameKey.PublicKey);
 				var assembly = new AssemblyDefUser(asmName, new Version(0, 0), pubKey);
 				assembly.Modules.Add(new ModuleDefUser(asmName + ".dll"));
 				ModuleDef module = assembly.ManifestModule;
@@ -53,7 +53,7 @@ namespace Confuser.Protections.Resources {
 				}
 				byte[] moduleBuff;
 				using (var ms = new MemoryStream()) {
-					module.Write(ms, new ModuleWriterOptions { StrongNameKey = writer.Options.StrongNameKey });
+					module.Write(ms, new ModuleWriterOptions { StrongNameKey = writer.TheOptions.StrongNameKey });
 					moduleBuff = ms.ToArray();
 				}
 

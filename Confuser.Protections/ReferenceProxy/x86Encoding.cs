@@ -69,7 +69,7 @@ namespace Confuser.Protections.ReferenceProxy {
 		}
 
 		void InjectNativeCode(object sender, ModuleWriterListenerEventArgs e) {
-			var writer = (ModuleWriter)sender;
+			var writer = (ModuleWriterBase)sender;
 			if (e.WriterEvent == ModuleWriterEvent.MDEndWriteMethodBodies) {
 				for (int n = 0; n < nativeCodes.Count; n++)
 					nativeCodes[n] = new Tuple<MethodDef, byte[], MethodBody>(

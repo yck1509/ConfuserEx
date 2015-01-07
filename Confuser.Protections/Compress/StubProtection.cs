@@ -90,7 +90,7 @@ namespace Confuser.Protections.Compress {
 				context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => {
 					if (e.WriterEvent == ModuleWriterEvent.MDBeginCreateTables) {
 						// Add key signature
-						var writer = (ModuleWriter)sender;
+						var writer = (ModuleWriterBase)sender;
 						var prot = (StubProtection)Parent;
 						uint blob = writer.MetaData.BlobHeap.Add(prot.ctx.KeySig);
 						uint rid = writer.MetaData.TablesHeap.StandAloneSigTable.Add(new RawStandAloneSigRow(blob));
