@@ -185,8 +185,18 @@ namespace Confuser.Protections.AntiTamper {
 			stream.Position += 2 + optSize;
 
 			uint encLoc = 0, encSize = 0;
+			int origSects = -1;
+			if (writer is NativeModuleWriter && writer.Module is ModuleDefMD)
+				origSects = ((ModuleDefMD)writer.Module).MetaData.PEImage.ImageSectionHeaders.Count;
 			for (int i = 0; i < sections; i++) {
-				uint nameHash = reader.ReadUInt32() * reader.ReadUInt32();
+				uint nameHash;
+				if (origSects > 0) {
+					origSects--;
+					stream.Write(new byte[8], 0, 8);
+					nameHash = 0;
+				}
+				else
+					nameHash = reader.ReadUInt32() * reader.ReadUInt32();
 				stream.Position += 8;
 				if (nameHash == name1 * name2) {
 					encSize = reader.ReadUInt32();
@@ -197,6 +207,8 @@ namespace Confuser.Protections.AntiTamper {
 					uint sectLoc = reader.ReadUInt32();
 					Hash(stream, reader, sectLoc, sectSize);
 				}
+				else
+					stream.Position += 8;
 				stream.Position += 16;
 			}
 
