@@ -1,4 +1,5 @@
 ﻿using System;
+using dnlib.DotNet;
 using dnlib.DotNet.Writer;
 
 namespace Confuser.Core {
@@ -8,6 +9,8 @@ namespace Confuser.Core {
 	public class ModuleWriterListener : IModuleWriterListener {
 		/// <inheritdoc />
 		void IModuleWriterListener.OnWriterEvent(ModuleWriterBase writer, ModuleWriterEvent evt) {
+			if (evt == ModuleWriterEvent.PESectionsCreated)
+				NativeEraser.Erase(writer as NativeModuleWriter, writer.Module as ModuleDefMD);
 			if (OnWriterEvent != null) {
 				OnWriterEvent(writer, new ModuleWriterListenerEventArgs(evt));
 			}
