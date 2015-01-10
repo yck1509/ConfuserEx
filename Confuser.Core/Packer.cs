@@ -31,6 +31,11 @@ namespace Confuser.Core {
 			string tmpDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 			string outDir = Path.Combine(tmpDir, Path.GetRandomFileName());
 			Directory.CreateDirectory(tmpDir);
+
+			for (int i = 0; i < context.OutputModules.Count; i++) {
+				string path = Path.GetFullPath(Path.Combine(tmpDir, context.OutputPaths[i]));
+				File.WriteAllBytes(path, context.OutputModules[i]);
+			}
 			File.WriteAllBytes(Path.Combine(tmpDir, fileName), module);
 
 			var proj = new ConfuserProject();
@@ -42,6 +47,9 @@ namespace Confuser.Core {
 			});
 			proj.BaseDirectory = tmpDir;
 			proj.OutputDirectory = outDir;
+			foreach (var path in context.Project.ProbePaths)
+				proj.ProbePaths.Add(path);
+			proj.ProbePaths.Add(context.Project.BaseDirectory);
 
 			PluginDiscovery discovery = null;
 			if (prot != null) {
