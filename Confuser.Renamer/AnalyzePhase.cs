@@ -152,10 +152,13 @@ namespace Confuser.Renamer {
 			else if (field.IsRuntimeSpecialName || field.IsSpecialName)
 				service.SetCanRename(field, false);
 
+			else if (parameters.GetParameter(context, field, "forceRen", false))
+				return;
+
 			else if (field.DeclaringType.IsSerializable && !field.IsNotSerialized)
 				service.SetCanRename(field, false);
 
-			else if (field.IsLiteral)
+			else if (field.IsLiteral && field.DeclaringType.IsEnum)
 				service.SetCanRename(field, false);
 		}
 
