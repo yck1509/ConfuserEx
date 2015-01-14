@@ -72,7 +72,9 @@ namespace Confuser.Core {
 				s.SetLength(0);
 				oldChunk.WriteTo(new BinaryWriter(s));
 				var buf = s.ToArray();
-				var newChunk = new BinaryReaderChunk(MemoryImageStream.Create(buf));
+				var newChunk = new BinaryReaderChunk(MemoryImageStream.Create(buf), oldChunk.GetVirtualSize());
+				newChunk.SetOffset(oldChunk.FileOffset, oldChunk.RVA);
+				
 				chunk.SetValue(origSect, newChunk);
 
 				sections.Add(Tuple.Create(
