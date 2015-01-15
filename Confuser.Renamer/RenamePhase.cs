@@ -62,6 +62,12 @@ namespace Confuser.Renamer {
 						typeDef.Namespace = service.ObfuscateName(typeDef.Namespace, mode);
 						typeDef.Name = service.ObfuscateName(typeDef.Name, mode);
 					}
+					foreach (var param in typeDef.GenericParameters)
+						param.Name = ((char)(param.Number + 1)).ToString();
+				}
+				else if (def is MethodDef) {
+					foreach (var param in ((MethodDef)def).GenericParameters)
+						param.Name = ((char)(param.Number + 1)).ToString();
 				}
 				else
 					def.Name = service.ObfuscateName(def.Name, mode);
