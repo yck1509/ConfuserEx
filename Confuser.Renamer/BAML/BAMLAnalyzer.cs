@@ -275,36 +275,6 @@ namespace Confuser.Renamer.BAML {
 				case BamlRecordType.ElementStart:
 				case BamlRecordType.NamedElementStart:
 					elem.Type = ResolveType(((ElementStartRecord)elem.Header).TypeId);
-					if (elem.Type.FullName == "System.Windows.Data.Binding") {
-						// Here comes the trouble...
-						// Aww, never mind...
-						foreach (BamlElement child in elem.Children) {
-							if (child.Header.Type == BamlRecordType.ConstructorParametersStart) {
-								var cnt = (TextRecord)child.Body[0];
-								string value = cnt.Value;
-								if (cnt is TextWithIdRecord)
-									value = strings[((TextWithIdRecord)cnt).ValueId].Value;
-								AnalyzePropertyPath(cnt.Value);
-							}
-						}
-					}
-					else if (elem.Type.FullName == "System.Windows.Markup.TypeExtension") {
-						foreach (BamlElement child in elem.Children) {
-							if (child.Header.Type == BamlRecordType.ConstructorParametersStart) {
-								var cnt = (TextRecord)child.Body[0];
-								string value = cnt.Value;
-								if (cnt is TextWithIdRecord)
-									value = strings[((TextWithIdRecord)cnt).ValueId].Value;
-
-								string prefix;
-								TypeSig sig = ResolveType(value.Trim(), out prefix);
-								if (sig != null && context.Modules.Contains((ModuleDefMD)sig.ToBasicTypeDefOrRef().ResolveTypeDefThrow().Module)) {
-									var reference = new BAMLConverterTypeReference(xmlnsCtx, sig, cnt);
-									AddTypeSigReference(sig, reference);
-								}
-							}
-						}
-					}
 					elem.Attribute = elem.Parent.Attribute;
 					if (elem.Attribute != null)
 						elem.Type = GetAttributeType(elem.Attribute);
@@ -430,6 +400,21 @@ namespace Confuser.Renamer.BAML {
 								service.AddReference(attrTarget, new BAMLAttributeReference(attrTarget, attrInfo.Item2));
 						}
 					}
+				}
+				else if (rec is TextRecord) {
+					var txt = (TextRecord)rec;
+					string value = txt.Value;
+					if (txt is TextWithIdRecord)
+						value = strings[((TextWithIdRecord)txt).ValueId].Value;
+
+					string prefix;
+					TypeSig sig = ResolveType(value.Trim(), out prefix);
+					if (sig != null && context.Modules.Contains((ModuleDefMD)sig.ToBasicTypeDefOrRef().ResolveTypeDefThrow().Module)) {
+						var reference = new BAMLConverterTypeReference(xmlnsCtx, sig, txt);
+						AddTypeSigReference(sig, reference);
+					}
+					else
+						AnalyzePropertyPath(value);
 				}
 			}
 		}
