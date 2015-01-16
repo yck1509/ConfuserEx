@@ -160,18 +160,21 @@ namespace Confuser.Renamer {
 			}
 
 			// Normal interface implementation
-			foreach (var iface in vTbl.InterfaceSlots.Values) {
-				foreach (var entry in iface.ToList()) {
-					if (!entry.Value.MethodDef.DeclaringType.IsInterface)
-						continue;
-					// This is the step 1 of 12.2 algorithm -- find implementation for still empty slots.
-					// Note that it seems we should include newslot methods as well, despite what the standard said.
-					MethodDef impl;
-					VTableSlot implSlot;
-					if (virtualMethods.TryGetValue(entry.Key, out impl))
-						iface[entry.Key] = entry.Value.OverridedBy(impl);
-					else if (vTbl.SlotsMap.TryGetValue(entry.Key, out implSlot))
-						iface[entry.Key] = entry.Value.OverridedBy(implSlot.MethodDef);
+			if (!typeDef.IsInterface) {
+				// Interface methods cannot implements base interface methods.
+				foreach (var iface in vTbl.InterfaceSlots.Values) {
+					foreach (var entry in iface.ToList()) {
+						if (!entry.Value.MethodDef.DeclaringType.IsInterface)
+							continue;
+						// This is the step 1 of 12.2 algorithm -- find implementation for still empty slots.
+						// Note that it seems we should include newslot methods as well, despite what the standard said.
+						MethodDef impl;
+						VTableSlot implSlot;
+						if (virtualMethods.TryGetValue(entry.Key, out impl))
+							iface[entry.Key] = entry.Value.OverridedBy(impl);
+						else if (vTbl.SlotsMap.TryGetValue(entry.Key, out implSlot))
+							iface[entry.Key] = entry.Value.OverridedBy(implSlot.MethodDef);
+					}
 				}
 			}
 
@@ -243,7 +246,8 @@ namespace Confuser.Renamer {
 			Func<VTableSlot, VTableSlot> implLookup = slot => {
 				MethodDef impl;
 				if (virtualMethods.TryGetValue(slot.Signature, out impl) &&
-				    impl.IsNewSlot) {
+				    impl.IsNewSlot && !impl.DeclaringType.IsInterface) {
+					// Interface methods cannot implements base interface methods.
 					// The Overrides of interface slots should directly points to the root interface slot
 					var targetSlot = slot;
 					while (targetSlot.Overrides != null && !targetSlot.MethodDef.DeclaringType.IsInterface)
