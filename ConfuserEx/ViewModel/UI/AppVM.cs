@@ -20,6 +20,11 @@ namespace ConfuserEx.ViewModel {
 
 		ProjectVM proj;
 
+		public AppVM() { }
+		public AppVM(bool showSavePrompt) {
+			firstSaved = !showSavePrompt;
+		}
+
 		public bool NavigationDisabled {
 			get { return navDisabled; }
 			set { SetProperty(ref navDisabled, value, "NavigationDisabled"); }
