@@ -54,6 +54,7 @@ namespace Confuser.Protections {
 			}
 
 			ModuleDefMD originModule = context.Modules[ctx.ModuleIndex];
+			ctx.OriginModuleDef = originModule;
 			var stubModule = new ModuleDefUser(ctx.ModuleName, originModule.Mvid, originModule.CorLibTypes.AssemblyRef);
 			ctx.Assembly.Modules.Insert(0, stubModule);
 			stubModule.Characteristics = originModule.Characteristics;
@@ -293,6 +294,16 @@ namespace Confuser.Protections {
 					MDTable<RawManifestResourceRow> resTbl = writer.MetaData.TablesHeap.ManifestResourceTable;
 					foreach (var resource in ctx.ManifestResources)
 						resTbl.Add(new RawManifestResourceRow(resource.Item1, resource.Item2, writer.MetaData.StringsHeap.Add(resource.Item3), impl));
+
+					// Add exported types
+					var exTbl = writer.MetaData.TablesHeap.ExportedTypeTable;
+					foreach (var type in ctx.OriginModuleDef.GetTypes()) {
+						if (!type.IsVisibleOutside())
+							continue;
+						exTbl.Add(new RawExportedTypeRow((uint)type.Attributes, type.Rid,
+						                                 writer.MetaData.StringsHeap.Add(type.Name),
+						                                 writer.MetaData.StringsHeap.Add(type.Namespace), impl));
+					}
 				}
 			}
 		}
