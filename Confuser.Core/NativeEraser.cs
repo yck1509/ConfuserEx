@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using dnlib.DotNet;
@@ -10,10 +9,6 @@ using SR = System.Reflection;
 
 namespace Confuser.Core {
 	internal class NativeEraser {
-		static readonly SR.FieldInfo origSects = typeof(NativeModuleWriter).GetField("origSections", SR.BindingFlags.NonPublic | SR.BindingFlags.Instance);
-		static readonly SR.FieldInfo chunk = typeof(NativeModuleWriter).GetNestedType("OrigSection", SR.BindingFlags.NonPublic).GetField("chunk");
-		static readonly SR.FieldInfo peSection = typeof(NativeModuleWriter).GetNestedType("OrigSection", SR.BindingFlags.NonPublic).GetField("peSection");
-
 		static void Erase(Tuple<uint, uint, byte[]> section, uint offset, uint len) {
 			Array.Clear(section.Item3, (int)(offset - section.Item1), (int)len);
 		}
@@ -62,20 +57,19 @@ namespace Confuser.Core {
 			if (writer == null || module == null)
 				return;
 
-			var sects = (IList)origSects.GetValue(writer);
 			var sections = new List<Tuple<uint, uint, byte[]>>();
 			var s = new MemoryStream();
-			foreach (var origSect in sects) {
-				var oldChunk = (BinaryReaderChunk)chunk.GetValue(origSect);
-				var sectHdr = (ImageSectionHeader)peSection.GetValue(origSect);
+			foreach (var origSect in writer.OrigSections) {
+				var oldChunk = origSect.Chunk;
+				var sectHdr = origSect.PESection;
 
 				s.SetLength(0);
 				oldChunk.WriteTo(new BinaryWriter(s));
 				var buf = s.ToArray();
 				var newChunk = new BinaryReaderChunk(MemoryImageStream.Create(buf), oldChunk.GetVirtualSize());
 				newChunk.SetOffset(oldChunk.FileOffset, oldChunk.RVA);
-				
-				chunk.SetValue(origSect, newChunk);
+
+				origSect.Chunk = newChunk;
 
 				sections.Add(Tuple.Create(
 					sectHdr.PointerToRawData,
