@@ -78,6 +78,8 @@ namespace ConfuserEx.ViewModel {
 			ThreadPool.QueueUserWorkItem(_ => {
 				try {
 					string path = System.IO.Path.Combine(parent.BaseDirectory, Path);
+					if (!string.IsNullOrEmpty(parent.FileName))
+						path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(parent.FileName), path);
 					AssemblyName name = System.Reflection.AssemblyName.GetAssemblyName(path);
 					AssemblyName = name.FullName;
 				}

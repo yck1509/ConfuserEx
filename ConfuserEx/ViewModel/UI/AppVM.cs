@@ -113,7 +113,7 @@ namespace ConfuserEx.ViewModel {
 			if (!PromptSave())
 				return;
 
-			Project = new ProjectVM(new ConfuserProject());
+			Project = new ProjectVM(new ConfuserProject(), null);
 			FileName = "Unnamed.crproj";
 		}
 
@@ -130,7 +130,7 @@ namespace ConfuserEx.ViewModel {
 					xmlDoc.Load(fileName);
 					var proj = new ConfuserProject();
 					proj.Load(xmlDoc);
-					Project = new ProjectVM(proj);
+					Project = new ProjectVM(proj, fileName);
 					FileName = fileName;
 				}
 				catch {

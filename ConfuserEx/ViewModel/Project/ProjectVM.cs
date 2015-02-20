@@ -10,9 +10,11 @@ namespace ConfuserEx.ViewModel {
 		readonly ConfuserProject proj;
 		bool modified;
 		ProjectSettingVM<Packer> packer;
+		string fileName;
 
-		public ProjectVM(ConfuserProject proj) {
+		public ProjectVM(ConfuserProject proj, string fileName) {
 			this.proj = proj;
+			this.fileName = fileName;
 
 			ObservableCollection<ProjectModuleVM> modules = Utils.Wrap(proj, module => new ProjectModuleVM(this, module));
 			modules.CollectionChanged += (sender, e) => IsModified = true;
@@ -87,6 +89,8 @@ namespace ConfuserEx.ViewModel {
 		public ObservableCollection<ConfuserComponent> Protections { get; private set; }
 		public ObservableCollection<ConfuserComponent> Packers { get; private set; }
 		public IList<ProjectRuleVM> Rules { get; private set; }
+
+		public string FileName { get { return fileName; } }
 
 		ConfuserProject IViewModel<ConfuserProject>.Model {
 			get { return proj; }

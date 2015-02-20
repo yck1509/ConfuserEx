@@ -14,7 +14,7 @@ namespace ConfuserEx {
 			InitializeComponent();
 
 			var app = new AppVM();
-			app.Project = new ProjectVM(new ConfuserProject());
+			app.Project = new ProjectVM(new ConfuserProject(), null);
 			app.FileName = "Unnamed.crproj";
 
 			app.Tabs.Add(new ProjectTabVM(app));
@@ -46,7 +46,7 @@ namespace ConfuserEx {
 				xmlDoc.Load(fileName);
 				var proj = new ConfuserProject();
 				proj.Load(xmlDoc);
-				app.Project = new ProjectVM(proj);
+				app.Project = new ProjectVM(proj, fileName);
 				app.FileName = fileName;
 			}
 			catch {
