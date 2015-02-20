@@ -88,7 +88,7 @@ namespace Confuser.CLI {
 
 		static int RunProject(ConfuserParameters parameters) {
 			var logger = new ConsoleLogger();
-			parameters.Logger = new ConsoleLogger();
+			parameters.Logger = logger;
 
 			Console.Title = "ConfuserEx - Running...";
 			ConfuserEngine.Run(parameters).Wait();
