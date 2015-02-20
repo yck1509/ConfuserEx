@@ -135,6 +135,10 @@ namespace Confuser.Protections.ReferenceProxy {
 					// No generic types / array types
 					if (operand.DeclaringType is TypeSpec)
 						continue;
+					// No varargs
+					if (operand.MethodSig.ParamsAfterSentinel != null &&
+						operand.MethodSig.ParamsAfterSentinel.Count > 0)
+						continue;
 					TypeDef declType = operand.DeclaringType.ResolveTypeDefThrow();
 					// No delegates
 					if (declType.IsDelegate())
