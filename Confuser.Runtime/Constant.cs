@@ -49,7 +49,7 @@ namespace Confuser.Runtime {
 
 			if (t == Mutation.KeyI0) {
 				int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
-				ret = (T)(object)Encoding.UTF8.GetString(b, (int)id, l);
+				ret = (T)(object)string.Intern(Encoding.UTF8.GetString(b, (int)id, l));
 			}
 			// NOTE: Assume little-endian
 			else if (t == Mutation.KeyI1) {
