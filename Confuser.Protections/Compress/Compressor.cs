@@ -201,6 +201,19 @@ namespace Confuser.Protections {
 			MethodDef entryPoint = defs.OfType<MethodDef>().Single(method => method.Name == "Main");
 			stubModule.EntryPoint = entryPoint;
 
+			if (compCtx.EntryPoint.HasAttribute("System.STAThreadAttribute")) {
+				var attrType = stubModule.CorLibTypes.GetTypeRef("System", "STAThreadAttribute");
+				var ctorSig = MethodSig.CreateInstance(stubModule.CorLibTypes.Void);
+				entryPoint.CustomAttributes.Add(new CustomAttribute(
+					new MemberRefUser(stubModule, ".ctor", ctorSig, attrType)));
+			}
+			else if (compCtx.EntryPoint.HasAttribute("System.MTAThreadAttribute")) {
+				var attrType = stubModule.CorLibTypes.GetTypeRef("System", "MTAThreadAttribute");
+				var ctorSig = MethodSig.CreateInstance(stubModule.CorLibTypes.Void);
+				entryPoint.CustomAttributes.Add(new CustomAttribute(
+					new MemberRefUser(stubModule, ".ctor", ctorSig, attrType)));
+			}
+
 			uint seed = random.NextUInt32();
 			compCtx.OriginModule = context.OutputModules[compCtx.ModuleIndex];
 
