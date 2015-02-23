@@ -58,6 +58,8 @@ namespace Confuser.Runtime {
 			Array.Clear(b, 0, b.Length);
 			h.Free();
 			Array.Clear(q, 0, q.Length);
+			// For some reasons, reflection on Assembly would not discover the types unless GetTypes is called.
+			m.GetTypes();
 
 			key = n.ResolveSignature(Mutation.KeyI2);
 			AppDomain.CurrentDomain.AssemblyResolve += Resolve;
