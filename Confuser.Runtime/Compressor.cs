@@ -76,10 +76,10 @@ namespace Confuser.Runtime {
 		}
 
 		static Assembly Resolve(object sender, ResolveEventArgs e) {
-			byte[] b = Encoding.UTF8.GetBytes(e.Name);
+			byte[] b = Encoding.UTF8.GetBytes(new AssemblyName(e.Name).Name.ToUpperInvariant());
 
 			Stream m = null;
-			if (b.Length + 4 < key.Length) {
+			if (b.Length + 4 <= key.Length) {
 				for (int i = 0; i < b.Length; i++)
 					b[i] *= key[i + 4];
 				string n = Convert.ToBase64String(b);
