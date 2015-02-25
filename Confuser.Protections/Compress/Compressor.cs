@@ -313,7 +313,7 @@ namespace Confuser.Protections {
 					foreach (var type in ctx.OriginModuleDef.GetTypes()) {
 						if (!type.IsVisibleOutside())
 							continue;
-						exTbl.Add(new RawExportedTypeRow((uint)type.Attributes, type.Rid,
+						exTbl.Add(new RawExportedTypeRow((uint)type.Attributes, 0,
 						                                 writer.MetaData.StringsHeap.Add(type.Name),
 						                                 writer.MetaData.StringsHeap.Add(type.Namespace), impl));
 					}
