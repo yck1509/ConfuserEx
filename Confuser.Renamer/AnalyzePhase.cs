@@ -122,6 +122,10 @@ namespace Confuser.Renamer {
 			if (type.InheritsFromCorlib("System.Attribute")) {
 				service.ReduceRenameMode(type, RenameMode.ASCII);
 			}
+
+			if (type.InheritsFrom("System.Configuration.SettingsBase")) {
+				service.SetCanRename(type, false);
+			}
 		}
 
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, MethodDef method) {
