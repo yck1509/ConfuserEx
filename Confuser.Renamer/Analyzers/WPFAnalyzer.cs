@@ -23,7 +23,7 @@ namespace Confuser.Renamer.Analyzers {
 		internal Dictionary<string, List<IBAMLReference>> bamlRefs = new Dictionary<string, List<IBAMLReference>>(StringComparer.OrdinalIgnoreCase);
 		public event Action<BAMLAnalyzer, BamlElement> AnalyzeBAMLElement;
 
-		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void Analyze(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			var method = def as MethodDef;
 			if (method != null) {
 				if (!method.HasBody)
@@ -37,9 +37,9 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void PreRename(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			var module = def as ModuleDefMD;
-			if (module == null)
+			if (module == null || !parameters.GetParameter<bool>(context, def, "renXaml", true))
 				return;
 
 			var wpfResInfo = context.Annotations.Get<Dictionary<string, Dictionary<string, BamlDocument>>>(module, BAMLKey);
@@ -63,7 +63,7 @@ namespace Confuser.Renamer.Analyzers {
 				}
 		}
 
-		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void PostRename(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			var module = def as ModuleDefMD;
 			if (module == null)
 				return;

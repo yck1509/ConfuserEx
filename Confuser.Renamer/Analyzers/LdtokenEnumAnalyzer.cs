@@ -6,7 +6,7 @@ using dnlib.DotNet.Emit;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class LdtokenEnumAnalyzer : IRenamer {
-		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void Analyze(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			var method = def as MethodDef;
 			if (method == null || !method.HasBody)
 				return;
@@ -59,11 +59,11 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void PreRename(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			//
 		}
 
-		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void PostRename(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			//
 		}
 

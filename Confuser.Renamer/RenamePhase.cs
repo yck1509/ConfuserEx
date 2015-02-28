@@ -23,7 +23,7 @@ namespace Confuser.Renamer {
 			context.Logger.Debug("Renaming...");
 			foreach (IRenamer renamer in service.Renamers) {
 				foreach (IDnlibDef def in parameters.Targets)
-					renamer.PreRename(context, service, def);
+					renamer.PreRename(context, service, parameters, def);
 				context.CheckCancellation();
 			}
 

@@ -7,7 +7,7 @@ using dnlib.DotNet;
 
 namespace Confuser.Renamer.Analyzers {
 	internal class VTableAnalyzer : IRenamer {
-		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void Analyze(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			VTable vTbl;
 
 			if (def is TypeDef) {
@@ -56,11 +56,11 @@ namespace Confuser.Renamer.Analyzers {
 			}
 		}
 
-		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void PreRename(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			//
 		}
 
-		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void PostRename(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			var method = def as MethodDef;
 			if (method == null || !method.IsVirtual || method.Overrides.Count == 0)
 				return;

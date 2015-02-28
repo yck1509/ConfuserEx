@@ -101,7 +101,7 @@ namespace Confuser.Renamer {
 				return;
 
 			foreach (IRenamer renamer in service.Renamers)
-				renamer.Analyze(context, service, def);
+				renamer.Analyze(context, service, parameters, def);
 		}
 
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, TypeDef type) {

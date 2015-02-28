@@ -9,7 +9,7 @@ namespace Confuser.Renamer.Analyzers {
 			wpfAnalyzer.AnalyzeBAMLElement += AnalyzeBAMLElement;
 		}
 
-		public void Analyze(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void Analyze(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			var type = def as TypeDef;
 			if (type == null || type.DeclaringType != null)
 				return;
@@ -105,11 +105,11 @@ namespace Confuser.Renamer.Analyzers {
 		}
 
 
-		public void PreRename(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void PreRename(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			//
 		}
 
-		public void PostRename(ConfuserContext context, INameService service, IDnlibDef def) {
+		public void PostRename(ConfuserContext context, INameService service, ProtectionParameters parameters, IDnlibDef def) {
 			//
 		}
 	}

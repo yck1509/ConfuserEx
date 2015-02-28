@@ -24,7 +24,7 @@ namespace Confuser.Renamer {
 
 			foreach (IRenamer renamer in service.Renamers) {
 				foreach (IDnlibDef def in parameters.Targets)
-					renamer.PostRename(context, service, def);
+					renamer.PostRename(context, service, parameters, def);
 				context.CheckCancellation();
 			}
 		}
