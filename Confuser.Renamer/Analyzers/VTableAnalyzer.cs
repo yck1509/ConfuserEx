@@ -53,6 +53,14 @@ namespace Confuser.Renamer.Analyzers {
 						service.AddReference(slot.Overrides.MethodDef, new OverrideDirectiveReference(slot, slot.Overrides));
 					}
 				}
+				else {
+					foreach (var slot in slots) {
+						if (slot.Overrides == null)
+							continue;
+						service.SetCanRename(method, false);
+						service.SetCanRename(slot.Overrides.MethodDef, false);
+					}
+				}
 			}
 		}
 
