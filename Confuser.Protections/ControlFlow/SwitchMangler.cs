@@ -183,7 +183,7 @@ namespace Confuser.Protections.ControlFlow {
 			body.MaxStack += 2;
 			IPredicate predicate = null;
 			if (ctx.Predicate == PredicateType.Normal) {
-				//predicate = new NormalPredicate(ctx);
+				predicate = new NormalPredicate(ctx);
 			}
 			else if (ctx.Predicate == PredicateType.Expression) {
 				predicate = new ExpressionPredicate(ctx);
@@ -217,7 +217,7 @@ namespace Confuser.Protections.ControlFlow {
 				var key = new int[keyId.Length];
 				for (i = 0; i < key.Length; i++) {
 					var q = ctx.Random.NextInt32() & 0x7fffffff;
-					key[i] = keyId[i]; // q - q % statements.Count + keyId[i];
+					key[i] = q - q % statements.Count + keyId[i];
 				}
 
 				var statementKeys = new Dictionary<Instruction, int>();
@@ -294,7 +294,7 @@ namespace Confuser.Protections.ControlFlow {
 
 								newStatement.RemoveAt(newStatement.Count - 1);
 
-								if (!unkSrc) {
+								if (unkSrc) {
 									newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, targetKey));
 								}
 								else {
@@ -387,11 +387,8 @@ namespace Confuser.Protections.ControlFlow {
 							operands[keyId[i]] = newStatement[0];
 						}
 					}
-					else {
-						foreach (var st in newStatement)
-							st.SequencePoint = null;
+					else
 						operands[keyId[i]] = switchHdr[0];
-					}
 
 					current.Value = newStatement.ToArray();
 					current = current.Next;
