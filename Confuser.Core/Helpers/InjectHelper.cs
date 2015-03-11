@@ -119,11 +119,16 @@ namespace Confuser.Core.Helpers {
 				foreach (Local local in methodDef.Body.Variables) {
 					var newLocal = new Local(ctx.Importer.Import(local.Type));
 					newMethodDef.Body.Variables.Add(newLocal);
+					newLocal.Name = local.Name;
+					newLocal.PdbAttributes = local.PdbAttributes;
+
 					bodyMap[local] = newLocal;
 				}
 
 				foreach (Instruction instr in methodDef.Body.Instructions) {
 					var newInstr = new Instruction(instr.OpCode, instr.Operand);
+					newInstr.SequencePoint = instr.SequencePoint;
+
 					if (newInstr.Operand is IType)
 						newInstr.Operand = ctx.Importer.Import((IType)newInstr.Operand);
 

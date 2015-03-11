@@ -63,7 +63,7 @@ namespace Confuser.Core.Helpers {
 		///     Computes a key sequence of the given CFG.
 		/// </summary>
 		/// <param name="graph">The CFG.</param>
-		/// <param name="random">The random source.</param>
+		/// <param name="random">The random source, or <c>null</c> if key id is needed.</param>
 		/// <returns>The generated key sequence of the CFG.</returns>
 		public static BlockKey[] ComputeKeys(ControlFlowGraph graph, RandomGenerator random) {
 			var keys = new BlockKey[graph.Count];
@@ -190,20 +190,22 @@ namespace Confuser.Core.Helpers {
 				}
 			} while (updated);
 
-			// Replace id with actual values
-			var idMap = new Dictionary<uint, uint>();
-			for (int i = 0; i < keys.Length; i++) {
-				BlockKey key = keys[i];
+			if (random != null) {
+				// Replace id with actual values
+				var idMap = new Dictionary<uint, uint>();
+				for (int i = 0; i < keys.Length; i++) {
+					BlockKey key = keys[i];
 
-				uint entryId = key.EntryState;
-				if (!idMap.TryGetValue(entryId, out key.EntryState))
-					key.EntryState = idMap[entryId] = random.NextUInt32();
+					uint entryId = key.EntryState;
+					if (!idMap.TryGetValue(entryId, out key.EntryState))
+						key.EntryState = idMap[entryId] = random.NextUInt32();
 
-				uint exitId = key.ExitState;
-				if (!idMap.TryGetValue(exitId, out key.ExitState))
-					key.ExitState = idMap[exitId] = random.NextUInt32();
+					uint exitId = key.ExitState;
+					if (!idMap.TryGetValue(exitId, out key.ExitState))
+						key.ExitState = idMap[exitId] = random.NextUInt32();
 
-				keys[i] = key;
+					keys[i] = key;
+				}
 			}
 		}
 	}

@@ -14,7 +14,7 @@ namespace Confuser.Core.Services {
 				string rtPath = "Confuser.Runtime.dll";
 				if (module.FullyQualifiedName[0] != '<')
 					rtPath = Path.Combine(Path.GetDirectoryName(module.FullyQualifiedName), rtPath);
-				rtModule = ModuleDefMD.Load(rtPath);
+				rtModule = ModuleDefMD.Load(rtPath, new ModuleCreationOptions() { TryToLoadPdbFromDisk = true });
 				rtModule.EnableTypeDefFindCache = true;
 			}
 			return rtModule.Find(fullName, true);

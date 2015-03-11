@@ -67,4 +67,63 @@ namespace Confuser.Runtime {
 			return ret;
 		}
 	}
+
+	internal struct CFGCtx {
+		uint A;
+		uint B;
+		uint C;
+		uint D;
+
+		public CFGCtx(uint seed) {
+			A = seed *= 0x21412321;
+			B = seed *= 0x21412321;
+			C = seed *= 0x21412321;
+			D = seed *= 0x21412321;
+		}
+
+		public uint Next(byte f, uint q) {
+			if ((f & 0x80) != 0) {
+				switch (f & 0x3) {
+					case 0:
+						A = q;
+						break;
+					case 1:
+						B = q;
+						break;
+					case 2:
+						C = q;
+						break;
+					case 3:
+						D = q;
+						break;
+				}
+			}
+			else {
+				switch (f & 0x3) {
+					case 0:
+						A ^= q;
+						break;
+					case 1:
+						B += q;
+						break;
+					case 2:
+						C ^= q;
+						break;
+					case 3:
+						D -= q;
+						break;
+				}
+			}
+
+			switch ((f >> 2) & 0x3) {
+				case 0:
+					return A;
+				case 1:
+					return B;
+				case 2:
+					return C;
+			}
+			return D;
+		}
+	}
 }

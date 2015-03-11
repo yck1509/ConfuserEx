@@ -32,6 +32,9 @@ namespace Confuser.Protections.Constants {
 		public INameService Name;
 		public RandomGenerator Random;
 
+		public TypeDef CfgCtxType;
+		public MethodDef CfgCtxCtor;
+		public MethodDef CfgCtxNext;
 		public Dictionary<MethodDef, List<Tuple<Instruction, uint, IMethod>>> ReferenceRepl;
 	}
 
