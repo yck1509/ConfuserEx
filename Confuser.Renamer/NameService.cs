@@ -181,7 +181,6 @@ namespace Confuser.Renamer {
 			else if (def is FieldDef) {
 				var field = (FieldDef)def;
 				field.Access = FieldAttributes.Assembly;
-				field.Name = RandomName();
 				if (!field.IsSpecialName && !field.IsRuntimeSpecialName)
 					field.Name = RandomName();
 			}
