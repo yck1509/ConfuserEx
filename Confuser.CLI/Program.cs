@@ -60,6 +60,12 @@ namespace Confuser.CLI {
 					parameters.Project = proj;
 				}
 				else {
+					if (string.IsNullOrEmpty(outDir)) {
+						Console.WriteLine("ConfuserEx.CLI: No output directory specified.");
+						PrintUsage();
+						return -1;
+					}
+
 					// Generate a ConfuserProject for input modules
 					// Assuming first file = main module
 					var proj = new ConfuserProject();
