@@ -54,35 +54,36 @@ namespace Confuser.Core {
 		protected static void AddPlugins(
 			ConfuserContext context, IList<Protection> protections, IList<Packer> packers,
 			IList<ConfuserComponent> components, Assembly asm) {
-			foreach (Type i in asm.GetTypes()) {
-				if (i.IsAbstract || !HasAccessibleDefConstructor(i))
-					continue;
+			foreach(var module in asm.GetLoadedModules())
+				foreach (var i in module.GetTypes()) {
+					if (i.IsAbstract || !HasAccessibleDefConstructor(i))
+						continue;
 
-				if (typeof(Protection).IsAssignableFrom(i)) {
-					try {
-						protections.Add((Protection)Activator.CreateInstance(i));
+					if (typeof(Protection).IsAssignableFrom(i)) {
+						try {
+							protections.Add((Protection)Activator.CreateInstance(i));
+						}
+						catch (Exception ex) {
+							context.Logger.ErrorException("Failed to instantiate protection '" + i.Name + "'.", ex);
+						}
 					}
-					catch (Exception ex) {
-						context.Logger.ErrorException("Failed to instantiate protection '" + i.Name + "'.", ex);
+					else if (typeof(Packer).IsAssignableFrom(i)) {
+						try {
+							packers.Add((Packer)Activator.CreateInstance(i));
+						}
+						catch (Exception ex) {
+							context.Logger.ErrorException("Failed to instantiate packer '" + i.Name + "'.", ex);
+						}
+					}
+					else if (typeof(ConfuserComponent).IsAssignableFrom(i)) {
+						try {
+							components.Add((ConfuserComponent)Activator.CreateInstance(i));
+						}
+						catch (Exception ex) {
+							context.Logger.ErrorException("Failed to instantiate component '" + i.Name + "'.", ex);
+						}
 					}
 				}
-				else if (typeof(Packer).IsAssignableFrom(i)) {
-					try {
-						packers.Add((Packer)Activator.CreateInstance(i));
-					}
-					catch (Exception ex) {
-						context.Logger.ErrorException("Failed to instantiate packer '" + i.Name + "'.", ex);
-					}
-				}
-				else if (typeof(ConfuserComponent).IsAssignableFrom(i)) {
-					try {
-						components.Add((ConfuserComponent)Activator.CreateInstance(i));
-					}
-					catch (Exception ex) {
-						context.Logger.ErrorException("Failed to instantiate component '" + i.Name + "'.", ex);
-					}
-				}
-			}
 			context.CheckCancellation();
 		}
 

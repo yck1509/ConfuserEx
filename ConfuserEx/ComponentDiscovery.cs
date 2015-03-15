@@ -8,19 +8,20 @@ namespace ConfuserEx {
 		static void CrossDomainLoadComponents() {
 			var ctx = (CrossDomainContext)AppDomain.CurrentDomain.GetData("ctx");
 			Assembly assembly = Assembly.LoadFile(ctx.PluginPath);
-			foreach (Type i in assembly.GetTypes()) {
-				if (i.IsAbstract || !PluginDiscovery.HasAccessibleDefConstructor(i))
-					continue;
+			foreach (var module in assembly.GetLoadedModules())
+				foreach (var i in module.GetTypes()) {
+					if (i.IsAbstract || !PluginDiscovery.HasAccessibleDefConstructor(i))
+						continue;
 
-				if (typeof(Protection).IsAssignableFrom(i)) {
-					var prot = (Protection)Activator.CreateInstance(i);
-					ctx.AddProtection(Info.FromComponent(prot, ctx.PluginPath));
+					if (typeof(Protection).IsAssignableFrom(i)) {
+						var prot = (Protection)Activator.CreateInstance(i);
+						ctx.AddProtection(Info.FromComponent(prot, ctx.PluginPath));
+					}
+					else if (typeof(Packer).IsAssignableFrom(i)) {
+						var packer = (Packer)Activator.CreateInstance(i);
+						ctx.AddPacker(Info.FromComponent(packer, ctx.PluginPath));
+					}
 				}
-				else if (typeof(Packer).IsAssignableFrom(i)) {
-					var packer = (Packer)Activator.CreateInstance(i);
-					ctx.AddPacker(Info.FromComponent(packer, ctx.PluginPath));
-				}
-			}
 		}
 
 		public static void LoadComponents(IList<ConfuserComponent> protections, IList<ConfuserComponent> packers, string pluginPath) {
