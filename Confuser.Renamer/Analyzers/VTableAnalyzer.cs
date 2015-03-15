@@ -26,10 +26,10 @@ namespace Confuser.Renamer.Analyzers {
 						// not rename the methods.
 						bool baseUnderCtrl = context.Modules.Contains(slot.MethodDef.DeclaringType.Module as ModuleDefMD);
 						bool ifaceUnderCtrl = context.Modules.Contains(slot.Overrides.MethodDef.DeclaringType.Module as ModuleDefMD);
-						if (!baseUnderCtrl && ifaceUnderCtrl) {
+						if ((!baseUnderCtrl && ifaceUnderCtrl) || !service.CanRename(slot.MethodDef)) {
 							service.SetCanRename(slot.Overrides.MethodDef, false);
 						}
-						else if (baseUnderCtrl && !ifaceUnderCtrl) {
+						else if (baseUnderCtrl && !ifaceUnderCtrl || !service.CanRename(slot.Overrides.MethodDef)) {
 							service.SetCanRename(slot.MethodDef, false);
 						}
 					}
