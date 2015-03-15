@@ -20,7 +20,7 @@ namespace Confuser.Protections.ControlFlow {
 				counts[key] = value + 1;
 			}
 
-			public Trace(CilBody body) {
+			public Trace(CilBody body, bool hasReturnValue) {
 				RefCount = new Dictionary<uint, int>();
 				BrRefCount = new Dictionary<uint, int>();
 				BeforeStack = new Dictionary<uint, int>();
@@ -43,7 +43,7 @@ namespace Confuser.Protections.ControlFlow {
 						currentStack = BeforeStack[instr.Offset];
 
 					BeforeStack[instr.Offset] = currentStack;
-					instr.UpdateStack(ref currentStack);
+					instr.UpdateStack(ref currentStack, hasReturnValue);
 					AfterStack[instr.Offset] = currentStack;
 
 					uint offset;
@@ -175,7 +175,7 @@ namespace Confuser.Protections.ControlFlow {
 		}
 
 		public override void Mangle(CilBody body, ScopeBlock root, CFContext ctx) {
-			Trace trace = new Trace(body);
+			Trace trace = new Trace(body, ctx.Method.ReturnType.RemoveModifiers().ElementType != ElementType.Void);
 			var local = new Local(ctx.Method.Module.CorLibTypes.UInt32);
 			body.Variables.Add(local);
 			body.InitLocals = true;
