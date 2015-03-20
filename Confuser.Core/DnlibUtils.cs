@@ -161,7 +161,7 @@ namespace Confuser.Core {
 		public static bool Implements(this TypeDef type, string fullName) {
 			do {
 				foreach (InterfaceImpl iface in type.Interfaces) {
-					if (iface.Interface.FullName == fullName)
+					if (iface.Interface.ReflectionFullName == fullName)
 						return true;
 				}
 

@@ -24,11 +24,10 @@ namespace Confuser.Core.Project.Patterns {
 			if (!(definition is TypeDef))
 				return false;
 			var type = (TypeDef)definition;
-			while (type.BaseType != null) {
-				type = type.BaseType.ResolveTypeDefThrow();
-				if (type.FullName == name)
-					return true;
-			}
+
+			if (type.InheritsFrom(name) || type.Implements(name))
+				return true;
+
 			return false;
 		}
 	}
