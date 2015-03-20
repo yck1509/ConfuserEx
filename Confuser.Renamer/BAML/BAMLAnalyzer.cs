@@ -502,7 +502,7 @@ namespace Confuser.Renamer.BAML {
 						if (match.Success)
 							src = match.Groups[1].Value;
 
-						if (src.StartsWith("./") || src.StartsWith("../")) {
+						if (!src.Contains("//")) {
 							var rel = new Uri(new Uri("pack://application:,,,/" + CurrentBAMLName), src);
 							src = rel.LocalPath;
 						}

@@ -13,12 +13,10 @@ namespace Confuser.Renamer.BAML {
 		public void Rename(string oldName, string newName) {
 			var value = rec.Value;
 			if (value.IndexOf(oldName, StringComparison.OrdinalIgnoreCase) != -1)
-				value = value.Replace(oldName, newName, StringComparison.OrdinalIgnoreCase);
+				value = newName;
 			else if (oldName.EndsWith(".baml")) {
 				Debug.Assert(newName.EndsWith(".baml"));
-				var oldXaml = oldName.Substring(0, oldName.Length - 5) + ".xaml";
-				var newXaml = newName.Substring(0, newName.Length - 5) + ".xaml";
-				value = value.Replace(oldXaml, newXaml, StringComparison.OrdinalIgnoreCase);
+				value = newName.Substring(0, newName.Length - 5) + ".xaml";
 			}
 			else
 				throw new UnreachableException();
