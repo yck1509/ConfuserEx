@@ -11,6 +11,9 @@ namespace Confuser.CLI {
 	internal class Program {
 		static int Main(string[] args) {
 			ConsoleColor original = Console.ForegroundColor;
+
+            UriParser.Register(new GenericUriParser (GenericUriParserOptions.GenericAuthority), "pack", -1);
+
 			Console.ForegroundColor = ConsoleColor.White;
 			string originalTitle = Console.Title;
 			Console.Title = "ConfuserEx";
