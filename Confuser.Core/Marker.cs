@@ -25,6 +25,11 @@ namespace Confuser.Core {
 		/// </summary>
 		public static readonly object RulesKey = new object();
 
+        /// <summary>
+        ///     Annotation key of subdirectories.
+        /// </summary>
+        public static readonly object SubDirKey = new object();
+
 		/// <summary>
 		///     The packers available to use.
 		/// </summary>
@@ -136,6 +141,7 @@ namespace Confuser.Core {
 
 				context.Annotations.Set(module.Item2, SNKey, LoadSNKey(context, module.Item1.SNKeyPath == null ? null : Path.Combine(proj.BaseDirectory, module.Item1.SNKeyPath), module.Item1.SNKeyPassword));
 				context.Annotations.Set(module.Item2, RulesKey, rules);
+                context.Annotations.Set(module.Item2, SubDirKey, module.Item1.BelongsToSubFolder);
 
 				foreach (IDnlibDef def in module.Item2.FindDefinitions()) {
 					ApplyRules(context, def, rules);

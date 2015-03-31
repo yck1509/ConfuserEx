@@ -54,6 +54,7 @@
     <xs:attribute name="external" type="xs:boolean" default="false" />
     <xs:attribute name="snKey" type="xs:string" use="optional" />
     <xs:attribute name="snKeyPass" type="xs:string" use="optional" />
+    <xs:attribute name="belongsToSubFolder" type="xs:string" use="optional" />
   </xs:complexType>
 
 
