@@ -24,7 +24,9 @@ namespace Confuser.Renamer.BAML {
 		readonly Dictionary<ushort, TypeSig> typeRefs = new Dictionary<ushort, TypeSig>();
 		readonly Dictionary<string, List<Tuple<AssemblyDef, string>>> xmlns = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
 
-		IKnownThings things;
+        readonly string packScheme = System.IO.Packaging.PackUriHelper.UriSchemePack + "://";
+
+        IKnownThings things;
 
 		KnownThingsv3 thingsv3;
 		KnownThingsv4 thingsv4;
@@ -503,7 +505,7 @@ namespace Confuser.Renamer.BAML {
 							src = match.Groups[1].Value;
 
 						if (!src.Contains("//")) {
-							var rel = new Uri(new Uri("pack://application:,,,/" + CurrentBAMLName), src);
+							var rel = new Uri(new Uri(packScheme + "application:,,,/" + CurrentBAMLName), src);
 							src = rel.LocalPath;
 						}
 						var reference = new BAMLPropertyReference(rec);
