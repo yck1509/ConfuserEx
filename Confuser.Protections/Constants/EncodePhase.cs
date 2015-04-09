@@ -285,7 +285,8 @@ namespace Confuser.Protections.Constants {
 									ldc.Remove(arrLen);
 							}
 
-							dataField.DeclaringType.Fields.Remove(dataField);
+                            if(dataField.DeclaringType!=null)
+							    dataField.DeclaringType.Fields.Remove(dataField);
 							var value = new byte[dataField.InitialValue.Length + 4];
 							value[0] = (byte)(arrLen >> 0);
 							value[1] = (byte)(arrLen >> 8);
