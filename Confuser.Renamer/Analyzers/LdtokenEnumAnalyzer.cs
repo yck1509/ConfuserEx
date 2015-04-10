@@ -156,7 +156,7 @@ namespace Confuser.Renamer.Analyzers {
 				}
 			}
 
-			return true;
+			return false;
 		}
 
 		void DisableRename(INameService service, TypeDef typeDef, bool memberOnly = true) {
