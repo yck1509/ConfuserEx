@@ -108,7 +108,7 @@ namespace Confuser.Renamer {
 			if (type.IsVisibleOutside() && !parameters.GetParameter(context, type, "renPublic", false)) {
 				service.SetCanRename(type, false);
 			}
-			else if (type.IsRuntimeSpecialName || type.IsSpecialName) {
+			else if (type.IsRuntimeSpecialName || type.IsSpecialName || type.IsGlobalModuleType) {
 				service.SetCanRename(type, false);
 			}
 			else if (type.FullName == "ConfusedByAttribute") {
