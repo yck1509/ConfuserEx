@@ -55,6 +55,7 @@
     <Compile Include="Analyzers\ResourceAnalyzer.cs" />
     <Compile Include="Analyzers\TypeBlobAnalyzer.cs" />
     <Compile Include="Analyzers\VTableAnalyzer.cs" />
+    <Compile Include="Analyzers\WinFormsAnalyzer.cs" />
     <Compile Include="Analyzers\WPFAnalyzer.cs" />
     <Compile Include="BAML\BAMLAnalyzer.cs" />
     <Compile Include="BAML\BamlDocument.cs" />

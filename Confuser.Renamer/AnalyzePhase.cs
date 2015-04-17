@@ -59,7 +59,8 @@ namespace Confuser.Renamer {
 
 		void RegisterRenamers(ConfuserContext context, NameService service) {
 			bool wpf = false,
-			     caliburn = false;
+			     caliburn = false,
+			     winforms = false;
 
 			foreach (var module in context.Modules)
 				foreach (var asmRef in module.GetAssemblyRefs()) {
@@ -69,6 +70,9 @@ namespace Confuser.Renamer {
 					}
 					else if (asmRef.Name == "Caliburn.Micro") {
 						caliburn = true;
+					}
+					else if (asmRef.Name == "System.Windows.Forms") {
+						winforms = true;
 					}
 				}
 
@@ -80,6 +84,12 @@ namespace Confuser.Renamer {
 					context.Logger.Debug("Caliburn.Micro found, enabling compatibility.");
 					service.Renamers.Add(new CaliburnAnalyzer(wpfAnalyzer));
 				}
+			}
+
+			if (winforms) {
+				var winformsAnalyzer = new WinFormsAnalyzer();
+				context.Logger.Debug("WinForms found, enabling compatibility.");
+				service.Renamers.Add(winformsAnalyzer);
 			}
 		}
 
