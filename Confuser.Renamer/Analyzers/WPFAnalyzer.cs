@@ -184,6 +184,8 @@ namespace Confuser.Renamer.Analyzers {
 				// Find CLR property for attached DP as well, because it seems attached DP can be use as normal DP as well.
 				PropertyDef property = null;
 				if ((property = declType.FindProperty(name)) != null) {
+					service.SetCanRename(property, false);
+
 					found = true;
 					if (property.GetMethod != null)
 						service.SetCanRename(property.GetMethod, false);
@@ -232,6 +234,8 @@ namespace Confuser.Renamer.Analyzers {
 					                          name, declType.FullName);
 					continue;
 				}
+				service.SetCanRename(eventDef, false);
+
 				if (eventDef.AddMethod != null)
 					service.SetCanRename(eventDef.AddMethod, false);
 
