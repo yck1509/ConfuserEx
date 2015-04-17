@@ -51,18 +51,17 @@ namespace Confuser.Core {
 			if (comp == null)
 				return defValue;
 
-			// For packers
-			if (comp is Packer) {
-				parameters = new Dictionary<string, string>(context.Project.Packer, StringComparer.OrdinalIgnoreCase);
+			if (comp is Packer && target == null) {
+				// Packer parameters are stored in modules
+				target = context.Modules[0];
 			}
-			else {
-				// For protections
-				var objParams = context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
-				if (objParams == null)
-					return defValue;
-				if (!objParams.TryGetValue(comp, out parameters))
-					return defValue;
-			}
+
+			var objParams = context.Annotations.Get<ProtectionSettings>(target, ParametersKey);
+			if (objParams == null)
+				return defValue;
+			if (!objParams.TryGetValue(comp, out parameters))
+				return defValue;
+
 			string ret;
 			if (parameters.TryGetValue(name, out ret)) {
 				Type paramType = typeof(T);
