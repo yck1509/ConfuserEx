@@ -47,6 +47,7 @@ namespace Confuser.Renamer {
 		readonly VTableStorage storage;
 		AnalyzePhase analyze;
 		readonly Dictionary<string, string> nameDict = new Dictionary<string, string>();
+		private ulong sequentialCount = 0;
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
@@ -141,6 +142,21 @@ namespace Confuser.Renamer {
 					var newName = "=" + Utils.EncodeString(hash, alphaNumCharset) + "=";
 					nameDict[newName] = name;
 					return newName;
+				case RenameMode.Sequential:
+					const string namePrefix = "#";
+					string sequentialName = namePrefix;
+					if (sequentialCount > uint.MaxValue)
+						sequentialName += Convert.ToBase64String(BitConverter.GetBytes(sequentialCount));
+					if (sequentialCount > ushort.MaxValue)
+						sequentialName += Convert.ToBase64String(BitConverter.GetBytes((uint)sequentialCount));
+					if (sequentialCount > byte.MaxValue)
+						sequentialName += Convert.ToBase64String(BitConverter.GetBytes((ushort)sequentialCount));
+					if (sequentialCount <= byte.MaxValue)
+						sequentialName += Convert.ToBase64String(new []{(byte)sequentialCount});
+					if (sequentialName == namePrefix)
+						throw new UnreachableException();
+					sequentialCount++;
+					return sequentialName;
 			}
 			throw new NotSupportedException("Rename mode '" + mode + "' is not supported.");
 		}
