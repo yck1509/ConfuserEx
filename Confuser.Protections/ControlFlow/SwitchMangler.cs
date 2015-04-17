@@ -9,7 +9,7 @@ namespace Confuser.Protections.ControlFlow {
 	internal class SwitchMangler : ManglerBase {
 		struct Trace {
 			public Dictionary<uint, int> RefCount;
-			public Dictionary<uint, int> BrRefCount;
+			public Dictionary<uint, List<Instruction>> BrRefs;
 			public Dictionary<uint, int> BeforeStack;
 			public Dictionary<uint, int> AfterStack;
 
@@ -22,7 +22,7 @@ namespace Confuser.Protections.ControlFlow {
 
 			public Trace(CilBody body, bool hasReturnValue) {
 				RefCount = new Dictionary<uint, int>();
-				BrRefCount = new Dictionary<uint, int>();
+				BrRefs = new Dictionary<uint, List<Instruction>>();
 				BeforeStack = new Dictionary<uint, int>();
 				AfterStack = new Dictionary<uint, int>();
 
@@ -54,10 +54,10 @@ namespace Confuser.Protections.ControlFlow {
 								BeforeStack[offset] = currentStack;
 
 							Increment(RefCount, offset);
-							Increment(BrRefCount, offset);
+							BrRefs.AddListEntry(offset, instr);
 
 							currentStack = 0;
-							break;
+							continue;
 						case FlowControl.Call:
 							if (instr.OpCode.Code == Code.Jmp)
 								currentStack = 0;
@@ -69,7 +69,7 @@ namespace Confuser.Protections.ControlFlow {
 										BeforeStack[target.Offset] = currentStack;
 
 									Increment(RefCount, target.Offset);
-									Increment(BrRefCount, target.Offset);
+									BrRefs.AddListEntry(target.Offset, instr);
 								}
 							}
 							else {
@@ -78,7 +78,7 @@ namespace Confuser.Protections.ControlFlow {
 									BeforeStack[offset] = currentStack;
 
 								Increment(RefCount, offset);
-								Increment(BrRefCount, offset);
+								BrRefs.AddListEntry(offset, instr);
 							}
 							break;
 						case FlowControl.Meta:
@@ -100,9 +100,9 @@ namespace Confuser.Protections.ControlFlow {
 			}
 
 			public bool IsBranchTarget(uint offset) {
-				int src;
-				if (BrRefCount.TryGetValue(offset, out src))
-					return src > 0;
+				List<Instruction> src;
+				if (BrRefs.TryGetValue(offset, out src))
+					return src.Count > 0;
 				return false;
 			}
 
@@ -230,26 +230,29 @@ namespace Confuser.Protections.ControlFlow {
 					current = current.Next;
 				}
 
-				var unkSourceTargets = new HashSet<Instruction>();
-				foreach (var instr in statements.First.Value) {
-					if (instr.Operand is Instruction)
-						unkSourceTargets.Add((Instruction)instr.Operand);
-					else if (instr.Operand is Instruction[]) {
-						foreach (var target in (Instruction[])instr.Operand)
-							unkSourceTargets.Add(target);
-					}
-				}
-				foreach (var instr in block.Instructions) {
-					if (instr.Operand is Instruction[]) {
-						foreach (var target in (Instruction[])instr.Operand)
-							unkSourceTargets.Add(target);
-					}
-				}
+				var statementLast = new HashSet<Instruction>(statements.Select(st => st.Last()));
 
 				Func<IList<Instruction>, bool> hasUnknownSource;
-				hasUnknownSource = instrs => instrs.Any(instr =>
-				                                        trace.HasMultipleSources(instr.Offset) ||
-				                                        unkSourceTargets.Contains(instr));
+				hasUnknownSource = instrs => instrs.Any(instr => {
+					if (trace.HasMultipleSources(instr.Offset))
+						return true;
+					List<Instruction> srcs;
+					if (trace.BrRefs.TryGetValue(instr.Offset, out srcs)) {
+						// Target of switch => assume unknown
+						if (srcs.Any(src => src.Operand is Instruction[]))
+							return true;
+
+						// Not within current instruction block / targeted in first statement
+						if (srcs.Any(src => src.Offset <= statements.First.Value.Last().Offset ||
+						                    src.Offset >= block.Instructions.Last().Offset))
+							return true;
+
+						// Not targeted by the last of statements
+						if (srcs.Any(src => statementLast.Contains(src)))
+							return true;
+					}
+					return false;
+				});
 
 				var switchInstr = new Instruction(OpCodes.Switch);
 				var switchHdr = new List<Instruction>();
