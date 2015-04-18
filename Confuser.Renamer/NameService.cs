@@ -47,6 +47,7 @@ namespace Confuser.Renamer {
 		readonly VTableStorage storage;
 		AnalyzePhase analyze;
 		readonly Dictionary<string, string> nameDict = new Dictionary<string, string>();
+		private ulong sequentialCount = 0;
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
@@ -125,8 +126,24 @@ namespace Confuser.Renamer {
 				return "";
 			if (mode == RenameMode.Debug)
 				return "_" + name;
+		    if (mode == RenameMode.Sequential) {
+		        const string namePrefix = "#";
+		        string sequentialName = namePrefix;
+		        if (sequentialCount > uint.MaxValue)
+		            sequentialName += Convert.ToBase64String(BitConverter.GetBytes(sequentialCount));
+		        if (sequentialCount > ushort.MaxValue)
+		            sequentialName += Convert.ToBase64String(BitConverter.GetBytes((uint) sequentialCount));
+		        if (sequentialCount > byte.MaxValue)
+		            sequentialName += Convert.ToBase64String(BitConverter.GetBytes((ushort) sequentialCount));
+		        if (sequentialCount <= byte.MaxValue)
+		            sequentialName += Convert.ToBase64String(new[] {(byte) sequentialCount});
+		        if (sequentialName == namePrefix)
+		            throw new UnreachableException();
+		        sequentialCount++;
+		        return sequentialName;
+		    }
 
-			byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
+		    byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
 
 			switch (mode) {
 				case RenameMode.Empty:
