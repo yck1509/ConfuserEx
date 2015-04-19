@@ -32,10 +32,15 @@ namespace Confuser.Renamer {
 					RickRoller.CommenceRickroll(context, (ModuleDef)def);
 
 				bool canRename = service.CanRename(def);
-				if (def is MethodDef)
-					if (canRename && parameters.GetParameter(context, def, "renameArgs", true)) {
-						foreach (ParamDef param in ((MethodDef)def).ParamDefs)
-							param.Name = null;
+				if (def is MethodDef) {
+                    var methodDef = (MethodDef)def;
+                    //always attempt remove locals for command line support
+                    if (methodDef.HasBody)
+                            foreach (var variable in methodDef.Body.Variables)
+                                variable.Name = string.Empty;
+                    if (canRename && parameters.GetParameter(context, def, "renameArgs", true)) 
+						    foreach (ParamDef param in ((MethodDef)def).ParamDefs)
+							    param.Name = null;
 					}
 
 				if (!canRename)
