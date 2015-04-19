@@ -55,7 +55,7 @@ namespace ConfuserEx {
 			}
 		}
 
-		readonly Regex symbolMatcher = new Regex("=[a-zA-Z0-9]+=");
+		readonly Regex symbolMatcher = new Regex("_[a-zA-Z0-9]+_");
 
 		void Decode_Click(object sender, RoutedEventArgs e) {
 			var trace = stackTrace.Text;

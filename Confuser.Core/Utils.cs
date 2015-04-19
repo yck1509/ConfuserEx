@@ -148,6 +148,8 @@ namespace Confuser.Core {
 					current /= charset.Length;
 				}
 			}
+			if (current != 0)
+				ret.Append(charset[current % charset.Length]);
 			return ret.ToString();
 		}
 

@@ -46,7 +46,9 @@ namespace Confuser.Renamer {
 		readonly RandomGenerator random;
 		readonly VTableStorage storage;
 		AnalyzePhase analyze;
-		readonly Dictionary<string, string> nameDict = new Dictionary<string, string>();
+		readonly byte[] nameId = new byte[8];
+		readonly Dictionary<string, string> nameMap1 = new Dictionary<string, string>();
+		readonly Dictionary<string, string> nameMap2 = new Dictionary<string, string>();
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
@@ -117,6 +119,14 @@ namespace Confuser.Renamer {
 			analyze.Analyze(this, context, ProtectionParameters.Empty, def, true);
 		}
 
+		void IncrementNameId() {
+			for (int i = nameId.Length - 1; i >= 0; i--) {
+				nameId[i]++;
+				if (nameId[i] != 0)
+					break;
+			}
+		}
+
 		public string ObfuscateName(string name, RenameMode mode) {
 			if (string.IsNullOrEmpty(name))
 				return string.Empty;
@@ -137,10 +147,24 @@ namespace Confuser.Renamer {
 					return Utils.EncodeString(hash, letterCharset);
 				case RenameMode.ASCII:
 					return Utils.EncodeString(hash, asciiCharset);
-				case RenameMode.Decodable:
-					var newName = "=" + Utils.EncodeString(hash, alphaNumCharset) + "=";
-					nameDict[newName] = name;
-					return newName;
+				case RenameMode.Decodable: {
+						if (nameMap1.ContainsKey(name))
+							return nameMap1[name];
+						IncrementNameId();
+						var newName = "_" + Utils.EncodeString(hash, alphaNumCharset) + "_";
+						nameMap2[newName] = name;
+						nameMap1[name] = newName;
+						return newName;
+					}
+				case RenameMode.Sequential: {
+						if (nameMap1.ContainsKey(name))
+							return nameMap1[name];
+						IncrementNameId();
+						var newName = "_" + Utils.EncodeString(nameId, alphaNumCharset) + "_";
+						nameMap2[newName] = name;
+						nameMap1[name] = newName;
+						return newName;
+					}
 			}
 			throw new NotSupportedException("Rename mode '" + mode + "' is not supported.");
 		}
@@ -240,7 +264,7 @@ namespace Confuser.Renamer {
 		}
 
 		public ICollection<KeyValuePair<string, string>> GetNameMap() {
-			return nameDict;
+			return nameMap2;
 		}
 	}
 }
