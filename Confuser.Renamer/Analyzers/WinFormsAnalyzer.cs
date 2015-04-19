@@ -31,7 +31,7 @@ namespace Confuser.Renamer.Analyzers {
 					var target = (IMethod)instr.Operand;
 
 					if ((target.DeclaringType.FullName == "System.Windows.Forms.ControlBindingsCollection" ||
-					     target.DeclaringType.FullName == "System.Windows.Forms.BindingsCollection") ||
+					     target.DeclaringType.FullName == "System.Windows.Forms.BindingsCollection") &&
 					    target.Name == "Add" && target.MethodSig.Params.Count != 1) {
 						binding.Add(Tuple.Create(true, instr));
 					}
