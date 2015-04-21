@@ -14,33 +14,41 @@ namespace Confuser.CLI {
 			Console.ForegroundColor = ConsoleColor.White;
 			string originalTitle = Console.Title;
 			Console.Title = "ConfuserEx";
+			try {
 
-			bool noPause = false;
-			string outDir = null;
-			var p = new OptionSet {
-				{
-					"n|nopause", "no pause after finishing protection.",
-					value => { noPause = (value != null); }
-				}, {
-					"o|out=", "specifies output directory.",
-					value => { outDir = value; }
+				bool noPause = false;
+				string outDir = null;
+				List<string> probePaths = new List<string>();
+				List<string> plugins = new List<string>();
+				var p = new OptionSet {
+					{
+						"n|nopause", "no pause after finishing protection.",
+						value => { noPause = (value != null); }
+					}, {
+						"o|out=", "specifies output directory.",
+						value => { outDir = value; }
+					}, {
+						"probe=", "specifies probe directory.",
+						value => { probePaths.Add(value); }
+					}, {
+						"plugin=", "specifies plugin path.",
+						value => { plugins.Add(value); }
+					}
+				};
+
+				List<string> files;
+				try {
+					files = p.Parse(args);
+					if (files.Count == 0)
+						throw new ArgumentException("No input files specified.");
 				}
-			};
+				catch (Exception ex) {
+					Console.Write("ConfuserEx.CLI: ");
+					Console.WriteLine(ex.Message);
+					PrintUsage();
+					return -1;
+				}
 
-			List<string> files;
-			try {
-				files = p.Parse(args);
-				if (files.Count == 0)
-					throw new ArgumentException("No input files specified.");
-			}
-			catch (Exception ex) {
-				Console.Write("ConfuserEx.CLI: ");
-				Console.WriteLine(ex.Message);
-				PrintUsage();
-				return -1;
-			}
-
-			try {
 				var parameters = new ConfuserParameters();
 
 				if (files.Count == 1 && Path.GetExtension(files[0]) == ".crproj") {
@@ -89,6 +97,10 @@ namespace Confuser.CLI {
 			
 					proj.BaseDirectory = Path.GetDirectoryName(files[0]);
 					proj.OutputDirectory = outDir;
+					foreach (var path in probePaths)
+						proj.ProbePaths.Add(path);
+					foreach (var path in plugins)
+						proj.PluginPaths.Add(path);
 					parameters.Project = proj;
 				}
 
@@ -127,6 +139,8 @@ namespace Confuser.CLI {
 			WriteLine("Confuser.CLI -n|noPause -o|out=<output directory> <modules>");
 			WriteLine("    -n|noPause : no pause after finishing protection.");
 			WriteLine("    -o|out     : specifies output directory.");
+			WriteLine("    -probe     : specifies probe directory.");
+			WriteLine("    -plugin    : specifies plugin path.");
 		}
 
 		static void WriteLineWithColor(ConsoleColor color, string txt) {
