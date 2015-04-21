@@ -36,6 +36,19 @@ namespace Confuser.Core {
 			var cpAttr = (CopyrightAttribute)assembly.GetCustomAttributes(typeof(CopyrightAttribute), false)[0];
 			Version = string.Format("{0} {1}", nameAttr.Product, verAttr.InformationalVersion);
 			Copyright = cpAttr.Copyright;
+
+			AppDomain.CurrentDomain.AssemblyResolve += (sender, e) => {
+				try {
+					var asmName = new AssemblyName(e.Name);
+					foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+						if (asm.GetName().Name == asmName.Name)
+							return asm;
+					return null;
+				}
+				catch {
+					return null;
+				}
+			};
 		}
 
 		/// <summary>

@@ -7,6 +7,9 @@ namespace ConfuserEx {
 	internal class ComponentDiscovery {
 		static void CrossDomainLoadComponents() {
 			var ctx = (CrossDomainContext)AppDomain.CurrentDomain.GetData("ctx");
+			// Initialize the version resolver callback
+			ConfuserEngine.Version.ToString();
+
 			Assembly assembly = Assembly.LoadFile(ctx.PluginPath);
 			foreach (var module in assembly.GetLoadedModules())
 				foreach (var i in module.GetTypes()) {
