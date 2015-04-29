@@ -17,6 +17,7 @@ namespace Confuser.CLI {
 			try {
 
 				bool noPause = false;
+				bool debug = false;
 				string outDir = null;
 				List<string> probePaths = new List<string>();
 				List<string> plugins = new List<string>();
@@ -33,6 +34,9 @@ namespace Confuser.CLI {
 					}, {
 						"plugin=", "specifies plugin path.",
 						value => { plugins.Add(value); }
+					}, {
+						"debug", "specifies debug symbol generation.",
+						value => { debug = (value != null); }
 					}
 				};
 
@@ -101,6 +105,7 @@ namespace Confuser.CLI {
 						proj.ProbePaths.Add(path);
 					foreach (var path in plugins)
 						proj.PluginPaths.Add(path);
+					proj.Debug = debug;
 					parameters.Project = proj;
 				}
 
@@ -141,6 +146,7 @@ namespace Confuser.CLI {
 			WriteLine("    -o|out     : specifies output directory.");
 			WriteLine("    -probe     : specifies probe directory.");
 			WriteLine("    -plugin    : specifies plugin path.");
+			WriteLine("    -debug     : specifies debug symbol generation.");
 		}
 
 		static void WriteLineWithColor(ConsoleColor color, string txt) {
