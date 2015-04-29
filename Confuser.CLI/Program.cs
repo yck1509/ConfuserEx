@@ -66,15 +66,30 @@ namespace Confuser.CLI {
 						return -1;
 					}
 
+					var proj = new ConfuserProject();
+
+					if (Path.GetExtension(files[files.Count - 1]) == ".crproj") {
+						var templateProj = new ConfuserProject();
+						var xmlDoc = new XmlDocument();
+						xmlDoc.Load(files[files.Count - 1]);
+						templateProj.Load(xmlDoc);
+						files.RemoveAt(files.Count - 1);
+			
+						foreach (var rule in templateProj.Rules)
+							proj.Rules.Add(rule);
+			                }
+					else 
+						parameters.Marker = new ObfAttrMarker();
+			
+			
 					// Generate a ConfuserProject for input modules
 					// Assuming first file = main module
-					var proj = new ConfuserProject();
 					foreach (var input in files)
-						proj.Add(new ProjectModule { Path = input });
+					proj.Add(new ProjectModule { Path = input });
+			
 					proj.BaseDirectory = Path.GetDirectoryName(files[0]);
 					proj.OutputDirectory = outDir;
 					parameters.Project = proj;
-					parameters.Marker = new ObfAttrMarker();
 				}
 
 				int retVal = RunProject(parameters);
