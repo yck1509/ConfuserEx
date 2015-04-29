@@ -71,7 +71,7 @@ namespace Confuser.Core {
 
 				if (paramType.IsEnum)
 					return (T)Enum.Parse(paramType, ret, true);
-				return (T)Convert.ChangeType(ret, typeof(T));
+				return (T)Convert.ChangeType(ret, paramType);
 			}
 			return defValue;
 		}
