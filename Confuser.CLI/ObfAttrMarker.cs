@@ -101,8 +101,11 @@ namespace Confuser.CLI {
 		}
 
 		static IEnumerable<ProtectionSettingsInfo> ProcessAttributes(IEnumerable<ObfuscationAttributeInfo> attrs) {
+			bool hasAttr = false;
+			ProtectionSettingsInfo info;
+
 			foreach (var attr in attrs) {
-				var info = new ProtectionSettingsInfo();
+				info = new ProtectionSettingsInfo();
 
 				info.Exclude = (attr.Exclude ?? true);
 				info.ApplyToMember = (attr.ApplyToMembers ?? true);
@@ -114,11 +117,24 @@ namespace Confuser.CLI {
 					throw new ArgumentException("Feature property cannot be set when Exclude is true.");
 				}
 				yield return info;
+				hasAttr = true;
+			}
+
+			if (!hasAttr) {
+				info = new ProtectionSettingsInfo();
+
+				info.Exclude = false;
+				info.ApplyToMember = false;
+				info.Settings = "";
+				yield return info;
 			}
 		}
 
-		void ApplySettings(IDnlibDef def, IEnumerable<ProtectionSettingsInfo> infos) {
-			var settings = new ProtectionSettings();
+		void ApplySettings(IDnlibDef def, IEnumerable<ProtectionSettingsInfo> infos, ProtectionSettings settings = null) {
+			if (settings == null)
+				settings = new ProtectionSettings();
+			else
+				settings = new ProtectionSettings(settings);
 
 			ProtectionSettingsInfo? last = null;
 			var parser = new ObfAttrParser(protections);
@@ -131,11 +147,12 @@ namespace Confuser.CLI {
 
 				last = info;
 
-				if (info.ApplyToMember) {
+				if (info.ApplyToMember && !string.IsNullOrEmpty(info.Settings)) {
 					parser.ParseProtectionString(settings, info.Settings);
 				}
 			}
-			if (last != null && !last.Value.ApplyToMember) {
+			if (last != null && !last.Value.ApplyToMember &&
+				!string.IsNullOrEmpty(last.Value.Settings)) {
 				parser.ParseProtectionString(settings, last.Value.Settings);
 			}
 
@@ -266,7 +283,7 @@ namespace Confuser.CLI {
 				return new Regex(Regex.Escape(ns.Substring(1)) + "$");
 			if (ns.Length >= 1 && ns[ns.Length - 1] == '*')
 				return new Regex(Regex.Escape("^" + ns.Substring(0, ns.Length - 1)));
-			return new Regex(Regex.Escape(ns));
+			return new Regex("^" + Regex.Escape(ns) + "$");
 		}
 
 		static ProtectionSettingsStack MatchNamespace(Dictionary<Regex, ProtectionSettingsStack> attrs, string ns) {
