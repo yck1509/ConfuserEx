@@ -1,7 +1,5 @@
 @echo off
 
-IF NOT EXIST ..\ConfuserEx.snk COPY ..\ConfuserEx_default.snk ..\ConfuserEx.snk
-
 %windir%\microsoft.net\framework\v4.0.30319\msbuild ..\Confuser2.sln /p:Configuration=Release "/p:Platform=Any CPU"
 
 IF %ERRORLEVEL% NEQ 0 GOTO err
