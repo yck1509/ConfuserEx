@@ -38,7 +38,7 @@ namespace Confuser.Renamer {
 							param.Name = null;
 					}
 
-				if (!canRename && !parameters.GetParameter(context, def, "forceRen", false))
+				if (!canRename)
 					continue;
 
 				RenameMode mode = service.GetRenameMode(def);
