@@ -41,7 +41,7 @@ namespace Confuser.Renamer.References {
 		}
 
 		public bool ShouldCancelRename() {
-			return false;
+			return baseSlot.MethodDefDeclType is GenericInstSig && thisSlot.MethodDef.Module.IsClr20;
 		}
 	}
 }
