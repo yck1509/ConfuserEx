@@ -124,8 +124,7 @@ namespace Confuser.Protections {
 					our brand new Heap
 					*/
 					//
-					byte[] data = { 0x30, 0xC2, 0xDA, 0xDB, 0x2A, 0x21, 0xA0, 0x40, 0x84, 0x6C, 0xEE, 0x55, 0x68, 0x82, 0x24, 0xDD };
-                    			writer.TheOptions.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#GUID", data));
+                    writer.TheOptions.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#GUID", Guid.NewGuid().ToByteArray()));
 					//
 					writer.TheOptions.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Strings", new byte[1]));
 					writer.TheOptions.MetaDataOptions.OtherHeapsEnd.Add(new RawHeap("#Blob", new byte[1]));
