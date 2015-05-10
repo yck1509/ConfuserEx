@@ -245,8 +245,13 @@ namespace Confuser.Core {
 				foreach (TypeSig genArg in genInst.GenericArguments)
 					FindTypeRefsInternal(genArg, ret);
 			}
-			else if (typeSig is TypeDefOrRefSig)
-				ret.Add(((TypeDefOrRefSig)typeSig).TypeDefOrRef);
+			else if (typeSig is TypeDefOrRefSig) {
+				var type = ((TypeDefOrRefSig)typeSig).TypeDefOrRef;
+				while (type != null) {
+					ret.Add(type);
+					type = type.DeclaringType;
+				}
+			}
 		}
 
 		/// <summary>
