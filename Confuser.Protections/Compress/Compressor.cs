@@ -16,6 +16,7 @@ using dnlib.DotNet.MD;
 using dnlib.DotNet.Writer;
 using dnlib.PE;
 using FileAttributes = dnlib.DotNet.FileAttributes;
+using SR = System.Reflection;
 
 namespace Confuser.Protections {
 	internal class Compressor : Packer {
@@ -83,7 +84,7 @@ namespace Confuser.Protections {
 			}
 		}
 
-		static string GetName(byte[] module) {
+		static string GetId(byte[] module) {
 			var md = MetaDataCreator.CreateMetaData(new PEImage(module));
 			var assemblyRow = md.TablesStream.ReadAssemblyRow(1);
 			var assembly = new AssemblyNameInfo();
@@ -93,7 +94,11 @@ namespace Confuser.Protections {
 			assembly.HashAlgId = (AssemblyHashAlgorithm)assemblyRow.HashAlgId;
 			assembly.Version = new Version(assemblyRow.MajorVersion, assemblyRow.MinorVersion, assemblyRow.BuildNumber, assemblyRow.RevisionNumber);
 			assembly.Attributes = (AssemblyAttributes)assemblyRow.Flags;
-			return assembly.Name;
+			return GetId(assembly);
+		}
+
+		static string GetId(IAssembly assembly) {
+			return new SR.AssemblyName(assembly.FullName).FullName.ToUpperInvariant();
 		}
 
 		void PackModules(ConfuserContext context, CompressorContext compCtx, ModuleDef stubModule, ICompressionService comp, RandomGenerator random) {
@@ -103,15 +108,15 @@ namespace Confuser.Protections {
 				if (i == compCtx.ModuleIndex)
 					continue;
 
-				string name = context.Modules[i].Assembly.Name.ToUpperInvariant();
-				modules.Add(name, context.OutputModules[i]);
+				string id = GetId(context.Modules[i].Assembly);
+				modules.Add(id, context.OutputModules[i]);
 
-				int strLen = Encoding.UTF8.GetByteCount(name);
+				int strLen = Encoding.UTF8.GetByteCount(id);
 				if (strLen > maxLen)
 					maxLen = strLen;
 			}
 			foreach (var extModule in context.ExternalModules) {
-				var name = GetName(extModule).ToUpperInvariant();
+				var name = GetId(extModule).ToUpperInvariant();
 				modules.Add(name, extModule);
 
 				int strLen = Encoding.UTF8.GetByteCount(name);

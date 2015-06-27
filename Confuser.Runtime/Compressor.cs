@@ -76,7 +76,7 @@ namespace Confuser.Runtime {
 		}
 
 		static Assembly Resolve(object sender, ResolveEventArgs e) {
-			byte[] b = Encoding.UTF8.GetBytes(new AssemblyName(e.Name).Name.ToUpperInvariant());
+			byte[] b = Encoding.UTF8.GetBytes(new AssemblyName(e.Name).FullName.ToUpperInvariant());
 
 			Stream m = null;
 			if (b.Length + 4 <= key.Length) {
