@@ -34,6 +34,9 @@ namespace Confuser.Core {
 
 			for (int i = 0; i < context.OutputModules.Count; i++) {
 				string path = Path.GetFullPath(Path.Combine(tmpDir, context.OutputPaths[i]));
+				var dir = Path.GetDirectoryName(path);
+				if (!Directory.Exists(dir))
+					Directory.CreateDirectory(dir);
 				File.WriteAllBytes(path, context.OutputModules[i]);
 			}
 			File.WriteAllBytes(Path.Combine(tmpDir, fileName), module);
