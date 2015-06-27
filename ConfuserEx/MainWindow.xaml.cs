@@ -40,7 +40,7 @@ namespace ConfuserEx {
 			if (args.Length != 2 || !File.Exists(args[1]))
 				return;
 
-			string fileName = args[1];
+			string fileName = Path.GetFullPath(args[1]);
 			try {
 				var xmlDoc = new XmlDocument();
 				xmlDoc.Load(fileName);
