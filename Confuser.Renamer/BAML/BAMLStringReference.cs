@@ -11,6 +11,11 @@ namespace Confuser.Renamer.BAML {
 			this.instr = instr;
 		}
 
+		public bool CanRename(string oldName, string newName) {
+			// TODO: Other protection interfering
+			return instr.OpCode.Code == Code.Ldstr;
+		}
+
 		public void Rename(string oldName, string newName) {
 			var value = (string)instr.Operand;
 			if (value.IndexOf(oldName, StringComparison.OrdinalIgnoreCase) != -1)

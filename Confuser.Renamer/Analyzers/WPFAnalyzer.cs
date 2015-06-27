@@ -56,9 +56,18 @@ namespace Confuser.Renamer.Analyzers {
 						else if (newName.EndsWith(".XAML"))
 							newName = service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".xaml";
 
+						bool renameOk = true;
 						foreach (var bamlRef in references)
-							bamlRef.Rename(doc.DocumentName, newName);
-						doc.DocumentName = newName;
+							if (!bamlRef.CanRename(doc.DocumentName, newName)) {
+								renameOk = false;
+								break;
+							}
+
+						if (renameOk) {
+							foreach (var bamlRef in references)
+								bamlRef.Rename(doc.DocumentName, newName);
+							doc.DocumentName = newName;
+						}
 					}
 				}
 		}

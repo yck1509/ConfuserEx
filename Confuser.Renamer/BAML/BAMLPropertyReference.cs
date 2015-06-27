@@ -10,6 +10,10 @@ namespace Confuser.Renamer.BAML {
 			this.rec = rec;
 		}
 
+		public bool CanRename(string oldName, string newName) {
+			return true;
+		}
+
 		public void Rename(string oldName, string newName) {
 			var value = rec.Value;
 			if (value.IndexOf(oldName, StringComparison.OrdinalIgnoreCase) != -1)
