@@ -214,9 +214,6 @@ namespace Confuser.CLI {
 						throw new ArgumentException("Only main module can set 'generate debug symbol'.");
 					project.Debug = bool.Parse(attr.FeatureValue);
 				}
-				if (project.Debug) {
-					module.LoadPdb();
-				}
 
 				if (attr.FeatureName.Equals("random seed", StringComparison.OrdinalIgnoreCase)) {
 					if (!isMain)
@@ -269,6 +266,10 @@ namespace Confuser.CLI {
 						}
 					}
 				}
+			}
+
+			if (project.Debug) {
+				module.LoadPdb();
 			}
 
 			ProcessModule(module, snKeyPath, snKeyPass, settingAttrs, namespaceAttrs);
