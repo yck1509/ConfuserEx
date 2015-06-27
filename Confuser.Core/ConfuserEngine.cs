@@ -334,7 +334,7 @@ namespace Confuser.Core {
 			context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => context.CheckCancellation();
 			context.CurrentModuleWriterOptions = new ModuleWriterOptions(context.CurrentModule, context.CurrentModuleWriterListener);
 
-			if (!context.CurrentModule.IsILOnly)
+			if (!context.CurrentModule.IsILOnly || context.CurrentModule.VTableFixups != null)
 				context.RequestNative();
 			
 			var snKey = context.Annotations.Get<StrongNameKey>(context.CurrentModule, Marker.SNKey);

@@ -15,7 +15,6 @@ namespace Confuser.CLI {
 			string originalTitle = Console.Title;
 			Console.Title = "ConfuserEx";
 			try {
-
 				bool noPause = false;
 				bool debug = false;
 				string outDir = null;
@@ -86,19 +85,19 @@ namespace Confuser.CLI {
 						xmlDoc.Load(files[files.Count - 1]);
 						templateProj.Load(xmlDoc);
 						files.RemoveAt(files.Count - 1);
-			
+
 						foreach (var rule in templateProj.Rules)
 							proj.Rules.Add(rule);
-			                }
-					else 
+					}
+					else
 						parameters.Marker = new ObfAttrMarker();
-			
-			
+
+
 					// Generate a ConfuserProject for input modules
 					// Assuming first file = main module
 					foreach (var input in files)
-					proj.Add(new ProjectModule { Path = input });
-			
+						proj.Add(new ProjectModule { Path = input });
+
 					proj.BaseDirectory = Path.GetDirectoryName(files[0]);
 					proj.OutputDirectory = outDir;
 					foreach (var path in probePaths)
