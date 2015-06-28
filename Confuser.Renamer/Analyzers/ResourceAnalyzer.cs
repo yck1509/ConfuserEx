@@ -36,6 +36,7 @@ namespace Confuser.Renamer.Analyzers {
 						context.Logger.WarnFormat("Could not find resource type '{0}'.", typeName);
 						continue;
 					}
+					service.ReduceRenameMode(type, RenameMode.ASCII);
 					service.AddReference(type, new ResourceReference(res, type, format));
 				}
 			}
@@ -55,6 +56,7 @@ namespace Confuser.Renamer.Analyzers {
 						context.Logger.WarnFormat("Could not find resource type '{0}'.", typeName);
 						continue;
 					}
+					service.ReduceRenameMode(type, RenameMode.ASCII);
 					service.AddReference(type, new ResourceReference(res, type, format));
 				}
 			}
