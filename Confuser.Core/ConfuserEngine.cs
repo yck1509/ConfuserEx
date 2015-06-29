@@ -135,7 +135,7 @@ namespace Confuser.Core {
 				MarkerResult markings = marker.MarkProject(parameters.Project, context);
 				context.Modules = markings.Modules.ToList().AsReadOnly();
 				foreach (var module in context.Modules)
-					module.EnableTypeDefFindCache = true;
+					module.EnableTypeDefFindCache = false;
 				context.OutputModules = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
 				context.OutputSymbols = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
 				context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToArray();
