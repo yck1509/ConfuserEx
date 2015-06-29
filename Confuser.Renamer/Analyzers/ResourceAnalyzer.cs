@@ -44,7 +44,7 @@ namespace Confuser.Renamer.Analyzers {
 				string format = "{0}.resources";
 				foreach (Resource res in module.Resources) {
 					Match match = ResourceNamePattern.Match(res.Name);
-					if (!match.Success)
+					if (!match.Success || res.ResourceType != ResourceType.Embedded)
 						continue;
 					string typeName = match.Groups[1].Value;
 
