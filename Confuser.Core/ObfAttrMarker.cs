@@ -324,7 +324,7 @@ namespace Confuser.Core {
 		void ProcessModule(ModuleDefMD module, Rules rules, string snKeyPath, string snKeyPass,
 		                   List<ObfuscationAttributeInfo> settingAttrs,
 		                   Dictionary<Regex, List<ObfuscationAttributeInfo>> namespaceAttrs) {
-			context.Annotations.Set(module, SNKey, LoadSNKey(context, Path.Combine(project.BaseDirectory, snKeyPath), snKeyPass));
+			context.Annotations.Set(module, SNKey, LoadSNKey(context, snKeyPath == null ? null : Path.Combine(project.BaseDirectory, snKeyPath), snKeyPass));
 
 			var moduleStack = new ProtectionSettingsStack();
 			moduleStack.Push(ProcessAttributes(settingAttrs));
