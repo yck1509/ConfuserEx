@@ -89,9 +89,6 @@ namespace Confuser.CLI {
 						foreach (var rule in templateProj.Rules)
 							proj.Rules.Add(rule);
 					}
-					else
-						parameters.Marker = new ObfAttrMarker();
-
 
 					// Generate a ConfuserProject for input modules
 					// Assuming first file = main module

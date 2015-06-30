@@ -53,7 +53,7 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <returns>The marker.</returns>
 		internal Marker GetMarker() {
-			return Marker ?? new Marker();
+			return Marker ?? new ObfAttrMarker();
 		}
 	}
 }

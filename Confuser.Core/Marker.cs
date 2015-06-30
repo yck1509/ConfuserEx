@@ -197,8 +197,8 @@ namespace Confuser.Core {
 		/// <param name="context">The working context.</param>
 		/// <param name="target">The target definition.</param>
 		/// <param name="rules">The rules.</param>
-		protected void ApplyRules(ConfuserContext context, IDnlibDef target, Rules rules) {
-			var ret = new ProtectionSettings();
+		protected void ApplyRules(ConfuserContext context, IDnlibDef target, Rules rules, ProtectionSettings baseSettings = null) {
+			var ret = baseSettings == null ? new ProtectionSettings() : new ProtectionSettings(baseSettings);
 			foreach (var i in rules) {
 				if (!(bool)i.Value.Evaluate(target)) continue;
 

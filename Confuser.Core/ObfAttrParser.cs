@@ -3,11 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Confuser.Core;
 
-namespace Confuser.CLI {
+namespace Confuser.Core {
 	internal struct ObfAttrParser {
-		IDictionary items;
+		readonly IDictionary items;
 
 		string str;
 		int index;
@@ -220,8 +219,7 @@ namespace Confuser.CLI {
 			while (state != ParseState.End) {
 				switch (state) {
 					case ParseState.ReadItemName:
-						if (!ReadId(buffer))
-							throw new ArgumentException("Unexpected end of string in ReadItemName state.");
+						ReadId(buffer);
 
 						packer = (Packer)items[buffer.ToString()];
 						buffer.Length = 0;

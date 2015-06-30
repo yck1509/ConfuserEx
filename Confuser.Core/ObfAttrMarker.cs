@@ -4,12 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Confuser.Core;
 using Confuser.Core.Project;
+using Confuser.Core.Project.Patterns;
 using dnlib.DotNet;
 
-namespace Confuser.CLI {
-	internal class ObfAttrMarker : Marker {
+namespace Confuser.Core {
+	using Rules = Dictionary<Rule, PatternExpression>;
+
+	public class ObfAttrMarker : Marker {
 		struct ObfuscationAttributeInfo {
 			public bool? ApplyToMembers;
 			public bool? Exclude;
@@ -24,7 +26,7 @@ namespace Confuser.CLI {
 		}
 
 		class ProtectionSettingsStack {
-			Stack<ProtectionSettingsInfo[]> stack;
+			readonly Stack<ProtectionSettingsInfo[]> stack;
 
 			public ProtectionSettingsStack() {
 				stack = new Stack<ProtectionSettingsInfo[]>();
@@ -130,7 +132,7 @@ namespace Confuser.CLI {
 			}
 		}
 
-		void ApplySettings(IDnlibDef def, IEnumerable<ProtectionSettingsInfo> infos, ProtectionSettings settings = null) {
+		void ApplySettings(IDnlibDef def, Rules rules, IEnumerable<ProtectionSettingsInfo> infos, ProtectionSettings settings = null) {
 			if (settings == null)
 				settings = new ProtectionSettings();
 			else
@@ -152,11 +154,11 @@ namespace Confuser.CLI {
 				}
 			}
 			if (last != null && !last.Value.ApplyToMember &&
-				!string.IsNullOrEmpty(last.Value.Settings)) {
+			    !string.IsNullOrEmpty(last.Value.Settings)) {
 				parser.ParseProtectionString(settings, last.Value.Settings);
 			}
 
-			ProtectionParameters.SetParameters(context, def, settings);
+			ApplyRules(context, def, rules, settings);
 		}
 
 		static readonly Regex NSPattern = new Regex("namespace '([^']*)'");
@@ -169,19 +171,36 @@ namespace Confuser.CLI {
 		Dictionary<string, string> packerParams;
 		List<byte[]> extModules;
 
-		protected override void MarkMember(IDnlibDef member, ConfuserContext context) {
+		/// <inheritdoc />
+		protected internal override void MarkMember(IDnlibDef member, ConfuserContext context) {
 			ModuleDef module = ((IMemberRef)member).Module;
 			ProtectionParameters.SetParameters(context, member, ProtectionParameters.GetParameters(context, module));
 		}
 
-		protected override MarkerResult MarkProject(ConfuserProject proj, ConfuserContext context) {
+		/// <inheritdoc />
+		protected internal override MarkerResult MarkProject(ConfuserProject proj, ConfuserContext context) {
 			crossModuleAttrs = new Dictionary<string, Dictionary<Regex, List<ObfuscationAttributeInfo>>>();
 			this.context = context;
 			project = proj;
 			extModules = new List<byte[]>();
 
+			if (proj.Packer != null) {
+				if (!packers.ContainsKey(proj.Packer.Id)) {
+					context.Logger.ErrorFormat("Cannot find packer with ID '{0}'.", proj.Packer.Id);
+					throw new ConfuserException(null);
+				}
+
+				packer = packers[proj.Packer.Id];
+				packerParams = new Dictionary<string, string>(proj.Packer, StringComparer.OrdinalIgnoreCase);
+			}
+
 			var modules = new List<Tuple<ProjectModule, ModuleDefMD>>();
 			foreach (ProjectModule module in proj) {
+				if (module.IsExternal) {
+					extModules.Add(module.LoadRaw(proj.BaseDirectory));
+					continue;
+				}
+
 				ModuleDefMD modDef = module.Resolve(proj.BaseDirectory, context.Resolver.DefaultModuleContext);
 				context.CheckCancellation();
 
@@ -191,18 +210,25 @@ namespace Confuser.CLI {
 			foreach (var module in modules) {
 				context.Logger.InfoFormat("Loading '{0}'...", module.Item1.Path);
 
-				MarkModule(module.Item2, module == modules[0]);
+				Rules rules = ParseRules(proj, module.Item1, context);
+				MarkModule(module.Item1, module.Item2, rules, module == modules[0]);
+
+				context.Annotations.Set(module.Item2, RulesKey, rules);
 
 				// Packer parameters are stored in modules
 				if (packer != null)
 					ProtectionParameters.GetParameters(context, module.Item2)[packer] = packerParams;
 			}
+
+			if (proj.Debug && proj.Packer != null)
+				context.Logger.Warn("Generated Debug symbols might not be usable with packers!");
+
 			return new MarkerResult(modules.Select(module => module.Item2).ToList(), packer, extModules);
 		}
 
-		void MarkModule(ModuleDefMD module, bool isMain) {
+		void MarkModule(ProjectModule projModule, ModuleDefMD module, Rules rules, bool isMain) {
 			var settingAttrs = new List<ObfuscationAttributeInfo>();
-			string snKeyPath = null, snKeyPass = null;
+			string snKeyPath = projModule.SNKeyPath, snKeyPass = projModule.SNKeyPassword;
 			Dictionary<Regex, List<ObfuscationAttributeInfo>> namespaceAttrs;
 			if (!crossModuleAttrs.TryGetValue(module.Name, out namespaceAttrs)) {
 				namespaceAttrs = new Dictionary<Regex, List<ObfuscationAttributeInfo>>();
@@ -272,7 +298,7 @@ namespace Confuser.CLI {
 				module.LoadPdb();
 			}
 
-			ProcessModule(module, snKeyPath, snKeyPass, settingAttrs, namespaceAttrs);
+			ProcessModule(module, rules, snKeyPath, snKeyPass, settingAttrs, namespaceAttrs);
 		}
 
 		static Regex TranslateNamespaceRegex(string ns) {
@@ -295,14 +321,14 @@ namespace Confuser.CLI {
 			return null;
 		}
 
-		void ProcessModule(ModuleDefMD module, string snKeyPath, string snKeyPass,
+		void ProcessModule(ModuleDefMD module, Rules rules, string snKeyPath, string snKeyPass,
 		                   List<ObfuscationAttributeInfo> settingAttrs,
 		                   Dictionary<Regex, List<ObfuscationAttributeInfo>> namespaceAttrs) {
-			context.Annotations.Set(module, SNKey, LoadSNKey(context, snKeyPath, snKeyPass));
+			context.Annotations.Set(module, SNKey, LoadSNKey(context, Path.Combine(project.BaseDirectory, snKeyPath), snKeyPass));
 
 			var moduleStack = new ProtectionSettingsStack();
 			moduleStack.Push(ProcessAttributes(settingAttrs));
-			ApplySettings(module, moduleStack.GetInfos());
+			ApplySettings(module, rules, moduleStack.GetInfos());
 
 			var nsSettings = namespaceAttrs.ToDictionary(kvp => kvp.Key, kvp => {
 				var nsStack = new ProtectionSettingsStack(moduleStack);
@@ -314,19 +340,19 @@ namespace Confuser.CLI {
 				var typeStack = MatchNamespace(nsSettings, type.Namespace) ?? moduleStack;
 				typeStack.Push(ProcessAttributes(ReadObfuscationAttributes(type)));
 
-				ApplySettings(type, typeStack.GetInfos());
-				ProcessTypeMembers(type, typeStack);
+				ApplySettings(type, rules, typeStack.GetInfos());
+				ProcessTypeMembers(type, rules, typeStack);
 
 				typeStack.Pop();
 			}
 		}
 
-		void ProcessTypeMembers(TypeDef type, ProtectionSettingsStack stack) {
+		void ProcessTypeMembers(TypeDef type, Rules rules, ProtectionSettingsStack stack) {
 			foreach (var nestedType in type.NestedTypes) {
 				stack.Push(ProcessAttributes(ReadObfuscationAttributes(nestedType)));
 
-				ApplySettings(nestedType, stack.GetInfos());
-				ProcessTypeMembers(nestedType, stack);
+				ApplySettings(nestedType, rules, stack.GetInfos());
+				ProcessTypeMembers(nestedType, rules, stack);
 
 				stack.Pop();
 			}
@@ -334,15 +360,15 @@ namespace Confuser.CLI {
 			foreach (var prop in type.Properties) {
 				stack.Push(ProcessAttributes(ReadObfuscationAttributes(prop)));
 
-				ApplySettings(prop, stack.GetInfos());
+				ApplySettings(prop, rules, stack.GetInfos());
 				if (prop.GetMethod != null) {
-					ProcessMember(prop.GetMethod, stack);
+					ProcessMember(prop.GetMethod, rules, stack);
 				}
 				if (prop.SetMethod != null) {
-					ProcessMember(prop.SetMethod, stack);
+					ProcessMember(prop.SetMethod, rules, stack);
 				}
 				foreach (var m in prop.OtherMethods)
-					ProcessMember(m, stack);
+					ProcessMember(m, rules, stack);
 
 				stack.Pop();
 			}
@@ -350,35 +376,35 @@ namespace Confuser.CLI {
 			foreach (var evt in type.Events) {
 				stack.Push(ProcessAttributes(ReadObfuscationAttributes(evt)));
 
-				ApplySettings(evt, stack.GetInfos());
+				ApplySettings(evt, rules, stack.GetInfos());
 				if (evt.AddMethod != null) {
-					ProcessMember(evt.AddMethod, stack);
+					ProcessMember(evt.AddMethod, rules, stack);
 				}
 				if (evt.RemoveMethod != null) {
-					ProcessMember(evt.RemoveMethod, stack);
+					ProcessMember(evt.RemoveMethod, rules, stack);
 				}
 				if (evt.InvokeMethod != null) {
-					ProcessMember(evt.InvokeMethod, stack);
+					ProcessMember(evt.InvokeMethod, rules, stack);
 				}
 				foreach (var m in evt.OtherMethods)
-					ProcessMember(m, stack);
+					ProcessMember(m, rules, stack);
 
 				stack.Pop();
 			}
 
 			foreach (var method in type.Methods) {
 				if (method.SemanticsAttributes == 0)
-					ProcessMember(method, stack);
+					ProcessMember(method, rules, stack);
 			}
 
 			foreach (var field in type.Fields) {
-				ProcessMember(field, stack);
+				ProcessMember(field, rules, stack);
 			}
 		}
 
-		void ProcessMember(IDnlibDef member, ProtectionSettingsStack stack) {
+		void ProcessMember(IDnlibDef member, Rules rules, ProtectionSettingsStack stack) {
 			stack.Push(ProcessAttributes(ReadObfuscationAttributes(member)));
-			ApplySettings(member, stack.GetInfos());
+			ApplySettings(member, rules, stack.GetInfos());
 			stack.Pop();
 		}
 	}
