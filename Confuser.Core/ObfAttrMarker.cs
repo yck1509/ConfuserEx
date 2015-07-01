@@ -235,13 +235,15 @@ namespace Confuser.Core {
 			}
 
 			foreach (var attr in ReadObfuscationAttributes(module.Assembly)) {
-				if (attr.FeatureName.Equals("generate debug symbol", StringComparison.OrdinalIgnoreCase)) {
+				if (string.IsNullOrEmpty(attr.FeatureName)) {
+					settingAttrs.Add(attr);
+				}
+				else if (attr.FeatureName.Equals("generate debug symbol", StringComparison.OrdinalIgnoreCase)) {
 					if (!isMain)
 						throw new ArgumentException("Only main module can set 'generate debug symbol'.");
 					project.Debug = bool.Parse(attr.FeatureValue);
 				}
-
-				if (attr.FeatureName.Equals("random seed", StringComparison.OrdinalIgnoreCase)) {
+				else if (attr.FeatureName.Equals("random seed", StringComparison.OrdinalIgnoreCase)) {
 					if (!isMain)
 						throw new ArgumentException("Only main module can set 'random seed'.");
 					project.Seed = attr.FeatureValue;
@@ -262,9 +264,6 @@ namespace Confuser.Core {
 						throw new ArgumentException("Only main module can add external modules.");
 					var rawModule = new ProjectModule { Path = attr.FeatureValue }.LoadRaw(project.BaseDirectory);
 					extModules.Add(rawModule);
-				}
-				else if (attr.FeatureName == "") {
-					settingAttrs.Add(attr);
 				}
 				else {
 					var match = NSInModulePattern.Match(attr.FeatureName);
