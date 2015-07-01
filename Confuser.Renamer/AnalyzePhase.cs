@@ -118,7 +118,7 @@ namespace Confuser.Renamer {
 			if (type.IsVisibleOutside() && !parameters.GetParameter(context, type, "renPublic", false)) {
 				service.SetCanRename(type, false);
 			}
-			else if (type.IsRuntimeSpecialName || type.IsSpecialName || type.IsGlobalModuleType) {
+			else if (type.IsRuntimeSpecialName || type.IsGlobalModuleType) {
 				service.SetCanRename(type, false);
 			}
 			else if (type.FullName == "ConfusedByAttribute") {
@@ -144,7 +144,7 @@ namespace Confuser.Renamer {
 			    !parameters.GetParameter(context, method, "renPublic", false))
 				service.SetCanRename(method, false);
 
-			else if (method.IsRuntimeSpecialName || method.IsSpecialName)
+			else if (method.IsRuntimeSpecialName)
 				service.SetCanRename(method, false);
 
 			else if (parameters.GetParameter(context, method, "forceRen", false))
@@ -163,7 +163,7 @@ namespace Confuser.Renamer {
 			    !parameters.GetParameter(context, field, "renPublic", false))
 				service.SetCanRename(field, false);
 
-			else if (field.IsRuntimeSpecialName || field.IsSpecialName)
+			else if (field.IsRuntimeSpecialName)
 				service.SetCanRename(field, false);
 
 			else if (parameters.GetParameter(context, field, "forceRen", false))
@@ -181,7 +181,7 @@ namespace Confuser.Renamer {
 			    !parameters.GetParameter(context, property, "renPublic", false))
 				service.SetCanRename(property, false);
 
-			else if (property.IsRuntimeSpecialName || property.IsSpecialName)
+			else if (property.IsRuntimeSpecialName)
 				service.SetCanRename(property, false);
 
 			else if (parameters.GetParameter(context, property, "forceRen", false))
@@ -199,7 +199,7 @@ namespace Confuser.Renamer {
 			    !parameters.GetParameter(context, evt, "renPublic", false))
 				service.SetCanRename(evt, false);
 
-			else if (evt.IsRuntimeSpecialName || evt.IsSpecialName)
+			else if (evt.IsRuntimeSpecialName)
 				service.SetCanRename(evt, false);
 		}
 	}
