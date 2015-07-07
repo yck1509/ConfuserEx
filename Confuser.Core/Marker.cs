@@ -161,20 +161,19 @@ namespace Confuser.Core {
 	            return parameters;
 	        }
 
-	        private static RSACryptoServiceProvider GetRsaProvider(byte[] bytes)
+            private static RSACryptoServiceProvider GetRsaProvider(byte[] bytes)
 	        {
 	            if (bytes == null)
 	                throw new ArgumentNullException("bytes");
 
 	            RSAParameters parameters = GetRSAParameters(bytes);
 
-// Must set KeyNumber to AT_SIGNATURE for strong
-// name keypair to be correctly imported.
-//	CspParameters cp = new CspParameters();
-//	cp.KeyNumber = 2; // AT_SIGNATURE
+                // Must set KeyNumber to AT_SIGNATURE for strong
+                // name keypair to be correctly imported.
+	            CspParameters cp = new CspParameters();
+	            cp.KeyNumber = 2; // AT_SIGNATURE
 
-//	RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(1024, cp);
-	            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+	            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(cp);
 	            rsa.ImportParameters(parameters);
 	            return rsa;
 	        }
@@ -276,7 +275,10 @@ namespace Confuser.Core {
 				    if (string.Equals(extension, ".snk", StringComparison.InvariantCulture))
 				    {
 				        var snkRsa = SnkUtil.GetRsaProvider(path);
-				        return new StrongNameKey(snkRsa.ExportCspBlob(true));
+				        var cspBlob = snkRsa.ExportCspBlob(true);
+                        // TODO: fix this horrible hack
+				        cspBlob[5] = 0x24;
+				        return new StrongNameKey(cspBlob);
 				    }
 
                     // pfx
