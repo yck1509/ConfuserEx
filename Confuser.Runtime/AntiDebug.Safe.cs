@@ -6,8 +6,11 @@ namespace Confuser.Runtime {
 	internal static class AntiDebugSafe {
 		static void Initialize() {
 			string x = "COR";
-			if (Environment.GetEnvironmentVariable(x + "_PROFILER") != null ||
-			    Environment.GetEnvironmentVariable(x + "_ENABLE_PROFILING") != null)
+			var env = typeof(Environment);
+			var method = env.GetMethod("GetEnvironmentVariable", new[] { typeof(string) });
+			if (method != null &&
+			    (method.Invoke(null, new object[] { x + "_PROFILER" }) != null ||
+				 method.Invoke(null, new object[] { x + "_ENABLE_PROFILING" }) != null))
 				Environment.FailFast(null);
 
 			var thread = new Thread(Worker);
