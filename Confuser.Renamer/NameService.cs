@@ -136,22 +136,20 @@ namespace Confuser.Renamer {
 			if (mode == RenameMode.Debug)
 				return "_" + name;
 
-			byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
-
-			switch (mode) {
+		    switch (mode) {
 				case RenameMode.Empty:
 					return "";
 				case RenameMode.Unicode:
-					return Utils.EncodeString(hash, unicodeCharset) + "\u202e";
+					return Utils.EncodeString(GetNameHash(name), unicodeCharset) + "\u202e";
 				case RenameMode.Letters:
-					return Utils.EncodeString(hash, letterCharset);
+					return Utils.EncodeString(GetNameHash(name), letterCharset);
 				case RenameMode.ASCII:
-					return Utils.EncodeString(hash, asciiCharset);
+					return Utils.EncodeString(GetNameHash(name), asciiCharset);
 				case RenameMode.Decodable: {
 						if (nameMap1.ContainsKey(name))
 							return nameMap1[name];
 						IncrementNameId();
-						var newName = "_" + Utils.EncodeString(hash, alphaNumCharset) + "_";
+						var newName = "_" + Utils.EncodeString(GetNameHash(name), alphaNumCharset) + "_";
 						nameMap2[newName] = name;
 						nameMap1[name] = newName;
 						return newName;
@@ -169,7 +167,13 @@ namespace Confuser.Renamer {
 			throw new NotSupportedException("Rename mode '" + mode + "' is not supported.");
 		}
 
-		public string RandomName() {
+	    private byte[] GetNameHash(string name)
+	    {
+	        byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
+	        return hash;
+	    }
+
+	    public string RandomName() {
 			return RandomName(RenameMode.Unicode);
 		}
 
