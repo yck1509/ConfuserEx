@@ -13,8 +13,6 @@ namespace Confuser.Renamer
     {
         private readonly ICryptoTransform decryptor;
 
-        private const string Base64Table = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-
         public NameReverser(string encryptionPassword)
         {
             var algorithm = NameService.CreateReversibleAlgorithm(encryptionPassword);
