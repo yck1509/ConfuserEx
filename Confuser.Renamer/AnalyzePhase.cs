@@ -21,10 +21,13 @@ namespace Confuser.Renamer {
 			get { return "Name analysis"; }
 		}
 
-		void ParseParameters(IDnlibDef def, ConfuserContext context, NameService service, ProtectionParameters parameters) {
+		void ParseParameters(IDnlibDef def, ConfuserContext context, INameService service, ProtectionParameters parameters) {
 			var mode = parameters.GetParameter<RenameMode?>(context, def, "mode", null);
 			if (mode != null)
 				service.SetRenameMode(def, mode.Value);
+            var password = parameters.GetParameter<string>(context, def, "password");
+		    if (password != null)
+		        service.SetReversibleEncryptionKey(def, password);
 		}
 
 		protected override void Execute(ConfuserContext context, ProtectionParameters parameters) {

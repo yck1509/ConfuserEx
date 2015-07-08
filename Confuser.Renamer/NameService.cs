@@ -8,7 +8,9 @@ using Confuser.Renamer.Analyzers;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer {
-	public interface INameService {
+    using System.Security.Cryptography;
+
+    public interface INameService {
 		VTableStorage GetVTables();
 
 		void Analyze(IDnlibDef def);
@@ -20,7 +22,10 @@ namespace Confuser.Renamer {
 		void SetRenameMode(object obj, RenameMode val);
 		void ReduceRenameMode(object obj, RenameMode val);
 
-		string ObfuscateName(string name, RenameMode mode);
+        ICryptoTransform GetReversibleCryptoTransform(object obj);
+        void SetReversibleEncryptionKey(object obj, string encryptionPassword);
+
+        string ObfuscateName(string name, RenameMode mode, ICryptoTransform reversibleCryptoTransform = null);
 		string RandomName();
 		string RandomName(RenameMode mode);
 
@@ -40,6 +45,7 @@ namespace Confuser.Renamer {
 		static readonly object ReferencesKey = new object();
 		static readonly object OriginalNameKey = new object();
 		static readonly object OriginalNamespaceKey = new object();
+		static readonly object CryptoTransformKey = new object();
 
 		readonly ConfuserContext context;
 		readonly byte[] nameSeed;
@@ -103,7 +109,28 @@ namespace Confuser.Renamer {
 				context.Annotations.Set(obj, RenameModeKey, val);
 		}
 
-		public void AddReference<T>(T obj, INameReference<T> reference) {
+	    public ICryptoTransform GetReversibleCryptoTransform(object obj) {
+	        return context.Annotations.Get<ICryptoTransform>(obj, CryptoTransformKey, null);
+	    }
+
+	    public void SetReversibleEncryptionKey(object obj, string encryptionPassword) {
+	        using (var sha = SHA256.Create()) {
+	            var encryptionPasswordBytes = Encoding.UTF8.GetBytes(encryptionPassword);
+	            sha.TransformFinalBlock(encryptionPasswordBytes, 0, encryptionPasswordBytes.Length);
+	            var encryptionKey = sha.Hash;
+	            var algorithm = Aes.Create();
+	            // the SHA256 produces a hash whose length can be directly used by AES 
+                // (and this is the maximum key size).
+	            algorithm.Key = encryptionKey;
+	            algorithm.Mode = CipherMode.CBC; // implicit default, but let's be explicit
+	            algorithm.Padding = PaddingMode.PKCS7; // same thing here
+	            algorithm.IV = new byte[algorithm.BlockSize/8]; // cryptographically, this is bad. However I don't see any other option right now.
+	            var cryptoTransform = algorithm.CreateEncryptor();
+                context.Annotations.Set(obj, CryptoTransformKey, cryptoTransform);
+	        }
+	    }
+
+	    public void AddReference<T>(T obj, INameReference<T> reference) {
 			context.Annotations.GetOrCreate(obj, ReferencesKey, key => new List<INameReference>()).Add(reference);
 		}
 
@@ -127,7 +154,7 @@ namespace Confuser.Renamer {
 			}
 		}
 
-		public string ObfuscateName(string name, RenameMode mode) {
+		public string ObfuscateName(string name, RenameMode mode, ICryptoTransform reversibleCryptoTransform = null) {
 			if (string.IsNullOrEmpty(name))
 				return string.Empty;
 
@@ -163,9 +190,22 @@ namespace Confuser.Renamer {
 						nameMap1[name] = newName;
 						return newName;
 					}
-			}
+                case RenameMode.Reversible:
+		            return GetReversibleObfuscatedName(name, reversibleCryptoTransform);
+		    }
 			throw new NotSupportedException("Rename mode '" + mode + "' is not supported.");
 		}
+
+	    private string GetReversibleObfuscatedName(string name, ICryptoTransform cryptoTransform) {
+	        if (cryptoTransform == null)
+	            throw new NotSupportedException("This rename mode requires a password.");
+	        // name consists in 
+	        var nameBytes = Encoding.UTF8.GetBytes(name);
+	        var encryptedBytes = cryptoTransform.TransformFinalBlock(nameBytes,0,nameBytes.Length);
+            // equals are also stripped, we will add them if necessary
+	        var encryptedName = string.Format("<?{0}>", Convert.ToBase64String(encryptedBytes).TrimEnd('='));
+	        return encryptedName;
+	    }
 
 	    private byte[] GetNameHash(string name)
 	    {
