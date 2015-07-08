@@ -56,6 +56,9 @@ namespace Confuser.Renamer {
 		readonly Dictionary<string, string> nameMap1 = new Dictionary<string, string>();
 		readonly Dictionary<string, string> nameMap2 = new Dictionary<string, string>();
 
+	    public const string ReversibleNameStartTag = "<?";
+	    public const string ReversibleNameEndTag = ">";
+
 		public NameService(ConfuserContext context) {
 			this.context = context;
 			storage = new VTableStorage(context.Logger);
@@ -114,19 +117,29 @@ namespace Confuser.Renamer {
 	    }
 
 	    public void SetReversibleEncryptionKey(object obj, string encryptionPassword) {
+	            var algorithm = CreateReversibleAlgorithm(encryptionPassword);
+	            var cryptoTransform = algorithm.CreateEncryptor();
+                context.Annotations.Set(obj, CryptoTransformKey, cryptoTransform);
+	    }
+
+        /// <summary>
+        /// Creates the reversible algorithm for name encryption decryption.
+        /// </summary>
+        /// <param name="encryptionPassword">The encryption password.</param>
+        /// <returns></returns>
+	    public static SymmetricAlgorithm CreateReversibleAlgorithm(string encryptionPassword) {
 	        using (var sha = SHA256.Create()) {
 	            var encryptionPasswordBytes = Encoding.UTF8.GetBytes(encryptionPassword);
 	            sha.TransformFinalBlock(encryptionPasswordBytes, 0, encryptionPasswordBytes.Length);
 	            var encryptionKey = sha.Hash;
 	            var algorithm = Aes.Create();
 	            // the SHA256 produces a hash whose length can be directly used by AES 
-                // (and this is the maximum key size).
+	            // (and this is the maximum key size).
 	            algorithm.Key = encryptionKey;
 	            algorithm.Mode = CipherMode.CBC; // implicit default, but let's be explicit
 	            algorithm.Padding = PaddingMode.PKCS7; // same thing here
 	            algorithm.IV = new byte[algorithm.BlockSize/8]; // cryptographically, this is bad. However I don't see any other option right now.
-	            var cryptoTransform = algorithm.CreateEncryptor();
-                context.Annotations.Set(obj, CryptoTransformKey, cryptoTransform);
+	            return algorithm;
 	        }
 	    }
 
@@ -203,7 +216,7 @@ namespace Confuser.Renamer {
 	        var nameBytes = Encoding.UTF8.GetBytes(name);
 	        var encryptedBytes = cryptoTransform.TransformFinalBlock(nameBytes,0,nameBytes.Length);
             // equals are also stripped, we will add them if necessary
-	        var encryptedName = string.Format("<?{0}>", Convert.ToBase64String(encryptedBytes).TrimEnd('='));
+	        var encryptedName = string.Format("{1}{0}{2}", Convert.ToBase64String(encryptedBytes).TrimEnd('='), ReversibleNameStartTag, ReversibleNameEndTag);
 	        return encryptedName;
 	    }
 

@@ -7,6 +7,7 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="36px" />
+            <RowDefinition Height="36px" />
             <RowDefinition Height="40px" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -22,10 +23,14 @@
                      local:FileDragDrop.Command="{x:Static local:FileDragDrop.FileCmd}" />
         </DockPanel>
         <DockPanel Grid.Row="1">
+            <Label DockPanel.Dock="Left" VerticalAlignment="Center" HorizontalAlignment="Right">Or password (for reversible name encryption):</Label>
+            <TextBox x:Name="PasswordBox" Margin="5" VerticalContentAlignment="Center" />
+        </DockPanel>
+        <DockPanel Grid.Row="2">
             <Button DockPanel.Dock="Right" Margin="5" Padding="10,0,10,0" Click="Decode_Click">Decode!</Button>
             <Label x:Name="status" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,2,10,2" />
         </DockPanel>
-        <TextBox x:Name="stackTrace" Grid.Row="2" Margin="5" AcceptsReturn="True" FontFamily="Consolas"
+        <TextBox x:Name="stackTrace" Grid.Row="3" Margin="5" AcceptsReturn="True" FontFamily="Consolas"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Visible" />
     </Grid>
 </Window>
