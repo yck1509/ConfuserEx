@@ -11,17 +11,17 @@ namespace Confuser.Renamer
     /// </summary>
     public class NameReverser : IDisposable
     {
-        private readonly ICryptoTransform decryptor;
+        //private readonly ICryptoTransform decryptor;
+        private SymmetricAlgorithm symmetricAlgorithm;
 
-        public NameReverser(string encryptionPassword)
-        {
-            var algorithm = NameService.CreateReversibleAlgorithm(encryptionPassword);
-            decryptor = algorithm.CreateDecryptor();
+        public NameReverser(string encryptionPassword) {
+            symmetricAlgorithm = NameService.CreateReversibleAlgorithm(encryptionPassword);
+            //decryptor = symmetricAlgorithm.CreateDecryptor();
         }
 
         public void Dispose()
         {
-            decryptor.Dispose();
+            //decryptor.Dispose();
         }
 
         /// <summary>
@@ -49,9 +49,11 @@ namespace Confuser.Renamer
                     // now, since it may actually be anything, try to convert, decrypt, etc. Any failure and we're inserting the original text
                     try {
                         var encryptedBytes = Convert.FromBase64String(base64String.ToString());
-                        var nameBytes = decryptor.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
-                        var name = Encoding.UTF8.GetString(nameBytes, NameService.DummyHeaderLength, nameBytes.Length - NameService.DummyHeaderLength);
-                        decoded.Append(name);
+                        using (var decryptor = symmetricAlgorithm.CreateDecryptor()) {
+                            var nameBytes = decryptor.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
+                            var name = Encoding.UTF8.GetString(nameBytes, NameService.DummyHeaderLength, nameBytes.Length - NameService.DummyHeaderLength);
+                            decoded.Append(name);
+                        }
                     }
                     catch {
                         decoded.Append(NameService.ReversibleNameStartTag);
