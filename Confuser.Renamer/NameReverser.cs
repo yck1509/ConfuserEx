@@ -41,14 +41,16 @@ namespace Confuser.Renamer
                 if (encodedAndRaw.Length == 1)
                     decoded.Append(encodedAndRaw[0]);
                 else {
-                    var base64String =new StringBuilder(encodedAndRaw[0]);
+                    var base64String = new StringBuilder(encodedAndRaw[0]);
+                    // some stack traces add a backslash
+                    base64String = base64String.Replace(@"\", "");
                     while (base64String.Length%4 != 0)
                         base64String.Append('=');
                     // now, since it may actually be anything, try to convert, decrypt, etc. Any failure and we're inserting the original text
                     try {
                         var encryptedBytes = Convert.FromBase64String(base64String.ToString());
                         var nameBytes = decryptor.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
-                        var name = Encoding.UTF8.GetString(nameBytes);
+                        var name = Encoding.UTF8.GetString(nameBytes, NameService.DummyHeaderLength, nameBytes.Length - NameService.DummyHeaderLength);
                         decoded.Append(name);
                     }
                     catch {

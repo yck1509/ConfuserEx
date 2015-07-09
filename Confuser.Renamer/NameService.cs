@@ -58,6 +58,7 @@ namespace Confuser.Renamer {
 
 	    public const string ReversibleNameStartTag = "<?";
 	    public const string ReversibleNameEndTag = ">";
+	    public const int DummyHeaderLength = 4;
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
@@ -214,8 +215,13 @@ namespace Confuser.Renamer {
 	            throw new NotSupportedException("This rename mode requires a password.");
 	        // name consists in 
 	        var nameBytes = Encoding.UTF8.GetBytes(name);
-	        var encryptedBytes = cryptoTransform.TransformFinalBlock(nameBytes,0,nameBytes.Length);
-            // equals are also stripped, we will add them if necessary
+	        // a few dummy bytes are added, in order to randomize full sequence
+	        var toBeTransformed = new byte[nameBytes.Length + DummyHeaderLength];
+	        for (int dummyIndex = 0; dummyIndex < DummyHeaderLength; dummyIndex++)
+	            toBeTransformed[dummyIndex] = random.NextByte();
+	        nameBytes.CopyTo(toBeTransformed, DummyHeaderLength);
+	        var encryptedBytes = cryptoTransform.TransformFinalBlock(toBeTransformed, 0, toBeTransformed.Length);
+	        // equals are also stripped, we will add them if necessary
 	        var encryptedName = string.Format("{1}{0}{2}", Convert.ToBase64String(encryptedBytes).TrimEnd('='), ReversibleNameStartTag, ReversibleNameEndTag);
 	        return encryptedName;
 	    }
