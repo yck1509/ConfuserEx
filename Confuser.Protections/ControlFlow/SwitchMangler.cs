@@ -272,8 +272,15 @@ namespace Confuser.Protections.ControlFlow {
 				switchHdr.Add(Instruction.Create(OpCodes.Rem_Un));
 				switchHdr.Add(switchInstr);
 
-				ctx.AddJump(switchHdr, statements.Last.Value[0]);
-				ctx.AddJunk(switchHdr);
+			    if (trace.BeforeStack[statements.Last.Value[0].Offset] == 0)
+			    {
+                    ctx.AddJump(switchHdr, statements.Last.Value[0]);
+                }
+			    else
+			    {
+                    ctx.AddJump(switchHdr, switchHdr[0]);
+                }
+                ctx.AddJunk(switchHdr);
 
 				var operands = new Instruction[statements.Count];
 				current = statements.First;
@@ -292,28 +299,37 @@ namespace Confuser.Protections.ControlFlow {
 							int brKey;
 							if (!trace.IsBranchTarget(newStatement.Last().Offset) &&
 							    statementKeys.TryGetValue(target, out brKey)) {
-								var targetKey = predicate != null ? predicate.GetSwitchKey(brKey) : brKey;
-								var unkSrc = hasUnknownSource(newStatement);
 
-								newStatement.RemoveAt(newStatement.Count - 1);
+                                if (trace.BeforeStack[target.Offset] == 0)
+                                {
+								    var targetKey = predicate != null ? predicate.GetSwitchKey(brKey) : brKey;
+								    var unkSrc = hasUnknownSource(newStatement);
 
-								if (unkSrc) {
-									newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, targetKey));
-								}
-								else {
-									var thisKey = key[i];
-									var r = ctx.Random.NextInt32();
-									newStatement.Add(Instruction.Create(OpCodes.Ldloc, local));
-									newStatement.Add(Instruction.CreateLdcI4(r));
-									newStatement.Add(Instruction.Create(OpCodes.Mul));
-									newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, (thisKey * r) ^ targetKey));
-									newStatement.Add(Instruction.Create(OpCodes.Xor));
-								}
+								    newStatement.RemoveAt(newStatement.Count - 1);
 
-								ctx.AddJump(newStatement, switchHdr[1]);
-								ctx.AddJunk(newStatement);
-								operands[keyId[i]] = newStatement[0];
-								converted = true;
+								    if (unkSrc) {
+									    newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, targetKey));
+								    }
+								    else {
+									    var thisKey = key[i];
+									    var r = ctx.Random.NextInt32();
+									    newStatement.Add(Instruction.Create(OpCodes.Ldloc, local));
+									    newStatement.Add(Instruction.CreateLdcI4(r));
+									    newStatement.Add(Instruction.Create(OpCodes.Mul));
+									    newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, (thisKey * r) ^ targetKey));
+									    newStatement.Add(Instruction.Create(OpCodes.Xor));
+								    }
+
+								    ctx.AddJump(newStatement, switchHdr[1]);
+								    ctx.AddJunk(newStatement);
+                                }
+
+                                if (trace.BeforeStack[newStatement[0].Offset] == 0)
+                                {
+                                    operands[keyId[i]] = newStatement[0];
+                                }
+
+                                converted = true;
 							}
 						}
 						else if (newStatement.Last().IsConditionalBranch()) {
@@ -323,72 +339,98 @@ namespace Confuser.Protections.ControlFlow {
 							int brKey;
 							if (!trace.IsBranchTarget(newStatement.Last().Offset) &&
 							    statementKeys.TryGetValue(target, out brKey)) {
-								bool unkSrc = hasUnknownSource(newStatement);
-								int nextKey = key[i + 1];
-								OpCode condBr = newStatement.Last().OpCode;
-								newStatement.RemoveAt(newStatement.Count - 1);
 
-								if (ctx.Random.NextBoolean()) {
-									condBr = InverseBranch(condBr);
-									int tmp = brKey;
-									brKey = nextKey;
-									nextKey = tmp;
-								}
+                                if (trace.BeforeStack[target.Offset] == 0)
+                                {
+                                    bool unkSrc = hasUnknownSource(newStatement);
+								    int nextKey = key[i + 1];
+								    OpCode condBr = newStatement.Last().OpCode;
+								    newStatement.RemoveAt(newStatement.Count - 1);
 
-								var thisKey = key[i];
-								int r = 0, xorKey = 0;
-								if (!unkSrc) {
-									r = ctx.Random.NextInt32();
-									xorKey = thisKey * r;
-								}
+								    if (ctx.Random.NextBoolean()) {
+									    condBr = InverseBranch(condBr);
+									    int tmp = brKey;
+									    brKey = nextKey;
+									    nextKey = tmp;
+								    }
 
-								Instruction brKeyInstr = Instruction.CreateLdcI4(xorKey ^ (predicate != null ? predicate.GetSwitchKey(brKey) : brKey));
-								Instruction nextKeyInstr = Instruction.CreateLdcI4(xorKey ^ (predicate != null ? predicate.GetSwitchKey(nextKey) : nextKey));
-								Instruction pop = Instruction.Create(OpCodes.Pop);
+								    var thisKey = key[i];
+								    int r = 0, xorKey = 0;
+								    if (!unkSrc) {
+									    r = ctx.Random.NextInt32();
+									    xorKey = thisKey * r;
+								    }
 
-								newStatement.Add(Instruction.Create(condBr, brKeyInstr));
-								newStatement.Add(nextKeyInstr);
-								newStatement.Add(Instruction.Create(OpCodes.Dup));
-								newStatement.Add(Instruction.Create(OpCodes.Br, pop));
-								newStatement.Add(brKeyInstr);
-								newStatement.Add(Instruction.Create(OpCodes.Dup));
-								newStatement.Add(pop);
+								    Instruction brKeyInstr = Instruction.CreateLdcI4(xorKey ^ (predicate != null ? predicate.GetSwitchKey(brKey) : brKey));
+								    Instruction nextKeyInstr = Instruction.CreateLdcI4(xorKey ^ (predicate != null ? predicate.GetSwitchKey(nextKey) : nextKey));
+								    Instruction pop = Instruction.Create(OpCodes.Pop);
 
-								if (!unkSrc) {
-									newStatement.Add(Instruction.Create(OpCodes.Ldloc, local));
-									newStatement.Add(Instruction.CreateLdcI4(r));
-									newStatement.Add(Instruction.Create(OpCodes.Mul));
-									newStatement.Add(Instruction.Create(OpCodes.Xor));
-								}
+								    newStatement.Add(Instruction.Create(condBr, brKeyInstr));
+								    newStatement.Add(nextKeyInstr);
+								    newStatement.Add(Instruction.Create(OpCodes.Dup));
+								    newStatement.Add(Instruction.Create(OpCodes.Br, pop));
+								    newStatement.Add(brKeyInstr);
+								    newStatement.Add(Instruction.Create(OpCodes.Dup));
+								    newStatement.Add(pop);
 
-								ctx.AddJump(newStatement, switchHdr[1]);
-								ctx.AddJunk(newStatement);
-								operands[keyId[i]] = newStatement[0];
-								converted = true;
+								    if (!unkSrc) {
+									    newStatement.Add(Instruction.Create(OpCodes.Ldloc, local));
+									    newStatement.Add(Instruction.CreateLdcI4(r));
+									    newStatement.Add(Instruction.Create(OpCodes.Mul));
+									    newStatement.Add(Instruction.Create(OpCodes.Xor));
+								    }
+
+								    ctx.AddJump(newStatement, switchHdr[1]);
+								    ctx.AddJunk(newStatement);
+
+                                    converted = true;
+                                }
+
+                                if (trace.BeforeStack[newStatement[0].Offset] == 0)
+                                {
+                                    operands[keyId[i]] = newStatement[0];
+                                }
 							}
 						}
 
 						if (!converted) {
 							// Normal
 
-							var targetKey = predicate != null ? predicate.GetSwitchKey(key[i + 1]) : key[i + 1];
-							if (!hasUnknownSource(newStatement)) {
-								var thisKey = key[i];
-								var r = ctx.Random.NextInt32();
-								newStatement.Add(Instruction.Create(OpCodes.Ldloc, local));
-								newStatement.Add(Instruction.CreateLdcI4(r));
-								newStatement.Add(Instruction.Create(OpCodes.Mul));
-								newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, (thisKey * r) ^ targetKey));
-								newStatement.Add(Instruction.Create(OpCodes.Xor));
-							}
-							else {
-								newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, targetKey));
-							}
+						    if (newStatement[newStatement.Count - 1].OpCode != OpCodes.Ret)
+						    {
+						        var nextStatement = current.Next;
+						        if (trace.BeforeStack[nextStatement.Value[0].Offset] == 0)
+						        {
+						            var targetKey = predicate != null ? predicate.GetSwitchKey(key[i + 1]) : key[i + 1];
+						            if (!hasUnknownSource(newStatement) && trace.BeforeStack[newStatement[0].Offset] == 0)
+						            {
+						                var thisKey = key[i];
+						                var r = ctx.Random.NextInt32();
+						                newStatement.Add(Instruction.Create(OpCodes.Ldloc, local));
+						                newStatement.Add(Instruction.CreateLdcI4(r));
+						                newStatement.Add(Instruction.Create(OpCodes.Mul));
+						                newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, (thisKey*r) ^ targetKey));
+						                newStatement.Add(Instruction.Create(OpCodes.Xor));
+						            }
+						            else
+						            {
+						                newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, targetKey));
+						            }
 
-							ctx.AddJump(newStatement, switchHdr[1]);
-							ctx.AddJunk(newStatement);
-							operands[keyId[i]] = newStatement[0];
-						}
+						            ctx.AddJump(newStatement, switchHdr[1]);
+						            ctx.AddJunk(newStatement);
+						        }
+						        else
+						        {
+						            newStatement.Add(Instruction.Create(OpCodes.Br, nextStatement.Value[0]));
+						        }
+						    }
+
+						    if (trace.BeforeStack[newStatement[0].Offset] == 0)
+                            {
+                                operands[keyId[i]] = newStatement[0];
+                            }
+                        }
 					}
 					else
 						operands[keyId[i]] = switchHdr[0];
@@ -397,7 +439,20 @@ namespace Confuser.Protections.ControlFlow {
 					current = current.Next;
 					i++;
 				}
-				operands[keyId[i]] = current.Value[0];
+
+			    if (trace.BeforeStack[current.Value[0].Offset] == 0)
+			    {
+			        operands[keyId[i]] = current.Value[0];
+			    }
+
+			    for (i = 0; i < operands.Length; i++)
+			    {
+			        if (operands[i] == null)
+			        {
+			            operands[i] = switchHdr[0];
+			        }
+			    }
+
 				switchInstr.Operand = operands;
 
 				Instruction[] first = statements.First.Value;
@@ -405,15 +460,19 @@ namespace Confuser.Protections.ControlFlow {
 				Instruction[] last = statements.Last.Value;
 				statements.RemoveLast();
 
-				List<Instruction[]> newStatements = statements.ToList();
+				List<Instruction[]> newStatements = statements.Where(s => trace.BeforeStack[s[0].Offset] == 0).ToList();
 				ctx.Random.Shuffle(newStatements);
 
-				block.Instructions.Clear();
+                List<Instruction[]> newOrderedStatements = statements.Where(s => trace.BeforeStack[s[0].Offset] != 0).ToList();
+
+                block.Instructions.Clear();
 				block.Instructions.AddRange(first);
 				block.Instructions.AddRange(switchHdr);
 				foreach (var statement in newStatements)
 					block.Instructions.AddRange(statement);
-				block.Instructions.AddRange(last);
+                foreach (var statement in newOrderedStatements)
+                    block.Instructions.AddRange(statement);
+                block.Instructions.AddRange(last);
 			}
 		}
 	}
