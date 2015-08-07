@@ -131,7 +131,7 @@ namespace Confuser.Protections.ControlFlow {
 						shouldSpilt = true;
 						break;
 				}
-				if ((instr.OpCode.OpCodeType != OpCodeType.Prefix && trace.AfterStack[instr.Offset] == 0) &&
+				if ((instr.OpCode.OpCodeType != OpCodeType.Prefix && (trace.AfterStack[instr.Offset] == 0 || instr.IsBr())) &&
 				    (shouldSpilt || ctx.Intensity > ctx.Random.NextDouble())) {
 					statements.AddLast(currentStatement.ToArray());
 					currentStatement.Clear();
