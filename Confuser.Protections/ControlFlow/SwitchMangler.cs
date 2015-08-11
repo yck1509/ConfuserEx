@@ -305,9 +305,10 @@ namespace Confuser.Protections.ControlFlow {
 									var targetKey = predicate != null ? predicate.GetSwitchKey(brKey) : brKey;
 									var unkSrc = hasUnknownSource(newStatement);
 
-									newStatement.RemoveAt(newStatement.Count - 1);
+								    var initialBeforeStack = trace.BeforeStack[newStatement[0].Offset];
+                                    newStatement.RemoveAt(newStatement.Count - 1);
 
-									if (unkSrc) {
+									if (unkSrc || initialBeforeStack != 0) {
 										newStatement.Add(Instruction.Create(OpCodes.Ldc_I4, targetKey));
 									}
 									else {
