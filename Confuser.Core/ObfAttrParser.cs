@@ -107,7 +107,7 @@ namespace Confuser.Core {
 
 						var preset = (ProtectionPreset)Enum.Parse(typeof(ProtectionPreset), buffer.ToString(), true);
 						foreach (var item in items.Values.OfType<Protection>().Where(prot => prot.Preset <= preset)) {
-							if (!settings.ContainsKey(item))
+							if (settings != null && !settings.ContainsKey(item))
 								settings.Add(item, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
 						}
 						buffer.Length = 0;
@@ -181,12 +181,14 @@ namespace Confuser.Core {
 						break;
 
 					case ParseState.EndItem:
-						if (protAct) {
-							settings[(Protection)items[protId]] = protParams;
-							protParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+						if (settings != null) {
+							if (protAct) {
+								settings[(Protection)items[protId]] = protParams;
+								protParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+							}
+							else
+								settings.Remove((Protection)items[protId]);
 						}
-						else
-							settings.Remove((Protection)items[protId]);
 
 						if (IsEnd())
 							state = ParseState.End;

@@ -102,7 +102,7 @@ namespace Confuser.Core {
 			return ret;
 		}
 
-		static IEnumerable<ProtectionSettingsInfo> ProcessAttributes(IEnumerable<ObfuscationAttributeInfo> attrs) {
+		IEnumerable<ProtectionSettingsInfo> ProcessAttributes(IEnumerable<ObfuscationAttributeInfo> attrs) {
 			bool hasAttr = false;
 			ProtectionSettingsInfo info;
 
@@ -112,6 +112,19 @@ namespace Confuser.Core {
 				info.Exclude = (attr.Exclude ?? true);
 				info.ApplyToMember = (attr.ApplyToMembers ?? true);
 				info.Settings = attr.FeatureValue;
+
+				bool ok = true;
+				try {
+					new ObfAttrParser().ParseProtectionString(null, info.Settings);
+				}
+				catch {
+					ok = false;
+				}
+
+				if (!ok) {
+					context.Logger.WarnFormat("Ignoring rule '{0}'.", info.Settings);
+					continue;
+				}
 
 				if (!string.IsNullOrEmpty(attr.FeatureName))
 					throw new ArgumentException("Feature name must not be set.");
