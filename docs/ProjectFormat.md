@@ -114,6 +114,18 @@ The identifier of the protection/packer.
 The arguments that passed to the protection.
 Optional.
 
+Element `argument`
+------------------
+
+An argument that is passed to a protection.
+
+**Attributes:**
+
+`name`:
+The name of the argument.
+
+`value`:
+The value of the argument.
 
 Applying rules
 --------------
