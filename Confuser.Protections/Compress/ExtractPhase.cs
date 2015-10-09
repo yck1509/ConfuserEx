@@ -37,18 +37,20 @@ namespace Confuser.Protections.Compress {
 			if (isExe) {
 				var ctx = new CompressorContext {
 					ModuleIndex = context.CurrentModuleIndex,
-					Assembly = context.CurrentModule.Assembly
+					Assembly = context.CurrentModule.Assembly,
+					CompatMode = parameters.GetParameter(context, null, "compat", false)
 				};
 				context.Annotations.Set(context, Compressor.ContextKey, ctx);
 
 				ctx.ModuleName = context.CurrentModule.Name;
-				context.CurrentModule.Name = "koi";
-
 				ctx.EntryPoint = context.CurrentModule.EntryPoint;
-				context.CurrentModule.EntryPoint = null;
-
 				ctx.Kind = context.CurrentModule.Kind;
-				context.CurrentModule.Kind = ModuleKind.NetModule;
+
+				if (!ctx.CompatMode) {
+					context.CurrentModule.Name = "koi";
+					context.CurrentModule.EntryPoint = null;
+					context.CurrentModule.Kind = ModuleKind.NetModule;
+				}
 
 				context.CurrentModuleWriterListener.OnWriterEvent += new ResourceRecorder(ctx, context.CurrentModule).OnWriterEvent;
 			}

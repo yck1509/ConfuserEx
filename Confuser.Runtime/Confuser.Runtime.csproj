@@ -53,6 +53,7 @@
     <Compile Include="Compressor.cs" />
     <Compile Include="Constant.cs" />
     <Compile Include="AntiTamper.JIT.cs" />
+    <Compile Include="Compressor.Compat.cs" />
     <Compile Include="Lzma.cs" />
     <Compile Include="Mutation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
