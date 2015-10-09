@@ -306,7 +306,7 @@ namespace Confuser.Protections {
 					ctx.KeyToken = sigToken;
 					MutationHelper.InjectKey(writer.Module.EntryPoint, 2, (int)sigToken);
 				}
-				else if (evt == ModuleWriterEvent.MDBeginAddResources) {
+				else if (evt == ModuleWriterEvent.MDBeginAddResources && !ctx.CompatMode) {
 					// Compute hash
 					byte[] hash = SHA1.Create().ComputeHash(ctx.OriginModule);
 					uint hashBlob = writer.MetaData.BlobHeap.Add(hash);
