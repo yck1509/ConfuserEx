@@ -42,6 +42,7 @@ namespace Confuser.Renamer {
 					continue;
 
 				RenameMode mode = service.GetRenameMode(def);
+			    var reversibleCryptoTransform = service.GetReversibleCryptoTransform(def);
 
 				IList<INameReference> references = service.GetReferences(def);
 				bool cancel = false;
@@ -54,25 +55,25 @@ namespace Confuser.Renamer {
 
 				if (def is TypeDef) {
 					var typeDef = (TypeDef)def;
-					if (parameters.GetParameter(context, def, "flatten", true)) {
-						typeDef.Name = service.ObfuscateName(typeDef.FullName, mode);
-						typeDef.Namespace = "";
-					}
-					else {
-						typeDef.Namespace = service.ObfuscateName(typeDef.Namespace, mode);
-						typeDef.Name = service.ObfuscateName(typeDef.Name, mode);
-					}
-					foreach (var param in typeDef.GenericParameters)
+				    if (parameters.GetParameter(context, def, "flatten", true)) {
+				        typeDef.Name = service.ObfuscateName(typeDef.FullName, mode, reversibleCryptoTransform);
+				        typeDef.Namespace = "";
+				    }
+				    else {
+				        typeDef.Namespace = service.ObfuscateName(typeDef.Namespace, mode, reversibleCryptoTransform);
+				        typeDef.Name = service.ObfuscateName(typeDef.Name, mode, reversibleCryptoTransform);
+				    }
+				    foreach (var param in typeDef.GenericParameters)
 						param.Name = ((char)(param.Number + 1)).ToString();
 				}
 				else if (def is MethodDef) {
-					foreach (var param in ((MethodDef)def).GenericParameters)
-						param.Name = ((char)(param.Number + 1)).ToString();
-					
-					def.Name = service.ObfuscateName(def.Name, mode);
+				    foreach (var param in ((MethodDef) def).GenericParameters)
+				        param.Name = ((char) (param.Number + 1)).ToString();
+
+				    def.Name = service.ObfuscateName(def.Name, mode, reversibleCryptoTransform);
 				}
 				else
-					def.Name = service.ObfuscateName(def.Name, mode);
+				    def.Name = service.ObfuscateName(def.Name, mode, reversibleCryptoTransform);
 
 				foreach (INameReference refer in references.ToList()) {
 					if (!refer.UpdateNameReference(context, service)) {

@@ -121,7 +121,9 @@ namespace Confuser.Protections {
 							}
 						}
 						if (ren) {
-							member.Name = name.ObfuscateName(member.Name, RenameMode.Unicode);
+						    var renameMode = name.GetRenameMode(member);
+						    var reversibleCryptoTransform = name.GetReversibleCryptoTransform(member);
+							member.Name = name.ObfuscateName(member.Name, renameMode, reversibleCryptoTransform);
 							name.SetCanRename(member, false);
 						}
 					}

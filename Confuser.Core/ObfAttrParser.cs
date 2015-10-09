@@ -46,6 +46,35 @@ namespace Confuser.Core {
 			return false;
 		}
 
+	    private bool ReadStringOrId(StringBuilder sb) {
+	        return ReadString(sb) || ReadId(sb);
+	    }
+
+	    /// <summary>
+        /// Reads a string between single quotes.
+        /// </summary>
+        /// <param name="sb">The target result.</param>
+        /// <returns></returns>
+		bool ReadString(StringBuilder sb)
+		{
+		    if (Peek() != '\'')
+		        return false;
+            index++;
+            while (index < str.Length) 
+            {
+				switch (str[index]) 
+                {
+					case '\'':
+                        index++;
+						return true;
+					default:
+						sb.Append(str[index++]);
+						break;
+				}
+			}
+			return false;
+		}
+
 		void Expect(char chr) {
 			if (str[index] != chr)
 				throw new ArgumentException("Expect '" + chr + "' at position " + (index + 1) + ".");
@@ -161,7 +190,7 @@ namespace Confuser.Core {
 						buffer.Length = 0;
 
 						Expect('=');
-						if (!ReadId(buffer))
+						if (!ReadStringOrId(buffer))
 							throw new ArgumentException("Unexpected end of string in ReadParam state.");
 						paramValue = buffer.ToString();
 						buffer.Length = 0;

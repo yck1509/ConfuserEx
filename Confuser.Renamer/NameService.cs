@@ -8,7 +8,9 @@ using Confuser.Renamer.Analyzers;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer {
-	public interface INameService {
+    using System.Security.Cryptography;
+
+    public interface INameService {
 		VTableStorage GetVTables();
 
 		void Analyze(IDnlibDef def);
@@ -20,7 +22,10 @@ namespace Confuser.Renamer {
 		void SetRenameMode(object obj, RenameMode val);
 		void ReduceRenameMode(object obj, RenameMode val);
 
-		string ObfuscateName(string name, RenameMode mode);
+        ICryptoTransform GetReversibleCryptoTransform(object obj);
+        void SetReversibleEncryptionKey(object obj, string encryptionPassword);
+
+        string ObfuscateName(string name, RenameMode mode, ICryptoTransform reversibleCryptoTransform = null);
 		string RandomName();
 		string RandomName(RenameMode mode);
 
@@ -40,6 +45,7 @@ namespace Confuser.Renamer {
 		static readonly object ReferencesKey = new object();
 		static readonly object OriginalNameKey = new object();
 		static readonly object OriginalNamespaceKey = new object();
+		static readonly object CryptoTransformKey = new object();
 
 		readonly ConfuserContext context;
 		readonly byte[] nameSeed;
@@ -49,6 +55,10 @@ namespace Confuser.Renamer {
 		readonly byte[] nameId = new byte[8];
 		readonly Dictionary<string, string> nameMap1 = new Dictionary<string, string>();
 		readonly Dictionary<string, string> nameMap2 = new Dictionary<string, string>();
+
+	    public const string ReversibleNameStartTag = "<?";
+	    public const string ReversibleNameEndTag = ">";
+	    public const int DummyHeaderLength = 4;
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
@@ -103,7 +113,38 @@ namespace Confuser.Renamer {
 				context.Annotations.Set(obj, RenameModeKey, val);
 		}
 
-		public void AddReference<T>(T obj, INameReference<T> reference) {
+	    public ICryptoTransform GetReversibleCryptoTransform(object obj) {
+	        return context.Annotations.Get<ICryptoTransform>(obj, CryptoTransformKey, null);
+	    }
+
+	    public void SetReversibleEncryptionKey(object obj, string encryptionPassword) {
+	            var algorithm = CreateReversibleAlgorithm(encryptionPassword);
+	            var cryptoTransform = algorithm.CreateEncryptor();
+                context.Annotations.Set(obj, CryptoTransformKey, cryptoTransform);
+	    }
+
+        /// <summary>
+        /// Creates the reversible algorithm for name encryption decryption.
+        /// </summary>
+        /// <param name="encryptionPassword">The encryption password.</param>
+        /// <returns></returns>
+	    public static SymmetricAlgorithm CreateReversibleAlgorithm(string encryptionPassword) {
+	        using (var sha = SHA256.Create()) {
+	            var encryptionPasswordBytes = Encoding.UTF8.GetBytes(encryptionPassword);
+	            sha.TransformFinalBlock(encryptionPasswordBytes, 0, encryptionPasswordBytes.Length);
+	            var encryptionKey = sha.Hash;
+	            var algorithm = Aes.Create();
+	            // the SHA256 produces a hash whose length can be directly used by AES 
+	            // (and this is the maximum key size).
+	            algorithm.Key = encryptionKey;
+	            algorithm.Mode = CipherMode.CBC; // implicit default, but let's be explicit
+	            algorithm.Padding = PaddingMode.PKCS7; // same thing here
+	            algorithm.IV = new byte[algorithm.BlockSize/8]; // cryptographically, this is bad. However I don't see any other option right now.
+	            return algorithm;
+	        }
+	    }
+
+	    public void AddReference<T>(T obj, INameReference<T> reference) {
 			context.Annotations.GetOrCreate(obj, ReferencesKey, key => new List<INameReference>()).Add(reference);
 		}
 
@@ -127,7 +168,7 @@ namespace Confuser.Renamer {
 			}
 		}
 
-		public string ObfuscateName(string name, RenameMode mode) {
+		public string ObfuscateName(string name, RenameMode mode, ICryptoTransform reversibleCryptoTransform = null) {
 			if (string.IsNullOrEmpty(name))
 				return string.Empty;
 
@@ -136,22 +177,20 @@ namespace Confuser.Renamer {
 			if (mode == RenameMode.Debug)
 				return "_" + name;
 
-			byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
-
-			switch (mode) {
+		    switch (mode) {
 				case RenameMode.Empty:
 					return "";
 				case RenameMode.Unicode:
-					return Utils.EncodeString(hash, unicodeCharset) + "\u202e";
+					return Utils.EncodeString(GetNameHash(name), unicodeCharset) + "\u202e";
 				case RenameMode.Letters:
-					return Utils.EncodeString(hash, letterCharset);
+					return Utils.EncodeString(GetNameHash(name), letterCharset);
 				case RenameMode.ASCII:
-					return Utils.EncodeString(hash, asciiCharset);
+					return Utils.EncodeString(GetNameHash(name), asciiCharset);
 				case RenameMode.Decodable: {
 						if (nameMap1.ContainsKey(name))
 							return nameMap1[name];
 						IncrementNameId();
-						var newName = "_" + Utils.EncodeString(hash, alphaNumCharset) + "_";
+						var newName = "_" + Utils.EncodeString(GetNameHash(name), alphaNumCharset) + "_";
 						nameMap2[newName] = name;
 						nameMap1[name] = newName;
 						return newName;
@@ -165,11 +204,35 @@ namespace Confuser.Renamer {
 						nameMap1[name] = newName;
 						return newName;
 					}
-			}
+                case RenameMode.Reversible:
+		            return GetReversibleObfuscatedName(name, reversibleCryptoTransform);
+		    }
 			throw new NotSupportedException("Rename mode '" + mode + "' is not supported.");
 		}
 
-		public string RandomName() {
+	    private string GetReversibleObfuscatedName(string name, ICryptoTransform cryptoTransform) {
+	        if (cryptoTransform == null)
+	            throw new NotSupportedException("This rename mode requires a password.");
+	        // name consists in 
+	        var nameBytes = Encoding.UTF8.GetBytes(name);
+	        // a few dummy bytes are added, in order to randomize full sequence
+	        var toBeTransformed = new byte[nameBytes.Length + DummyHeaderLength];
+	        for (int dummyIndex = 0; dummyIndex < DummyHeaderLength; dummyIndex++)
+	            toBeTransformed[dummyIndex] = random.NextByte();
+	        nameBytes.CopyTo(toBeTransformed, DummyHeaderLength);
+	        var encryptedBytes = cryptoTransform.TransformFinalBlock(toBeTransformed, 0, toBeTransformed.Length);
+	        // equals are also stripped, we will add them if necessary
+	        var encryptedName = string.Format("{1}{0}{2}", Convert.ToBase64String(encryptedBytes).TrimEnd('='), ReversibleNameStartTag, ReversibleNameEndTag);
+	        return encryptedName;
+	    }
+
+	    private byte[] GetNameHash(string name)
+	    {
+	        byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
+	        return hash;
+	    }
+
+	    public string RandomName() {
 			return RandomName(RenameMode.Unicode);
 		}
 

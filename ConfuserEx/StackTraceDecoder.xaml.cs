@@ -8,7 +8,9 @@ using Confuser.Core;
 using Ookii.Dialogs.Wpf;
 
 namespace ConfuserEx {
-	/// <summary>
+    using Confuser.Renamer;
+
+    /// <summary>
 	///     Interaction logic for StackTraceDecoder.xaml
 	/// </summary>
 	public partial class StackTraceDecoder : Window {
@@ -59,7 +61,10 @@ namespace ConfuserEx {
 
 		void Decode_Click(object sender, RoutedEventArgs e) {
 			var trace = stackTrace.Text;
-			stackTrace.Text = symbolMatcher.Replace(trace, DecodeSymbol);
+		    if (!string.IsNullOrEmpty(PasswordBox.Text))
+		        stackTrace.Text = NameReverser.Decode(trace, PasswordBox.Text);
+		    else
+		        stackTrace.Text = symbolMatcher.Replace(trace, DecodeSymbol);
 		}
 
 		string DecodeSymbol(Match match) {

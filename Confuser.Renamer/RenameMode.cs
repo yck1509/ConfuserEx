@@ -8,6 +8,7 @@ namespace Confuser.Renamer {
 		Letters,
 		Decodable,
 		Sequential,
-		Debug
+		Debug,
+        Reversible,
 	}
 }
