@@ -151,6 +151,8 @@ namespace Confuser.Core {
 			else
 				settings = new ProtectionSettings(settings);
 
+			ApplyRules(context, def, rules, settings);
+
 			ProtectionSettingsInfo? last = null;
 			var parser = new ObfAttrParser(protections);
 			foreach (var info in infos) {
@@ -170,8 +172,6 @@ namespace Confuser.Core {
 			    !string.IsNullOrEmpty(last.Value.Settings)) {
 				parser.ParseProtectionString(settings, last.Value.Settings);
 			}
-
-			ApplyRules(context, def, rules, settings);
 		}
 
 		static readonly Regex NSPattern = new Regex("namespace '([^']*)'");
