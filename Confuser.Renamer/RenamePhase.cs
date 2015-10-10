@@ -68,7 +68,7 @@ namespace Confuser.Renamer {
 				else if (def is MethodDef) {
 					foreach (var param in ((MethodDef)def).GenericParameters)
 						param.Name = ((char)(param.Number + 1)).ToString();
-					
+
 					def.Name = service.ObfuscateName(def.Name, mode);
 				}
 				else

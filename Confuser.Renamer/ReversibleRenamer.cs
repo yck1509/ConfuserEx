@@ -17,11 +17,11 @@ namespace Confuser.Renamer {
 		}
 
 		static string Base64Encode(byte[] buf) {
-			return Convert.ToBase64String(buf).Trim('=').Replace('+', '$').Replace('/', '?');
+			return Convert.ToBase64String(buf).Trim('=').Replace('+', '$').Replace('/', '_');
 		}
 
 		static byte[] Base64Decode(string str) {
-			str = str.Replace('$', '+').Replace('?', '/').PadRight((str.Length + 3) & ~3, '=');
+			str = str.Replace('$', '+').Replace('_', '/').PadRight((str.Length + 3) & ~3, '=');
 			return Convert.FromBase64String(str);
 		}
 

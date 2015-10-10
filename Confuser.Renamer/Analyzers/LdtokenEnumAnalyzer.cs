@@ -40,7 +40,7 @@ namespace Confuser.Renamer.Analyzers {
 						if (!(instr.Operand is TypeSpec)) {
 							TypeDef type = ((ITypeDefOrRef)instr.Operand).ResolveTypeDefThrow();
 							if (context.Modules.Contains((ModuleDefMD)type.Module) &&
-								HandleTypeOf(context, service, method, i)) {
+							    HandleTypeOf(context, service, method, i)) {
 								var t = type;
 								do {
 									DisableRename(service, t, false);

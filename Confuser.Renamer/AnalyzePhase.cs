@@ -104,8 +104,12 @@ namespace Confuser.Renamer {
 				Analyze(service, context, parameters, (PropertyDef)def);
 			else if (def is EventDef)
 				Analyze(service, context, parameters, (EventDef)def);
-			else if (def is ModuleDef)
+			else if (def is ModuleDef) {
+				var pass = parameters.GetParameter<string>(context, def, "password", null);
+				if (pass != null)
+					service.reversibleRenamer = new ReversibleRenamer(pass);
 				service.SetCanRename(def, false);
+			}
 
 			if (!runAnalyzer || parameters.GetParameter(context, def, "forceRen", false))
 				return;
@@ -153,7 +157,7 @@ namespace Confuser.Renamer {
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, MethodDef method) {
 			if (method.DeclaringType.IsVisibleOutside() &&
 			    (method.IsFamily || method.IsFamilyOrAssembly || method.IsPublic) &&
-				!IsVisibleOutside(context, parameters, method))
+			    !IsVisibleOutside(context, parameters, method))
 				service.SetCanRename(method, false);
 
 			else if (method.IsRuntimeSpecialName)
@@ -172,7 +176,7 @@ namespace Confuser.Renamer {
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, FieldDef field) {
 			if (field.DeclaringType.IsVisibleOutside() &&
 			    (field.IsFamily || field.IsFamilyOrAssembly || field.IsPublic) &&
-				!IsVisibleOutside(context, parameters, field))
+			    !IsVisibleOutside(context, parameters, field))
 				service.SetCanRename(field, false);
 
 			else if (field.IsRuntimeSpecialName)
@@ -190,7 +194,7 @@ namespace Confuser.Renamer {
 
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, PropertyDef property) {
 			if (property.DeclaringType.IsVisibleOutside() &&
-				!IsVisibleOutside(context, parameters, property))
+			    !IsVisibleOutside(context, parameters, property))
 				service.SetCanRename(property, false);
 
 			else if (property.IsRuntimeSpecialName)
@@ -208,7 +212,7 @@ namespace Confuser.Renamer {
 
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, EventDef evt) {
 			if (evt.DeclaringType.IsVisibleOutside() &&
-				!IsVisibleOutside(context, parameters, evt))
+			    !IsVisibleOutside(context, parameters, evt))
 				service.SetCanRename(evt, false);
 
 			else if (evt.IsRuntimeSpecialName)

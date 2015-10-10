@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using Confuser.Core;
 using Confuser.Renamer.Analyzers;
@@ -24,9 +25,9 @@ namespace Confuser.Renamer.BAML {
 		readonly Dictionary<ushort, TypeSig> typeRefs = new Dictionary<ushort, TypeSig>();
 		readonly Dictionary<string, List<Tuple<AssemblyDef, string>>> xmlns = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
 
-        readonly string packScheme = System.IO.Packaging.PackUriHelper.UriSchemePack + "://";
+		readonly string packScheme = PackUriHelper.UriSchemePack + "://";
 
-        IKnownThings things;
+		IKnownThings things;
 
 		KnownThingsv3 thingsv3;
 		KnownThingsv4 thingsv4;
@@ -93,8 +94,8 @@ namespace Confuser.Renamer.BAML {
 		}
 
 		public BamlDocument Analyze(ModuleDefMD module, string bamlName, byte[] data) {
-			this.Module = module;
-			this.CurrentBAMLName = bamlName;
+			Module = module;
+			CurrentBAMLName = bamlName;
 			if (module.IsClr40) {
 				things = thingsv4 ?? (thingsv4 = new KnownThingsv4(context, module));
 			}

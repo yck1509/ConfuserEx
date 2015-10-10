@@ -49,6 +49,7 @@ namespace Confuser.Renamer {
 		readonly byte[] nameId = new byte[8];
 		readonly Dictionary<string, string> nameMap1 = new Dictionary<string, string>();
 		readonly Dictionary<string, string> nameMap2 = new Dictionary<string, string>();
+		internal ReversibleRenamer reversibleRenamer;
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
@@ -148,23 +149,29 @@ namespace Confuser.Renamer {
 				case RenameMode.ASCII:
 					return Utils.EncodeString(hash, asciiCharset);
 				case RenameMode.Decodable: {
-						if (nameMap1.ContainsKey(name))
-							return nameMap1[name];
-						IncrementNameId();
-						var newName = "_" + Utils.EncodeString(hash, alphaNumCharset) + "_";
-						nameMap2[newName] = name;
-						nameMap1[name] = newName;
-						return newName;
-					}
+					if (nameMap1.ContainsKey(name))
+						return nameMap1[name];
+					IncrementNameId();
+					var newName = "_" + Utils.EncodeString(hash, alphaNumCharset) + "_";
+					nameMap2[newName] = name;
+					nameMap1[name] = newName;
+					return newName;
+				}
 				case RenameMode.Sequential: {
-						if (nameMap1.ContainsKey(name))
-							return nameMap1[name];
-						IncrementNameId();
-						var newName = "_" + Utils.EncodeString(nameId, alphaNumCharset) + "_";
-						nameMap2[newName] = name;
-						nameMap1[name] = newName;
-						return newName;
-					}
+					if (nameMap1.ContainsKey(name))
+						return nameMap1[name];
+					IncrementNameId();
+					var newName = "_" + Utils.EncodeString(nameId, alphaNumCharset) + "_";
+					nameMap2[newName] = name;
+					nameMap1[name] = newName;
+					return newName;
+				}
+				case RenameMode.Reversible: {
+					if (reversibleRenamer == null)
+						throw new ArgumentException("Password not provided for reversible renaming.");
+					var newName = reversibleRenamer.Encrypt(name);
+					return newName;
+				}
 			}
 			throw new NotSupportedException("Rename mode '" + mode + "' is not supported.");
 		}
