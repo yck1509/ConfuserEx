@@ -90,6 +90,7 @@
     <Compile Include="References\ResourceReference.cs" />
     <Compile Include="RenameMode.cs" />
     <Compile Include="RenamePhase.cs" />
+    <Compile Include="ReversibleRenamer.cs" />
     <Compile Include="RickRoller.cs" />
     <Compile Include="VTable.cs" />
   </ItemGroup>
