@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using Confuser.Core;
+using Confuser.Renamer;
 using Ookii.Dialogs.Wpf;
 
 namespace ConfuserEx {
@@ -55,16 +56,33 @@ namespace ConfuserEx {
 			}
 		}
 
-		readonly Regex symbolMatcher = new Regex("_[a-zA-Z0-9]+_");
+		readonly Regex mapSymbolMatcher = new Regex("_[a-zA-Z0-9]+_");
+		readonly Regex passSymbolMatcher = new Regex("[a-zA-Z0-9_$]{23,}");
+		ReversibleRenamer renamer;
 
 		void Decode_Click(object sender, RoutedEventArgs e) {
 			var trace = stackTrace.Text;
-			stackTrace.Text = symbolMatcher.Replace(trace, DecodeSymbol);
+			if (optSym.IsChecked ?? true)
+				stackTrace.Text = mapSymbolMatcher.Replace(trace, DecodeSymbolMap);
+			else {
+				renamer = new ReversibleRenamer(PassBox.Text);
+				stackTrace.Text = passSymbolMatcher.Replace(trace, DecodeSymbolPass);
+			}
 		}
 
-		string DecodeSymbol(Match match) {
+		string DecodeSymbolMap(Match match) {
 			var sym = match.Value;
 			return symMap.GetValueOrDefault(sym, sym);
+		}
+
+		string DecodeSymbolPass(Match match) {
+			var sym = match.Value;
+			try {
+				return renamer.Decrypt(sym);
+			}
+			catch {
+				return sym;
+			}
 		}
 	}
 }
