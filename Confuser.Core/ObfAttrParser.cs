@@ -46,6 +46,25 @@ namespace Confuser.Core {
 			return false;
 		}
 
+		bool ReadString(StringBuilder sb) {
+			Expect('\'');
+			while (index < str.Length) {
+				switch (str[index]) {
+					case '\\':
+						sb.Append(str[++index]);
+						break;
+					case '\'':
+						index++;
+						return true;
+					default:
+						sb.Append(str[index]);
+						break;
+				}
+				index++;
+			}
+			return false;
+		}
+
 		void Expect(char chr) {
 			if (str[index] != chr)
 				throw new ArgumentException("Expect '" + chr + "' at position " + (index + 1) + ".");
@@ -161,8 +180,9 @@ namespace Confuser.Core {
 						buffer.Length = 0;
 
 						Expect('=');
-						if (!ReadId(buffer))
+						if (!(Peek() == '\'' ? ReadString(buffer) : ReadId(buffer)))
 							throw new ArgumentException("Unexpected end of string in ReadParam state.");
+
 						paramValue = buffer.ToString();
 						buffer.Length = 0;
 
