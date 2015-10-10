@@ -54,7 +54,7 @@
 
             <ListBox Grid.Row="3" Grid.ColumnSpan="2" Margin="5" local:Skin.EmptyPrompt="Drag input modules here"
                      ItemsSource="{Binding App.Project.Modules}" HorizontalContentAlignment="Stretch"
-                     SelectedIndex="{Binding SelectedIndex}" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     SelectionMode="Extended" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      Grid.IsSharedSizeScope="True" local:FileDragDrop.Command="{Binding DragDrop}"
                      ScrollViewer.CanContentScroll="False">
                 <ListBox.ItemTemplate>
@@ -71,6 +71,11 @@
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
             </ListBox>
             <DockPanel Grid.Row="3" Grid.Column="2" LastChildFill="False">
                 <Button Height="26" Margin="5" DockPanel.Dock="Top" Command="{Binding Add}">
