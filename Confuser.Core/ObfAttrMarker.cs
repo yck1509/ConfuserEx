@@ -152,6 +152,7 @@ namespace Confuser.Core {
 				settings = new ProtectionSettings(settings);
 
 			ApplyRules(context, def, rules, settings);
+			settings = ProtectionParameters.GetParameters(context, def);
 
 			ProtectionSettingsInfo? last = null;
 			var parser = new ObfAttrParser(protections);
