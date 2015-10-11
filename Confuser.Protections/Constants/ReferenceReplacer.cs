@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Confuser.Core;
 using Confuser.Core.Helpers;
 using Confuser.Core.Services;
@@ -147,7 +148,6 @@ namespace Confuser.Protections.Constants {
 
 			CFGState entry;
 			if (!ctx.StatesMap.TryGetValue(key.EntryState, out entry)) {
-				Debug.Assert(key.Type == BlockKeyType.Explicit);
 				key.Type = BlockKeyType.Explicit;
 			}
 
@@ -373,10 +373,27 @@ namespace Confuser.Protections.Constants {
 			}
 
 			// Update state for blocks not in use
-			for (int i = 0; i < graph.Count; i++) {
-				if (blockReferences.ContainsKey(i))
+			var done = new HashSet<ControlFlowBlock>();
+			var q = new Stack<ControlFlowBlock>(graph.Where(b => (b.Type & ControlFlowBlockType.Entry) != 0).Reverse());
+			while (q.Count > 0) {
+				var block = q.Pop();
+				if (done.Contains(block))
 					continue;
-				InsertEmptyStateUpdate(cfgCtx, graph[i]);
+				done.Add(block);
+
+				foreach (var succ in block.Targets)
+					q.Push(succ);
+
+				if (blockReferences.ContainsKey(block.Id))
+					continue;
+				InsertEmptyStateUpdate(cfgCtx, block);
+			}
+
+			for (int i = 0; i < graph.Count; i++) {
+				var block = graph[i];
+				if (done.Contains(block) || blockReferences.ContainsKey(block.Id))
+					continue;
+				InsertEmptyStateUpdate(cfgCtx, block);
 			}
 
 			// Update references
