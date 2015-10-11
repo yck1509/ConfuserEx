@@ -7,13 +7,11 @@ namespace Confuser.Renamer {
 	public class ReversibleRenamer {
 		RijndaelManaged cipher;
 		byte[] key;
-		byte ivId;
 
 		public ReversibleRenamer(string password) {
 			cipher = new RijndaelManaged();
 			using (var sha = SHA256.Create())
 				cipher.Key = key = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-			ivId = key[0];
 		}
 
 		static string Base64Encode(byte[] buf) {
@@ -32,15 +30,16 @@ namespace Confuser.Renamer {
 			return iv;
 		}
 
-		byte[] NextIV(out byte ivId) {
-			var iv = GetIV(this.ivId);
-			ivId = this.ivId++;
-			return iv;
+		byte GetIVId(string str) {
+			byte x = (byte)str[0];
+			for (int i = 1; i < str.Length; i++)
+				x = (byte)(x * 3 + (byte)str[i]);
+			return x;
 		}
 
 		public string Encrypt(string name) {
-			byte ivId;
-			cipher.IV = NextIV(out ivId);
+			byte ivId = GetIVId(name);
+			cipher.IV = GetIV(ivId);
 			var buf = Encoding.UTF8.GetBytes(name);
 
 			using (var ms = new MemoryStream()) {
