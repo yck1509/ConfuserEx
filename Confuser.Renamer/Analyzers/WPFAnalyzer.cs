@@ -17,7 +17,6 @@ namespace Confuser.Renamer.Analyzers
     internal class WPFAnalyzer : IRenamer
     {
         static readonly object BAMLKey = new object();
-
         static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
         internal static readonly Regex UriPattern = new Regex(";COMPONENT/(.+\\.[BX]AML)$");
         BAMLAnalyzer analyzer;
