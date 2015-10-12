@@ -59,13 +59,13 @@ namespace Confuser.Core {
 				yield return evt;
 		}
 
-        /// <summary>
-        ///     Determines whether the specified type is visible outside the containing assembly.
-        /// </summary>
-        /// <param name="typeDef">The type.</param>
-        /// <param name="exeNonPublic">Visibility of executable modules.</param>
-        /// <returns><c>true</c> if the specified type is visible outside the containing assembly; otherwise, <c>false</c>.</returns>
-        public static bool IsVisibleOutside(this TypeDef typeDef, bool exeNonPublic = true) {
+		/// <summary>
+		///     Determines whether the specified type is visible outside the containing assembly.
+		/// </summary>
+		/// <param name="typeDef">The type.</param>
+		/// <param name="exeNonPublic">Visibility of executable modules.</param>
+		/// <returns><c>true</c> if the specified type is visible outside the containing assembly; otherwise, <c>false</c>.</returns>
+		public static bool IsVisibleOutside(this TypeDef typeDef, bool exeNonPublic = true) {
 			// Assume executable modules' type is not visible
 			if (exeNonPublic && (typeDef.Module.Kind == ModuleKind.Windows || typeDef.Module.Kind == ModuleKind.Console))
 				return false;
