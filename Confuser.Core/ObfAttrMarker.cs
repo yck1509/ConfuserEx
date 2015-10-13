@@ -11,6 +11,9 @@ using dnlib.DotNet;
 namespace Confuser.Core {
 	using Rules = Dictionary<Rule, PatternExpression>;
 
+	/// <summary>
+	/// Obfuscation Attribute Marker
+	/// </summary>
 	public class ObfAttrMarker : Marker {
 		struct ObfuscationAttributeInfo {
 			public bool? ApplyToMembers;
