@@ -143,6 +143,11 @@ namespace Confuser.Core {
 		public byte[] CurrentModuleSymbol { get; internal set; }
 
 		/// <summary>
+		///		Gets the token used to indicate cancellation
+		/// </summary>
+		public CancellationToken CancellationToken { get { return token; } }
+
+		/// <summary>
 		///     Throws a System.OperationCanceledException if protection process has been canceled.
 		/// </summary>
 		/// <exception cref="OperationCanceledException">

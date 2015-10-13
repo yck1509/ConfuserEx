@@ -373,25 +373,9 @@ namespace Confuser.Protections.Constants {
 			}
 
 			// Update state for blocks not in use
-			var done = new HashSet<ControlFlowBlock>();
-			var q = new Stack<ControlFlowBlock>(graph.Where(b => (b.Type & ControlFlowBlockType.Entry) != 0).Reverse());
-			while (q.Count > 0) {
-				var block = q.Pop();
-				if (done.Contains(block))
-					continue;
-				done.Add(block);
-
-				foreach (var succ in block.Targets)
-					q.Push(succ);
-
-				if (blockReferences.ContainsKey(block.Id))
-					continue;
-				InsertEmptyStateUpdate(cfgCtx, block);
-			}
-
 			for (int i = 0; i < graph.Count; i++) {
 				var block = graph[i];
-				if (done.Contains(block) || blockReferences.ContainsKey(block.Id))
+				if (blockReferences.ContainsKey(block.Id))
 					continue;
 				InsertEmptyStateUpdate(cfgCtx, block);
 			}
