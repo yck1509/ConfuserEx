@@ -170,6 +170,17 @@ namespace Confuser.Core.Project {
 	/// <typeparam name="T"><see cref="Protection" /> or <see cref="Packer" /></typeparam>
 	public class SettingItem<T> : Dictionary<string, string> {
 		/// <summary>
+		/// Initialize this setting item instance
+		/// </summary>
+		/// <param name="id">The protection id</param>
+		/// <param name="action">The action to take</param>
+		/// <param name="inherit">Inherits protection</param>
+		public SettingItem(string id = null, SettingItemAction action = SettingItemAction.Add) {
+			Id = id;
+			Action = action;
+		}
+
+		/// <summary>
 		///     The identifier of component
 		/// </summary>
 		/// <value>The identifier of component.</value>
@@ -239,6 +250,18 @@ namespace Confuser.Core.Project {
 	///     A rule that control how <see cref="Protection" />s are applied to module
 	/// </summary>
 	public class Rule : List<SettingItem<Protection>> {
+		/// <summary>
+		/// Initialize this rule instance
+		/// </summary>
+		/// <param name="pattern">The pattern</param>
+		/// <param name="preset">The preset</param>
+		/// <param name="inherit">Inherits protection</param>
+		public Rule(string pattern = "true", ProtectionPreset preset = ProtectionPreset.None, bool inherit = false) {
+			Pattern = pattern;
+			Preset = preset;
+			Inherit = inherit;
+		}
+		
 		/// <summary>
 		///     Gets or sets the pattern that determine the target components of the rule.
 		/// </summary>
