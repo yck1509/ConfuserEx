@@ -147,6 +147,21 @@ namespace Confuser.Core.Project {
 		public override string ToString() {
 			return Path;
 		}
+
+		/// <summary>
+		///     Clones this instance.
+		/// </summary>
+		/// <returns>A duplicated module.</returns>
+		public ProjectModule Clone() {
+			var ret = new ProjectModule();
+			ret.Path = Path;
+			ret.IsExternal = IsExternal;
+			ret.SNKeyPath = SNKeyPath;
+			ret.SNKeyPassword = SNKeyPassword;
+			foreach (var r in Rules)
+				ret.Rules.Add(r.Clone());
+			return ret;
+		}
 	}
 
 	/// <summary>
@@ -243,6 +258,17 @@ namespace Confuser.Core.Project {
 			foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>())
 				Add(i.Attributes["name"].Value, i.Attributes["value"].Value);
 		}
+
+		/// <summary>
+		///     Clones this instance.
+		/// </summary>
+		/// <returns>A duplicated setting item.</returns>
+		public SettingItem<T> Clone() {
+			var item = new SettingItem<T>(Id, Action);
+			foreach (var entry in this)
+				item.Add(entry.Key, entry.Value);
+			return item;
+		}
 	}
 
 
@@ -261,7 +287,7 @@ namespace Confuser.Core.Project {
 			Preset = preset;
 			Inherit = inherit;
 		}
-		
+
 		/// <summary>
 		///     Gets or sets the pattern that determine the target components of the rule.
 		/// </summary>
@@ -563,6 +589,26 @@ namespace Confuser.Core.Project {
 					Add(asm);
 				}
 			}
+		}
+
+		/// <summary>
+		///     Clones this instance.
+		/// </summary>
+		/// <returns>A duplicated project.</returns>
+		public ConfuserProject Clone() {
+			var ret = new ConfuserProject();
+			ret.Seed = Seed;
+			ret.Debug = Debug;
+			ret.OutputDirectory = OutputDirectory;
+			ret.BaseDirectory = BaseDirectory;
+			ret.Packer = Packer == null ? null : Packer.Clone();
+			ret.ProbePaths = new List<string>(ProbePaths);
+			ret.PluginPaths = new List<string>(PluginPaths);
+			foreach (var module in this)
+				ret.Add(module.Clone());
+			foreach (var r in Rules)
+				ret.Rules.Add(r);
+			return ret;
 		}
 	}
 }

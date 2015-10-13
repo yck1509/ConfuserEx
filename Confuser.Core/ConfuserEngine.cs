@@ -77,7 +77,7 @@ namespace Confuser.Core {
 			// 1. Setup context
 			var context = new ConfuserContext();
 			context.Logger = parameters.GetLogger();
-			context.Project = parameters.Project;
+			context.Project = parameters.Project.Clone();
 			context.PackerInitiated = parameters.PackerInitiated;
 			context.token = token;
 
