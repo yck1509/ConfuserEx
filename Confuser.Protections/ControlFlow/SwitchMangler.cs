@@ -132,16 +132,15 @@ namespace Confuser.Protections.ControlFlow {
 					case FlowControl.Cond_Branch:
 					case FlowControl.Return:
 					case FlowControl.Throw:
+						shouldSpilt = true;
 						if (trace.AfterStack[instr.Offset] != 0) {
 							if (instr.Operand is Instruction)
 								requiredInstr.Add((Instruction)instr.Operand);
 							else if (instr.Operand is Instruction[]) {
 								foreach (var target in (Instruction[])instr.Operand)
 									requiredInstr.Add(target);
-								shouldSpilt = false;
 							}
 						}
-						shouldSpilt = true;
 						break;
 				}
 				requiredInstr.Remove(instr);
