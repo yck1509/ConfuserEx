@@ -204,11 +204,11 @@ namespace Confuser.Core {
 						if (settings != null) {
 							if (protAct) {
 								settings[(Protection)items[protId]] = protParams;
-								protParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 							}
 							else
 								settings.Remove((Protection)items[protId]);
 						}
+						protParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 						if (IsEnd())
 							state = ParseState.End;
