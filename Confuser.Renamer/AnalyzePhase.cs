@@ -127,7 +127,7 @@ namespace Confuser.Renamer {
 			if (renPublic == null)
 				return type.IsVisibleOutside();
 			else
-				return type.IsVisibleOutside(false) && renPublic.Value;
+				return type.IsVisibleOutside(false) && !renPublic.Value;
 		}
 
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, TypeDef type) {
