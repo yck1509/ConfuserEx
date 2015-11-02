@@ -21,9 +21,12 @@ namespace Confuser.Core.Project.Patterns {
 		/// <inheritdoc />
 		public override object Evaluate(IDnlibDef definition) {
 			string name = Arguments[0].Evaluate(definition).ToString();
-			if (!(definition is TypeDef))
+
+			var type = definition as TypeDef;
+			if (type == null && definition is IMemberDef)
+				type = ((IMemberDef)definition).DeclaringType;
+			if (type == null)
 				return false;
-			var type = (TypeDef)definition;
 
 			if (type.InheritsFrom(name) || type.Implements(name))
 				return true;
