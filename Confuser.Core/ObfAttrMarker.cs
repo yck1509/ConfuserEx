@@ -118,7 +118,7 @@ namespace Confuser.Core {
 
 				bool ok = true;
 				try {
-					new ObfAttrParser().ParseProtectionString(null, info.Settings);
+					new ObfAttrParser(protections).ParseProtectionString(null, info.Settings);
 				}
 				catch {
 					ok = false;
