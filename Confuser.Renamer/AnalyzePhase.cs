@@ -123,7 +123,7 @@ namespace Confuser.Renamer {
 			if (type == null)
 				type = def.DeclaringType;
 
-			var renPublic = parameters.GetParameter<bool?>(context, type, "renPublic", null);
+			var renPublic = parameters.GetParameter<bool?>(context, def, "renPublic", null);
 			if (renPublic == null)
 				return type.IsVisibleOutside();
 			else
