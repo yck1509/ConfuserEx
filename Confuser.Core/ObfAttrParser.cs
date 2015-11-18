@@ -202,6 +202,9 @@ namespace Confuser.Core {
 
 					case ParseState.EndItem:
 						if (settings != null) {
+							if (!items.Contains(protId))
+								throw new KeyNotFoundException("Cannot find protection with id '" + protId + "'.");
+
 							if (protAct) {
 								settings[(Protection)items[protId]] = protParams;
 							}
@@ -243,7 +246,11 @@ namespace Confuser.Core {
 					case ParseState.ReadItemName:
 						ReadId(buffer);
 
-						packer = (Packer)items[buffer.ToString()];
+						var packerId = buffer.ToString();
+						if (!items.Contains(packerId))
+							throw new KeyNotFoundException("Cannot find packer with id '" + packerId + "'.");
+
+						packer = (Packer)items[packerId];
 						buffer.Length = 0;
 
 						if (IsEnd() || Peek() == ';')
