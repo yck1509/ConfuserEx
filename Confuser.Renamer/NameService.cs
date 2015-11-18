@@ -152,7 +152,7 @@ namespace Confuser.Renamer {
 					if (nameMap1.ContainsKey(name))
 						return nameMap1[name];
 					IncrementNameId();
-					var newName = "_" + Utils.EncodeString(hash, alphaNumCharset) + "_";
+					var newName = Utils.EncodeString(hash, alphaNumCharset);
 					nameMap2[newName] = name;
 					nameMap1[name] = newName;
 					return newName;
@@ -161,7 +161,7 @@ namespace Confuser.Renamer {
 					if (nameMap1.ContainsKey(name))
 						return nameMap1[name];
 					IncrementNameId();
-					var newName = "_" + Utils.EncodeString(nameId, alphaNumCharset) + "_";
+					var newName = Utils.EncodeString(nameId, alphaNumCharset);
 					nameMap2[newName] = name;
 					nameMap1[name] = newName;
 					return newName;
