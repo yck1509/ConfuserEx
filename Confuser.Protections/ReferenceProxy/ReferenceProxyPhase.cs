@@ -123,6 +123,11 @@ namespace Confuser.Protections.ReferenceProxy {
 				Instruction instr = ctx.Body.Instructions[i];
 				if (instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt || instr.OpCode.Code == Code.Newobj) {
 					var operand = (IMethod)instr.Operand;
+					var def = operand.ResolveMethodDef();
+
+					if (def != null && ctx.Context.Annotations.Get<object>(def, ReferenceProxyProtection.TargetExcluded) != null)
+						return;
+
 					// Call constructor
 					if (instr.OpCode.Code != Code.Newobj && operand.Name == ".ctor")
 						continue;
