@@ -329,7 +329,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 		void EncodeField(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriterBase)sender;
-			if (e.WriterEvent == ModuleWriterEvent.MDMemberDefRidsAllocated) {
+			if (e.WriterEvent == ModuleWriterEvent.MDMemberDefRidsAllocated && keyAttrs != null) {
 				Dictionary<TypeDef, Func<int, int>> keyFuncs = keyAttrs
 					.Where(entry => entry != null)
 					.ToDictionary(entry => entry.Item1, entry => entry.Item2);
