@@ -486,7 +486,23 @@ namespace Confuser.Core {
 		void ProcessMember(IDnlibDef member, Rules rules, ProtectionSettingsStack stack) {
 			stack.Push(ProcessAttributes(ReadObfuscationAttributes(member)));
 			ApplySettings(member, rules, stack.GetInfos());
+			ProcessBody(member as MethodDef, rules, stack);
 			stack.Pop();
+		}
+
+		void ProcessBody(MethodDef method, Rules rules, ProtectionSettingsStack stack) {
+			if (method == null || method.Body == null)
+				return;
+
+			var declType = method.DeclaringType;
+			foreach (var instr in method.Body.Instructions)
+				if (instr.Operand is MethodDef) {
+					var cgType = ((MethodDef)instr.Operand).DeclaringType;
+					if (cgType.DeclaringType == declType && cgType.IsCompilerGenerated()) {
+						ApplySettings(cgType, rules, stack.GetInfos());
+						ProcessTypeMembers(cgType, rules, stack);
+					}
+				}
 		}
 	}
 }

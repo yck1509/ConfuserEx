@@ -103,6 +103,15 @@ namespace Confuser.Core {
 		}
 
 		/// <summary>
+		///     Determines whether the specified type is compiler generated.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns><c>true</c> if specified type is compiler generated; otherwise, <c>false</c>.</returns>
+		public static bool IsCompilerGenerated(this TypeDef type) {
+			return type.HasAttribute("System.Runtime.CompilerServices.CompilerGeneratedAttribute");
+		}
+
+		/// <summary>
 		///     Determines whether the specified type is a delegate.
 		/// </summary>
 		/// <param name="type">The type.</param>
