@@ -83,7 +83,7 @@ namespace Confuser.Core {
 			return index == str.Length;
 		}
 
-		public void ParseProtectionString(ProtectionSettings settings, string str) {
+		public void ParseProtectionString(IDictionary<ConfuserComponent, Dictionary<string, string>> settings, string str) {
 			if (str == null)
 				return;
 
