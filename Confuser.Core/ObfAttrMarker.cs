@@ -179,7 +179,7 @@ namespace Confuser.Core {
 		}
 
 		static readonly Regex NSPattern = new Regex("namespace '([^']*)'");
-		static readonly Regex NSInModulePattern = new Regex("namespace '([^']*)' in module '([^'])'");
+		static readonly Regex NSInModulePattern = new Regex("namespace '([^']*)' in module '([^']*)'");
 
 		Dictionary<string, Dictionary<Regex, List<ObfuscationAttributeInfo>>> crossModuleAttrs;
 		ConfuserContext context;
