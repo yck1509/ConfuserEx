@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Confuser.Core;
+using Confuser.Core.Services;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer {
