@@ -189,7 +189,6 @@ namespace Confuser.Core.Project {
 		/// </summary>
 		/// <param name="id">The protection id</param>
 		/// <param name="action">The action to take</param>
-		/// <param name="inherit">Inherits protection</param>
 		public SettingItem(string id = null, SettingItemAction action = SettingItemAction.Add) {
 			Id = id;
 			Action = action;
