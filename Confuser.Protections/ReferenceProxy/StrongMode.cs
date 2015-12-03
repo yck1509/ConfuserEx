@@ -127,6 +127,10 @@ namespace Confuser.Protections.ReferenceProxy {
 			// Replace instruction
 			instr.OpCode = OpCodes.Call;
 			instr.Operand = proxy.Item2;
+
+			var targetDef = target.ResolveMethodDef();
+			if (targetDef != null)
+				ctx.Context.Annotations.Set(targetDef, ReferenceProxyProtection.Targeted, ReferenceProxyProtection.Targeted);
 		}
 
 		void ProcessInvoke(RPContext ctx, int instrIndex, int argBeginIndex) {
@@ -161,6 +165,10 @@ namespace Confuser.Protections.ReferenceProxy {
 				instr.OpCode = OpCodes.Call;
 				instr.Operand = delegateType.FindMethod("Invoke");
 			}
+
+			var targetDef = target.ResolveMethodDef();
+			if (targetDef != null)
+				ctx.Context.Annotations.Set(targetDef, ReferenceProxyProtection.Targeted, ReferenceProxyProtection.Targeted);
 		}
 
 		MethodDef CreateBridge(RPContext ctx, TypeDef delegateType, FieldDef field, MethodSig sig) {
