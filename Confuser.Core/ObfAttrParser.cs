@@ -126,7 +126,7 @@ namespace Confuser.Core {
 
 						var preset = (ProtectionPreset)Enum.Parse(typeof(ProtectionPreset), buffer.ToString(), true);
 						foreach (var item in items.Values.OfType<Protection>().Where(prot => prot.Preset <= preset)) {
-							if (prot.Preset != ProtectionPreset.None && settings != null && !settings.ContainsKey(item))
+							if (item.Preset != ProtectionPreset.None && settings != null && !settings.ContainsKey(item))
 								settings.Add(item, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
 						}
 						buffer.Length = 0;
