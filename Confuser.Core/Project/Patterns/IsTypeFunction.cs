@@ -24,7 +24,7 @@ namespace Confuser.Core.Project.Patterns {
 		public override object Evaluate(IDnlibDef definition) {
 			TypeDef type = definition as TypeDef;
 			if (type == null && definition is IMemberDef)
-				type = ((IMemberDef)type).DeclaringType;
+				type = ((IMemberDef)definition).DeclaringType;
 			if (type == null)
 				return false;
 
