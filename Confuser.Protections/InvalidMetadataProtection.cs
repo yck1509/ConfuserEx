@@ -29,7 +29,7 @@ namespace Confuser.Protections {
 		}
 
 		public override ProtectionPreset Preset {
-			get { return ProtectionPreset.Maximum; }
+			get { return ProtectionPreset.None; }
 		}
 
 		protected override void Initialize(ConfuserContext context) {

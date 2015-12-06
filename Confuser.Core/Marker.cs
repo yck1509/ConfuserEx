@@ -52,7 +52,7 @@ namespace Confuser.Core {
 		/// <param name="settings">The settings.</param>
 		void FillPreset(ProtectionPreset preset, ProtectionSettings settings) {
 			foreach (Protection prot in protections.Values)
-				if (prot.Preset <= preset && !settings.ContainsKey(prot))
+				if (prot.Preset != ProtectionPreset.None && prot.Preset <= preset && !settings.ContainsKey(prot))
 					settings.Add(prot, new Dictionary<string, string>());
 		}
 
