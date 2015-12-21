@@ -225,7 +225,7 @@ namespace Confuser.Protections.Constants {
 					continue;
 
 				moduleCtx.Elements = 0;
-				string elements = parameters.GetParameter(context, context.CurrentModule, "elements", "SI");
+				string elements = parameters.GetParameter(context, method, "elements", "SI");
 				foreach (char elem in elements)
 					switch (elem) {
 						case 'S':
