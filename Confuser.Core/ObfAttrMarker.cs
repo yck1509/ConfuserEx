@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Confuser.Core.Project;
 using Confuser.Core.Project.Patterns;
 using dnlib.DotNet;
@@ -123,14 +124,18 @@ namespace Confuser.Core {
 			}
 		}
 
+		static readonly Regex OrderPattern = new Regex("^(\\d+)\\. (.+)$");
+
 		static IEnumerable<ObfuscationAttributeInfo> ReadObfuscationAttributes(IHasCustomAttribute item) {
-			var ret = new List<ObfuscationAttributeInfo>();
+			var ret = new List<Tuple<int?, ObfuscationAttributeInfo>>();
 			for (int i = item.CustomAttributes.Count - 1; i >= 0; i--) {
 				var ca = item.CustomAttributes[i];
 				if (ca.TypeFullName != "System.Reflection.ObfuscationAttribute")
 					continue;
 
 				var info = new ObfuscationAttributeInfo();
+				int? order = null;
+
 				info.Owner = item;
 				bool strip = true;
 				foreach (var prop in ca.Properties) {
@@ -153,6 +158,18 @@ namespace Confuser.Core {
 						case "Feature":
 							Debug.Assert(prop.Type.ElementType == ElementType.String);
 							string feature = (UTF8String)prop.Value;
+
+							var match = OrderPattern.Match(feature);
+							if (match.Success) {
+								var orderStr = match.Groups[1].Value;
+								var f = match.Groups[2].Value;
+								int o;
+								if (!int.TryParse(orderStr, out o))
+									throw new NotSupportedException(string.Format("Failed to parse feature '{0}' in {1} ", feature, item));
+								order = o;
+								feature = f;
+							}
+
 							int sepIndex = feature.IndexOf(':');
 							if (sepIndex == -1) {
 								info.FeatureName = "";
@@ -171,10 +188,10 @@ namespace Confuser.Core {
 				if (strip)
 					item.CustomAttributes.RemoveAt(i);
 
-				ret.Add(info);
+				ret.Add(Tuple.Create(order, info));
 			}
 			ret.Reverse();
-			return ret;
+			return ret.OrderBy(pair => pair.Item1).Select(pair => pair.Item2);
 		}
 
 		bool ToInfo(ObfuscationAttributeInfo attr, out ProtectionSettingsInfo info) {
