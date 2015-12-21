@@ -17,6 +17,9 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="settings">The settings to copy from.</param>
 		public ProtectionSettings(ProtectionSettings settings) {
+			if (settings == null)
+				return;
+
 			foreach (var i in settings)
 				Add(i.Key, new Dictionary<string, string>(i.Value));
 		}
