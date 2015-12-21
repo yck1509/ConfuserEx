@@ -16,6 +16,7 @@ namespace Confuser.Core {
 	/// </summary>
 	public class ObfAttrMarker : Marker {
 		struct ObfuscationAttributeInfo {
+			public IHasCustomAttribute Owner;
 			public bool? ApplyToMembers;
 			public bool? Exclude;
 			public string FeatureName;
@@ -130,6 +131,7 @@ namespace Confuser.Core {
 					continue;
 
 				var info = new ObfuscationAttributeInfo();
+				info.Owner = item;
 				bool strip = true;
 				foreach (var prop in ca.Properties) {
 					switch (prop.Name) {
@@ -193,14 +195,14 @@ namespace Confuser.Core {
 			}
 
 			if (!ok) {
-				context.Logger.WarnFormat("Ignoring rule '{0}'.", info.Settings);
+				context.Logger.WarnFormat("Ignoring rule '{0}' in {1}.", info.Settings, attr.Owner);
 				return false;
 			}
 
 			if (!string.IsNullOrEmpty(attr.FeatureName))
-				throw new ArgumentException("Feature name must not be set.");
+				throw new ArgumentException("Feature name must not be set. Owner=" + attr.Owner);
 			if (info.Exclude && (!string.IsNullOrEmpty(attr.FeatureName) || !string.IsNullOrEmpty(attr.FeatureValue))) {
-				throw new ArgumentException("Feature property cannot be set when Exclude is true.");
+				throw new ArgumentException("Feature property cannot be set when Exclude is true. Owner=" + attr.Owner);
 			}
 			return true;
 		}
@@ -315,7 +317,7 @@ namespace Confuser.Core {
 				expr = new PatternParser().Parse(pattern);
 			}
 			catch (Exception ex) {
-				throw new Exception("Error when parsing pattern " + pattern + " in ObfuscationAttribute", ex);
+				throw new Exception("Error when parsing pattern " + pattern + " in ObfuscationAttribute. Owner=" + attr.Owner, ex);
 			}
 
 			var info = new ProtectionSettingsInfo();
@@ -334,7 +336,7 @@ namespace Confuser.Core {
 			}
 
 			if (!ok)
-				context.Logger.WarnFormat("Ignoring rule '{0}'.", info.Settings);
+				context.Logger.WarnFormat("Ignoring rule '{0}' in {1}.", info.Settings, attr.Owner);
 			else
 				infos.Add(info);
 		}
