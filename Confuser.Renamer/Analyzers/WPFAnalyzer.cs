@@ -17,7 +17,7 @@ namespace Confuser.Renamer.Analyzers {
 		static readonly object BAMLKey = new object();
 
 		static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
-		internal static readonly Regex UriPattern = new Regex(";COMPONENT/(.+\\.[BX]AML)$");
+		internal static readonly Regex UriPattern = new Regex("(?:;COMPONENT/|APPLICATION\\:,,,/)(.+\\.[BX]AML)$");
 		BAMLAnalyzer analyzer;
 
 		internal Dictionary<string, List<IBAMLReference>> bamlRefs = new Dictionary<string, List<IBAMLReference>>(StringComparer.OrdinalIgnoreCase);
@@ -166,6 +166,8 @@ namespace Confuser.Renamer.Analyzers {
 						var match = UriPattern.Match(operand);
 						if (match.Success)
 							operand = match.Groups[1].Value;
+						else if (operand.Contains("/"))
+							context.Logger.WarnFormat("Fail to extract XAML name from '{0}'.", instr.Operand);
 
 						var reference = new BAMLStringReference(instr);
 						operand = operand.TrimStart('/');

@@ -504,6 +504,8 @@ namespace Confuser.Renamer.BAML {
 						var match = WPFAnalyzer.UriPattern.Match(src);
 						if (match.Success)
 							src = match.Groups[1].Value;
+						else if (rec.Value.Contains("/"))
+							context.Logger.WarnFormat("Fail to extract XAML name from '{0}'.", rec.Value);
 
 						if (!src.Contains("//")) {
 							var rel = new Uri(new Uri(packScheme + "application:,,,/" + CurrentBAMLName), src);
