@@ -108,7 +108,9 @@ namespace Confuser.Core {
 						continue;
 
 					if (info.Exclude) {
-						if (info.ApplyToMember)
+                        if (current)
+                            settings.Clear();
+						else if (info.ApplyToMember)
 							settings.Clear();
 						continue;
 					}
