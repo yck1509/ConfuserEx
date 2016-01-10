@@ -56,7 +56,7 @@ namespace Confuser.Protections.Constants {
 				else if (entry.Key is float) {
 					var t = new RTransform();
 					t.R4 = (float)entry.Key;
-					EncodeConstant32(moduleCtx, t.Hi, context.CurrentModule.CorLibTypes.Single, entry.Value);
+					EncodeConstant32(moduleCtx, t.Lo, context.CurrentModule.CorLibTypes.Single, entry.Value);
 				}
 				else if (entry.Key is double) {
 					var t = new RTransform();
@@ -348,8 +348,8 @@ namespace Confuser.Protections.Constants {
 			[FieldOffset(0)] public float R4;
 			[FieldOffset(0)] public double R8;
 
-			[FieldOffset(0)] public readonly uint Hi;
-			[FieldOffset(4)] public readonly uint Lo;
+			[FieldOffset(4)] public readonly uint Hi;
+			[FieldOffset(0)] public readonly uint Lo;
 		}
 	}
 }
