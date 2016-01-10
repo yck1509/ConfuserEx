@@ -188,7 +188,8 @@ namespace Confuser.Renamer {
 			else if (field.DeclaringType.IsSerializable && !field.IsNotSerialized)
 				service.SetCanRename(field, false);
 
-			else if (field.IsLiteral && field.DeclaringType.IsEnum)
+			else if (field.IsLiteral && field.DeclaringType.IsEnum &&
+				!parameters.GetParameter(context, field, "renEnum", false))
 				service.SetCanRename(field, false);
 		}
 
