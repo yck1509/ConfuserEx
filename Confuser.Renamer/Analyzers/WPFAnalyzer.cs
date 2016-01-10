@@ -17,7 +17,7 @@ namespace Confuser.Renamer.Analyzers {
 		static readonly object BAMLKey = new object();
 
 		static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
-		internal static readonly Regex UriPattern = new Regex("(?:;COMPONENT/|APPLICATION\\:,,,/)(.+\\.[BX]AML)$");
+		internal static readonly Regex UriPattern = new Regex("(?:;COMPONENT|APPLICATION\\:,,,)(/.+\\.[BX]AML)$");
 		BAMLAnalyzer analyzer;
 
 		internal Dictionary<string, List<IBAMLReference>> bamlRefs = new Dictionary<string, List<IBAMLReference>>(StringComparer.OrdinalIgnoreCase);
