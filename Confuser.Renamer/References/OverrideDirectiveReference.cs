@@ -35,9 +35,13 @@ namespace Confuser.Renamer.References {
 			IMethod target;
 			if (baseSlot.MethodDefDeclType is GenericInstSig) {
 				var declType = (GenericInstSig)baseSlot.MethodDefDeclType;
-				var mode = service.GetRenameMode(method);
-				var baseMethodDefName = service.ObfuscateName(baseSlot.MethodDef.Name, mode);
-				target = new MemberRefUser(method.Module, baseMethodDefName, baseSlot.MethodDef.MethodSig, declType.ToTypeDefOrRef());
+				string name = service.GetOriginalName(baseSlot.MethodDef);
+				if (service.CanRename(baseSlot.MethodDef))
+				{
+					var mode = service.GetRenameMode(baseSlot.MethodDef);
+					name = service.ObfuscateName(name, mode);
+				}
+				target = new MemberRefUser(method.Module, name, baseSlot.MethodDef.MethodSig, declType.ToTypeDefOrRef());
 				target = (IMethod)new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(target);
 			}
 			else {
