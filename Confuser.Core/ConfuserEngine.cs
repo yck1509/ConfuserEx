@@ -133,12 +133,12 @@ namespace Confuser.Core {
 				context.Logger.Info("Loading input modules...");
 				marker.Initalize(prots, packers);
 				MarkerResult markings = marker.MarkProject(parameters.Project, context);
-				context.Modules = markings.Modules.ToList().AsReadOnly();
+				context.Modules = new ModuleSorter(markings.Modules).Sort().ToList().AsReadOnly();
 				foreach (var module in context.Modules)
 					module.EnableTypeDefFindCache = false;
-				context.OutputModules = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
-				context.OutputSymbols = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
-				context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToArray();
+				context.OutputModules = Enumerable.Repeat<byte[]>(null, context.Modules.Count).ToArray();
+				context.OutputSymbols = Enumerable.Repeat<byte[]>(null, context.Modules.Count).ToArray();
+				context.OutputPaths = Enumerable.Repeat<string>(null, context.Modules.Count).ToArray();
 				context.Packer = markings.Packer;
 				context.ExternalModules = markings.ExternalModules;
 
