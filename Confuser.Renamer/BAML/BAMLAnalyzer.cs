@@ -251,6 +251,8 @@ namespace Confuser.Renamer.BAML {
 				TypeDef typeDef = type.ResolveTypeDefThrow();
 				if (context.Modules.Contains((ModuleDefMD)typeDef.Module)) {
 					service.ReduceRenameMode(typeDef, RenameMode.Letters);
+					if (type is TypeRef)
+						service.AddReference(typeDef, new TypeRefReference((TypeRef)type, typeDef));
 					service.AddReference(typeDef, reference);
 				}
 			}
