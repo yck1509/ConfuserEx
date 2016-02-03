@@ -368,7 +368,7 @@ namespace Confuser.Renamer.BAML {
 					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
 
-					if ((customRec.SerializerTypeId & 0x4000) != 0 && (customRec.SerializerTypeId & 0x4000) == 0x89) {
+					if ((customRec.SerializerTypeId & ~0x4000) != 0 && (customRec.SerializerTypeId & ~0x4000) == 0x89) {
 						// See BamlRecordReader.GetCustomDependencyPropertyValue.
 						// Umm... Well, actually nothing to do, since this record only describe DP, which already won't be renamed.
 					}
