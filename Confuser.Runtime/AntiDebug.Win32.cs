@@ -22,7 +22,7 @@ namespace Confuser.Runtime {
 		[DllImport("kernel32.dll")]
 		static extern bool IsDebuggerPresent();
 
-		[DllImport("kernel32.dll")]
+		[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
 		static extern int OutputDebugString(string str);
 
 		static void Worker(object thread) {
