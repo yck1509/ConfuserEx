@@ -31,7 +31,7 @@ namespace Confuser.Core {
 
 		static void Erase(List<Tuple<uint, uint, byte[]>> sections, uint methodOffset) {
 			foreach (var sect in sections)
-				if (methodOffset >= sect.Item1) {
+				if (methodOffset >= sect.Item1 && methodOffset - sect.Item1 < sect.Item3.Length) {
 					uint f = sect.Item3[methodOffset - sect.Item1];
 					uint size;
 					switch ((f & 7)) {
