@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,6 +32,8 @@ namespace Confuser.Renamer {
 		void SetOriginalNamespace(object obj, string ns);
 
 		void MarkHelper(IDnlibDef def, IMarkerService marker, ConfuserComponent parentComp);
+
+		string GetOriginalName(object obj);
 	}
 
 	internal class NameService : INameService {
