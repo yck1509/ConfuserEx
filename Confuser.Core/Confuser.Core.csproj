@@ -160,6 +160,7 @@
   </Target>
   <Target Name="BeforeBuild">
     <MSBuild Projects="$(SolutionDir)\Build\UpdateVersion.csproj" Targets="Build" Properties="Configuration=Release" />
-    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="UpdateVersion.exe &quot;$(SolutionDir)" Timeout="60000" />
+    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="UpdateVersion.exe &quot;$(SolutionDir)" Timeout="60000" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="mono UpdateVersion.exe &quot;$(SolutionDir)&quot;" Timeout="60000" Condition=" '$(OS)' != 'Windows_NT' " />
   </Target>
 </Project>
