@@ -37,7 +37,7 @@ namespace Confuser.Renamer {
 
 				if (def is MethodDef) {
 					var method = (MethodDef)def;
-					if (canRename && parameters.GetParameter(context, def, "renameArgs", true)) {
+					if ((canRename || method.IsConstructor) && parameters.GetParameter(context, def, "renameArgs", true)) {
 						foreach (ParamDef param in ((MethodDef)def).ParamDefs)
 							param.Name = null;
 					}
