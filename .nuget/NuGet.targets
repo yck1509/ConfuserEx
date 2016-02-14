@@ -85,7 +85,7 @@
         </BuildDependsOn>
     </PropertyGroup>
 
-    <Target Name="CheckPrerequisites">
+    <Target Name="CheckPrerequisites" Condition=" '$(OS)' == 'Windows_NT'">
         <!-- Raise an error if we're unable to locate nuget.exe  -->
         <Error Condition="'$(DownloadNuGetExe)' != 'true' AND !Exists('$(NuGetExePath)')" Text="Unable to locate '$(NuGetExePath)'" />
         <!--
