@@ -50,6 +50,8 @@ namespace Confuser.Renamer.References {
 						service.AddReference(baseSlot.MethodDef, new MemberRefReference((MemberRef)target, baseSlot.MethodDef));
 				}
 			}
+
+			target.MethodSig = new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(method.MethodSig);
 			if (target is MemberRef)
 				AddImportReference(context, service, method.Module, baseSlot.MethodDef, (MemberRef)target);
 
