@@ -113,7 +113,7 @@ namespace Confuser.Renamer.Analyzers {
 		void AnalyzeMemberRef(ConfuserContext context, INameService service, MemberRef memberRef) {
 			ITypeDefOrRef declType = memberRef.DeclaringType;
 			var typeSpec = declType as TypeSpec;
-			if (typeSpec == null)
+			if (typeSpec == null || typeSpec.TypeSig.IsArray || typeSpec.TypeSig.IsSZArray)
 				return;
 
 			TypeSig sig = typeSpec.TypeSig;
