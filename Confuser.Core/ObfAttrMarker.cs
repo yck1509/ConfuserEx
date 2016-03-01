@@ -259,7 +259,9 @@ namespace Confuser.Core {
 		IEnumerable<ProtectionSettingsInfo> ReadInfos(IHasCustomAttribute item) {
 			foreach (var attr in ReadObfuscationAttributes(item)) {
 				ProtectionSettingsInfo info;
-				if (ToInfo(attr, out info))
+				if (!string.IsNullOrEmpty(attr.FeatureName))
+					yield return AddRule(attr, null);
+				else if (ToInfo(attr, out info))
 					yield return info;
 			}
 		}
@@ -327,7 +329,7 @@ namespace Confuser.Core {
 			return new MarkerResult(modules.Select(module => module.Item2).ToList(), packer, extModules);
 		}
 
-		void AddRule(ObfuscationAttributeInfo attr, List<ProtectionSettingsInfo> infos) {
+		ProtectionSettingsInfo AddRule(ObfuscationAttributeInfo attr, List<ProtectionSettingsInfo> infos) {
 			Debug.Assert(attr.FeatureName != null);
 
 			var pattern = attr.FeatureName;
@@ -356,8 +358,9 @@ namespace Confuser.Core {
 
 			if (!ok)
 				context.Logger.WarnFormat("Ignoring rule '{0}' in {1}.", info.Settings, attr.Owner);
-			else
+			else if (infos != null)
 				infos.Add(info);
+			return info;
 		}
 
 		void MarkModule(ProjectModule projModule, ModuleDefMD module, Rules rules, bool isMain) {
