@@ -38,6 +38,12 @@ namespace Confuser.Core {
 			readonly ObfAttrParser parser;
 			ProtectionSettings settings;
 
+			enum ApplyInfoType {
+				CurrentInfoOnly,
+				CurrentInfoInherits,
+				ParentInfo
+			}
+
 			class PopHolder : IDisposable {
 				ProtectionSettingsStack parent;
 
@@ -76,9 +82,8 @@ namespace Confuser.Core {
 				var infoArray = infos.ToArray();
 
 				if (stack.Count > 0) {
-					foreach (var i in stack.Skip(1).Reverse())
-						ApplyInfo(target, settings, i.Item2.Where(info => info.Condition != null), false);
-					ApplyInfo(target, settings, stack.Peek().Item2, false);
+					foreach (var i in stack.Reverse())
+						ApplyInfo(target, settings, i.Item2, ApplyInfoType.ParentInfo);
 				}
 
 				IDisposable result;
@@ -86,11 +91,11 @@ namespace Confuser.Core {
 					var originalSettings = this.settings;
 
 					// the settings that would apply to members
-					ApplyInfo(target, settings, infoArray, false);
+					ApplyInfo(target, settings, infoArray, ApplyInfoType.CurrentInfoInherits);
 					this.settings = new ProtectionSettings(settings);
 
 					// the settings that would apply to itself
-					ApplyInfo(target, settings, infoArray, true);
+					ApplyInfo(target, settings, infoArray, ApplyInfoType.CurrentInfoOnly);
 					stack.Push(Tuple.Create(originalSettings, infoArray));
 
 					result = new PopHolder(this);
@@ -102,21 +107,23 @@ namespace Confuser.Core {
 				return result;
 			}
 
-			void ApplyInfo(IDnlibDef context, ProtectionSettings settings, IEnumerable<ProtectionSettingsInfo> infos, bool current) {
+			void ApplyInfo(IDnlibDef context, ProtectionSettings settings, IEnumerable<ProtectionSettingsInfo> infos, ApplyInfoType type) {
 				foreach (var info in infos) {
 					if (info.Condition != null && !(bool)info.Condition.Evaluate(context))
 						continue;
 
-					if (info.Exclude) {
-						if (current)
+					if (info.Condition == null && info.Exclude) {
+						if (type == ApplyInfoType.CurrentInfoOnly ||
+							(type == ApplyInfoType.CurrentInfoInherits && info.ApplyToMember)) {
 							settings.Clear();
-						else if (info.ApplyToMember)
-							settings.Clear();
-						continue;
+						}
 					}
-
-					if ((info.ApplyToMember || current || info.Condition != null) && !string.IsNullOrEmpty(info.Settings)) {
-						parser.ParseProtectionString(settings, info.Settings);
+					if (!string.IsNullOrEmpty(info.Settings)) {
+						if ((type == ApplyInfoType.ParentInfo && info.Condition != null && info.ApplyToMember) ||
+							type == ApplyInfoType.CurrentInfoOnly ||
+							(type == ApplyInfoType.CurrentInfoInherits && info.Condition == null && info.ApplyToMember)) {
+							parser.ParseProtectionString(settings, info.Settings);
+						}
 					}
 				}
 			}
@@ -232,7 +239,7 @@ namespace Confuser.Core {
 			info.Condition = expr;
 
 			info.Exclude = false;
-			info.ApplyToMember = false;
+			info.ApplyToMember = true;
 
 			var settings = new StringBuilder();
 			foreach (var item in rule) {
