@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns {
@@ -22,7 +23,7 @@ namespace Confuser.Core.Project.Patterns {
 		public override object Evaluate(IDnlibDef definition) {
 			if (!(definition is TypeDef) && !(definition is IMemberDef))
 				return false;
-			object ns = Arguments[0].Evaluate(definition);
+			var ns = Arguments[0].Evaluate(definition).ToString();
 
 			var type = definition as TypeDef;
 			if (type == null)
@@ -31,7 +32,7 @@ namespace Confuser.Core.Project.Patterns {
 			while (type.IsNested)
 				type = type.DeclaringType;
 
-			return type != null && type.Namespace == ns.ToString();
+			return type != null && Regex.IsMatch(type.Namespace, ns);
 		}
 	}
 }
