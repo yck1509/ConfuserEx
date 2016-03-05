@@ -147,7 +147,8 @@ namespace Confuser.Renamer.Analyzers {
 		void AnalyzeMethod(ConfuserContext context, INameService service, MethodDef method) {
 			var dpRegInstrs = new List<Tuple<bool, Instruction>>();
 			var routedEvtRegInstrs = new List<Instruction>();
-			foreach (Instruction instr in method.Body.Instructions) {
+			for (int i = 0; i < method.Body.Instructions.Count; i++) {
+				Instruction instr = method.Body.Instructions[i];
 				if ((instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt)) {
 					var regMethod = (IMethod)instr.Operand;
 
@@ -158,6 +159,15 @@ namespace Confuser.Renamer.Analyzers {
 					else if (regMethod.DeclaringType.FullName == "System.Windows.EventManager" &&
 					         regMethod.Name.String == "RegisterRoutedEvent") {
 						routedEvtRegInstrs.Add(instr);
+					}
+				}
+				else if (instr.OpCode.Code == Code.Newobj) {
+					var methodRef = (IMethod)instr.Operand;
+
+					if (methodRef.DeclaringType.FullName == "System.Windows.Data.PropertyGroupDescription" &&
+					    methodRef.Name == ".ctor" && i - 1 >= 0 && method.Body.Instructions[i - 1].OpCode.Code == Code.Ldstr) {
+						foreach (var property in analyzer.LookupProperty((string)method.Body.Instructions[i - 1].Operand))
+							service.SetCanRename(property, false);
 					}
 				}
 				else if (instr.OpCode == OpCodes.Ldstr) {
