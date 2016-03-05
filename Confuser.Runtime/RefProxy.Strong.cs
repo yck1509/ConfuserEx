@@ -63,7 +63,7 @@ namespace Confuser.Runtime {
 					code[index++] = (byte)i;
 
 					var mType = mIndex == -1 ? method.DeclaringType : mParams[mIndex].ParameterType;
-					if (!mType.IsValueType) {
+					if (mType.IsClass && !(mType.IsPointer || mType.IsByRef)) {
 						var cToken = info.GetTokenFor(mType.TypeHandle);
 						code[index++] = 0x74;
 						code[index++] = (byte)cToken;
