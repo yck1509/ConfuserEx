@@ -127,10 +127,6 @@ namespace Confuser.Core {
 					}
 				}
 			}
-
-			public ProtectionSettings GetCurrentSettings() {
-				return new ProtectionSettings(settings);
-			}
 		}
 
 		static readonly Regex OrderPattern = new Regex("^(\\d+)\\. (.+)$");
@@ -284,8 +280,9 @@ namespace Confuser.Core {
 		/// <inheritdoc />
 		protected internal override void MarkMember(IDnlibDef member, ConfuserContext context) {
 			ModuleDef module = ((IMemberRef)member).Module;
-			var settings = context.Annotations.Get<ProtectionSettings>(module, ModuleSettingsKey);
-			ProtectionParameters.SetParameters(context, member, new ProtectionSettings(settings));
+			var stack = context.Annotations.Get<ProtectionSettingsStack>(module, ModuleSettingsKey);
+			using (stack.Apply(member, Enumerable.Empty<ProtectionSettingsInfo>()))
+				return;
 		}
 
 		/// <inheritdoc />
@@ -431,7 +428,7 @@ namespace Confuser.Core {
 		}
 
 		void ProcessModule(ModuleDefMD module, ProtectionSettingsStack stack) {
-			context.Annotations.Set(module, ModuleSettingsKey, stack.GetCurrentSettings());
+			context.Annotations.Set(module, ModuleSettingsKey, new ProtectionSettingsStack(stack));
 			foreach (var type in module.Types) {
 				using (stack.Apply(type, ReadInfos(type)))
 					ProcessTypeMembers(type, stack);
