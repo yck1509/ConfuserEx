@@ -60,7 +60,8 @@ namespace Confuser.Renamer {
 		void RegisterRenamers(ConfuserContext context, NameService service) {
 			bool wpf = false,
 			     caliburn = false,
-			     winforms = false;
+			     winforms = false,
+			     json = false;
 
 			foreach (var module in context.Modules)
 				foreach (var asmRef in module.GetAssemblyRefs()) {
@@ -73,6 +74,9 @@ namespace Confuser.Renamer {
 					}
 					else if (asmRef.Name == "System.Windows.Forms") {
 						winforms = true;
+					}
+					else if (asmRef.Name == "Newtonsoft.Json") {
+						json = true;
 					}
 				}
 
@@ -90,6 +94,12 @@ namespace Confuser.Renamer {
 				var winformsAnalyzer = new WinFormsAnalyzer();
 				context.Logger.Debug("WinForms found, enabling compatibility.");
 				service.Renamers.Add(winformsAnalyzer);
+			}
+
+			if (json) {
+				var jsonAnalyzer = new JsonAnalyzer();
+				context.Logger.Debug("Newtonsoft.Json found, enabling compatibility.");
+				service.Renamers.Add(jsonAnalyzer);
 			}
 		}
 

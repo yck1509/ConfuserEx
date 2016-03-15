@@ -16,6 +16,9 @@ namespace Confuser.Renamer {
 		bool CanRename(object obj);
 		void SetCanRename(object obj, bool val);
 
+		void SetParam(IDnlibDef def, string name, string value);
+		string GetParam(IDnlibDef def, string name);
+
 		RenameMode GetRenameMode(object obj);
 		void SetRenameMode(object obj, RenameMode val);
 		void ReduceRenameMode(object obj, RenameMode val);
@@ -90,6 +93,26 @@ namespace Confuser.Renamer {
 
 		public void SetCanRename(object obj, bool val) {
 			context.Annotations.Set(obj, CanRenameKey, val);
+		}
+
+		public void SetParam(IDnlibDef def, string name, string value) {
+			var param = ProtectionParameters.GetParameters(context, def);
+			if (param == null)
+				ProtectionParameters.SetParameters(context, def, param = new ProtectionSettings());
+			Dictionary<string, string> nameParam;
+			if (!param.TryGetValue(analyze.Parent, out nameParam))
+				param[analyze.Parent] = nameParam = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+			nameParam[name] = value;
+		}
+
+		public string GetParam(IDnlibDef def, string name) {
+			var param = ProtectionParameters.GetParameters(context, def);
+			if (param == null)
+				return null;
+			Dictionary<string, string> nameParam;
+			if (!param.TryGetValue(analyze.Parent, out nameParam))
+				return null;
+			return nameParam.GetValueOrDefault(name);
 		}
 
 		public RenameMode GetRenameMode(object obj) {
