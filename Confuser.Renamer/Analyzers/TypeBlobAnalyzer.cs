@@ -20,8 +20,7 @@ namespace Confuser.Renamer.Analyzers {
 			// MemberRef
 			table = module.TablesStream.Get(Table.Method);
 			len = table.Rows;
-			IEnumerable<MethodDef> methods = Enumerable.Range(1, (int)len)
-			                                           .Select(rid => module.ResolveMethod((uint)rid));
+			IEnumerable<MethodDef> methods = module.GetTypes().SelectMany(type => type.Methods);
 			foreach (MethodDef method in methods) {
 				foreach (MethodOverride methodImpl in method.Overrides) {
 					if (methodImpl.MethodBody is MemberRef)
