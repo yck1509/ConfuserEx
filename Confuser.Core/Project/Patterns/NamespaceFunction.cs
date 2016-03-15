@@ -29,10 +29,13 @@ namespace Confuser.Core.Project.Patterns {
 			if (type == null)
 				type = ((IMemberDef)definition).DeclaringType;
 
+			if (type == null)
+				return false;
+
 			while (type.IsNested)
 				type = type.DeclaringType;
 
-			return type != null && Regex.IsMatch(type.Namespace, ns);
+			return type != null && Regex.IsMatch(type.Namespace ?? "", ns);
 		}
 	}
 }

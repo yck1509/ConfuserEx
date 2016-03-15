@@ -215,10 +215,25 @@ namespace Confuser.Protections.Constants {
 			}
 		}
 
+		void RemoveDataFieldRefs(ConfuserContext context, HashSet<FieldDef> dataFields, HashSet<Instruction> fieldRefs) {
+			foreach (var type in context.CurrentModule.GetTypes())
+				foreach (var method in type.Methods.Where(m => m.HasBody)) {
+					foreach (var instr in method.Body.Instructions)
+						if (instr.Operand is FieldDef && !fieldRefs.Contains(instr))
+							dataFields.Remove((FieldDef)instr.Operand);
+				}
+
+			foreach (var fieldToRemove in dataFields) {
+				fieldToRemove.DeclaringType.Fields.Remove(fieldToRemove);
+			}
+		}
+
 		void ExtractConstants(
 			ConfuserContext context, ProtectionParameters parameters, CEContext moduleCtx,
 			Dictionary<object, List<Tuple<MethodDef, Instruction>>> ldc,
 			Dictionary<byte[], List<Tuple<MethodDef, Instruction>>> ldInit) {
+			var dataFields = new HashSet<FieldDef>();
+			var fieldRefs = new HashSet<Instruction>();
 			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>().WithProgress(context.Logger)) {
 				if (!method.HasBody)
 					continue;
@@ -284,8 +299,9 @@ namespace Confuser.Protections.Constants {
 									ldc.Remove(arrLen);
 							}
 
-                            if(dataField.DeclaringType!=null)
-							    dataField.DeclaringType.Fields.Remove(dataField);
+							dataFields.Add(dataField);
+							fieldRefs.Add(instrs[i - 1]);
+
 							var value = new byte[dataField.InitialValue.Length + 4];
 							value[0] = (byte)(arrLen >> 0);
 							value[1] = (byte)(arrLen >> 8);
@@ -328,6 +344,7 @@ namespace Confuser.Protections.Constants {
 
 				context.CheckCancellation();
 			}
+			RemoveDataFieldRefs(context, dataFields, fieldRefs);
 		}
 
 		class ByteArrayComparer : IEqualityComparer<byte[]> {
