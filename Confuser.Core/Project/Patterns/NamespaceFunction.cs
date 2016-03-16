@@ -23,7 +23,7 @@ namespace Confuser.Core.Project.Patterns {
 		public override object Evaluate(IDnlibDef definition) {
 			if (!(definition is TypeDef) && !(definition is IMemberDef))
 				return false;
-			var ns = Arguments[0].Evaluate(definition).ToString();
+			var ns = "^" + Arguments[0].Evaluate(definition).ToString() + "$";
 
 			var type = definition as TypeDef;
 			if (type == null)

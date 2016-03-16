@@ -206,7 +206,13 @@ namespace Confuser.Core {
 								throw new KeyNotFoundException("Cannot find protection with id '" + protId + "'.");
 
 							if (protAct) {
-								settings[(Protection)items[protId]] = protParams;
+								if (settings.ContainsKey((Protection)items[protId])) {
+									var p = settings[(Protection)items[protId]];
+									foreach (var kvp in protParams)
+										p[kvp.Key] = kvp.Value;
+								}
+								else
+									settings[(Protection)items[protId]] = protParams;
 							}
 							else
 								settings.Remove((Protection)items[protId]);
