@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Confuser.Core;
+using Confuser.Core.Services;
 using dnlib.DotNet;
 
 namespace Confuser.Renamer {
@@ -28,7 +29,12 @@ namespace Confuser.Renamer {
 			}
 
 			var pdbDocs = new HashSet<string>();
-			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
+
+			var rng = context.Registry.GetService<IRandomService>().GetRandomGenerator(Parent.Id);
+			int randMax = parameters.Targets.Count;
+			var targets = parameters.Targets.OrderBy(x => rng.NextInt32(randMax)).ToArray().WithProgress(context.Logger);
+			
+			foreach (IDnlibDef def in targets) {
 				if (def is ModuleDef && parameters.GetParameter(context, def, "rickroll", false))
 					RickRoller.CommenceRickroll(context, (ModuleDef)def);
 
