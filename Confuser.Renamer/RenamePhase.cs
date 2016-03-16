@@ -27,8 +27,10 @@ namespace Confuser.Renamer {
 				context.CheckCancellation();
 			}
 
+			var targets = parameters.Targets.ToList();
+			service.GetRandom().Shuffle(targets);
 			var pdbDocs = new HashSet<string>();
-			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
+			foreach (IDnlibDef def in targets.WithProgress(context.Logger)) {
 				if (def is ModuleDef && parameters.GetParameter(context, def, "rickroll", false))
 					RickRoller.CommenceRickroll(context, (ModuleDef)def);
 
