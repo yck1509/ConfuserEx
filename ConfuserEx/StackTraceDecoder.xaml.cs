@@ -56,7 +56,7 @@ namespace ConfuserEx {
 			}
 		}
 
-		readonly Regex mapSymbolMatcher = new Regex("[a-zA-Z0-9]+");
+		readonly Regex mapSymbolMatcher = new Regex("_[a-zA-Z0-9]+");
 		readonly Regex passSymbolMatcher = new Regex("[a-zA-Z0-9_$]{23,}");
 		ReversibleRenamer renamer;
 
