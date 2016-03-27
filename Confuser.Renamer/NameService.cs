@@ -182,8 +182,30 @@ namespace Confuser.Renamer {
 			}
 		}
 
+		string ParseGenericName(string name, out int? count) {
+			if (name.LastIndexOf('`') != -1) {
+				int index = name.LastIndexOf('`');
+				int c;
+				if (int.TryParse(name.Substring(index + 1), out c)) {
+					count = c;
+					return name.Substring(0, index);
+				}
+			}
+			count = null;
+			return name;
+		}
+
+		string MakeGenericName(string name, int? count) {
+			if (count == null)
+				return name;
+			else
+				return string.Format("{0}`{1}", name, count.Value);
+		}
+
 		public string ObfuscateName(string name, RenameMode mode) {
 			string newName = null;
+			int? count;
+			name = ParseGenericName(name, out count);
 
 			if (string.IsNullOrEmpty(name))
 				return string.Empty;
@@ -196,7 +218,7 @@ namespace Confuser.Renamer {
 				if (reversibleRenamer == null)
 					throw new ArgumentException("Password not provided for reversible renaming.");
 				newName = reversibleRenamer.Encrypt(name);
-				return newName;
+				return MakeGenericName(newName, count);
 			}
 
 			if (nameMap1.ContainsKey(name))
@@ -205,7 +227,7 @@ namespace Confuser.Renamer {
 			byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
 			for (int i = 0; i < 100; i++) {
 				newName = ObfuscateNameInternal(hash, mode);
-				if (!identifiers.Contains(newName))
+				if (!identifiers.Contains(MakeGenericName(newName, count)))
 					break;
 				hash = Utils.SHA1(hash);
 			}
@@ -215,7 +237,7 @@ namespace Confuser.Renamer {
 				nameMap1[name] = newName;
 			}
 
-			return newName;
+			return MakeGenericName(newName, count);
 		}
 
 		public string RandomName() {
