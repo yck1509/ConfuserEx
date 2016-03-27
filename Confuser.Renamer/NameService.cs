@@ -145,6 +145,13 @@ namespace Confuser.Renamer {
 			analyze.Analyze(this, context, ProtectionParameters.Empty, def, true);
 		}
 
+		public void SetNameId(uint id) {
+			for (int i = nameId.Length - 1; i >= 0; i--) {
+				nameId[i] = (byte)(id & 0xff);
+				id >>= 8;
+			}
+		}
+
 		void IncrementNameId() {
 			for (int i = nameId.Length - 1; i >= 0; i--) {
 				nameId[i]++;

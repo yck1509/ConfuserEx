@@ -118,6 +118,11 @@ namespace Confuser.Renamer {
 				var pass = parameters.GetParameter<string>(context, def, "password", null);
 				if (pass != null)
 					service.reversibleRenamer = new ReversibleRenamer(pass);
+
+				var idOffset = parameters.GetParameter<uint>(context, def, "idOffset", 0);
+				if (idOffset != 0)
+					service.SetNameId(idOffset);
+
 				service.SetCanRename(def, false);
 			}
 
