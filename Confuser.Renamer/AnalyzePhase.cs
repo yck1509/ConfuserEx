@@ -156,6 +156,9 @@ namespace Confuser.Renamer {
 				// Courtesy
 				service.SetCanRename(type, false);
 			}
+            else if (type.IsSerializable) {
+                service.SetCanRename(type, false);
+            }
 
 			if (parameters.GetParameter(context, type, "forceRen", false))
 				return;
