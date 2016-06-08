@@ -27,21 +27,40 @@ namespace Confuser.Renamer {
 				context.CheckCancellation();
 			}
 
-			foreach (IDnlibDef def in parameters.Targets.WithProgress(context.Logger)) {
+			var targets = parameters.Targets.ToList();
+			service.GetRandom().Shuffle(targets);
+			var pdbDocs = new HashSet<string>();
+			foreach (IDnlibDef def in targets.WithProgress(context.Logger)) {
 				if (def is ModuleDef && parameters.GetParameter(context, def, "rickroll", false))
 					RickRoller.CommenceRickroll(context, (ModuleDef)def);
 
 				bool canRename = service.CanRename(def);
-				if (def is MethodDef)
-					if (canRename && parameters.GetParameter(context, def, "renameArgs", true)) {
+				RenameMode mode = service.GetRenameMode(def);
+
+				if (def is MethodDef) {
+					var method = (MethodDef)def;
+					if ((canRename || method.IsConstructor) && parameters.GetParameter(context, def, "renameArgs", true)) {
 						foreach (ParamDef param in ((MethodDef)def).ParamDefs)
 							param.Name = null;
 					}
 
+					if (parameters.GetParameter(context, def, "renPdb", false) && method.HasBody) {
+						foreach (var instr in method.Body.Instructions) {
+							if (instr.SequencePoint != null && !pdbDocs.Contains(instr.SequencePoint.Document.Url)) {
+								instr.SequencePoint.Document.Url = service.ObfuscateName(instr.SequencePoint.Document.Url, mode);
+								pdbDocs.Add(instr.SequencePoint.Document.Url);
+							}
+						}
+						foreach (var local in method.Body.Variables) {
+							if (!string.IsNullOrEmpty(local.Name))
+								local.Name = service.ObfuscateName(local.Name, mode);
+						}
+						method.Body.Scope = null;
+					}
+				}
+
 				if (!canRename)
 					continue;
-
-				RenameMode mode = service.GetRenameMode(def);
 
 				IList<INameReference> references = service.GetReferences(def);
 				bool cancel = false;
@@ -68,7 +87,7 @@ namespace Confuser.Renamer {
 				else if (def is MethodDef) {
 					foreach (var param in ((MethodDef)def).GenericParameters)
 						param.Name = ((char)(param.Number + 1)).ToString();
-					
+
 					def.Name = service.ObfuscateName(def.Name, mode);
 				}
 				else

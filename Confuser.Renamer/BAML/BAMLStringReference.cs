@@ -22,7 +22,15 @@ namespace Confuser.Renamer.BAML {
 				value = newName;
 			else if (oldName.EndsWith(".baml")) {
 				Debug.Assert(newName.EndsWith(".baml"));
-				value = newName.Substring(0, newName.Length - 5) + ".xaml";
+				/*
+                 * Nik's patch for maintaining relative paths. If the xaml file is referenced in this manner
+                 * "/some.namespace;component/somefolder/somecontrol.xaml"
+                 * then we want to keep the relative path and namespace intact. We should be obfuscating it like this - /some.namespace;component/somefolder/asjdjh2398498dswk.xaml
+                 * */
+				//value = newName.Substring(0, newName.Length - 5) + ".xaml";
+				value = value.Replace(oldName.Replace(".baml", string.Empty, StringComparison.InvariantCultureIgnoreCase),
+				                      newName.Replace(".baml", String.Empty, StringComparison.InvariantCultureIgnoreCase),
+				                      StringComparison.InvariantCultureIgnoreCase);
 			}
 			else
 				throw new UnreachableException();

@@ -147,6 +147,21 @@ namespace Confuser.Core.Project {
 		public override string ToString() {
 			return Path;
 		}
+
+		/// <summary>
+		///     Clones this instance.
+		/// </summary>
+		/// <returns>A duplicated module.</returns>
+		public ProjectModule Clone() {
+			var ret = new ProjectModule();
+			ret.Path = Path;
+			ret.IsExternal = IsExternal;
+			ret.SNKeyPath = SNKeyPath;
+			ret.SNKeyPassword = SNKeyPassword;
+			foreach (var r in Rules)
+				ret.Rules.Add(r.Clone());
+			return ret;
+		}
 	}
 
 	/// <summary>
@@ -169,6 +184,16 @@ namespace Confuser.Core.Project {
 	/// </summary>
 	/// <typeparam name="T"><see cref="Protection" /> or <see cref="Packer" /></typeparam>
 	public class SettingItem<T> : Dictionary<string, string> {
+		/// <summary>
+		/// Initialize this setting item instance
+		/// </summary>
+		/// <param name="id">The protection id</param>
+		/// <param name="action">The action to take</param>
+		public SettingItem(string id = null, SettingItemAction action = SettingItemAction.Add) {
+			Id = id;
+			Action = action;
+		}
+
 		/// <summary>
 		///     The identifier of component
 		/// </summary>
@@ -232,6 +257,17 @@ namespace Confuser.Core.Project {
 			foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>())
 				Add(i.Attributes["name"].Value, i.Attributes["value"].Value);
 		}
+
+		/// <summary>
+		///     Clones this instance.
+		/// </summary>
+		/// <returns>A duplicated setting item.</returns>
+		public SettingItem<T> Clone() {
+			var item = new SettingItem<T>(Id, Action);
+			foreach (var entry in this)
+				item.Add(entry.Key, entry.Value);
+			return item;
+		}
 	}
 
 
@@ -239,6 +275,18 @@ namespace Confuser.Core.Project {
 	///     A rule that control how <see cref="Protection" />s are applied to module
 	/// </summary>
 	public class Rule : List<SettingItem<Protection>> {
+		/// <summary>
+		/// Initialize this rule instance
+		/// </summary>
+		/// <param name="pattern">The pattern</param>
+		/// <param name="preset">The preset</param>
+		/// <param name="inherit">Inherits protection</param>
+		public Rule(string pattern = "true", ProtectionPreset preset = ProtectionPreset.None, bool inherit = false) {
+			Pattern = pattern;
+			Preset = preset;
+			Inherit = inherit;
+		}
+
 		/// <summary>
 		///     Gets or sets the pattern that determine the target components of the rule.
 		/// </summary>
@@ -540,6 +588,26 @@ namespace Confuser.Core.Project {
 					Add(asm);
 				}
 			}
+		}
+
+		/// <summary>
+		///     Clones this instance.
+		/// </summary>
+		/// <returns>A duplicated project.</returns>
+		public ConfuserProject Clone() {
+			var ret = new ConfuserProject();
+			ret.Seed = Seed;
+			ret.Debug = Debug;
+			ret.OutputDirectory = OutputDirectory;
+			ret.BaseDirectory = BaseDirectory;
+			ret.Packer = Packer == null ? null : Packer.Clone();
+			ret.ProbePaths = new List<string>(ProbePaths);
+			ret.PluginPaths = new List<string>(PluginPaths);
+			foreach (var module in this)
+				ret.Add(module.Clone());
+			foreach (var r in Rules)
+				ret.Rules.Add(r);
+			return ret;
 		}
 	}
 }

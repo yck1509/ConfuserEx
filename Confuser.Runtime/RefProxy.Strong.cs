@@ -54,11 +54,26 @@ namespace Confuser.Runtime {
 
 				DynamicILInfo info = dm.GetDynamicILInfo();
 				info.SetLocalSignature(new byte[] { 0x7, 0x0 });
-				var code = new byte[2 * argTypes.Length + 6];
+				var code = new byte[(2 + 5) * argTypes.Length + 6];
 				int index = 0;
+				var mParams = method.GetParameters();
+				int mIndex = method.IsConstructor ? 0 : -1;
 				for (int i = 0; i < argTypes.Length; i++) {
 					code[index++] = 0x0e;
 					code[index++] = (byte)i;
+
+					var mType = mIndex == -1 ? method.DeclaringType : mParams[mIndex].ParameterType;
+					if (mType.IsClass && !(mType.IsPointer || mType.IsByRef)) {
+						var cToken = info.GetTokenFor(mType.TypeHandle);
+						code[index++] = 0x74;
+						code[index++] = (byte)cToken;
+						code[index++] = (byte)(cToken >> 8);
+						code[index++] = (byte)(cToken >> 16);
+						code[index++] = (byte)(cToken >> 24);
+					}
+					else
+						index += 5;
+					mIndex++;
 				}
 				code[index++] = (byte)((byte)fieldInfo.Name[Mutation.KeyI8] ^ opKey);
 				int dmToken = info.GetTokenFor(method.MethodHandle);

@@ -20,8 +20,7 @@ namespace Confuser.Renamer.Analyzers {
 			// MemberRef
 			table = module.TablesStream.Get(Table.Method);
 			len = table.Rows;
-			IEnumerable<MethodDef> methods = Enumerable.Range(1, (int)len)
-			                                           .Select(rid => module.ResolveMethod((uint)rid));
+			IEnumerable<MethodDef> methods = module.GetTypes().SelectMany(type => type.Methods);
 			foreach (MethodDef method in methods) {
 				foreach (MethodOverride methodImpl in method.Overrides) {
 					if (methodImpl.MethodBody is MemberRef)
@@ -113,7 +112,7 @@ namespace Confuser.Renamer.Analyzers {
 		void AnalyzeMemberRef(ConfuserContext context, INameService service, MemberRef memberRef) {
 			ITypeDefOrRef declType = memberRef.DeclaringType;
 			var typeSpec = declType as TypeSpec;
-			if (typeSpec == null)
+			if (typeSpec == null || typeSpec.TypeSig.IsArray || typeSpec.TypeSig.IsSZArray)
 				return;
 
 			TypeSig sig = typeSpec.TypeSig;

@@ -56,8 +56,17 @@ namespace Confuser.Protections {
 
 			ModuleDefMD originModule = context.Modules[ctx.ModuleIndex];
 			ctx.OriginModuleDef = originModule;
+
 			var stubModule = new ModuleDefUser(ctx.ModuleName, originModule.Mvid, originModule.CorLibTypes.AssemblyRef);
-			ctx.Assembly.Modules.Insert(0, stubModule);
+			if (ctx.CompatMode) {
+				var assembly = new AssemblyDefUser(originModule.Assembly);
+				assembly.Name += ".cr";
+				assembly.Modules.Add(stubModule);
+			}
+			else {
+				ctx.Assembly.Modules.Insert(0, stubModule);
+				ImportAssemblyTypeReferences(originModule, stubModule);
+			}
 			stubModule.Characteristics = originModule.Characteristics;
 			stubModule.Cor20HeaderFlags = originModule.Cor20HeaderFlags;
 			stubModule.Cor20HeaderRuntimeVersion = originModule.Cor20HeaderRuntimeVersion;
@@ -70,7 +79,6 @@ namespace Confuser.Protections {
 			stubModule.RuntimeVersion = originModule.RuntimeVersion;
 			stubModule.TablesHeaderVersion = originModule.TablesHeaderVersion;
 			stubModule.Win32Resources = originModule.Win32Resources;
-			ImportAssemblyTypeReferences(originModule, stubModule);
 
 			InjectStub(context, ctx, parameters, stubModule);
 
@@ -186,7 +194,9 @@ namespace Confuser.Protections {
 			var rt = context.Registry.GetService<IRuntimeService>();
 			RandomGenerator random = context.Registry.GetService<IRandomService>().GetRandomGenerator(Id);
 			var comp = context.Registry.GetService<ICompressionService>();
-			IEnumerable<IDnlibDef> defs = InjectHelper.Inject(rt.GetRuntimeType("Confuser.Runtime.Compressor"), stubModule.GlobalType, stubModule);
+
+			var rtType = rt.GetRuntimeType(compCtx.CompatMode ? "Confuser.Runtime.CompressorCompat" : "Confuser.Runtime.Compressor");
+			IEnumerable<IDnlibDef> defs = InjectHelper.Inject(rtType, stubModule.GlobalType, stubModule);
 
 			switch (parameters.GetParameter(context, context.CurrentModule, "key", Mode.Normal)) {
 				case Mode.Normal:
@@ -296,7 +306,7 @@ namespace Confuser.Protections {
 					ctx.KeyToken = sigToken;
 					MutationHelper.InjectKey(writer.Module.EntryPoint, 2, (int)sigToken);
 				}
-				else if (evt == ModuleWriterEvent.MDBeginAddResources) {
+				else if (evt == ModuleWriterEvent.MDBeginAddResources && !ctx.CompatMode) {
 					// Compute hash
 					byte[] hash = SHA1.Create().ComputeHash(ctx.OriginModule);
 					uint hashBlob = writer.MetaData.BlobHeap.Add(hash);

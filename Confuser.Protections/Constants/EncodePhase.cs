@@ -56,7 +56,7 @@ namespace Confuser.Protections.Constants {
 				else if (entry.Key is float) {
 					var t = new RTransform();
 					t.R4 = (float)entry.Key;
-					EncodeConstant32(moduleCtx, t.Hi, context.CurrentModule.CorLibTypes.Single, entry.Value);
+					EncodeConstant32(moduleCtx, t.Lo, context.CurrentModule.CorLibTypes.Single, entry.Value);
 				}
 				else if (entry.Key is double) {
 					var t = new RTransform();
@@ -144,18 +144,17 @@ namespace Confuser.Protections.Constants {
 		}
 
 		void EncodeConstant64(CEContext moduleCtx, uint hi, uint lo, TypeSig valueType, List<Tuple<MethodDef, Instruction>> references) {
-			int buffIndex = moduleCtx.EncodedBuffer.IndexOf(hi);
-			while (buffIndex != -1) {
-				if (moduleCtx.EncodedBuffer[buffIndex + 1] == lo)
+			int buffIndex = -1;
+			do {
+				buffIndex = moduleCtx.EncodedBuffer.IndexOf(lo, buffIndex + 1);
+				if (buffIndex + 1 < moduleCtx.EncodedBuffer.Count && moduleCtx.EncodedBuffer[buffIndex + 1] == hi)
 					break;
-				buffIndex = moduleCtx.EncodedBuffer.IndexOf(hi, buffIndex + 1);
-				if (buffIndex + 1 >= moduleCtx.EncodedBuffer.Count)
-					buffIndex = -1;
-			}
+			} while (buffIndex >= 0);
+			
 			if (buffIndex == -1) {
 				buffIndex = moduleCtx.EncodedBuffer.Count;
-				moduleCtx.EncodedBuffer.Add(hi);
 				moduleCtx.EncodedBuffer.Add(lo);
+				moduleCtx.EncodedBuffer.Add(hi);
 			}
 
 			UpdateReference(moduleCtx, valueType, references, buffIndex, desc => desc.NumberID);
@@ -216,16 +215,31 @@ namespace Confuser.Protections.Constants {
 			}
 		}
 
+		void RemoveDataFieldRefs(ConfuserContext context, HashSet<FieldDef> dataFields, HashSet<Instruction> fieldRefs) {
+			foreach (var type in context.CurrentModule.GetTypes())
+				foreach (var method in type.Methods.Where(m => m.HasBody)) {
+					foreach (var instr in method.Body.Instructions)
+						if (instr.Operand is FieldDef && !fieldRefs.Contains(instr))
+							dataFields.Remove((FieldDef)instr.Operand);
+				}
+
+			foreach (var fieldToRemove in dataFields) {
+				fieldToRemove.DeclaringType.Fields.Remove(fieldToRemove);
+			}
+		}
+
 		void ExtractConstants(
 			ConfuserContext context, ProtectionParameters parameters, CEContext moduleCtx,
 			Dictionary<object, List<Tuple<MethodDef, Instruction>>> ldc,
 			Dictionary<byte[], List<Tuple<MethodDef, Instruction>>> ldInit) {
+			var dataFields = new HashSet<FieldDef>();
+			var fieldRefs = new HashSet<Instruction>();
 			foreach (MethodDef method in parameters.Targets.OfType<MethodDef>().WithProgress(context.Logger)) {
 				if (!method.HasBody)
 					continue;
 
 				moduleCtx.Elements = 0;
-				string elements = parameters.GetParameter(context, context.CurrentModule, "elements", "SI");
+				string elements = parameters.GetParameter(context, method, "elements", "SI");
 				foreach (char elem in elements)
 					switch (elem) {
 						case 'S':
@@ -285,8 +299,9 @@ namespace Confuser.Protections.Constants {
 									ldc.Remove(arrLen);
 							}
 
-                            if(dataField.DeclaringType!=null)
-							    dataField.DeclaringType.Fields.Remove(dataField);
+							dataFields.Add(dataField);
+							fieldRefs.Add(instrs[i - 1]);
+
 							var value = new byte[dataField.InitialValue.Length + 4];
 							value[0] = (byte)(arrLen >> 0);
 							value[1] = (byte)(arrLen >> 8);
@@ -329,6 +344,7 @@ namespace Confuser.Protections.Constants {
 
 				context.CheckCancellation();
 			}
+			RemoveDataFieldRefs(context, dataFields, fieldRefs);
 		}
 
 		class ByteArrayComparer : IEqualityComparer<byte[]> {
@@ -349,8 +365,8 @@ namespace Confuser.Protections.Constants {
 			[FieldOffset(0)] public float R4;
 			[FieldOffset(0)] public double R8;
 
-			[FieldOffset(0)] public readonly uint Hi;
-			[FieldOffset(4)] public readonly uint Lo;
+			[FieldOffset(4)] public readonly uint Hi;
+			[FieldOffset(0)] public readonly uint Lo;
 		}
 	}
 }

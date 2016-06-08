@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 using Confuser.Core;
 using Confuser.Renamer.Analyzers;
@@ -24,9 +25,9 @@ namespace Confuser.Renamer.BAML {
 		readonly Dictionary<ushort, TypeSig> typeRefs = new Dictionary<ushort, TypeSig>();
 		readonly Dictionary<string, List<Tuple<AssemblyDef, string>>> xmlns = new Dictionary<string, List<Tuple<AssemblyDef, string>>>();
 
-        readonly string packScheme = System.IO.Packaging.PackUriHelper.UriSchemePack + "://";
+		readonly string packScheme = PackUriHelper.UriSchemePack + "://";
 
-        IKnownThings things;
+		IKnownThings things;
 
 		KnownThingsv3 thingsv3;
 		KnownThingsv4 thingsv4;
@@ -93,8 +94,8 @@ namespace Confuser.Renamer.BAML {
 		}
 
 		public BamlDocument Analyze(ModuleDefMD module, string bamlName, byte[] data) {
-			this.Module = module;
-			this.CurrentBAMLName = bamlName;
+			Module = module;
+			CurrentBAMLName = bamlName;
 			if (module.IsClr40) {
 				things = thingsv4 ?? (thingsv4 = new KnownThingsv4(context, module));
 			}
@@ -250,6 +251,8 @@ namespace Confuser.Renamer.BAML {
 				TypeDef typeDef = type.ResolveTypeDefThrow();
 				if (context.Modules.Contains((ModuleDefMD)typeDef.Module)) {
 					service.ReduceRenameMode(typeDef, RenameMode.Letters);
+					if (type is TypeRef)
+						service.AddReference(typeDef, new TypeRefReference((TypeRef)type, typeDef));
 					service.AddReference(typeDef, reference);
 				}
 			}
@@ -365,7 +368,7 @@ namespace Confuser.Renamer.BAML {
 					if (elem.Attribute != null && attr != null)
 						type = GetAttributeType(attr);
 
-					if ((customRec.SerializerTypeId & 0x4000) != 0 && (customRec.SerializerTypeId & 0x4000) == 0x89) {
+					if ((customRec.SerializerTypeId & ~0x4000) != 0 && (customRec.SerializerTypeId & ~0x4000) == 0x89) {
 						// See BamlRecordReader.GetCustomDependencyPropertyValue.
 						// Umm... Well, actually nothing to do, since this record only describe DP, which already won't be renamed.
 					}
@@ -503,6 +506,8 @@ namespace Confuser.Renamer.BAML {
 						var match = WPFAnalyzer.UriPattern.Match(src);
 						if (match.Success)
 							src = match.Groups[1].Value;
+						else if (rec.Value.Contains("/"))
+							context.Logger.WarnFormat("Fail to extract XAML name from '{0}'.", rec.Value);
 
 						if (!src.Contains("//")) {
 							var rel = new Uri(new Uri(packScheme + "application:,,,/" + CurrentBAMLName), src);
@@ -515,6 +520,8 @@ namespace Confuser.Renamer.BAML {
 						var bamlRefs = service.FindRenamer<WPFAnalyzer>().bamlRefs;
 						bamlRefs.AddListEntry(baml, reference);
 						bamlRefs.AddListEntry(xaml, reference);
+						bamlRefs.AddListEntry(Uri.EscapeUriString(baml), reference);
+						bamlRefs.AddListEntry(Uri.EscapeUriString(xaml), reference);
 					}
 				}
 			}

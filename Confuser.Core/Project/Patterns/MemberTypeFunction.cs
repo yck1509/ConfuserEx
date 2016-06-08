@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Text.RegularExpressions;
 using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns {
@@ -20,27 +22,44 @@ namespace Confuser.Core.Project.Patterns {
 
 		/// <inheritdoc />
 		public override object Evaluate(IDnlibDef definition) {
-			object type = Arguments[0].Evaluate(definition);
+			string typeRegex = Arguments[0].Evaluate(definition).ToString();
+
+			var memberType = new StringBuilder();
 
 			if (definition is TypeDef)
-				return StringComparer.OrdinalIgnoreCase.Compare(type.ToString(), "type") == 0;
+				memberType.Append("type ");
 
-			if (definition is MethodDef)
-				return StringComparer.OrdinalIgnoreCase.Compare(type.ToString(), "method") == 0;
+			if (definition is MethodDef) {
+				memberType.Append("method ");
+
+				var method = (MethodDef)definition;
+				if (method.IsGetter)
+					memberType.Append("propertym getter ");
+				else if (method.IsSetter)
+					memberType.Append("propertym setter ");
+				else if (method.IsAddOn)
+					memberType.Append("eventm add ");
+				else if (method.IsRemoveOn)
+					memberType.Append("eventm remove ");
+				else if (method.IsFire)
+					memberType.Append("eventm fire ");
+				else if (method.IsOther)
+					memberType.Append("other ");
+			}
 
 			if (definition is FieldDef)
-				return StringComparer.OrdinalIgnoreCase.Compare(type.ToString(), "field") == 0;
+				memberType.Append("field ");
 
 			if (definition is PropertyDef)
-				return StringComparer.OrdinalIgnoreCase.Compare(type.ToString(), "property") == 0;
+				memberType.Append("property ");
 
 			if (definition is EventDef)
-				return StringComparer.OrdinalIgnoreCase.Compare(type.ToString(), "event") == 0;
+				memberType.Append("event ");
 
 			if (definition is ModuleDef)
-				return StringComparer.OrdinalIgnoreCase.Compare(type.ToString(), "module") == 0;
+				memberType.Append("module ");
 
-			return false;
+			return Regex.IsMatch(memberType.ToString(), typeRegex);
 		}
 	}
 }

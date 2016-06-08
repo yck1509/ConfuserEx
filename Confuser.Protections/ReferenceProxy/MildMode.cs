@@ -64,6 +64,10 @@ namespace Confuser.Protections.ReferenceProxy {
 			}
 			else
 				invoke.Operand = proxy;
+
+			var targetDef = target.ResolveMethodDef();
+			if (targetDef != null)
+				ctx.Context.Annotations.Set(targetDef, ReferenceProxyProtection.Targeted, ReferenceProxyProtection.Targeted);
 		}
 
 		public override void Finalize(RPContext ctx) { }

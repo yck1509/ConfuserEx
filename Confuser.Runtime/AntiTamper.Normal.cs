@@ -54,6 +54,9 @@ namespace Confuser.Runtime {
 			uint w = 0x40;
 			VirtualProtect((IntPtr)e, l << 2, w, out w);
 
+			if (w == 0x40)
+				return;
+
 			uint h = 0;
 			for (uint i = 0; i < l; i++) {
 				*e ^= y[h & 0xf];

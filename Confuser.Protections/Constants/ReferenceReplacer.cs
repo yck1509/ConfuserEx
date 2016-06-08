@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Confuser.Core;
 using Confuser.Core.Helpers;
 using Confuser.Core.Services;
@@ -147,7 +148,6 @@ namespace Confuser.Protections.Constants {
 
 			CFGState entry;
 			if (!ctx.StatesMap.TryGetValue(key.EntryState, out entry)) {
-				Debug.Assert(key.Type == BlockKeyType.Explicit);
 				key.Type = BlockKeyType.Explicit;
 			}
 
@@ -374,9 +374,10 @@ namespace Confuser.Protections.Constants {
 
 			// Update state for blocks not in use
 			for (int i = 0; i < graph.Count; i++) {
-				if (blockReferences.ContainsKey(i))
+				var block = graph[i];
+				if (blockReferences.ContainsKey(block.Id))
 					continue;
-				InsertEmptyStateUpdate(cfgCtx, graph[i]);
+				InsertEmptyStateUpdate(cfgCtx, block);
 			}
 
 			// Update references

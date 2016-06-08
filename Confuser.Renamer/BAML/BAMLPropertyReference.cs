@@ -24,7 +24,7 @@ namespace Confuser.Renamer.BAML {
 			}
 			else
 				throw new UnreachableException();
-			rec.Value = value;
+			rec.Value = "pack://application:,,,/" + value;
 		}
 	}
 }

@@ -81,6 +81,7 @@
     </Compile>
     <Compile Include="ComponentConverter.cs" />
     <Compile Include="ComponentDiscovery.cs" />
+    <Compile Include="BoolToVisibilityConverter.cs" />
     <Compile Include="EnumValuesExtension.cs" />
     <Compile Include="FileDragDrop.cs" />
     <Compile Include="InvertBoolConverter.cs" />

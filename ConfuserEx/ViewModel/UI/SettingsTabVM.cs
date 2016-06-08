@@ -94,9 +94,9 @@ namespace ConfuserEx.ViewModel {
 
 		protected override void OnPropertyChanged(string property) {
 			if (property == "HasPacker") {
-				if (hasPacker)
+				if (hasPacker && App.Project.Packer == null)
 					App.Project.Packer = new ProjectSettingVM<Packer>(App.Project, new SettingItem<Packer> { Id = App.Project.Packers[0].Id });
-				else
+				else if (!hasPacker)
 					App.Project.Packer = null;
 			}
 			base.OnPropertyChanged(property);

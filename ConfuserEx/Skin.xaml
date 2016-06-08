@@ -845,6 +845,55 @@
         </Setter>
     </Style>
 
+    <Style TargetType="{x:Type RadioButton}">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource CheckRadioFocusVisual}" />
+        <Setter Property="Foreground" Value="{StaticResource Foreground}" />
+        <Setter Property="Background" Value="{StaticResource LightBackground}" />
+        <Setter Property="BorderBrush" Value="{StaticResource Border}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="5,0,0,0" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource EmptyCheckBoxFocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <BulletDecorator Background="Transparent" SnapsToDevicePixels="true">
+                        <BulletDecorator.Bullet>
+                            <Grid>
+                                <Ellipse x:Name="CheckMarkBorder" Stroke="{TemplateBinding BorderBrush}"
+                                        StrokeThickness="{TemplateBinding BorderThickness}"
+                                        Fill="{TemplateBinding Background}" />
+                                <Ellipse x:Name="CheckMark" Fill="{TemplateBinding Foreground}"
+                                               FlowDirection="LeftToRight" Height="7" Margin="3" Width="7" />
+                            </Grid>
+                        </BulletDecorator.Bullet>
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </BulletDecorator>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="false">
+                            <Setter Property="Visibility" TargetName="CheckMark" Value="Hidden" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}">
+                            <Setter Property="Fill" TargetName="CheckMark" Value="{StaticResource DisabledForeground}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter Property="Fill" TargetName="CheckMarkBorder"
+                                    Value="{StaticResource HighlightBackground}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Fill" TargetName="CheckMarkBorder"
+                                    Value="{StaticResource DisabledBackground}" />
+                            <Setter Property="Fill" TargetName="CheckMark" Value="{StaticResource DisabledForeground}" />
+                            <Setter Property="Foreground" Value="{StaticResource DisabledForeground}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="{x:Type ListBox}">
         <Setter Property="Background" Value="{StaticResource ControlBackground}" />
         <Setter Property="Foreground" Value="{StaticResource Foreground}" />

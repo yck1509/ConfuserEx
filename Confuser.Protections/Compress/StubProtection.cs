@@ -42,7 +42,8 @@ namespace Confuser.Protections.Compress {
 		}
 
 		protected override void PopulatePipeline(ProtectionPipeline pipeline) {
-			pipeline.InsertPreStage(PipelineStage.Inspection, new InjPhase(this));
+			if (!ctx.CompatMode)
+				pipeline.InsertPreStage(PipelineStage.Inspection, new InjPhase(this));
 			pipeline.InsertPostStage(PipelineStage.BeginModule, new SigPhase(this));
 		}
 
@@ -95,6 +96,9 @@ namespace Confuser.Protections.Compress {
 						uint blob = writer.MetaData.BlobHeap.Add(prot.ctx.KeySig);
 						uint rid = writer.MetaData.TablesHeap.StandAloneSigTable.Add(new RawStandAloneSigRow(blob));
 						Debug.Assert((0x11000000 | rid) == prot.ctx.KeyToken);
+
+						if (prot.ctx.CompatMode)
+							return;
 
 						// Add File reference
 						byte[] hash = SHA1.Create().ComputeHash(prot.ctx.OriginModule);

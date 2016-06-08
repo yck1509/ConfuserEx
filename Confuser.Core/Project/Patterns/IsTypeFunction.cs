@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text;
+using System.Text.RegularExpressions;
 using dnlib.DotNet;
 
 namespace Confuser.Core.Project.Patterns {
@@ -21,27 +23,37 @@ namespace Confuser.Core.Project.Patterns {
 		/// <inheritdoc />
 		public override object Evaluate(IDnlibDef definition) {
 			TypeDef type = definition as TypeDef;
+			if (type == null && definition is IMemberDef)
+				type = ((IMemberDef)definition).DeclaringType;
 			if (type == null)
 				return false;
 
-			string typeType = Arguments[0].Evaluate(definition).ToString();
+			string typeRegex = Arguments[0].Evaluate(definition).ToString();
+
+			var typeType = new StringBuilder();
 
 			if (type.IsEnum)
-				return StringComparer.OrdinalIgnoreCase.Compare(typeType, "enum") == 0;
+				typeType.Append("enum ");
 
 			if (type.IsInterface)
-				return StringComparer.OrdinalIgnoreCase.Compare(typeType, "interface") == 0;
+				typeType.Append("interface ");
 
 			if (type.IsValueType)
-				return StringComparer.OrdinalIgnoreCase.Compare(typeType, "valuetype") == 0;
+				typeType.Append("valuetype ");
 
 			if (type.IsDelegate())
-				return StringComparer.OrdinalIgnoreCase.Compare(typeType, "delegate") == 0;
+				typeType.Append("delegate ");
 
 			if (type.IsAbstract)
-				return StringComparer.OrdinalIgnoreCase.Compare(typeType, "abstract") == 0;
+				typeType.Append("abstract ");
 
-			return false;
+			if (type.IsNested)
+				typeType.Append("nested ");
+
+			if (type.IsSerializable)
+				typeType.Append("serializable ");
+
+			return Regex.IsMatch(typeType.ToString(), typeRegex);
 		}
 	}
 }

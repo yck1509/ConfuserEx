@@ -11,6 +11,7 @@ namespace ConfuserEx.ViewModel {
 		readonly ProjectVM parent;
 		string asmName = "Unknown";
 		string simpleName;
+		bool isSelected;
 
 		public ProjectModuleVM(ProjectVM parent, ProjectModule module) {
 			this.parent = parent;
@@ -24,6 +25,11 @@ namespace ConfuserEx.ViewModel {
 				SimpleName = System.IO.Path.GetFileName(module.Path);
 				LoadAssemblyName();
 			}
+		}
+
+		public bool IsSelected {
+			get { return isSelected; }
+			set { SetProperty(ref isSelected, value, "IsSelected"); }
 		}
 
 		public ProjectModule Module {

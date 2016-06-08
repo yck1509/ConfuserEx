@@ -55,6 +55,7 @@
     <Compile Include="API\APIStore.cs" />
     <Compile Include="API\IDataStore.cs" />
     <Compile Include="API\IOpaquePredicate.cs" />
+    <Compile Include="ModuleSorter.cs" />
     <Compile Include="Helpers\ControlFlowGraph.cs" />
     <Compile Include="Helpers\KeySequence.cs" />
     <Compile Include="LZMA\Common\CRC.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Project\InvalidPatternException.cs" />
     <Compile Include="Project\PatternParser.cs" />
     <Compile Include="Project\Patterns\AndOperator.cs" />
+    <Compile Include="Project\Patterns\HasAttrFunction.cs" />
     <Compile Include="Project\Patterns\IsTypeFunction.cs" />
     <Compile Include="Project\Patterns\InheritsFunction.cs" />
     <Compile Include="Project\Patterns\IsPublicFunction.cs" />
@@ -158,6 +160,7 @@
   </Target>
   <Target Name="BeforeBuild">
     <MSBuild Projects="$(SolutionDir)\Build\UpdateVersion.csproj" Targets="Build" Properties="Configuration=Release" />
-    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="UpdateVersion.exe &quot;$(SolutionDir)" Timeout="60000" />
+    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="UpdateVersion.exe &quot;$(SolutionDir)" Timeout="60000" Condition=" '$(OS)' == 'Windows_NT' " />
+    <Exec WorkingDirectory="$(SolutionDir)\Build" Command="mono UpdateVersion.exe &quot;$(SolutionDir)&quot;" Timeout="60000" Condition=" '$(OS)' != 'Windows_NT' " />
   </Target>
 </Project>

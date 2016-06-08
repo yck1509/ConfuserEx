@@ -17,7 +17,7 @@ namespace Confuser.Renamer.Analyzers {
 		static readonly object BAMLKey = new object();
 
 		static readonly Regex ResourceNamePattern = new Regex("^.*\\.g\\.resources$");
-		internal static readonly Regex UriPattern = new Regex(";COMPONENT/(.+\\.[BX]AML)$");
+		internal static readonly Regex UriPattern = new Regex("(?:;COMPONENT|APPLICATION\\:,,,)(/.+\\.[BX]AML)$");
 		BAMLAnalyzer analyzer;
 
 		internal Dictionary<string, List<IBAMLReference>> bamlRefs = new Dictionary<string, List<IBAMLReference>>(StringComparer.OrdinalIgnoreCase);
@@ -51,10 +51,37 @@ namespace Confuser.Renamer.Analyzers {
 					List<IBAMLReference> references;
 					if (bamlRefs.TryGetValue(doc.DocumentName, out references)) {
 						var newName = doc.DocumentName.ToUpperInvariant();
+
+						#region old code
+
+						//if (newName.EndsWith(".BAML"))
+						//    newName = service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".baml";
+						//else if (newName.EndsWith(".XAML"))
+						//    newName = service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".xaml";
+
+						#endregion
+
+						#region Niks patch fix
+
+						/*
+                         * Nik's patch for maintaining relative paths. If the xaml file is referenced in this manner
+                         * "/some.namespace;component/somefolder/somecontrol.xaml"
+                         * then we want to keep the relative path and namespace intact. We should be obfuscating it like this - /some.namespace;component/somefolder/asjdjh2398498dswk.xaml
+                        * */
+
+						string[] completePath = newName.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
+						string newShinyName = string.Empty;
+						for (int i = 0; i <= completePath.Length - 2; i++) {
+							newShinyName += completePath[i].ToLowerInvariant() + "/";
+						}
 						if (newName.EndsWith(".BAML"))
-							newName = service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".baml";
+							newName = newShinyName + service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".baml";
 						else if (newName.EndsWith(".XAML"))
-							newName = service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".xaml";
+							newName = newShinyName + service.RandomName(RenameMode.Letters).ToLowerInvariant() + ".xaml";
+
+						context.Logger.Debug(String.Format("Preserving virtual paths. Replaced {0} with {1}", doc.DocumentName, newName));
+
+						#endregion
 
 						bool renameOk = true;
 						foreach (var bamlRef in references)
@@ -120,7 +147,8 @@ namespace Confuser.Renamer.Analyzers {
 		void AnalyzeMethod(ConfuserContext context, INameService service, MethodDef method) {
 			var dpRegInstrs = new List<Tuple<bool, Instruction>>();
 			var routedEvtRegInstrs = new List<Instruction>();
-			foreach (Instruction instr in method.Body.Instructions) {
+			for (int i = 0; i < method.Body.Instructions.Count; i++) {
+				Instruction instr = method.Body.Instructions[i];
 				if ((instr.OpCode.Code == Code.Call || instr.OpCode.Code == Code.Callvirt)) {
 					var regMethod = (IMethod)instr.Operand;
 
@@ -133,12 +161,23 @@ namespace Confuser.Renamer.Analyzers {
 						routedEvtRegInstrs.Add(instr);
 					}
 				}
+				else if (instr.OpCode.Code == Code.Newobj) {
+					var methodRef = (IMethod)instr.Operand;
+
+					if (methodRef.DeclaringType.FullName == "System.Windows.Data.PropertyGroupDescription" &&
+					    methodRef.Name == ".ctor" && i - 1 >= 0 && method.Body.Instructions[i - 1].OpCode.Code == Code.Ldstr) {
+						foreach (var property in analyzer.LookupProperty((string)method.Body.Instructions[i - 1].Operand))
+							service.SetCanRename(property, false);
+					}
+				}
 				else if (instr.OpCode == OpCodes.Ldstr) {
 					var operand = ((string)instr.Operand).ToUpperInvariant();
 					if (operand.EndsWith(".BAML") || operand.EndsWith(".XAML")) {
 						var match = UriPattern.Match(operand);
 						if (match.Success)
 							operand = match.Groups[1].Value;
+						else if (operand.Contains("/"))
+							context.Logger.WarnFormat("Fail to extract XAML name from '{0}'.", instr.Operand);
 
 						var reference = new BAMLStringReference(instr);
 						operand = operand.TrimStart('/');

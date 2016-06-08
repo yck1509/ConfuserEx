@@ -9,8 +9,7 @@ namespace Confuser.Runtime {
 			var env = typeof(Environment);
 			var method = env.GetMethod("GetEnvironmentVariable", new[] { typeof(string) });
 			if (method != null &&
-			    (method.Invoke(null, new object[] { x + "_PROFILER" }) != null ||
-				 method.Invoke(null, new object[] { x + "_ENABLE_PROFILING" }) != null))
+			    "1".Equals(method.Invoke(null, new object[] { x + "_ENABLE_PROFILING" })))
 				Environment.FailFast(null);
 
 			var thread = new Thread(Worker);

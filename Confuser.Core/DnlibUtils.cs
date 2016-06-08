@@ -63,10 +63,11 @@ namespace Confuser.Core {
 		///     Determines whether the specified type is visible outside the containing assembly.
 		/// </summary>
 		/// <param name="typeDef">The type.</param>
+		/// <param name="exeNonPublic">Visibility of executable modules.</param>
 		/// <returns><c>true</c> if the specified type is visible outside the containing assembly; otherwise, <c>false</c>.</returns>
-		public static bool IsVisibleOutside(this TypeDef typeDef) {
+		public static bool IsVisibleOutside(this TypeDef typeDef, bool exeNonPublic = true) {
 			// Assume executable modules' type is not visible
-			if (typeDef.Module.Kind == ModuleKind.Windows || typeDef.Module.Kind == ModuleKind.Console)
+			if (exeNonPublic && (typeDef.Module.Kind == ModuleKind.Windows || typeDef.Module.Kind == ModuleKind.Console))
 				return false;
 
 			do {
@@ -99,6 +100,15 @@ namespace Confuser.Core {
 			return type.IsImport ||
 			       type.HasAttribute("System.Runtime.InteropServices.ComImportAttribute") ||
 			       type.HasAttribute("System.Runtime.InteropServices.TypeLibTypeAttribute");
+		}
+
+		/// <summary>
+		///     Determines whether the specified type is compiler generated.
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns><c>true</c> if specified type is compiler generated; otherwise, <c>false</c>.</returns>
+		public static bool IsCompilerGenerated(this TypeDef type) {
+			return type.HasAttribute("System.Runtime.CompilerServices.CompilerGeneratedAttribute");
 		}
 
 		/// <summary>

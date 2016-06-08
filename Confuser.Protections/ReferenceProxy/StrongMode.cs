@@ -127,6 +127,10 @@ namespace Confuser.Protections.ReferenceProxy {
 			// Replace instruction
 			instr.OpCode = OpCodes.Call;
 			instr.Operand = proxy.Item2;
+
+			var targetDef = target.ResolveMethodDef();
+			if (targetDef != null)
+				ctx.Context.Annotations.Set(targetDef, ReferenceProxyProtection.Targeted, ReferenceProxyProtection.Targeted);
 		}
 
 		void ProcessInvoke(RPContext ctx, int instrIndex, int argBeginIndex) {
@@ -161,6 +165,10 @@ namespace Confuser.Protections.ReferenceProxy {
 				instr.OpCode = OpCodes.Call;
 				instr.Operand = delegateType.FindMethod("Invoke");
 			}
+
+			var targetDef = target.ResolveMethodDef();
+			if (targetDef != null)
+				ctx.Context.Annotations.Set(targetDef, ReferenceProxyProtection.Targeted, ReferenceProxyProtection.Targeted);
 		}
 
 		MethodDef CreateBridge(RPContext ctx, TypeDef delegateType, FieldDef field, MethodSig sig) {
@@ -329,7 +337,7 @@ namespace Confuser.Protections.ReferenceProxy {
 
 		void EncodeField(object sender, ModuleWriterListenerEventArgs e) {
 			var writer = (ModuleWriterBase)sender;
-			if (e.WriterEvent == ModuleWriterEvent.MDMemberDefRidsAllocated) {
+			if (e.WriterEvent == ModuleWriterEvent.MDMemberDefRidsAllocated && keyAttrs != null) {
 				Dictionary<TypeDef, Func<int, int>> keyFuncs = keyAttrs
 					.Where(entry => entry != null)
 					.ToDictionary(entry => entry.Item1, entry => entry.Item2);

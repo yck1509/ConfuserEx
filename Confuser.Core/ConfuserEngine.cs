@@ -77,7 +77,7 @@ namespace Confuser.Core {
 			// 1. Setup context
 			var context = new ConfuserContext();
 			context.Logger = parameters.GetLogger();
-			context.Project = parameters.Project;
+			context.Project = parameters.Project.Clone();
 			context.PackerInitiated = parameters.PackerInitiated;
 			context.token = token;
 
@@ -133,12 +133,12 @@ namespace Confuser.Core {
 				context.Logger.Info("Loading input modules...");
 				marker.Initalize(prots, packers);
 				MarkerResult markings = marker.MarkProject(parameters.Project, context);
-				context.Modules = markings.Modules.ToList().AsReadOnly();
+				context.Modules = new ModuleSorter(markings.Modules).Sort().ToList().AsReadOnly();
 				foreach (var module in context.Modules)
 					module.EnableTypeDefFindCache = false;
-				context.OutputModules = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
-				context.OutputSymbols = Enumerable.Repeat<byte[]>(null, markings.Modules.Count).ToArray();
-				context.OutputPaths = Enumerable.Repeat<string>(null, markings.Modules.Count).ToArray();
+				context.OutputModules = Enumerable.Repeat<byte[]>(null, context.Modules.Count).ToArray();
+				context.OutputSymbols = Enumerable.Repeat<byte[]>(null, context.Modules.Count).ToArray();
+				context.OutputPaths = Enumerable.Repeat<string>(null, context.Modules.Count).ToArray();
 				context.Packer = markings.Packer;
 				context.ExternalModules = markings.ExternalModules;
 
@@ -327,12 +327,25 @@ namespace Confuser.Core {
 			}
 		}
 
+		static void CopyPEHeaders(PEHeadersOptions writerOptions, ModuleDefMD module) {
+			var image = module.MetaData.PEImage;
+			writerOptions.MajorImageVersion = image.ImageNTHeaders.OptionalHeader.MajorImageVersion;
+			writerOptions.MajorLinkerVersion = image.ImageNTHeaders.OptionalHeader.MajorLinkerVersion;
+			writerOptions.MajorOperatingSystemVersion = image.ImageNTHeaders.OptionalHeader.MajorOperatingSystemVersion;
+			writerOptions.MajorSubsystemVersion = image.ImageNTHeaders.OptionalHeader.MajorSubsystemVersion;
+			writerOptions.MinorImageVersion = image.ImageNTHeaders.OptionalHeader.MinorImageVersion;
+			writerOptions.MinorLinkerVersion = image.ImageNTHeaders.OptionalHeader.MinorLinkerVersion;
+			writerOptions.MinorOperatingSystemVersion = image.ImageNTHeaders.OptionalHeader.MinorOperatingSystemVersion;
+			writerOptions.MinorSubsystemVersion = image.ImageNTHeaders.OptionalHeader.MinorSubsystemVersion;
+		}
+
 		static void BeginModule(ConfuserContext context) {
 			context.Logger.InfoFormat("Processing module '{0}'...", context.CurrentModule.Name);
 
 			context.CurrentModuleWriterListener = new ModuleWriterListener();
 			context.CurrentModuleWriterListener.OnWriterEvent += (sender, e) => context.CheckCancellation();
 			context.CurrentModuleWriterOptions = new ModuleWriterOptions(context.CurrentModule, context.CurrentModuleWriterListener);
+			CopyPEHeaders(context.CurrentModuleWriterOptions.PEHeadersOptions, context.CurrentModule);
 
 			if (!context.CurrentModule.IsILOnly || context.CurrentModule.VTableFixups != null)
 				context.RequestNative();

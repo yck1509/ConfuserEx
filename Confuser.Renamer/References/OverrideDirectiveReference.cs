@@ -35,14 +35,23 @@ namespace Confuser.Renamer.References {
 			IMethod target;
 			if (baseSlot.MethodDefDeclType is GenericInstSig) {
 				var declType = (GenericInstSig)baseSlot.MethodDefDeclType;
-				target = new MemberRefUser(method.Module, baseSlot.MethodDef.Name, baseSlot.MethodDef.MethodSig, declType.ToTypeDefOrRef());
-				target = (IMethod)new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(target);
+
+				MemberRef targetRef = new MemberRefUser(method.Module, baseSlot.MethodDef.Name, baseSlot.MethodDef.MethodSig, declType.ToTypeDefOrRef());
+				targetRef = new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(targetRef);
+				service.AddReference(baseSlot.MethodDef, new MemberRefReference(targetRef, baseSlot.MethodDef));
+
+				target = targetRef;
 			}
 			else {
 				target = baseSlot.MethodDef;
-				if (target.Module != method.Module)
+				if (target.Module != method.Module) {
 					target = (IMethod)new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(baseSlot.MethodDef);
+					if (target is MemberRef)
+						service.AddReference(baseSlot.MethodDef, new MemberRefReference((MemberRef)target, baseSlot.MethodDef));
+				}
 			}
+
+			target.MethodSig = new Importer(method.Module, ImporterOptions.TryToUseTypeDefs).Import(method.MethodSig);
 			if (target is MemberRef)
 				AddImportReference(context, service, method.Module, baseSlot.MethodDef, (MemberRef)target);
 

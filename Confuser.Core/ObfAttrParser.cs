@@ -46,6 +46,25 @@ namespace Confuser.Core {
 			return false;
 		}
 
+		bool ReadString(StringBuilder sb) {
+			Expect('\'');
+			while (index < str.Length) {
+				switch (str[index]) {
+					case '\\':
+						sb.Append(str[++index]);
+						break;
+					case '\'':
+						index++;
+						return true;
+					default:
+						sb.Append(str[index]);
+						break;
+				}
+				index++;
+			}
+			return false;
+		}
+
 		void Expect(char chr) {
 			if (str[index] != chr)
 				throw new ArgumentException("Expect '" + chr + "' at position " + (index + 1) + ".");
@@ -64,7 +83,7 @@ namespace Confuser.Core {
 			return index == str.Length;
 		}
 
-		public void ParseProtectionString(ProtectionSettings settings, string str) {
+		public void ParseProtectionString(IDictionary<ConfuserComponent, Dictionary<string, string>> settings, string str) {
 			if (str == null)
 				return;
 
@@ -107,7 +126,7 @@ namespace Confuser.Core {
 
 						var preset = (ProtectionPreset)Enum.Parse(typeof(ProtectionPreset), buffer.ToString(), true);
 						foreach (var item in items.Values.OfType<Protection>().Where(prot => prot.Preset <= preset)) {
-							if (!settings.ContainsKey(item))
+							if (item.Preset != ProtectionPreset.None && settings != null && !settings.ContainsKey(item))
 								settings.Add(item, new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase));
 						}
 						buffer.Length = 0;
@@ -161,8 +180,9 @@ namespace Confuser.Core {
 						buffer.Length = 0;
 
 						Expect('=');
-						if (!ReadId(buffer))
+						if (!(Peek() == '\'' ? ReadString(buffer) : ReadId(buffer)))
 							throw new ArgumentException("Unexpected end of string in ReadParam state.");
+
 						paramValue = buffer.ToString();
 						buffer.Length = 0;
 
@@ -181,12 +201,23 @@ namespace Confuser.Core {
 						break;
 
 					case ParseState.EndItem:
-						if (protAct) {
-							settings[(Protection)items[protId]] = protParams;
-							protParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+						if (settings != null) {
+							if (!items.Contains(protId))
+								throw new KeyNotFoundException("Cannot find protection with id '" + protId + "'.");
+
+							if (protAct) {
+								if (settings.ContainsKey((Protection)items[protId])) {
+									var p = settings[(Protection)items[protId]];
+									foreach (var kvp in protParams)
+										p[kvp.Key] = kvp.Value;
+								}
+								else
+									settings[(Protection)items[protId]] = protParams;
+							}
+							else
+								settings.Remove((Protection)items[protId]);
 						}
-						else
-							settings.Remove((Protection)items[protId]);
+						protParams = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
 						if (IsEnd())
 							state = ParseState.End;
@@ -221,7 +252,11 @@ namespace Confuser.Core {
 					case ParseState.ReadItemName:
 						ReadId(buffer);
 
-						packer = (Packer)items[buffer.ToString()];
+						var packerId = buffer.ToString();
+						if (!items.Contains(packerId))
+							throw new KeyNotFoundException("Cannot find packer with id '" + packerId + "'.");
+
+						packer = (Packer)items[packerId];
 						buffer.Length = 0;
 
 						if (IsEnd() || Peek() == ';')

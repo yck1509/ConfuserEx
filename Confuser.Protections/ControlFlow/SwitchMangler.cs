@@ -118,6 +118,10 @@ namespace Confuser.Protections.ControlFlow {
 			var statements = new LinkedList<Instruction[]>();
 			var currentStatement = new List<Instruction>();
 
+			// Instructions that must be included in the ccurrent statement to ensure all outgoing
+			// branches have stack = 0
+			var requiredInstr = new HashSet<Instruction>();
+
 			for (int i = 0; i < block.Instructions.Count; i++) {
 				Instruction instr = block.Instructions[i];
 				currentStatement.Add(instr);
@@ -129,9 +133,19 @@ namespace Confuser.Protections.ControlFlow {
 					case FlowControl.Return:
 					case FlowControl.Throw:
 						shouldSpilt = true;
+						if (trace.AfterStack[instr.Offset] != 0) {
+							if (instr.Operand is Instruction)
+								requiredInstr.Add((Instruction)instr.Operand);
+							else if (instr.Operand is Instruction[]) {
+								foreach (var target in (Instruction[])instr.Operand)
+									requiredInstr.Add(target);
+							}
+						}
 						break;
 				}
-				if ((instr.OpCode.OpCodeType != OpCodeType.Prefix && trace.AfterStack[instr.Offset] == 0) &&
+				requiredInstr.Remove(instr);
+				if ((instr.OpCode.OpCodeType != OpCodeType.Prefix && trace.AfterStack[instr.Offset] == 0 &&
+				     requiredInstr.Count == 0) &&
 				    (shouldSpilt || ctx.Intensity > ctx.Random.NextDouble())) {
 					statements.AddLast(currentStatement.ToArray());
 					currentStatement.Clear();

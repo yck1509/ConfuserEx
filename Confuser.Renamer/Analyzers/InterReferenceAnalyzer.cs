@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Confuser.Core;
 using Confuser.Renamer.References;
 using dnlib.DotNet;
@@ -12,14 +13,9 @@ namespace Confuser.Renamer.Analyzers {
 			var module = def as ModuleDefMD;
 			if (module == null) return;
 
-			MDTable table;
-			uint len;
-
 			// MemberRef/MethodSpec
-			table = module.TablesStream.Get(Table.Method);
-			len = table.Rows;
-			for (uint i = 1; i <= len; i++) {
-				MethodDef methodDef = module.ResolveMethod(i);
+			var methods = module.GetTypes().SelectMany(type => type.Methods);
+			foreach(var methodDef in methods) {
 				foreach (var ov in methodDef.Overrides) {
 					ProcessMemberRef(context, service, module, ov.MethodBody);
 					ProcessMemberRef(context, service, module, ov.MethodDeclaration);
@@ -34,8 +30,8 @@ namespace Confuser.Renamer.Analyzers {
 			}
 
 			// TypeRef
-			table = module.TablesStream.Get(Table.TypeRef);
-			len = table.Rows;
+			var table = module.TablesStream.Get(Table.TypeRef);
+			uint len = table.Rows;
 			for (uint i = 1; i <= len; i++) {
 				TypeRef typeRef = module.ResolveTypeRef(i);
 
