@@ -83,7 +83,7 @@ namespace Confuser.Core {
 				throw new ConfuserException(ex);
 			}
 
-			context.OutputModules = new[] { File.ReadAllBytes(Path.Combine(outDir, fileName)) };
+			context.OutputModules = new[] { File.ReadAllBytes(Path.Combine(tmpDir, fileName)) };
 			context.OutputPaths = new[] { fileName };
 		}
 	}
