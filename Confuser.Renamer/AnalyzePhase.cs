@@ -157,6 +157,21 @@ namespace Confuser.Renamer {
 				service.SetCanRename(type, false);
 			}
 
+			/*
+			 * Can't rename Classes/Types that will be serialized
+			 */
+			if(type != null) {
+				if (type.IsSerializable) {
+					service.SetCanRename(type, false);
+				}
+
+				if (type.DeclaringType != null) {
+					if (type.DeclaringType.IsSerializable) {
+						service.SetCanRename(type, false);
+					}
+				}
+			}
+
 			if (parameters.GetParameter(context, type, "forceRen", false))
 				return;
 
@@ -200,8 +215,29 @@ namespace Confuser.Renamer {
 			else if (parameters.GetParameter(context, field, "forceRen", false))
 				return;
 
-			else if (field.DeclaringType.IsSerializable && !field.IsNotSerialized)
+			/*
+			 * System.Xml.Serialization.XmlSerializer
+			 * 
+			 * XmlSerializer by default serializes fields marked with [NonSerialized]
+			 * This is a work-around that causes all fields in a class marked [Serializable]
+			 * to _not_ be renamed, unless marked with [XmlIgnoreAttribute]
+			 * 
+			 * If we have a way to detect which serializer method the code is going to use
+			 * for the class, or if Microsoft makes XmlSerializer respond to [NonSerialized]
+			 * we'll have a more accurate way to achieve this.
+			 */
+			else if (field.DeclaringType.IsSerializable) // && !field.IsNotSerialized)
 				service.SetCanRename(field, false);
+
+			else if (field.DeclaringType.IsSerializable && (field.CustomAttributes.IsDefined("XmlIgnore")
+														|| field.CustomAttributes.IsDefined("XmlIgnoreAttribute")
+														|| field.CustomAttributes.IsDefined("System.Xml.Serialization.XmlIgnore")
+														|| field.CustomAttributes.IsDefined("System.Xml.Serialization.XmlIgnoreAttribute")
+														|| field.CustomAttributes.IsDefined("T:System.Xml.Serialization.XmlIgnoreAttribute"))) // Can't seem to detect CustomAttribute
+				service.SetCanRename(field, true);
+			/*
+			 * End of XmlSerializer work-around
+			 */
 
 			else if (field.IsLiteral && field.DeclaringType.IsEnum &&
 				!parameters.GetParameter(context, field, "renEnum", false))
