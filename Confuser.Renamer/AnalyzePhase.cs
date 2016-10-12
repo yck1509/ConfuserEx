@@ -255,7 +255,31 @@ namespace Confuser.Renamer {
 			else if (parameters.GetParameter(context, property, "forceRen", false))
 				return;
 
-			else if (property.DeclaringType.Implements("System.ComponentModel.INotifyPropertyChanged"))
+            /*
+             * System.Xml.Serialization.XmlSerializer
+             * 
+             * XmlSerializer by default serializes fields marked with [NonSerialized]
+             * This is a work-around that causes all fields in a class marked [Serializable]
+             * to _not_ be renamed, unless marked with [XmlIgnoreAttribute]
+             * 
+             * If we have a way to detect which serializer method the code is going to use
+             * for the class, or if Microsoft makes XmlSerializer respond to [NonSerialized]
+             * we'll have a more accurate way to achieve this.
+             */
+            else if (property.DeclaringType.IsSerializable) // && !field.IsNotSerialized)
+                service.SetCanRename(property, false);
+
+            else if (property.DeclaringType.IsSerializable && (property.CustomAttributes.IsDefined("XmlIgnore")
+                                                        || property.CustomAttributes.IsDefined("XmlIgnoreAttribute")
+                                                        || property.CustomAttributes.IsDefined("System.Xml.Serialization.XmlIgnore")
+                                                        || property.CustomAttributes.IsDefined("System.Xml.Serialization.XmlIgnoreAttribute")
+                                                        || property.CustomAttributes.IsDefined("T:System.Xml.Serialization.XmlIgnoreAttribute"))) // Can't seem to detect CustomAttribute
+                service.SetCanRename(property, true);
+            /*
+			 * End of XmlSerializer work-around
+			 */
+
+            else if (property.DeclaringType.Implements("System.ComponentModel.INotifyPropertyChanged"))
 				service.SetCanRename(property, false);
 
 			else if (property.DeclaringType.Name.String.Contains("AnonymousType"))
