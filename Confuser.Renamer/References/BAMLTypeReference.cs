@@ -19,7 +19,10 @@ namespace Confuser.Renamer.References {
 		}
 
 		public bool ShouldCancelRename() {
-			return false;
+			// For GenericInstSig we will have sig.ReflectionFullName refer to the old
+			// (unobfuscated) name, even if it should be obfuscated. Thus #424 created. If fixed,
+			// this line could be replaced with return false; as it was before.
+			return sig is GenericInstSig;
 		}
 	}
 }
