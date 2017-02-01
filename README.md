@@ -30,7 +30,7 @@ The format of project file can be found in docs\ProjectFormat.md
 
 Bug Report
 ----------
-See the [Issues Report](http://yck1509.github.io/ConfuserEx/issues/) section of website.
+See the [Issues Report](https://github.com/CubeCoders/ConfuserEx-Reborn/issues) section of website.
 
 
 License
@@ -39,5 +39,6 @@ See LICENSE file for details.
 
 Credits
 -------
+**[yck1509](https://github.com/yck1509/ConfuserEx)** for the original ConfuserEx
 **[0xd4d](https://github.com/0xd4d)** for his awesome work and extensive knowledge!  
 Members of **[Black Storm Forum](http://board.b-at-s.info/)** for their help!
