@@ -1,7 +1,9 @@
-ConfuserEx
+ConfuserEx-Reborn
 ========
 ConfuserEx is a open-source protector for .NET applications.
 It is the successor of [Confuser](http://confuser.codeplex.com) project.
+
+ConfuserEx-Reborn is a continuation of the ConfuserEx project including fixes and tweaks from other users and community members.
 
 Features
 --------
