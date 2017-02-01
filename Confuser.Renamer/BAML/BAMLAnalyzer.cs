@@ -503,16 +503,27 @@ namespace Confuser.Renamer.BAML {
 				if (declType == "System.Windows.ResourceDictionary") {
 					var src = rec.Value.ToUpperInvariant();
 					if (src.EndsWith(".BAML") || src.EndsWith(".XAML")) {
-						var match = WPFAnalyzer.UriPattern.Match(src);
-						if (match.Success)
-							src = match.Groups[1].Value;
-						else if (rec.Value.Contains("/"))
-							context.Logger.WarnFormat("Fail to extract XAML name from '{0}'.", rec.Value);
+						// Relative address
+						if (src.StartsWith("../")) {
+							var oldSrc = src;
+							var fake_domain = "http://Confuser.Ex/";
+							var uri = new Uri(fake_domain + CurrentBAMLName + "/../" + src);
+							src = uri.ToString().Substring(fake_domain.Length);
 
-						if (!src.Contains("//")) {
-							var rel = new Uri(new Uri(packScheme + "application:,,,/" + CurrentBAMLName), src);
-							src = rel.LocalPath;
+							context.Logger.InfoFormat("Convert [{0}] at [{1}] to [{2}].", oldSrc, CurrentBAMLName, src);
+						} else {
+							var match = WPFAnalyzer.UriPattern.Match(src);
+							if (match.Success)
+								src = match.Groups[1].Value;
+							else if (rec.Value.Contains("/"))
+								context.Logger.WarnFormat("[BAML] Fail to extract XAML name from '{0}'.", rec.Value);
+
+							if (!src.Contains("//")) {
+								var rel = new Uri(new Uri(packScheme + "application:,,,/" + CurrentBAMLName), src);
+								src = rel.LocalPath;
+							}
 						}
+
 						var reference = new BAMLPropertyReference(rec);
 						src = src.TrimStart('/');
 						var baml = src.Substring(0, src.Length - 5) + ".BAML";
