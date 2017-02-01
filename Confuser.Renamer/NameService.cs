@@ -205,7 +205,9 @@ namespace Confuser.Renamer {
 		public string ObfuscateName(string name, RenameMode mode) {
 			string newName = null;
 			int? count;
-			name = ParseGenericName(name, out count);
+
+            var fullName = name;
+            name = ParseGenericName(name, out count);
 
 			if (string.IsNullOrEmpty(name))
 				return string.Empty;
@@ -221,8 +223,8 @@ namespace Confuser.Renamer {
 				return MakeGenericName(newName, count);
 			}
 
-			if (nameMap1.ContainsKey(name))
-				return nameMap1[name];
+			if (nameMap1.ContainsKey(fullName))
+				return nameMap1[fullName];
 
 			byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
 			for (int i = 0; i < 100; i++) {
@@ -233,8 +235,8 @@ namespace Confuser.Renamer {
 			}
 
 			if ((mode & RenameMode.Decodable) != 0) {
-				nameMap2[newName] = name;
-				nameMap1[name] = newName;
+				nameMap2[newName] = fullName;
+				nameMap1[fullName] = newName;
 			}
 
 			return MakeGenericName(newName, count);
