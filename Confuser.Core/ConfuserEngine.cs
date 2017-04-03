@@ -372,6 +372,16 @@ namespace Confuser.Core {
 		}
 
 		static void EndModule(ConfuserContext context) {
+			
+			foreach (var module in context.Modules)
+                              foreach (var type in module.Types)
+                                   for (int i = type.CustomAttributes.Count - 1; i > -1; --i)
+                                   {
+                                          var attribute = type.CustomAttributes[i];
+                                          if (attribute.AttributeType.FullName == "System.Diagnostics.DebuggerDisplayAttribute")
+                                                  type.CustomAttributes.Remove(attribute);
+                                   }	
+			
 			string output = context.Modules[context.CurrentModuleIndex].Location;
 			if (output != null) {
 				if (!Path.IsPathRooted(output))
