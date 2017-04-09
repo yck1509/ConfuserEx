@@ -150,7 +150,7 @@ namespace Confuser.Protections.ReferenceProxy {
 						continue;
 					// No instance value type methods
 					if (declType.IsValueType && operand.MethodSig.HasThis)
-						return;
+						continue;
 					// No prefixed call
 					if (i - 1 >= 0 && ctx.Body.Instructions[i - 1].OpCode.OpCodeType == OpCodeType.Prefix)
 						continue;
