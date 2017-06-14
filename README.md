@@ -1,12 +1,12 @@
-ConfuserEx
+ConfuserEx-Reborn
 ========
-ConfuserEx is a open-source protector for .NET applications.
-It is the successor of [Confuser](http://confuser.codeplex.com) project.
+ConfuserEx-Reborn is the continuation of and replacement for the original ConfuserEx project. ConfuserEx Reborn is an open-source obfuscator and protector for C#/.NET applications. It including fixes and tweaks from other users and community members.
 
 Features
 --------
 * Supports .NET Framework 2.0/3.0/3.5/4.0/4.5
-* Symbol renaming (Support WPF/BAML)
+* Supports Mono (Some feature restrictions apply)
+* Symbol renaming (Support WPF/XAML/BAML)
 * Protection against debuggers/profilers
 * Protection against memory dumping
 * Protection against tampering (method encryption)
@@ -28,8 +28,7 @@ The format of project file can be found in docs\ProjectFormat.md
 
 Bug Report
 ----------
-See the [Issues Report](http://yck1509.github.io/ConfuserEx/issues/) section of website.
-
+See the [Issues Report](https://github.com/CubeCoders/ConfuserEx-Reborn/issues) section of website.
 
 License
 -------
@@ -37,5 +36,6 @@ See LICENSE file for details.
 
 Credits
 -------
-**[0xd4d](https://github.com/0xd4d)** for his awesome work and extensive knowledge!  
-Members of **[Black Storm Forum](http://board.b-at-s.info/)** for their help!
+* **[yck1509](https://github.com/yck1509/ConfuserEx)** for the original ConfuserEx
+* **[0xd4d](https://github.com/0xd4d)** for his awesome work and extensive knowledge!  
+* Members of **[Black Storm Forum](http://board.b-at-s.info/)** for their help!

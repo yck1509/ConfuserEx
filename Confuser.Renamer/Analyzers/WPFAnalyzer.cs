@@ -177,7 +177,7 @@ namespace Confuser.Renamer.Analyzers {
 						if (match.Success)
 							operand = match.Groups[1].Value;
 						else if (operand.Contains("/"))
-							context.Logger.WarnFormat("Fail to extract XAML name from '{0}'.", instr.Operand);
+							context.Logger.WarnFormat("[WPF] Fail to extract XAML name from '{0}'.", instr.Operand);
 
 						var reference = new BAMLStringReference(instr);
 						operand = operand.TrimStart('/');
