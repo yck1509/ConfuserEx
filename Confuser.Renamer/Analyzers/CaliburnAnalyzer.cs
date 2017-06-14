@@ -45,7 +45,7 @@ namespace Confuser.Renamer.Analyzers {
 				else if (attr.Item1 != null)
 					attrName = attr.Item1.Name;
 
-				if (attrName == "Attach")
+				if (attrName == "Attach" || (attrName == "Value" && prop.Value.Contains("Action")))
 					AnalyzeMessageAttach(analyzer, attr, prop.Value);
 
 				if (attrName == "Name")
@@ -60,7 +60,7 @@ namespace Confuser.Renamer.Analyzers {
 			if (attr.Item2 == null)
 				return;
 			var attrDeclType = analyzer.ResolveType(attr.Item2.OwnerTypeId);
-			if (attrDeclType.FullName != "Caliburn.Micro.Message")
+			if (attrDeclType.FullName != "Caliburn.Micro.Message" && attrDeclType.FullName != "System.Windows.Setter")
 				return;
 
 			foreach (var msg in value.Split(';')) {
