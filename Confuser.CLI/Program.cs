@@ -67,8 +67,10 @@ namespace Confuser.CLI {
 						WriteLineWithColor(ConsoleColor.Red, ex.ToString());
 						return -1;
 					}
+                    if (outDir != null)
+                        proj.OutputDirectory = outDir;
 
-					parameters.Project = proj;
+                    parameters.Project = proj;
 				}
 				else {
 					if (string.IsNullOrEmpty(outDir)) {
