@@ -1,9 +1,9 @@
-ConfuserEx
+Neo-ConfuserEx
 ========
-ConfuserEx is a open-source protector for .NET applications.
-It is the successor of [Confuser](http://confuser.codeplex.com) project.
+Neo-ConfuserEx is an open-source protector for .NET applications. 
+It is the successor of [ConfuserEx](https://yck1509.github.io/ConfuserEx/) project.
 
-Features
+Original Features
 --------
 * Supports .NET Framework 2.0/3.0/3.5/4.0/4.5
 * Symbol renaming (Support WPF/BAML)
@@ -28,7 +28,7 @@ The format of project file can be found in docs\ProjectFormat.md
 
 Bug Report
 ----------
-See the [Issues Report](http://yck1509.github.io/ConfuserEx/issues/) section of website.
+See the [Issues Report](https://github.com/XenocodeRCE/neo-ConfuserEx/issues) section of website.
 
 
 License
@@ -37,5 +37,6 @@ See LICENSE file for details.
 
 Credits
 -------
+**[yck1509](https://github.com/yck1509)** the one and only, original coder of [ConfuserEx](https://yck1509.github.io/ConfuserEx/)
 **[0xd4d](https://github.com/0xd4d)** for his awesome work and extensive knowledge!  
 Members of **[Black Storm Forum](http://board.b-at-s.info/)** for their help!
