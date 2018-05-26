@@ -3,6 +3,16 @@ Neo-ConfuserEx
 Neo-ConfuserEx is an open-source protector for .NET applications. 
 It is the successor of [ConfuserEx](https://yck1509.github.io/ConfuserEx/) project.
 
+New Features
+--------
+**TODO_:**
+* [] Merge pull requests from original [ConfuserEx](https://yck1509.github.io/ConfuserEx/) repository project.
+* [] Update to prevent public tools from working.
+* [] Add a solid maths interpreter
+* [] A little bit of native protection ?
+* [] Wait and see suggestions ;-)
+
+
 Original Features
 --------
 * Supports .NET Framework 2.0/3.0/3.5/4.0/4.5
