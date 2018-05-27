@@ -13,7 +13,7 @@ namespace Confuser.CLI {
 			ConsoleColor original = Console.ForegroundColor;
 			Console.ForegroundColor = ConsoleColor.White;
 			string originalTitle = Console.Title;
-			Console.Title = "ConfuserEx";
+			Console.Title = "Neo-ConfuserEx";
 			try {
 				bool noPause = false;
 				bool debug = false;

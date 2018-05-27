@@ -36,3 +36,7 @@ gh-pages/
 GlobalAssemblyInfo.cs
 /Build/*.zip
 !Build/7z.exe
+.vs/Confuser2/v15/Server/sqlite3/db.lock
+.vs/Confuser2/v15/Server/sqlite3/storage.ide
+.vs/Confuser2/v15/Server/sqlite3/storage.ide-shm
+.vs/Confuser2/v15/Server/sqlite3/storage.ide-wal
