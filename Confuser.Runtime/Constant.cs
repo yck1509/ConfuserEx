@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Reflection;
 
 namespace Confuser.Runtime {
 	internal static class Constant {
@@ -40,31 +41,38 @@ namespace Confuser.Runtime {
 		}
 
 		static T Get<T>(uint id) {
-			id = (uint)Mutation.Placeholder((int)id);
-			uint t = id >> 30;
+            if (Assembly.GetExecutingAssembly() == Assembly.GetCallingAssembly())
+            {
+                id = (uint)Mutation.Placeholder((int)id);
+                uint t = id >> 30;
 
-			T ret = default(T);
-			id &= 0x3fffffff;
-			id <<= 2;
+                T ret = default(T);
+                id &= 0x3fffffff;
+                id <<= 2;
 
-			if (t == Mutation.KeyI0) {
-				int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
-				ret = (T)(object)string.Intern(Encoding.UTF8.GetString(b, (int)id, l));
-			}
-			// NOTE: Assume little-endian
-			else if (t == Mutation.KeyI1) {
-				var v = new T[1];
-				Buffer.BlockCopy(b, (int)id, v, 0, Mutation.Value<int>());
-				ret = v[0];
-			}
-			else if (t == Mutation.KeyI2) {
-				int s = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
-				int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
-				Array v = Array.CreateInstance(typeof(T).GetElementType(), l);
-				Buffer.BlockCopy(b, (int)id, v, 0, s - 4);
-				ret = (T)(object)v;
-			}
-			return ret;
+                if (t == Mutation.KeyI0)
+                {
+                    int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
+                    ret = (T)(object)string.Intern(Encoding.UTF8.GetString(b, (int)id, l));
+                }
+                // NOTE: Assume little-endian
+                else if (t == Mutation.KeyI1)
+                {
+                    var v = new T[1];
+                    Buffer.BlockCopy(b, (int)id, v, 0, Mutation.Value<int>());
+                    ret = v[0];
+                }
+                else if (t == Mutation.KeyI2)
+                {
+                    int s = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
+                    int l = b[id++] | (b[id++] << 8) | (b[id++] << 16) | (b[id++] << 24);
+                    Array v = Array.CreateInstance(typeof(T).GetElementType(), l);
+                    Buffer.BlockCopy(b, (int)id, v, 0, s - 4);
+                    ret = (T)(object)v;
+                }
+                return ret;
+            }
+            return default(T);
 		}
 	}
 
