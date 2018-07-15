@@ -14,7 +14,7 @@ using dnlib.DotNet.Writer;
 using MethodBody = dnlib.DotNet.Writer.MethodBody;
 
 namespace Confuser.Protections.AntiTamper {
-	internal class NormalMode : IModeHandler {
+	internal class AntiMode : IModeHandler {
 		uint c;
 		IKeyDeriver deriver;
 
@@ -47,7 +47,7 @@ namespace Confuser.Protections.AntiTamper {
 			deriver.Init(context, random);
 
 			var rt = context.Registry.GetService<IRuntimeService>();
-			TypeDef initType = rt.GetRuntimeType("Confuser.Runtime.AntiTamperNormal");
+			TypeDef initType = rt.GetRuntimeType("Confuser.Runtime.AntiTamperAnti");
 			IEnumerable<IDnlibDef> members = InjectHelper.Inject(initType, context.CurrentModule.GlobalType, context.CurrentModule);
 			var initMethod = (MethodDef)members.Single(m => m.Name == "Initialize");
 
