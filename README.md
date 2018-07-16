@@ -8,6 +8,7 @@ New Features
 **WHATS NEW?**
 * [x] Updated Constants encoding
 * [x] Added new Antitamper mode
+* [x] Added new feature : Type Scrambler
 * [x] Merged Pull-Requests from original ConfuserEX repo
 
 Original Features
