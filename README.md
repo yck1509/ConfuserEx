@@ -5,13 +5,10 @@ It is the successor of [ConfuserEx](https://yck1509.github.io/ConfuserEx/) proje
 
 New Features
 --------
-**TODO_:**
-* [ ] Merge pull requests from original [ConfuserEx](https://yck1509.github.io/ConfuserEx/) repository project.
-* [ ] Update to prevent public tools from working.
-* [ ] Add a solid maths interpreter
-* [ ] A little bit of native protection ?
-* [ ] Wait and see suggestions ;-)
-
+**WHATS NEW?**
+* [x] Updated Constants encoding
+* [x] Added new Antitamper mode
+* [x] Merged Pull-Requests from original ConfuserEX repo
 
 Original Features
 --------
@@ -27,7 +24,6 @@ Original Features
 * Embedding dependency
 * Compressing output
 * Extensible plugin API
-* Many more are coming!
 
 Usage
 -----
@@ -48,5 +44,7 @@ See LICENSE file for details.
 Credits
 -------
 **[yck1509](https://github.com/yck1509)** the one and only, original coder of [ConfuserEx](https://yck1509.github.io/ConfuserEx/)
+
 **[0xd4d](https://github.com/0xd4d)** for his awesome work and extensive knowledge!  
+
 Members of **[Black Storm Forum](http://board.b-at-s.info/)** for their help!
