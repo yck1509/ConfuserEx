@@ -389,7 +389,7 @@ namespace Confuser.Core {
 
 			MemoryStream pdb = null, output = new MemoryStream();
 
-			if (context.CurrentModule.PdbState != null) {
+            if (context.CurrentModule.PdbState != null) {
 				pdb = new MemoryStream();
 				context.CurrentModuleWriterOptions.WritePdb = true;
 				context.CurrentModuleWriterOptions.PdbFileName = Path.ChangeExtension(Path.GetFileName(context.OutputPaths[context.CurrentModuleIndex]), "pdb");

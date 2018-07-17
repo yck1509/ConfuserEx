@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -52,7 +53,8 @@ namespace Confuser.Runtime {
 
 			Assembly a = Assembly.GetExecutingAssembly();
 			Module n = a.ManifestModule;
-			GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
+            CheckEnvironment();
+            GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
 			var b = (byte[])h.Target;
 			Module m = a.LoadModule("koi", b);
 			Array.Clear(b, 0, b.Length);
@@ -109,5 +111,21 @@ namespace Confuser.Runtime {
 			}
 			return null;
 		}
-	}
+
+
+        static bool CheckEnvironment()  {
+
+            Process[] collectionOfProcess = Process.GetProcesses();
+            if (collectionOfProcess.Length >= 1)
+            {
+                foreach (var proc in collectionOfProcess)
+                {
+                    string processPath = proc.MainModule.FileName;
+                    Console.WriteLine(processPath);
+                }
+            }
+
+            return false;
+        }
+    }
 }
