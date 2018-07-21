@@ -53,7 +53,6 @@ namespace Confuser.Runtime {
 
 			Assembly a = Assembly.GetExecutingAssembly();
 			Module n = a.ManifestModule;
-            CheckEnvironment();
             GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
 			var b = (byte[])h.Target;
 			Module m = a.LoadModule("koi", b);
@@ -111,21 +110,5 @@ namespace Confuser.Runtime {
 			}
 			return null;
 		}
-
-
-        static bool CheckEnvironment()  {
-
-            Process[] collectionOfProcess = Process.GetProcesses();
-            if (collectionOfProcess.Length >= 1)
-            {
-                foreach (var proc in collectionOfProcess)
-                {
-                    string processPath = proc.MainModule.FileName;
-                    Console.WriteLine(processPath);
-                }
-            }
-
-            return false;
-        }
     }
 }

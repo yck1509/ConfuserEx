@@ -40,3 +40,8 @@ GlobalAssemblyInfo.cs
 .vs/Confuser2/v15/Server/sqlite3/storage.ide
 .vs/Confuser2/v15/Server/sqlite3/storage.ide-shm
 .vs/Confuser2/v15/Server/sqlite3/storage.ide-wal
+dbg/dbg.csproj
+dbg/Program.cs
+dbg/app.config
+dbg/Properties/AssemblyInfo.cs
+Confuser2.sln

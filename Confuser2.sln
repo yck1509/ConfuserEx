@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confuser.Core", "Confuser.Core\Confuser.Core.csproj", "{BEB67A6E-4C54-4DE5-8C6B-2C12F44A7B92}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dnlib", "dnlib\src\dnlib.csproj", "{FDFC1237-143F-4919-8318-4926901F4639}"
@@ -25,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confuser.Runtime", "Confuse
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfuserEx", "ConfuserEx\ConfuserEx.csproj", "{B5205EBA-EC32-4C53-86A0-FAEEE7393EC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dbg", "dbg\dbg.csproj", "{0725F09F-BD84-49AA-85CB-70CB1E075CBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,8 +68,15 @@ Global
 		{B5205EBA-EC32-4C53-86A0-FAEEE7393EC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5205EBA-EC32-4C53-86A0-FAEEE7393EC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5205EBA-EC32-4C53-86A0-FAEEE7393EC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0725F09F-BD84-49AA-85CB-70CB1E075CBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0725F09F-BD84-49AA-85CB-70CB1E075CBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0725F09F-BD84-49AA-85CB-70CB1E075CBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0725F09F-BD84-49AA-85CB-70CB1E075CBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {56700086-C022-4E57-B881-718D552F0912}
 	EndGlobalSection
 EndGlobal
