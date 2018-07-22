@@ -17,9 +17,8 @@ Please have a look at our [WIKI](https://github.com/XenocodeRCE/neo-ConfuserEx/w
 
 Obfuscation Features
 --------
-* Supports .NET Framework 2.0/3.0/3.5/4.0/4.5
+* Supports .NET Framework 2.0/3.0/3.5/4.0/4.5 and up to 4.7.2
 * Symbol renaming (Support WPF/BAML)
-
 * Protection against **debuggers/profilers**
 * Protection against **memory dumping**
 * Protection against **tampering (method encryption)**
