@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Confuser.Runtime", "Confuse
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfuserEx", "ConfuserEx\ConfuserEx.csproj", "{B5205EBA-EC32-4C53-86A0-FAEEE7393EC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{E98490BB-63E5-492D-B14E-304DE928F81A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +68,10 @@ Global
 		{B5205EBA-EC32-4C53-86A0-FAEEE7393EC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5205EBA-EC32-4C53-86A0-FAEEE7393EC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5205EBA-EC32-4C53-86A0-FAEEE7393EC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E98490BB-63E5-492D-B14E-304DE928F81A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E98490BB-63E5-492D-B14E-304DE928F81A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E98490BB-63E5-492D-B14E-304DE928F81A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E98490BB-63E5-492D-B14E-304DE928F81A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
