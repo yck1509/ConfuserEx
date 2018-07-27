@@ -31,9 +31,14 @@ namespace Confuser.Protections.TypeScramble.Scrambler {
 
         public override void Scan() {
 
-            foreach (var v in TargetMethod.Body.Variables) {
-                RegisterGeneric(v.Type);
+             if (TargetMethod.HasBody)
+            {
+                foreach (var v in TargetMethod.Body.Variables)
+                {
+                    RegisterGeneric(v.Type);
+                }
             }
+            
             if (TargetMethod.ReturnType != TargetMethod.Module.CorLibTypes.Void) {
                 RegisterGeneric(TargetMethod.ReturnType);
             }
@@ -59,8 +64,12 @@ namespace Confuser.Protections.TypeScramble.Scrambler {
                 TargetMethod.GenericParameters.Add(generic);
             }
 
-            foreach (var v in TargetMethod.Body.Variables) {
-                v.Type = ConvertToGenericIfAvalible(v.Type);
+             if (TargetMethod.HasBody)
+            {
+                foreach (var v in TargetMethod.Body.Variables)
+                {
+                    v.Type = ConvertToGenericIfAvalible(v.Type);
+                }
             }
 
             foreach (var p in TargetMethod.Parameters) {
