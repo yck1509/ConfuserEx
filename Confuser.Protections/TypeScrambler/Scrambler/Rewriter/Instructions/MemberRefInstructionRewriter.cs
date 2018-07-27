@@ -28,6 +28,10 @@ namespace Confuser.Protections.TypeScramble.Scrambler.Rewriter.Instructions {
         public override void ProcessOperand(TypeService service, MethodDef method, IList<Instruction> body, ref int index, MemberRef operand) {
 
             ScannedMethod current = service.GetItem(method.MDToken) as ScannedMethod;
+             
+            if (operand.MethodSig == null)
+                return;
+            
             if (operand.MethodSig.Params.Count > 0 || current == null || body[index].OpCode != OpCodes.Newobj) {
                 return;
             }
