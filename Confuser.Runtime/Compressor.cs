@@ -45,7 +45,8 @@ namespace Confuser.Runtime {
 			}
 			return g;
 		}
-
+  [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        static extern bool CheckRemoteDebuggerPresent(IntPtr hProcess, ref bool isDebuggerPresent);
 		[STAThread]
 		static int Main(string[] args) {
 			var l = (uint)Mutation.KeyI0;
@@ -55,6 +56,9 @@ namespace Confuser.Runtime {
 			Module n = a.ManifestModule;
             GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
 			var b = (byte[])h.Target;
+			bool isDebuggerPresent = false;
+			      CheckRemoteDebuggerPresent(Process.GetCurrentProcess().Handle, ref isDebuggerPresent);
+            if (isDebuggerPresent) Environment.FailFast(null);
             Module m = a.LoadModule("koi", b);
             
             Array.Clear(b, 0, b.Length);
