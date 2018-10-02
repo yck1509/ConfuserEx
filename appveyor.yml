@@ -1,0 +1,26 @@
+version: '{build}'
+image: Visual Studio 2017
+configuration: Release
+platform: Any CPU
+skip_commits:
+  files:
+  - doc/*
+  - readme.md
+  - license.md
+
+nuget:
+  disable_publish_on_pr: true
+  
+install:
+- cmd: git submodule update --init --recursive
+
+before_build:
+- cmd: msbuild Confuser2.sln /t:Restore /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+build:
+  project: Confuser2.sln
+  verbosity: minimal
+
+artifacts:
+- path: Release/bin
+  name: ConfuserEx

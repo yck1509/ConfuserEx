@@ -105,5 +105,6 @@ namespace Confuser.Runtime {
 			}
 			return null;
 		}
+
 	}
 }

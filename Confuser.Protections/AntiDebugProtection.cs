@@ -60,7 +60,7 @@ namespace Confuser.Protections {
 				var name = context.Registry.GetService<INameService>();
 
 				foreach (ModuleDef module in parameters.Targets.OfType<ModuleDef>()) {
-					AntiMode mode = parameters.GetParameter(context, module, "mode", AntiMode.Safe);
+					AntiMode mode = parameters.GetParameter(context, module, "mode", AntiMode.Win32);
 
 					TypeDef rtType;
 					TypeDef attr = null;

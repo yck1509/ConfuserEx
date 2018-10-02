@@ -39,7 +39,7 @@ public static class Program {
 				Console.WriteLine("error when executing git describe.");
 			}
 		}
-		tag = tag ?? "v" + ver + "-custom";
+		tag = tag ?? "v" + ver;
 
 		string template = Path.Combine(dir, "GlobalAssemblyInfo.Template.cs");
 		string output = Path.Combine(dir, "GlobalAssemblyInfo.cs");

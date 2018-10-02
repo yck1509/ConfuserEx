@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -44,7 +45,8 @@ namespace Confuser.Runtime {
 			}
 			return g;
 		}
-
+  [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        static extern bool CheckRemoteDebuggerPresent(IntPtr hProcess, ref bool isDebuggerPresent);
 		[STAThread]
 		static int Main(string[] args) {
 			var l = (uint)Mutation.KeyI0;
@@ -52,10 +54,14 @@ namespace Confuser.Runtime {
 
 			Assembly a = Assembly.GetExecutingAssembly();
 			Module n = a.ManifestModule;
-			GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
+            GCHandle h = Decrypt(q, (uint)Mutation.KeyI1);
 			var b = (byte[])h.Target;
-			Module m = a.LoadModule("koi", b);
-			Array.Clear(b, 0, b.Length);
+			bool isDebuggerPresent = false;
+			      CheckRemoteDebuggerPresent(Process.GetCurrentProcess().Handle, ref isDebuggerPresent);
+            if (isDebuggerPresent) Environment.FailFast(null);
+            Module m = a.LoadModule("koi", b);
+            
+            Array.Clear(b, 0, b.Length);
 			h.Free();
 			Array.Clear(q, 0, q.Length);
 
@@ -109,5 +115,5 @@ namespace Confuser.Runtime {
 			}
 			return null;
 		}
-	}
+    }
 }

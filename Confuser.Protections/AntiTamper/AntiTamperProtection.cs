@@ -65,13 +65,16 @@ namespace Confuser.Protections {
 				if (!parameters.Targets.Any())
 					return;
 
-				Mode mode = parameters.GetParameter(context, context.CurrentModule, "mode", Mode.Normal);
+				Mode mode = parameters.GetParameter(context, context.CurrentModule, "mode", Mode.Anti);
 				IModeHandler modeHandler;
 				switch (mode) {
 					case Mode.Normal:
 						modeHandler = new NormalMode();
 						break;
-					case Mode.JIT:
+                    case Mode.Anti:
+                        modeHandler = new AntiMode();
+                        break;
+                    case Mode.JIT:
 						modeHandler = new JITMode();
 						break;
 					default:
@@ -105,6 +108,7 @@ namespace Confuser.Protections {
 
 		enum Mode {
 			Normal,
+            Anti,
 			JIT
 		}
 	}

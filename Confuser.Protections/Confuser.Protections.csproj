@@ -57,6 +57,7 @@
     <Compile Include="AntiTamper\JITBody.cs" />
     <Compile Include="AntiTamper\JITMode.cs" />
     <Compile Include="AntiTamper\NormalDeriver.cs" />
+    <Compile Include="AntiTamper\AntiMode.cs" />
     <Compile Include="AntiTamper\NormalMode.cs" />
     <Compile Include="Compress\Compressor.cs" />
     <Compile Include="Compress\CompressorContext.cs" />
@@ -116,6 +117,28 @@
     <Compile Include="Resources\NormalMode.cs" />
     <Compile Include="Resources\REContext.cs" />
     <Compile Include="Resources\ResourceProtection.cs" />
+    <Compile Include="TypeScrambler\AnalyzePhase.cs" />
+    <Compile Include="TypeScrambler\ScramblePhase.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Analyzers\ContextAnalyzer.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Analyzers\ContextAnalyzerFactory.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Analyzers\MemberRefAnalyzer.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Analyzers\MethodDefAnalyzer.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Analyzers\MethodSpecAnalyzer.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Analyzers\TypeRefAnalyzer.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Rewriter\EmbeddedCode\ObjectCreationFactory.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Rewriter\Instructions\InstructionRewriter.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Rewriter\Instructions\InstructionRewriterFactory.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Rewriter\Instructions\MemberRefInstructionRewriter.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Rewriter\Instructions\MethodDefInstructionRewriter.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Rewriter\Instructions\MethodSpecInstructionRewriter.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Rewriter\Instructions\TypeDefInstructionRewriter.cs" />
+    <Compile Include="TypeScrambler\Scrambler\Rewriter\Instructions\TypeRefInstructionRewriter.cs" />
+    <Compile Include="TypeScrambler\Scrambler\ScannedItem.cs" />
+    <Compile Include="TypeScrambler\Scrambler\ScannedMethod.cs" />
+    <Compile Include="TypeScrambler\Scrambler\ScannedType.cs" />
+    <Compile Include="TypeScrambler\Scrambler\TypeRewriter.cs" />
+    <Compile Include="TypeScrambler\TypeScrambleProtection.cs" />
+    <Compile Include="TypeScrambler\TypeService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\ConfuserEx.snk">
