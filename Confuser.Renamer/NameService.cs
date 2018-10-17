@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Confuser.Core;
@@ -58,6 +59,8 @@ namespace Confuser.Renamer {
 
 		public NameService(ConfuserContext context) {
 			this.context = context;
+			if (context.InputSymbolMap != null)
+				LoadInputSymbolMap(context.InputSymbolMap);
 			storage = new VTableStorage(context.Logger);
 			random = context.Registry.GetService<IRandomService>().GetRandomGenerator(NameProtection._FullId);
 			nameSeed = random.NextBytes(20);
@@ -69,6 +72,23 @@ namespace Confuser.Renamer {
 				new ResourceAnalyzer(),
 				new LdtokenEnumAnalyzer()
 			};
+		}
+
+		private void LoadInputSymbolMap(string inputSymbolMapPath)
+		{
+			var lineNum = 0;
+			foreach (var line in File.ReadLines(inputSymbolMapPath))
+			{
+				lineNum++;
+				if (string.IsNullOrWhiteSpace(line)) continue;
+				var fields = line.Split('\t');
+				if (fields.Length != 2)
+					throw new FileFormatException(string.Format("Cannot read input symbol map {0}:{1}", inputSymbolMapPath, lineNum));
+				var key = fields[0];
+				var value = fields[1];
+				nameMap2.Add(key, value);
+				nameMap1.Add(value, key);
+			}
 		}
 
 		public IList<IRenamer> Renamers { get; private set; }
@@ -227,7 +247,7 @@ namespace Confuser.Renamer {
 			byte[] hash = Utils.Xor(Utils.SHA1(Encoding.UTF8.GetBytes(name)), nameSeed);
 			for (int i = 0; i < 100; i++) {
 				newName = ObfuscateNameInternal(hash, mode);
-				if (!identifiers.Contains(MakeGenericName(newName, count)))
+				if (!identifiers.Contains(MakeGenericName(newName, count)) && !nameMap2.ContainsKey(newName))
 					break;
 				hash = Utils.SHA1(hash);
 			}

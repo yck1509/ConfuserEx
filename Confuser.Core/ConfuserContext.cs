@@ -75,6 +75,12 @@ namespace Confuser.Core {
 		public string OutputDirectory { get; internal set; }
 
 		/// <summary>
+		///     Gets the input symbol map (optional).
+		/// </summary>
+		/// <value>The input symbol map.</value>
+		public string InputSymbolMap { get; internal set; }
+
+		/// <summary>
 		///     Gets the packer.
 		/// </summary>
 		/// <value>The packer.</value>
