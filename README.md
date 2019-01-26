@@ -3,6 +3,10 @@ ConfuserEx
 ConfuserEx is a open-source protector for .NET applications.
 It is the successor of [Confuser](http://confuser.codeplex.com) project.
 
+NOTICE
+======
+This project is discontinued and unmaintained. Alternative forked projects can be found in [this issue](https://github.com/yck1509/ConfuserEx/issues/671).
+
 Features
 --------
 * Supports .NET Framework 2.0/3.0/3.5/4.0/4.5
