@@ -210,6 +210,7 @@ namespace Confuser.Renamer {
 
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, PropertyDef property) {
 			if (IsVisibleOutside(context, parameters, property.DeclaringType) &&
+			    property.IsPublic() &&
 			    IsVisibleOutside(context, parameters, property))
 				service.SetCanRename(property, false);
 
@@ -228,6 +229,7 @@ namespace Confuser.Renamer {
 
 		void Analyze(NameService service, ConfuserContext context, ProtectionParameters parameters, EventDef evt) {
 			if (IsVisibleOutside(context, parameters, evt.DeclaringType) &&
+			    evt.IsPublic() &&
 			    IsVisibleOutside(context, parameters, evt))
 				service.SetCanRename(evt, false);
 
