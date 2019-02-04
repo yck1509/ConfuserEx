@@ -269,14 +269,9 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="property">The property.</param>
 		/// <returns><c>true</c> if the specified property is public; otherwise, <c>false</c>.</returns>
-		public static bool IsPublic(this PropertyDef property) {
-			if (property.GetMethod != null && property.GetMethod.IsPublic)
-				return true;
-
-			if (property.SetMethod != null && property.SetMethod.IsPublic)
-				return true;
-
-			return property.OtherMethods.Any(method => method.IsPublic);
+		public static bool IsPublic (this PropertyDef property)
+		{
+			return property.AllMethods ().Any (method => method.IsPublic);
 		}
 
 		/// <summary>
@@ -284,14 +279,9 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="property">The property.</param>
 		/// <returns><c>true</c> if the specified property is static; otherwise, <c>false</c>.</returns>
-		public static bool IsStatic(this PropertyDef property) {
-			if (property.GetMethod != null && property.GetMethod.IsStatic)
-				return true;
-
-			if (property.SetMethod != null && property.SetMethod.IsStatic)
-				return true;
-
-			return property.OtherMethods.Any(method => method.IsStatic);
+		public static bool IsStatic (this PropertyDef property)
+		{
+			return property.AllMethods ().Any (method => method.IsStatic);
 		}
 
 		/// <summary>
@@ -299,17 +289,9 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="evt">The event.</param>
 		/// <returns><c>true</c> if the specified event is public; otherwise, <c>false</c>.</returns>
-		public static bool IsPublic(this EventDef evt) {
-			if (evt.AddMethod != null && evt.AddMethod.IsPublic)
-				return true;
-
-			if (evt.RemoveMethod != null && evt.RemoveMethod.IsPublic)
-				return true;
-
-			if (evt.InvokeMethod != null && evt.InvokeMethod.IsPublic)
-				return true;
-
-			return evt.OtherMethods.Any(method => method.IsPublic);
+		public static bool IsPublic (this EventDef evt)
+		{
+			return evt.AllMethods ().Any (method => method.IsPublic);
 		}
 
 		/// <summary>
@@ -317,17 +299,53 @@ namespace Confuser.Core {
 		/// </summary>
 		/// <param name="evt">The event.</param>
 		/// <returns><c>true</c> if the specified event is static; otherwise, <c>false</c>.</returns>
-		public static bool IsStatic(this EventDef evt) {
-			if (evt.AddMethod != null && evt.AddMethod.IsStatic)
-				return true;
+		public static bool IsStatic (this EventDef evt)
+		{
+			return evt.AllMethods ().Any (method => method.IsStatic);
+		}
 
-			if (evt.RemoveMethod != null && evt.RemoveMethod.IsStatic)
-				return true;
+		/// <summary>
+		///     Determines whether the specified method is an explictly implemented interface member.
+		/// </summary>
+		/// <param name="method">The method.</param>
+		/// <returns><c>true</c> if the specified method is an explictly implemented interface member; otherwise, <c>false</c>.</returns>
+		public static bool IsExplicitlyImplementedInterfaceMember (this MethodDef method)
+		{
+			return method.IsFinal && method.IsPrivate;
+		}
 
-			if (evt.InvokeMethod != null && evt.InvokeMethod.IsStatic)
-				return true;
+		/// <summary>
+		///     Determines whether the specified property is an explictly implemented interface member.
+		/// </summary>
+		/// <param name="property">The method.</param>
+		/// <returns><c>true</c> if the specified property is an explictly implemented interface member; otherwise, <c>false</c>.</returns>
+		public static bool IsExplicitlyImplementedInterfaceMember (this PropertyDef property)
+		{
+			return property.AllMethods ().Any (IsExplicitlyImplementedInterfaceMember);
+		}
 
-			return evt.OtherMethods.Any(method => method.IsStatic);
+		/// <summary>
+		///     Determines whether the specified event is an explictly implemented interface member.
+		/// </summary>
+		/// <param name="evt">The event.</param>
+		/// <returns><c>true</c> if the specified eve is an explictly implemented interface member; otherwise, <c>false</c>.</returns>
+		public static bool IsExplicitlyImplementedInterfaceMember (this EventDef evt)
+		{
+			return evt.AllMethods ().Any (IsExplicitlyImplementedInterfaceMember);
+		}
+
+		private static IEnumerable<MethodDef> AllMethods (this EventDef evt)
+		{
+			return new [] { evt.AddMethod, evt.RemoveMethod, evt.InvokeMethod }
+				.Concat (evt.OtherMethods)
+				.Where (m => m != null);
+		}
+
+		private static IEnumerable<MethodDef> AllMethods (this PropertyDef property)
+		{
+			return new [] { property.GetMethod, property.SetMethod }
+				.Concat (property.OtherMethods)
+				.Where (m => m != null);
 		}
 
 		/// <summary>
