@@ -86,6 +86,7 @@ namespace Confuser.Core {
 			bool ok = false;
 			try {
 				var asmResolver = new AssemblyResolver();
+				asmResolver.FindExactMatch = true;
 				asmResolver.EnableTypeDefCache = true;
 				asmResolver.DefaultModuleContext = new ModuleContext(asmResolver);
 				context.Resolver = asmResolver;
