@@ -413,8 +413,17 @@ namespace Confuser.Renamer.BAML {
 						value = strings[((TextWithIdRecord)txt).ValueId].Value;
 
 					string prefix;
-					TypeSig sig = ResolveType(value.Trim(), out prefix);
-					if (sig != null && context.Modules.Contains((ModuleDefMD)sig.ToBasicTypeDefOrRef().ResolveTypeDefThrow().Module)) {
+					
+					TypeSig sig = null;
+
+					//Prevent unhandled exception when BAML strings contain invalid TypeName chars
+					try
+					{
+						sig = ResolveType(value.Trim(), out prefix);
+					}
+					catch(TypeNameParserException) {}
+					
+				    if (sig != null && context.Modules.Contains((ModuleDefMD)sig.ToBasicTypeDefOrRef().ResolveTypeDefThrow().Module)) {
 						var reference = new BAMLConverterTypeReference(xmlnsCtx, sig, txt);
 						AddTypeSigReference(sig, reference);
 					}
