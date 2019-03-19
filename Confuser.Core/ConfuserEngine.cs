@@ -91,6 +91,10 @@ namespace Confuser.Core {
 				context.Resolver = asmResolver;
 				context.BaseDirectory = Path.Combine(Environment.CurrentDirectory, parameters.Project.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
 				context.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.OutputDirectory.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar);
+
+				if (!string.IsNullOrWhiteSpace(parameters.Project.InputSymbolMap))
+					context.InputSymbolMap = Path.Combine(parameters.Project.BaseDirectory, parameters.Project.InputSymbolMap);
+
 				foreach (string probePath in parameters.Project.ProbePaths)
 					asmResolver.PostSearchPaths.Insert(0, Path.Combine(context.BaseDirectory, probePath));
 

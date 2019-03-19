@@ -27,6 +27,11 @@ The seed of the random generator in protection process.
 Indicates whether the debug symbols (*.pdb) are generated.
 Currently unused.
 
+`inputSymbolMap`
+Path to symbols map relative to `baseDir`.
+It if is set, rename protection will respect name mappings specified there and only generate additional ones as needed. Does not make sense for non-reversible rename modes.
+Symbol map file can be taken from previous obfuscation or created manually. Every non-empty line must contain exactly one tab character that separates two values: the first is obfuscated name and the second is original one. No duplications in either original or obfuscated names are allowed.
+
 **Elements:**
 
 `rule`:  

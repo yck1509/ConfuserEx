@@ -450,6 +450,12 @@ namespace Confuser.Core.Project {
 		public string BaseDirectory { get; set; }
 
 		/// <summary>
+		///     Gets or sets the input symbol map file.
+		/// </summary>
+		/// <value>The file with input symbol map.</value>
+		public string InputSymbolMap { get; set; }
+
+		/// <summary>
 		///     Gets a list of protection rules that applies globally.
 		/// </summary>
 		/// <value>A list of protection rules.</value>
@@ -556,6 +562,11 @@ namespace Confuser.Core.Project {
 			else
 				Seed = null;
 
+			if (docElem.Attributes["inputSymbolMap"] != null)
+				InputSymbolMap = docElem.Attributes["inputSymbolMap"].Value.NullIfEmpty();
+			else
+				InputSymbolMap = null;
+
 			if (docElem.Attributes["debug"] != null)
 				Debug = bool.Parse(docElem.Attributes["debug"].Value);
 			else
@@ -597,6 +608,7 @@ namespace Confuser.Core.Project {
 		public ConfuserProject Clone() {
 			var ret = new ConfuserProject();
 			ret.Seed = Seed;
+			ret.InputSymbolMap = InputSymbolMap;
 			ret.Debug = Debug;
 			ret.OutputDirectory = OutputDirectory;
 			ret.BaseDirectory = BaseDirectory;
