@@ -192,10 +192,10 @@ namespace Confuser.Renamer {
 					return Utils.EncodeString(hash, asciiCharset);
 				case RenameMode.Decodable:
 					IncrementNameId();
-					return "_" + Utils.EncodeString(hash, alphaNumCharset);
+					return Utils.EncodeString(hash, alphaNumCharset);
 				case RenameMode.Sequential:
 					IncrementNameId();
-					return "_" + Utils.EncodeString(nameId, alphaNumCharset);
+					return Utils.EncodeString(nameId, alphaNumCharset);
 				default:
 
 					throw new NotSupportedException("Rename mode '" + mode + "' is not supported.");
