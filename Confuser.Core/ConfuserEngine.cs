@@ -381,6 +381,11 @@ namespace Confuser.Core {
 			else {
 				output = context.CurrentModule.Name;
 			}
+		    var belongsToSubFolder = context.Annotations.Get<string>(context.CurrentModule, Marker.SubDirKey);
+            if(!String.IsNullOrWhiteSpace(belongsToSubFolder))
+			{
+			    output = Path.Combine(Path.GetDirectoryName(output), belongsToSubFolder, Path.GetFileName(output));
+			}
 			context.OutputPaths[context.CurrentModuleIndex] = output;
 		}
 

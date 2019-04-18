@@ -40,6 +40,11 @@ namespace Confuser.Core.Project {
 		/// <value>The password of the strong name private key, or null if not necessary.</value>
 		public string SNKeyPassword { get; set; }
 
+        /// <summary>
+        /// Gets or sets the subfolder into which the resulting obfuscated file should be placed.
+        /// </summary>
+        public string BelongsToSubFolder { get; set; }
+
 		/// <summary>
 		///     Gets a list of protection rules applies to the module.
 		/// </summary>
@@ -102,6 +107,11 @@ namespace Confuser.Core.Project {
 				snKeyPassAttr.Value = SNKeyPassword;
 				elem.Attributes.Append(snKeyPassAttr);
 			}
+			if (BelongsToSubFolder != null) {
+				XmlAttribute toSubFolderAttr = xmlDoc.CreateAttribute("belongsToSubFolder");
+				toSubFolderAttr.Value = BelongsToSubFolder;
+				elem.Attributes.Append(toSubFolderAttr);
+			}
 
 
 			foreach (Rule i in Rules)
@@ -131,6 +141,11 @@ namespace Confuser.Core.Project {
 				SNKeyPassword = elem.Attributes["snKeyPass"].Value.NullIfEmpty();
 			else
 				SNKeyPassword = null;
+
+			if (elem.Attributes["belongsToSubFolder"] != null)
+				BelongsToSubFolder = elem.Attributes["belongsToSubFolder"].Value.NullIfEmpty();
+			else
+				BelongsToSubFolder = null;
 
 			Rules.Clear();
 			foreach (XmlElement i in elem.ChildNodes.OfType<XmlElement>()) {
