@@ -19,9 +19,6 @@
     <!-- Project URL provides a link for the gallery -->
     <projectUrl>https://github.com/yck1509/ConfuserEx</projectUrl>
 
-    <!-- License information is displayed on the gallery -->
-    <license type="expression">MIT</license>
-
     <!-- 
             If true, this value prompts the user to accept the license when
             installing the package. 
