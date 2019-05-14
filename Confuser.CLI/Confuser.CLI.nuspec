@@ -5,7 +5,7 @@
     <id>Confuser.CLI</id>
 
     <!-- The package version number that is used when resolving dependencies -->
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <!-- Authors contain text that appears directly on the gallery -->
     <authors>yck1509</authors>
